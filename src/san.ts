@@ -1,52 +1,46 @@
-import { FILE_NAMES, RANK_NAMES, isDrop, Move, CastlingSide } from './types';
-import { charToRole, defined, roleToChar, parseSquare, makeSquare, squareFile, squareRank, opposite } from './util';
+import { isDrop, Move, PocketRole, PROMOTABLE_ROLES } from './types';
+import { defined, roleToChar, parseSquare, makeSquare, opposite } from './util';
 import { SquareSet } from './squareSet';
-import { Position } from './chess';
-import { attacks, kingAttacks, queenAttacks, rookAttacks, bishopAttacks, knightAttacks } from './attacks';
+import { Position } from './shogi';
+import { attacks, kingAttacks, rookAttacks, bishopAttacks, silverAttacks, knightAttacks, goldAttacks, horseAttacks, dragonAttacks } from './attacks';
+import { shogiCoord, lishogiCharToRole, shogiCoordToChessCord, parseChessSquare } from './compat';
 
 function makeSanWithoutSuffix(pos: Position, move: Move): string {
   let san = '';
   if (isDrop(move)) {
-    if (move.role !== 'pawn') san = roleToChar(move.role).toUpperCase();
-    san += '@' + makeSquare(move.to);
+      san = roleToChar(move.role).toUpperCase() + '*' + shogiCoordToChessCord(makeSquare(move.to));
   } else {
     const role = pos.board.getRole(move.from);
     if (!role) return '--';
-    if (role === 'king' && (pos.board[pos.turn].has(move.to) || Math.abs(move.to - move.from) === 2)) {
-      san = move.to > move.from ? 'O-O' : 'O-O-O';
-    } else {
-      const capture = pos.board.occupied.has(move.to) || (role === 'pawn' && squareFile(move.from) !== squareFile(move.to));
-      if (role !== 'pawn') {
-        san = roleToChar(role).toUpperCase();
+	const capture = pos.board.occupied.has(move.to);
+	san = roleToChar(role).toUpperCase();
 
-        // Disambiguation
-        let others;
-        if (role === 'king') others = kingAttacks(move.to).intersect(pos.board.king);
-        else if (role === 'queen') others = queenAttacks(move.to, pos.board.occupied).intersect(pos.board.queen);
-        else if (role === 'rook') others = rookAttacks(move.to, pos.board.occupied).intersect(pos.board.rook);
-        else if (role === 'bishop') others = bishopAttacks(move.to, pos.board.occupied).intersect(pos.board.bishop);
-        else others = knightAttacks(move.to).intersect(pos.board.knight);
-        others = others.intersect(pos.board[pos.turn]).without(move.from);
-        if (others.nonEmpty()) {
-          const ctx = pos.ctx();
-          for (const from of others) {
-            if (!pos.dests(from, ctx).has(move.to)) others = others.without(from);
-          }
-          if (others.nonEmpty()) {
-            let row = false;
-            let column = others.intersects(SquareSet.fromRank(squareRank(move.from)));
-            if (others.intersects(SquareSet.fromFile(squareFile(move.from)))) row = true;
-            else column = true;
-            if (column) san += FILE_NAMES[squareFile(move.from)];
-            if (row) san += RANK_NAMES[squareRank(move.from)];
-          }
-        }
-      } else if (capture) san = FILE_NAMES[squareFile(move.from)];
+    if (role !== 'pawn' && role !== 'lance') {
+		
+		// Disambiguation
+		let others;
+		if (role === 'king') others = kingAttacks(move.to).intersect(pos.board.king);
+		else if (role === 'rook') others = rookAttacks(move.to, pos.board.occupied).intersect(pos.board.rook);
+		else if (role === 'bishop') others = bishopAttacks(move.to, pos.board.occupied).intersect(pos.board.bishop);
+		else if (role === 'gold') others = goldAttacks(pos.turn, move.to).intersect(pos.board.gold);
+		else if (role === 'silver') others = silverAttacks(pos.turn, move.to).intersect(pos.board.silver);
+		else if (role === 'knight') others = knightAttacks(pos.turn, move.to).intersect(pos.board.knight);
+		else if (role === 'tokin') others = goldAttacks(pos.turn, move.to).intersect(pos.board.tokin);
+		else if (role === 'promoted_lance') others = goldAttacks(pos.turn, move.to).intersect(pos.board.promoted_lance);
+		else if (role === 'promoted_knight') others = goldAttacks(pos.turn, move.to).intersect(pos.board.promoted_knight);
+		else if (role === 'promoted_silver') others = goldAttacks(pos.turn, move.to).intersect(pos.board.promoted_silver);
+		else if (role === 'horse') others = horseAttacks(move.to, pos.board.occupied).intersect(pos.board.horse);
+		else others = dragonAttacks(move.to, pos.board.occupied).intersect(pos.board.dragon);
 
-      if (capture) san += 'x';
-      san += makeSquare(move.to);
-      if (move.promotion) san += '=' + roleToChar(move.promotion).toUpperCase();
+		others = others.intersect(pos.board[pos.turn]).without(move.from);
+		if (others.nonEmpty()) {
+			san += shogiCoordToChessCord(makeSquare(move.from));
+		}
     }
+    if (capture) san += 'x';
+	san += shogiCoordToChessCord(makeSquare(move.to));
+	if (move.promotion) san += '+';
+	else if (SquareSet.promotionZone(pos.turn).has(move.to)) san += "=";
   }
   return san;
 }
@@ -54,8 +48,6 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
 export function makeSanAndPlay(pos: Position, move: Move): string {
   const san = makeSanWithoutSuffix(pos, move);
   pos.play(move);
-  if (pos.outcome()?.winner) return san + '#';
-  if (pos.isCheck()) return san + '+';
   return san;
 }
 
@@ -64,14 +56,12 @@ export function makeSanVariation(pos: Position, variation: Move[]): string {
   const line = [];
   for (let i = 0; i < variation.length; i++) {
     if (i !== 0) line.push(' ');
-    if (pos.turn === 'white') line.push(pos.fullmoves, '. ');
-    else if (i === 0) line.push(pos.fullmoves, '... ');
+    line.push(pos.fullmoves, '. ');
     const san = makeSanWithoutSuffix(pos, variation[i]);
     pos.play(variation[i]);
     line.push(san);
     if (san === '--') return line.join('');
-    if (i === variation.length - 1 && pos.outcome()?.winner) line.push('#');
-    else if (pos.isCheck()) line.push('+');
+    if (i === variation.length - 1 && pos.outcome()?.winner) line.push('投了');
   }
   return line.join('');
 }
@@ -83,45 +73,33 @@ export function makeSan(pos: Position, move: Move): string {
 export function parseSan(pos: Position, san: string): Move | undefined {
   const ctx = pos.ctx();
 
-  // Castling
-  let castlingSide: CastlingSide | undefined;
-  if (san === 'O-O' || san === 'O-O+' || san === 'O-O#') castlingSide = 'h';
-  else if (san === 'O-O-O' || san === 'O-O-O+' || san === 'O-O-O#') castlingSide = 'a';
-  if (castlingSide) {
-    const rook = pos.castles.rook[pos.turn][castlingSide];
-    if (!defined(ctx.king) || !defined(rook) || !pos.dests(ctx.king, ctx).has(rook)) return;
-    return {
-      from: ctx.king,
-      to: rook,
-    };
-  }
-
   // Normal move
-  const match = san.match(/^([NBRQK])?([a-h])?([1-8])?[\-x]?([a-h][1-8])(?:=?([nbrqkNBRQK]))?[\+#]?$/);
+  const match = san.match(/^([PLNSGKBRTUMAHD])([a-i][1-9])?[x]?([a-i][1-9])[\+\=]?$/);
   if (!match) {
     // Drop
-    const match = san.match(/^([pnbrqkPNBRQK])?@([a-h][1-8])[\+#]?$/);
+    const match = san.match(/^([PLNSGBRplsgbr])\*([a-i][1-9])$/);
     if (!match) return;
     const move = {
-      role: charToRole(match[1]) || 'pawn',
+      role: lishogiCharToRole(match[1]) as PocketRole,
       to: parseSquare(match[2])!,
     };
     return pos.isLegal(move, ctx) ? move : undefined;
   }
-  const role = charToRole(match[1]) || 'pawn';
-  const to = parseSquare(match[4])!;
+  const role = lishogiCharToRole(match[1])!;
+  const to = parseSquare(match[3])!;
 
-  const promotion = charToRole(match[5]);
-  if (!!promotion !== (role === 'pawn' && SquareSet.backranks().has(to))) return;
-  if (promotion === 'king' && pos.rules !== 'antichess') return;
+  const promotionStr = match[4];
+  let promotion = !!promotionStr;
+  if (promotion && promotionStr === '+' && (!((PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)) || !SquareSet.promotionZone(pos.turn).has(to))) return; // can't promote
+  else if((!promotion || promotionStr === '=') &&
+	  (((role === 'pawn' || role === 'lance') && SquareSet.backrank(pos.turn).has(to)) ||
+	  (role === 'knight' && SquareSet.backrank2(pos.turn).has(to))))
+	  promotion = true; // force promotion
 
+  const fromStr = match[2];
   let candidates = pos.board.pieces(pos.turn, role);
-  if (match[2]) candidates = candidates.intersect(SquareSet.fromFile(match[2].charCodeAt(0) - 'a'.charCodeAt(0)));
-  if (match[3]) candidates = candidates.intersect(SquareSet.fromRank(match[3].charCodeAt(0) - '1'.charCodeAt(0)));
-
-  // Optimization: Reduce set of candidates
-  const pawnAdvance = role === 'pawn' ? SquareSet.fromFile(squareFile(to)) : SquareSet.empty();
-  candidates = candidates.intersect(pawnAdvance.union(attacks({color: opposite(pos.turn), role}, to, pos.board.occupied)));
+  if (fromStr) candidates = candidates.intersect(SquareSet.fromSquare(parseChessSquare(fromStr)!));
+  else candidates = candidates.intersect(attacks({color: opposite(pos.turn), role}, to, pos.board.occupied));
 
   // Check uniqueness and legality
   let from;

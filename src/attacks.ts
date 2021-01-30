@@ -6,7 +6,7 @@ function computeRange(square: Square, deltas: number[]): SquareSet {
   let range = SquareSet.empty();
   for (const delta of deltas) {
     const sq = square + delta;
-    if (0 <= sq && sq < 64 && Math.abs(squareFile(square) - squareFile(sq)) <= 2) {
+    if (0 <= sq && sq < 81 && Math.abs(squareFile(square) - squareFile(sq)) <= 2) {
       range = range.with(sq);
     }
   }
@@ -15,23 +15,42 @@ function computeRange(square: Square, deltas: number[]): SquareSet {
 
 function tabulate<T>(f: (square: Square) => T): BySquare<T> {
   const table = [];
-  for (let square = 0; square < 64; square++) table[square] = f(square);
+  for (let square = 0; square < 81; square++) table[square] = f(square);
   return table;
 }
 
-const KING_ATTACKS = tabulate(sq => computeRange(sq, [-9, -8, -7, -1, 1, 7, 8, 9]));
-const KNIGHT_ATTACKS = tabulate(sq => computeRange(sq, [-17, -15, -10, -6, 6, 10, 15, 17]));
+const KING_ATTACKS = tabulate(sq => computeRange(sq, [-10, -9, -8, -1, 1, 8, 9, 10]));
+const KNIGHT_ATTACKS = {
+	black: tabulate(sq => computeRange(sq, [17, 19])),
+	white: tabulate(sq => computeRange(sq, [-17, -19])),
+}
 const PAWN_ATTACKS = {
-  white: tabulate(sq => computeRange(sq, [7, 9])),
-  black: tabulate(sq => computeRange(sq, [-7, -9])),
+  black: tabulate(sq => computeRange(sq, [9])),
+  white: tabulate(sq => computeRange(sq, [-9])),
+};
+const SILVER_ATTACKS = {
+  black: tabulate(sq => computeRange(sq, [-10, -8, 8, 9, 10])),
+  white: tabulate(sq => computeRange(sq, [-10, -9, -8, 8, 10])),
+};
+const GOLD_ATTACKS = {
+  black: tabulate(sq => computeRange(sq, [-9, -1, 1, 8, 9, 10])),
+  white: tabulate(sq => computeRange(sq, [-10, -9, -8, -1, 1, 9])),
 };
 
 export function kingAttacks(square: Square): SquareSet {
   return KING_ATTACKS[square];
 }
 
-export function knightAttacks(square: Square): SquareSet {
-  return KNIGHT_ATTACKS[square];
+export function knightAttacks(color: Color, square: Square): SquareSet {
+  return KNIGHT_ATTACKS[color][square];
+}
+
+export function silverAttacks(color: Color, square: Square): SquareSet {
+  return SILVER_ATTACKS[color][square];
+}
+
+export function goldAttacks(color: Color, square: Square): SquareSet {
+  return GOLD_ATTACKS[color][square];
 }
 
 export function pawnAttacks(color: Color, square: Square): SquareSet {
@@ -41,24 +60,27 @@ export function pawnAttacks(color: Color, square: Square): SquareSet {
 const FILE_RANGE = tabulate(sq => SquareSet.fromFile(squareFile(sq)).without(sq));
 const RANK_RANGE = tabulate(sq => SquareSet.fromRank(squareRank(sq)).without(sq));
 
+const FORW_RANGE = tabulate(sq => SquareSet.forwardRanks(squareRank(sq)).without(sq));
+const BACK_RANGE = tabulate(sq => SquareSet.backwardRanks(squareRank(sq)).without(sq));
+
 const DIAG_RANGE = tabulate(sq => {
-  const diag = new SquareSet(0x0804_0201, 0x8040_2010);
-  const shift = 8 * (squareRank(sq) - squareFile(sq));
-  return (shift >= 0 ? diag.shl64(shift) : diag.shr64(-shift)).without(sq);
+  const diag = new SquareSet(0x100401, 0x802008, 0x4010040);
+  const shift = 9 * (squareRank(sq) - squareFile(sq));
+  return (shift >= 0 ? diag.shl81(shift) : diag.shr81(-shift)).without(sq);
 });
 
 const ANTI_DIAG_RANGE = tabulate(sq => {
-  const diag = new SquareSet(0x1020_4080, 0x0102_0408);
-  const shift = 8 * (squareRank(sq) + squareFile(sq) - 7);
-  return (shift >= 0 ? diag.shl64(shift) : diag.shr64(-shift)).without(sq);
+  const diag = new SquareSet(0x1010100, 0x202020, 0x40404);
+  const shift = 9 * (squareRank(sq) + squareFile(sq) - 8);
+  return (shift >= 0 ? diag.shl81(shift) : diag.shr81(-shift)).without(sq);
 });
 
 function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
   let forward = occupied.intersect(range);
-  let reverse = forward.bswap64(); // Assumes no more than 1 bit per rank
-  forward = forward.minus64(bit);
-  reverse = reverse.minus64(bit.bswap64());
-  return forward.xor(reverse.bswap64()).intersect(range);
+  let reverse = forward.bswap81(); // Assumes no more than 1 bit per rank
+  forward = forward.minus81(bit);
+  reverse = reverse.minus81(bit.bswap81());
+  return forward.xor(reverse.bswap81()).intersect(range);
 }
 
 function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -68,10 +90,10 @@ function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
 function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
   const range = RANK_RANGE[square];
   let forward = occupied.intersect(range);
-  let reverse = forward.rbit64();
-  forward = forward.minus64(SquareSet.fromSquare(square));
-  reverse = reverse.minus64(SquareSet.fromSquare(63 - square));
-  return forward.xor(reverse.rbit64()).intersect(range);
+  let reverse = forward.rbit81();
+  forward = forward.minus81(SquareSet.fromSquare(square));
+  reverse = reverse.minus81(SquareSet.fromSquare(80 - square));
+  return forward.xor(reverse.rbit81()).intersect(range);
 }
 
 export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -83,17 +105,35 @@ export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
   return fileAttacks(square, occupied).xor(rankAttacks(square, occupied));
 }
 
-export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
-  return bishopAttacks(square, occupied).xor(rookAttacks(square, occupied));
+export function lanceAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+	return color === "black" ?
+		fileAttacks(square, occupied).intersect(FORW_RANGE[square]):
+		fileAttacks(square, occupied).intersect(BACK_RANGE[square]) ;
+}
+
+export function horseAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return bishopAttacks(square, occupied).union(kingAttacks(square));
+}
+
+export function dragonAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return rookAttacks(square, occupied).union(kingAttacks(square));
 }
 
 export function attacks(piece: Piece, square: Square, occupied: SquareSet): SquareSet {
   switch (piece.role) {
   case 'pawn': return pawnAttacks(piece.color, square);
-  case 'knight': return knightAttacks(square);
+  case 'lance': return lanceAttacks(piece.color, square, occupied);
+  case 'knight': return knightAttacks(piece.color, square);
+  case 'silver': return silverAttacks(piece.color, square);
+  case 'promoted_knight':
+  case 'promoted_lance':
+  case 'promoted_silver':
+  case 'tokin':
+  case 'gold': return goldAttacks(piece.color, square);
   case 'bishop': return bishopAttacks(square, occupied);
   case 'rook': return rookAttacks(square, occupied);
-  case 'queen': return queenAttacks(square, occupied);
+  case 'horse': return horseAttacks(square, occupied);
+  case 'dragon': return dragonAttacks(square, occupied);
   case 'king': return kingAttacks(square);
   }
 }
@@ -108,5 +148,5 @@ export function ray(a: Square, b: Square): SquareSet {
 }
 
 export function between(a: Square, b: Square): SquareSet {
-  return ray(a, b).intersect(SquareSet.full().shl64(a).xor(SquareSet.full().shl64(b))).withoutFirst();
+  return ray(a, b).intersect(SquareSet.full().shl81(a).xor(SquareSet.full().shl81(b))).withoutFirst();
 }

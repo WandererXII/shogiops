@@ -1,63 +1,56 @@
-import { Color, ROLES, Square } from './types';
+import { Color, POCKET_ROLES, Square } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 
 export class MaterialSide {
   pawn: number;
+  lance: number;
   knight: number;
+  silver: number;
+  gold: number;
   bishop: number;
   rook: number;
-  queen: number;
-  king: number;
 
   private constructor() { }
 
   static empty(): MaterialSide {
     const m = new MaterialSide();
-    for (const role of ROLES) m[role] = 0;
+    for (const role of POCKET_ROLES) m[role] = 0;
     return m;
   }
 
   static fromBoard(board: Board, color: Color): MaterialSide {
     const m = new MaterialSide();
-    for (const role of ROLES) m[role] = board.pieces(color, role).size();
+    for (const role of POCKET_ROLES) m[role] = board.pieces(color, role).size();
     return m;
   }
 
   clone(): MaterialSide {
     const m = new MaterialSide();
-    for (const role of ROLES) m[role] = this[role];
+    for (const role of POCKET_ROLES) m[role] = this[role];
     return m;
   }
 
   equals(other: MaterialSide): boolean {
-    return ROLES.every(role => this[role] === other[role]);
+    return POCKET_ROLES.every(role => this[role] === other[role]);
   }
 
   add(other: MaterialSide): MaterialSide {
     const m = new MaterialSide();
-    for (const role of ROLES) m[role] = this[role] + other[role];
+    for (const role of POCKET_ROLES) m[role] = this[role] + other[role];
     return m;
   }
 
   nonEmpty(): boolean {
-    return ROLES.some(role => this[role] > 0);
+    return POCKET_ROLES.some(role => this[role] > 0);
   }
 
   isEmpty(): boolean {
     return !this.nonEmpty();
   }
 
-  hasPawns(): boolean {
-    return this.pawn > 0;
-  }
-
-  hasNonPawns(): boolean {
-    return this.knight > 0 || this.bishop > 0 || this.rook > 0 || this.queen > 0 || this.king > 0;
-  }
-
   count(): number {
-    return this.pawn + this.knight + this.bishop + this.rook + this.queen + this.king;
+    return this.pawn + this.lance + this.knight + this.silver + this.gold + this.bishop + this.rook;
   }
 }
 
@@ -95,52 +88,20 @@ export class Material {
   nonEmpty(): boolean {
     return !this.isEmpty();
   }
-
-  hasPawns(): boolean {
-    return this.white.hasPawns() || this.black.hasPawns();
-  }
-
-  hasNonPawns(): boolean {
-    return this.white.hasNonPawns() || this.black.hasNonPawns();
-  }
-}
-
-export class RemainingChecks {
-  constructor(public white: number, public black: number) { }
-
-  static default(): RemainingChecks {
-    return new RemainingChecks(3, 3);
-  }
-
-  clone(): RemainingChecks {
-    return new RemainingChecks(this.white, this.black);
-  }
-
-  equals(other: RemainingChecks): boolean {
-    return this.white === other.white && this.black === other.black;
-  }
 }
 
 export interface Setup {
   board: Board;
-  pockets: Material | undefined;
+  pockets: Material;
   turn: Color;
-  unmovedRooks: SquareSet;
-  epSquare: Square | undefined;
-  remainingChecks: RemainingChecks | undefined;
-  halfmoves: number;
   fullmoves: number;
 }
 
 export function defaultSetup(): Setup {
   return {
     board: Board.default(),
-    pockets: undefined,
-    turn: 'white',
-    unmovedRooks: SquareSet.corners(),
-    epSquare: undefined,
-    remainingChecks: undefined,
-    halfmoves: 0,
-    fullmoves: 1,
+    pockets: Material.empty(),
+    turn: 'black',
+	fullmoves: 1,
   };
 }

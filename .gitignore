@@ -3,10 +3,11 @@ docs/
 coverage/
 package-lock.json
 yarn.lock
+.vscode/
 
 /attacks.js
 /board.js
-/chess.js
+/shogi.js
 /compat.js
 /variant.js
 /transform.js
@@ -22,7 +23,7 @@ yarn.lock
 
 /attacks.d.ts
 /board.d.ts
-/chess.d.ts
+/shogi.d.ts
 /compat.d.ts
 /variant.d.ts
 /transform.d.ts
@@ -38,7 +39,7 @@ yarn.lock
 
 /attacks.js.map
 /board.js.map
-/chess.js.map
+/shogi.js.map
 /compat.js.map
 /variant.js.map
 /transform.js.map

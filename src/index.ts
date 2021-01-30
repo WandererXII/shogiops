@@ -11,10 +11,9 @@ export {
   ByColor,
   Role,
   ROLES,
+  POCKET_ROLES,
+  PROMOTABLE_ROLES,
   ByRole,
-  CastlingSide,
-  CASTLING_SIDES,
-  ByCastlingSide,
   Piece,
   NormalMove,
   DropMove,
@@ -30,10 +29,10 @@ export {
   charToRole,
   defined,
   makeSquare,
-  makeUci,
+  makeUsi,
   opposite,
   parseSquare,
-  parseUci,
+  parseUsi,
   roleToChar,
   squareFile,
   squareRank,
@@ -48,7 +47,11 @@ export {
   kingAttacks,
   knightAttacks,
   pawnAttacks,
-  queenAttacks,
+  lanceAttacks,
+  silverAttacks,
+  goldAttacks,
+  horseAttacks,
+  dragonAttacks,
   ray,
   rookAttacks,
 } from './attacks';
@@ -58,19 +61,17 @@ export { Board } from './board';
 export {
   Material,
   MaterialSide,
-  RemainingChecks,
   Setup,
   defaultSetup,
 } from './setup';
 
 export {
   IllegalSetup,
-  Castles,
-  Chess,
+  Shogi,
   Position,
   PositionError,
   Context
-} from './chess';
+} from './shogi';
 
 export * as compat from './compat';
 

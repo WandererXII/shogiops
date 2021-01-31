@@ -11,7 +11,7 @@ export class MaterialSide {
   bishop: number;
   rook: number;
 
-  private constructor() { }
+  private constructor() {}
 
   static empty(): MaterialSide {
     const m = new MaterialSide();
@@ -55,7 +55,7 @@ export class MaterialSide {
 }
 
 export class Material {
-  constructor(public white: MaterialSide, public black: MaterialSide) { }
+  constructor(public white: MaterialSide, public black: MaterialSide) {}
 
   static empty(): Material {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
@@ -102,6 +102,6 @@ export function defaultSetup(): Setup {
     board: Board.default(),
     pockets: Material.empty(),
     turn: 'black',
-	fullmoves: 1,
+    fullmoves: 1,
   };
 }

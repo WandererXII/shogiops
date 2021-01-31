@@ -19,8 +19,7 @@ export enum InvalidFen {
   Fullmoves = 'ERR_FULLMOVES',
 }
 
-export class FenError extends Error { }
-
+export class FenError extends Error {}
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
@@ -41,12 +40,11 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
       file = 0;
       rank--;
     } else {
-	  const step = parseInt(c, 10);
-	  if (step > 0) file += step;
+      const step = parseInt(c, 10);
+      if (step > 0) file += step;
       else {
-		if (file >= 9 || rank < 0) return Result.err(new FenError(InvalidFen.Board));
-		if (c === '+' && (i+1) < boardPart.length)
-			c += boardPart[++i];
+        if (file >= 9 || rank < 0) return Result.err(new FenError(InvalidFen.Board));
+        if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
         const square = file + rank * 9;
         const piece = charToPiece(c);
         if (!piece) return Result.err(new FenError(InvalidFen.Board));
@@ -60,15 +58,16 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
 }
 
 export function parsePockets(pocketPart: string): Result<Material, FenError> {
-  if (pocketPart.length > 81 || pocketPart.toLowerCase().includes('k')) return Result.err(new FenError(InvalidFen.Pockets));
+  if (pocketPart.length > 81 || pocketPart.toLowerCase().includes('k'))
+    return Result.err(new FenError(InvalidFen.Pockets));
   const pockets = Material.empty();
   for (let i = 0; i < pocketPart.length; i++) {
-	let c = pocketPart[i];
-	if (c === '-') break;
-	const num = parseInt(c, 10);
-	const count = (num > 0) ? num : 1;
-	const piece = (num > 0 && (i+1) < pocketPart.length) ? charToPiece(pocketPart[++i]) : charToPiece(c);
-	if (!piece) return Result.err(new FenError(InvalidFen.Pockets));
+    let c = pocketPart[i];
+    if (c === '-') break;
+    const num = parseInt(c, 10);
+    const count = num > 0 ? num : 1;
+    const piece = num > 0 && i + 1 < pocketPart.length ? charToPiece(pocketPart[++i]) : charToPiece(c);
+    if (!piece) return Result.err(new FenError(InvalidFen.Pockets));
     pockets[piece.color][piece.role as PocketRole] += count;
   }
   return Result.ok(pockets);
@@ -91,7 +90,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   // Pocket
   const pocketPart = parts.shift();
   let pockets: Result<Material, FenError>;
-  if(!defined(pocketPart)) pockets = Result.ok(Material.empty());
+  if (!defined(pocketPart)) pockets = Result.ok(Material.empty());
   else pockets = parsePockets(pocketPart);
 
   // Turn
@@ -101,14 +100,16 @@ export function parseFen(fen: string): Result<Setup, FenError> {
 
   if (parts.length > 0) return Result.err(new FenError(InvalidFen.Fen));
 
-    return board.chain(board => pockets.map(pockets => {
+  return board.chain(board =>
+    pockets.map(pockets => {
       return {
         board,
         pockets,
         turn,
-        fullmoves: Math.max(1, fullmoves)
+        fullmoves: Math.max(1, fullmoves),
       };
-  }));
+    })
+  );
 }
 
 interface FenOpts {
@@ -159,24 +160,22 @@ export function makeBoardFen(board: Board): string {
 
 export function makePocket(material: MaterialSide): string {
   return POCKET_ROLES.map(role => {
-	  const r = roleToChar(role);
-	  const n = material[role];
-	  return (n > 1) ? (n + r) : n === 1 ? r : ''; 
-	}).join('');
+    const r = roleToChar(role);
+    const n = material[role];
+    return n > 1 ? n + r : n === 1 ? r : '';
+  }).join('');
 }
 
 export function makePockets(pocket: Material): string {
-	const pockets = makePocket(pocket.black).toUpperCase() + makePocket(pocket.white)
-	return pockets === '' ? '-': pockets;
+  const pockets = makePocket(pocket.black).toUpperCase() + makePocket(pocket.white);
+  return pockets === '' ? '-' : pockets;
 }
 
 export function makeFen(setup: Setup, opts?: FenOpts): string {
   return [
     makeBoardFen(setup.board),
-	setup.turn[0],
-	makePockets(setup.pockets),
-    ...(opts?.epd ? [] : [
-      Math.max(1, Math.min(setup.fullmoves, 9999)),
-    ])
+    setup.turn[0],
+    makePockets(setup.pockets),
+    ...(opts?.epd ? [] : [Math.max(1, Math.min(setup.fullmoves, 9999))]),
   ].join(' ');
 }

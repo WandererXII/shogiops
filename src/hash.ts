@@ -13,7 +13,8 @@ export function fxhash32(word: number, state = 0): number {
 
 export function hashBoard(board: Board, state = 0): number {
   state = fxhash32(board.white.lo, fxhash32(board.white.mid, fxhash32(board.white.hi, state)));
-  for (const role of ROLES) state = fxhash32(board[role].lo, fxhash32(board[role].mid, fxhash32(board[role].hi, state)));
+  for (const role of ROLES)
+    state = fxhash32(board[role].lo, fxhash32(board[role].mid, fxhash32(board[role].hi, state)));
   return state;
 }
 

@@ -22,7 +22,7 @@ export class Board implements Iterable<[Square, Piece]> {
   dragon: SquareSet;
   king: SquareSet;
 
-  private constructor() { }
+  private constructor() {}
 
   static default(): Board {
     const board = new Board();
@@ -34,20 +34,20 @@ export class Board implements Iterable<[Square, Piece]> {
     this.occupied = new SquareSet(0x7fd05ff, 0x0, 0x7fd05ff);
     this.black = new SquareSet(0x7fd05ff, 0x0, 0x0);
     this.white = new SquareSet(0x0, 0x0, 0x7fd05ff);
-	this.pawn = new SquareSet(0x7fc0000, 0x0, 0x1ff);
-	this.lance = new SquareSet(0x101, 0x0, 0x4040000);
-	this.knight = new SquareSet(0x82, 0x0, 0x2080000);
-	this.silver = new SquareSet(0x44, 0x0, 0x1100000);
-	this.gold = new SquareSet(0x28, 0x0, 0xa00000);
+    this.pawn = new SquareSet(0x7fc0000, 0x0, 0x1ff);
+    this.lance = new SquareSet(0x101, 0x0, 0x4040000);
+    this.knight = new SquareSet(0x82, 0x0, 0x2080000);
+    this.silver = new SquareSet(0x44, 0x0, 0x1100000);
+    this.gold = new SquareSet(0x28, 0x0, 0xa00000);
     this.bishop = new SquareSet(0x400, 0x0, 0x10000);
     this.rook = new SquareSet(0x10000, 0x0, 0x400);
-	this.king = new SquareSet(0x10, 0x0, 0x400000);
-	this.tokin = SquareSet.empty();
-  	this.promoted_lance = SquareSet.empty();
-  	this.promoted_knight = SquareSet.empty();
-  	this.promoted_silver = SquareSet.empty();
-  	this.horse = SquareSet.empty();
-  	this.dragon = SquareSet.empty();
+    this.king = new SquareSet(0x10, 0x0, 0x400000);
+    this.tokin = SquareSet.empty();
+    this.promoted_lance = SquareSet.empty();
+    this.promoted_knight = SquareSet.empty();
+    this.promoted_silver = SquareSet.empty();
+    this.horse = SquareSet.empty();
+    this.dragon = SquareSet.empty();
   }
 
   static empty(): Board {

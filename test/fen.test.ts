@@ -34,7 +34,7 @@ test.each([
   '+lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5+R1/+L+N+SGKGSNL b - 1',
   '8l/1l+R2P3/p2pBG1pp/kps1p4/Nn1P2G2/P1P1P2PP/1PS6/1KSG3+r1/LN2+p3L w Sbgn3p 124',
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b - 10',
-])('parse and make fen', (fen) => {
+])('parse and make fen', fen => {
   const setup = parseFen(fen).unwrap();
   expect(makeFen(setup)).toEqual(fen);
 });

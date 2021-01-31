@@ -21,9 +21,9 @@ function tabulate<T>(f: (square: Square) => T): BySquare<T> {
 
 const KING_ATTACKS = tabulate(sq => computeRange(sq, [-10, -9, -8, -1, 1, 8, 9, 10]));
 const KNIGHT_ATTACKS = {
-	black: tabulate(sq => computeRange(sq, [17, 19])),
-	white: tabulate(sq => computeRange(sq, [-17, -19])),
-}
+  black: tabulate(sq => computeRange(sq, [17, 19])),
+  white: tabulate(sq => computeRange(sq, [-17, -19])),
+};
 const PAWN_ATTACKS = {
   black: tabulate(sq => computeRange(sq, [9])),
   white: tabulate(sq => computeRange(sq, [-9])),
@@ -106,9 +106,9 @@ export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
 }
 
 export function lanceAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
-	return color === "black" ?
-		fileAttacks(square, occupied).intersect(FORW_RANGE[square]):
-		fileAttacks(square, occupied).intersect(BACK_RANGE[square]) ;
+  return color === 'black'
+    ? fileAttacks(square, occupied).intersect(FORW_RANGE[square])
+    : fileAttacks(square, occupied).intersect(BACK_RANGE[square]);
 }
 
 export function horseAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -121,20 +121,30 @@ export function dragonAttacks(square: Square, occupied: SquareSet): SquareSet {
 
 export function attacks(piece: Piece, square: Square, occupied: SquareSet): SquareSet {
   switch (piece.role) {
-  case 'pawn': return pawnAttacks(piece.color, square);
-  case 'lance': return lanceAttacks(piece.color, square, occupied);
-  case 'knight': return knightAttacks(piece.color, square);
-  case 'silver': return silverAttacks(piece.color, square);
-  case 'promoted_knight':
-  case 'promoted_lance':
-  case 'promoted_silver':
-  case 'tokin':
-  case 'gold': return goldAttacks(piece.color, square);
-  case 'bishop': return bishopAttacks(square, occupied);
-  case 'rook': return rookAttacks(square, occupied);
-  case 'horse': return horseAttacks(square, occupied);
-  case 'dragon': return dragonAttacks(square, occupied);
-  case 'king': return kingAttacks(square);
+    case 'pawn':
+      return pawnAttacks(piece.color, square);
+    case 'lance':
+      return lanceAttacks(piece.color, square, occupied);
+    case 'knight':
+      return knightAttacks(piece.color, square);
+    case 'silver':
+      return silverAttacks(piece.color, square);
+    case 'promoted_knight':
+    case 'promoted_lance':
+    case 'promoted_silver':
+    case 'tokin':
+    case 'gold':
+      return goldAttacks(piece.color, square);
+    case 'bishop':
+      return bishopAttacks(square, occupied);
+    case 'rook':
+      return rookAttacks(square, occupied);
+    case 'horse':
+      return horseAttacks(square, occupied);
+    case 'dragon':
+      return dragonAttacks(square, occupied);
+    case 'king':
+      return kingAttacks(square);
   }
 }
 
@@ -148,5 +158,7 @@ export function ray(a: Square, b: Square): SquareSet {
 }
 
 export function between(a: Square, b: Square): SquareSet {
-  return ray(a, b).intersect(SquareSet.full().shl81(a).xor(SquareSet.full().shl81(b))).withoutFirst();
+  return ray(a, b)
+    .intersect(SquareSet.full().shl81(a).xor(SquareSet.full().shl81(b)))
+    .withoutFirst();
 }

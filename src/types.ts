@@ -18,7 +18,22 @@ export type ByColor<T> = {
   [color in Color]: T;
 };
 
-export const ROLES = ['pawn', 'lance', 'knight', 'silver', 'gold', 'bishop', 'rook', 'tokin', 'promoted_lance', 'promoted_knight', 'promoted_silver', 'horse', 'dragon', 'king'] as const;
+export const ROLES = [
+  'pawn',
+  'lance',
+  'knight',
+  'silver',
+  'gold',
+  'bishop',
+  'rook',
+  'tokin',
+  'promoted_lance',
+  'promoted_knight',
+  'promoted_silver',
+  'horse',
+  'dragon',
+  'king',
+] as const;
 export const POCKET_ROLES = ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'] as const;
 export const PROMOTABLE_ROLES = ['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'] as const;
 export type Role = typeof ROLES[number];

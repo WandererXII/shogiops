@@ -1,9 +1,36 @@
 import { Result } from '@badrap/result';
-import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, POCKET_ROLES, PROMOTABLE_ROLES, PromotableRole, PocketRole, DropMove } from './types';
+import {
+  Rules,
+  Color,
+  COLORS,
+  Square,
+  Move,
+  isDrop,
+  Piece,
+  Outcome,
+  POCKET_ROLES,
+  PROMOTABLE_ROLES,
+  PromotableRole,
+  PocketRole,
+  DropMove,
+} from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup, Material } from './setup';
-import { bishopAttacks, rookAttacks, knightAttacks, kingAttacks, pawnAttacks, between, ray, lanceAttacks, silverAttacks, goldAttacks, horseAttacks, dragonAttacks } from './attacks';
+import {
+  bishopAttacks,
+  rookAttacks,
+  knightAttacks,
+  kingAttacks,
+  pawnAttacks,
+  between,
+  ray,
+  lanceAttacks,
+  silverAttacks,
+  goldAttacks,
+  horseAttacks,
+  dragonAttacks,
+} from './attacks';
 import { opposite, defined, unpromote, promote } from './util';
 
 export enum IllegalSetup {
@@ -15,24 +42,26 @@ export enum IllegalSetup {
   Variant = 'ERR_VARIANT',
 }
 
-export class PositionError extends Error { }
+export class PositionError extends Error {}
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
   return board[attacker].intersect(
-    rookAttacks(square, occupied).intersect(board.rook)
-	  .union(bishopAttacks(square, occupied).intersect(board.bishop))
-	  .union(lanceAttacks(opposite(attacker), square, occupied).intersect(board.lance))
-	  .union(knightAttacks(opposite(attacker), square).intersect(board.knight))
-	  .union(silverAttacks(opposite(attacker), square).intersect(board.silver))
-	  .union(goldAttacks(opposite(attacker), square).intersect(board.gold))
-	  .union(goldAttacks(opposite(attacker), square).intersect(board.tokin))
-	  .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_lance))
-	  .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_knight))
-	  .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_silver))
-	  .union(horseAttacks(square, occupied).intersect(board.horse))
-	  .union(dragonAttacks(square, occupied).intersect(board.dragon))
+    rookAttacks(square, occupied)
+      .intersect(board.rook)
+      .union(bishopAttacks(square, occupied).intersect(board.bishop))
+      .union(lanceAttacks(opposite(attacker), square, occupied).intersect(board.lance))
+      .union(knightAttacks(opposite(attacker), square).intersect(board.knight))
+      .union(silverAttacks(opposite(attacker), square).intersect(board.silver))
+      .union(goldAttacks(opposite(attacker), square).intersect(board.gold))
+      .union(goldAttacks(opposite(attacker), square).intersect(board.tokin))
+      .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_lance))
+      .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_knight))
+      .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_silver))
+      .union(horseAttacks(square, occupied).intersect(board.horse))
+      .union(dragonAttacks(square, occupied).intersect(board.dragon))
       .union(kingAttacks(square).intersect(board.king))
-      .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn)));
+      .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn))
+  );
 }
 
 export interface Context {
@@ -50,7 +79,7 @@ export abstract class Position {
   fullmoves: number;
   lastMove: Move | undefined;
 
-  protected constructor(readonly rules: Rules) { }
+  protected constructor(readonly rules: Rules) {}
 
   // When subclassing:
   // - static default()
@@ -68,15 +97,23 @@ export abstract class Position {
   }
 
   protected playCaptureAt(square: Square, captured: Piece): void {
-	  const unpromotedRole = unpromote(captured.role);
+    const unpromotedRole = unpromote(captured.role);
     if (unpromotedRole) this.pockets[opposite(captured.color)][unpromotedRole]++;
   }
 
   ctx(): Context {
     const variantEnd = this.isVariantEnd();
     const king = this.board.kingOf(this.turn);
-    if (!defined(king)) return { king, blockers: SquareSet.empty(), checkers: SquareSet.empty(), variantEnd, mustCapture: false };
-    const snipers = rookAttacks(king, SquareSet.empty()).intersect(this.board.rook)
+    if (!defined(king))
+      return {
+        king,
+        blockers: SquareSet.empty(),
+        checkers: SquareSet.empty(),
+        variantEnd,
+        mustCapture: false,
+      };
+    const snipers = rookAttacks(king, SquareSet.empty())
+      .intersect(this.board.rook)
       .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishop))
       .union(lanceAttacks(opposite(this.turn), king, SquareSet.empty()).intersect(this.board.lance))
       .union(horseAttacks(king, SquareSet.empty()).intersect(this.board.horse))
@@ -104,16 +141,18 @@ export abstract class Position {
     pos.board = this.board.clone();
     pos.pockets = this.pockets?.clone();
     pos.turn = this.turn;
-	pos.fullmoves = this.fullmoves;
-	pos.lastMove = this.lastMove;
+    pos.fullmoves = this.fullmoves;
+    pos.lastMove = this.lastMove;
     return pos;
   }
 
   equalsIgnoreMoves(other: Position): boolean {
-    return this.rules === other.rules &&
-     this.board.equals(other.board) &&
+    return (
+      this.rules === other.rules &&
+      this.board.equals(other.board) &&
       ((other.pockets && this.pockets?.equals(other.pockets)) || (!this.pockets && !other.pockets)) &&
-      this.turn === other.turn;
+      this.turn === other.turn
+    );
   }
 
   toSetup(): Setup {
@@ -133,30 +172,38 @@ export abstract class Position {
     ctx = ctx || this.ctx();
     for (const square of this.board[this.turn]) {
       if (this.dests(square, ctx).nonEmpty()) return true;
-	}
-	for (const prole of POCKET_ROLES){
-		if (this.pockets[this.turn][prole] > 0 && this.dropDests(prole, ctx).nonEmpty()) return true;
-	}
+    }
+    for (const prole of POCKET_ROLES) {
+      if (this.pockets[this.turn][prole] > 0 && this.dropDests(prole, ctx).nonEmpty()) return true;
+    }
     return false;
   }
 
   isLegal(move: Move, ctx?: Context): boolean {
     if (isDrop(move)) {
-		const role = move.role as PocketRole;
-      	if (!role || this.pockets[this.turn][role] <= 0) return false;
-      	return this.dropDests(role, ctx).has(move.to);
+      const role = move.role as PocketRole;
+      if (!role || this.pockets[this.turn][role] <= 0) return false;
+      return this.dropDests(role, ctx).has(move.to);
     } else {
-	  const role = this.board.getRole(move.from)
-	  if(!role) return false;
+      const role = this.board.getRole(move.from);
+      if (!role) return false;
 
-	  // Checking whether this role can be promoted
-	  if (move.promotion && (!((PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)))) return false;
-	  // Checking whether piece is entering/leaving the promotion zone
-	  if (move.promotion && !(SquareSet.promotionZone(this.turn).has(move.to) || SquareSet.promotionZone(this.turn).has(move.from))) return false;
-	  // Checking whether the promotion must be forced
-	  if (!move.promotion && role &&
-		  (((role === 'pawn' || role === 'lance') && SquareSet.backrank(this.turn).has(move.to)) || 
-		  (role === 'knight' && SquareSet.backrank2(this.turn).has(move.to)))) return false;
+      // Checking whether this role can be promoted
+      if (move.promotion && !(PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)) return false;
+      // Checking whether piece is entering/leaving the promotion zone
+      if (
+        move.promotion &&
+        !(SquareSet.promotionZone(this.turn).has(move.to) || SquareSet.promotionZone(this.turn).has(move.from))
+      )
+        return false;
+      // Checking whether the promotion must be forced
+      if (
+        !move.promotion &&
+        role &&
+        (((role === 'pawn' || role === 'lance') && SquareSet.backrank(this.turn).has(move.to)) ||
+          (role === 'knight' && SquareSet.backrank2(this.turn).has(move.to)))
+      )
+        return false;
 
       const dests = this.dests(move.from, ctx);
       return dests.has(move.to);
@@ -187,8 +234,9 @@ export abstract class Position {
     const variantOutcome = this.variantOutcome(ctx);
     if (variantOutcome) return variantOutcome;
     ctx = ctx || this.ctx();
-	if (this.isCheckmate(ctx) && !(this.lastMove && isDrop(this.lastMove) && this.lastMove.role === 'pawn')) return { winner: opposite(this.turn) };
-	else if (this.isCheckmate(ctx)) return { winner: this.turn }
+    if (this.isCheckmate(ctx) && !(this.lastMove && isDrop(this.lastMove) && this.lastMove.role === 'pawn'))
+      return { winner: opposite(this.turn) };
+    else if (this.isCheckmate(ctx)) return { winner: this.turn };
     else if (this.isInsufficientMaterial() || this.isStalemate(ctx)) return { winner: undefined };
     else return;
   }
@@ -204,30 +252,30 @@ export abstract class Position {
   }
 
   allDropDests(ctx?: Context): Map<PocketRole, SquareSet> {
-	  ctx = ctx || this.ctx();
-	  const d = new Map();
-	  if (ctx.variantEnd) return d;
-	  for (const prole of POCKET_ROLES) {
-		  if(this.pockets[this.turn][prole] > 0) d.set(prole, this.dropDests(prole, ctx));
-		  else d.set(prole, SquareSet.empty());
-	  }
-	  return d;
+    ctx = ctx || this.ctx();
+    const d = new Map();
+    if (ctx.variantEnd) return d;
+    for (const prole of POCKET_ROLES) {
+      if (this.pockets[this.turn][prole] > 0) d.set(prole, this.dropDests(prole, ctx));
+      else d.set(prole, SquareSet.empty());
+    }
+    return d;
   }
 
   play(move: Move): void {
     const turn = this.turn;
 
     this.fullmoves += 1;
-	this.turn = opposite(turn);
-	this.lastMove = move;
+    this.turn = opposite(turn);
+    this.lastMove = move;
 
     if (isDrop(move)) {
       this.board.set(move.to, { role: move.role, color: turn });
       this.pockets[turn][move.role]--;
     } else {
-	  const piece = this.board.take(move.from);
-	  if (!piece) return;
-	  const role = piece.role;
+      const piece = this.board.take(move.from);
+      if (!piece) return;
+      const role = piece.role;
       if (move.promotion && (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)) {
         piece.role = promote(role as PromotableRole);
       }
@@ -236,7 +284,6 @@ export abstract class Position {
       if (capture) this.playCaptureAt(move.to, capture);
     }
   }
-
 }
 
 export class Shogi extends Position {
@@ -277,13 +324,14 @@ export class Shogi extends Position {
     if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
-	const b1 = this.board.pawn.union(this.board.lance);
+    const b1 = this.board.pawn.union(this.board.lance);
 
-	if (SquareSet.backrank('black').intersect(b1.intersect(this.board['black'])).nonEmpty() ||
-		SquareSet.backrank('white').intersect(b1.intersect(this.board['white'])).nonEmpty() ||
-		SquareSet.backrank2('black').intersect(this.board.knight.intersect(this.board['black'])).nonEmpty() ||
-		SquareSet.backrank2('white').intersect(this.board.knight.intersect(this.board['white'])).nonEmpty()
-		)
+    if (
+      SquareSet.backrank('black').intersect(b1.intersect(this.board['black'])).nonEmpty() ||
+      SquareSet.backrank('white').intersect(b1.intersect(this.board['white'])).nonEmpty() ||
+      SquareSet.backrank2('black').intersect(this.board.knight.intersect(this.board['black'])).nonEmpty() ||
+      SquareSet.backrank2('white').intersect(this.board.knight.intersect(this.board['white'])).nonEmpty()
+    )
       return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
 
     return this.validateCheckers();
@@ -301,37 +349,37 @@ export class Shogi extends Position {
   }
 
   dropDests(role: PocketRole, ctx?: Context): SquareSet {
-	let mask = this.board.occupied.complement();
-	ctx = ctx || this.ctx();
-	// Removing backranks, where no legal moves would be possible
-	if(role === 'pawn' || role === 'lance') mask = mask.diff(SquareSet.backrank(this.turn));
-	if(role === 'knight') mask = mask.diff(SquareSet.backrank2(this.turn));
+    let mask = this.board.occupied.complement();
+    ctx = ctx || this.ctx();
+    // Removing backranks, where no legal moves would be possible
+    if (role === 'pawn' || role === 'lance') mask = mask.diff(SquareSet.backrank(this.turn));
+    if (role === 'knight') mask = mask.diff(SquareSet.backrank2(this.turn));
 
-	// Checking for double pawns
-	if(role === 'pawn') {
-		const pawns = this.board.pawn.intersect(this.board[this.turn]);
-		for (let i = 0; i < 9; i++){
-			const file = SquareSet.fromFile(i);
-			if(pawns.intersect(file).nonEmpty()) mask = mask.diff(file);
-		}
-	}
+    // Checking for double pawns
+    if (role === 'pawn') {
+      const pawns = this.board.pawn.intersect(this.board[this.turn]);
+      for (let i = 0; i < 9; i++) {
+        const file = SquareSet.fromFile(i);
+        if (pawns.intersect(file).nonEmpty()) mask = mask.diff(file);
+      }
+    }
 
-	// Checking for pawn checkmate
-	if(defined(ctx.king) && role === 'pawn'){
-		const king = this.board.pieces(opposite(this.turn), 'king');
-		const kingFront = (this.turn === 'black' ? king.shr81(9) : king.shl81(9)).singleSquare();
-		if(kingFront && mask.has(kingFront)) {
-			const child = this.clone();
-			child.play({role: 'pawn', to: kingFront});
-			if(defined(child.outcome())) mask = mask.diff(SquareSet.fromSquare(kingFront));
-		}
-	}
+    // Checking for pawn checkmate
+    if (defined(ctx.king) && role === 'pawn') {
+      const king = this.board.pieces(opposite(this.turn), 'king');
+      const kingFront = (this.turn === 'black' ? king.shr81(9) : king.shl81(9)).singleSquare();
+      if (kingFront && mask.has(kingFront)) {
+        const child = this.clone();
+        child.play({ role: 'pawn', to: kingFront });
+        if (defined(child.outcome())) mask = mask.diff(SquareSet.fromSquare(kingFront));
+      }
+    }
 
-	if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
-		const checker = ctx.checkers.singleSquare();
-		if (!defined(checker)) return SquareSet.empty();
-		return mask.intersect(between(checker, ctx.king));
-	  } else return mask;
+    if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
+      const checker = ctx.checkers.singleSquare();
+      if (!defined(checker)) return SquareSet.empty();
+      return mask.intersect(between(checker, ctx.king));
+    } else return mask;
   }
 
   dests(square: Square, ctx?: Context): SquareSet {
@@ -340,16 +388,19 @@ export class Shogi extends Position {
     const piece = this.board.get(square);
     if (!piece || piece.color !== this.turn) return SquareSet.empty();
 
-	let pseudo;
-	if (piece.role === 'pawn') pseudo = pawnAttacks(this.turn, square);
+    let pseudo;
+    if (piece.role === 'pawn') pseudo = pawnAttacks(this.turn, square);
     else if (piece.role === 'lance') pseudo = lanceAttacks(this.turn, square, this.board.occupied);
-	else if (piece.role === 'knight') pseudo = knightAttacks(this.turn, square);
-	else if (piece.role === 'silver') pseudo = silverAttacks(this.turn, square);
-	else if (piece.role === 'gold' ||
-			 piece.role === 'tokin' ||
-			 piece.role === 'promoted_lance' ||
-			 piece.role === 'promoted_knight' ||
-			 piece.role === 'promoted_silver') pseudo = goldAttacks(this.turn, square);
+    else if (piece.role === 'knight') pseudo = knightAttacks(this.turn, square);
+    else if (piece.role === 'silver') pseudo = silverAttacks(this.turn, square);
+    else if (
+      piece.role === 'gold' ||
+      piece.role === 'tokin' ||
+      piece.role === 'promoted_lance' ||
+      piece.role === 'promoted_knight' ||
+      piece.role === 'promoted_silver'
+    )
+      pseudo = goldAttacks(this.turn, square);
     else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
     else if (piece.role === 'rook') pseudo = rookAttacks(square, this.board.occupied);
     else if (piece.role === 'horse') pseudo = horseAttacks(square, this.board.occupied);

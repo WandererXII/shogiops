@@ -47,50 +47,50 @@ test('shl81', () => {
 });
 
 test('rbit81', () => {
-	const r = new SquareSet(0x1, 0x0, 0x0);
-	const r2 = new SquareSet(0x2001, 0x1, 0x40000);
-	expect(SquareSet.full().rbit81()).toEqual(SquareSet.full());
-	expect(SquareSet.empty().rbit81()).toEqual(SquareSet.empty());
-	expect(r.rbit81()).toEqual(new SquareSet(0x0, 0x0, 0x4000000));
-	expect(r2.rbit81()).toEqual(new SquareSet(0x100, 0x4000000, 0x4002000));
+  const r = new SquareSet(0x1, 0x0, 0x0);
+  const r2 = new SquareSet(0x2001, 0x1, 0x40000);
+  expect(SquareSet.full().rbit81()).toEqual(SquareSet.full());
+  expect(SquareSet.empty().rbit81()).toEqual(SquareSet.empty());
+  expect(r.rbit81()).toEqual(new SquareSet(0x0, 0x0, 0x4000000));
+  expect(r2.rbit81()).toEqual(new SquareSet(0x100, 0x4000000, 0x4002000));
 });
 
 test('fromRank', () => {
-	expect(SquareSet.fromRank(0)).toEqual(new SquareSet(0x000001FF, 0, 0));
-	expect(SquareSet.fromRank(1)).toEqual(new SquareSet(0x3fe00, 0x0, 0x0));
-	expect(SquareSet.fromRank(2)).toEqual(new SquareSet(0x7fc0000, 0x0, 0x0));
-	expect(SquareSet.fromRank(3)).toEqual(new SquareSet(0x0, 0x1ff, 0x0));
-	expect(SquareSet.fromRank(4)).toEqual(new SquareSet(0x0, 0x3fe00, 0x0));
-	expect(SquareSet.fromRank(5)).toEqual(new SquareSet(0x0, 0x7fc0000, 0x0));
-	expect(SquareSet.fromRank(6)).toEqual(new SquareSet(0x0, 0x0, 0x1ff));
-	expect(SquareSet.fromRank(7)).toEqual(new SquareSet(0x0, 0x0, 0x3fe00));
-	expect(SquareSet.fromRank(8)).toEqual(new SquareSet(0x0, 0x0, 0x7fc0000));
+  expect(SquareSet.fromRank(0)).toEqual(new SquareSet(0x000001ff, 0, 0));
+  expect(SquareSet.fromRank(1)).toEqual(new SquareSet(0x3fe00, 0x0, 0x0));
+  expect(SquareSet.fromRank(2)).toEqual(new SquareSet(0x7fc0000, 0x0, 0x0));
+  expect(SquareSet.fromRank(3)).toEqual(new SquareSet(0x0, 0x1ff, 0x0));
+  expect(SquareSet.fromRank(4)).toEqual(new SquareSet(0x0, 0x3fe00, 0x0));
+  expect(SquareSet.fromRank(5)).toEqual(new SquareSet(0x0, 0x7fc0000, 0x0));
+  expect(SquareSet.fromRank(6)).toEqual(new SquareSet(0x0, 0x0, 0x1ff));
+  expect(SquareSet.fromRank(7)).toEqual(new SquareSet(0x0, 0x0, 0x3fe00));
+  expect(SquareSet.fromRank(8)).toEqual(new SquareSet(0x0, 0x0, 0x7fc0000));
 });
 
 test('fromFile', () => {
-	expect(SquareSet.fromFile(0)).toEqual(new SquareSet(0x40201, 0x40201, 0x40201));
-	expect(SquareSet.fromFile(1)).toEqual(new SquareSet(0x80402, 0x80402, 0x80402));
-	expect(SquareSet.fromFile(2)).toEqual(new SquareSet(0x100804, 0x100804, 0x100804));
-	expect(SquareSet.fromFile(3)).toEqual(new SquareSet(0x201008, 0x201008, 0x201008));
-	expect(SquareSet.fromFile(4)).toEqual(new SquareSet(0x402010, 0x402010, 0x402010));
-	expect(SquareSet.fromFile(5)).toEqual(new SquareSet(0x804020, 0x804020, 0x804020));
-	expect(SquareSet.fromFile(6)).toEqual(new SquareSet(0x1008040, 0x1008040, 0x1008040));
-	expect(SquareSet.fromFile(7)).toEqual(new SquareSet(0x2010080, 0x2010080, 0x2010080));
-	expect(SquareSet.fromFile(8)).toEqual(new SquareSet(0x4020100, 0x4020100, 0x4020100));
+  expect(SquareSet.fromFile(0)).toEqual(new SquareSet(0x40201, 0x40201, 0x40201));
+  expect(SquareSet.fromFile(1)).toEqual(new SquareSet(0x80402, 0x80402, 0x80402));
+  expect(SquareSet.fromFile(2)).toEqual(new SquareSet(0x100804, 0x100804, 0x100804));
+  expect(SquareSet.fromFile(3)).toEqual(new SquareSet(0x201008, 0x201008, 0x201008));
+  expect(SquareSet.fromFile(4)).toEqual(new SquareSet(0x402010, 0x402010, 0x402010));
+  expect(SquareSet.fromFile(5)).toEqual(new SquareSet(0x804020, 0x804020, 0x804020));
+  expect(SquareSet.fromFile(6)).toEqual(new SquareSet(0x1008040, 0x1008040, 0x1008040));
+  expect(SquareSet.fromFile(7)).toEqual(new SquareSet(0x2010080, 0x2010080, 0x2010080));
+  expect(SquareSet.fromFile(8)).toEqual(new SquareSet(0x4020100, 0x4020100, 0x4020100));
 });
 
 test('backwardRanks', () => {
-	expect(SquareSet.backwardRanks(0)).toEqual(SquareSet.empty());
-	expect(SquareSet.backwardRanks(9)).toEqual(new SquareSet(0x07FFFFFF, 0x07FFFFFF, 0x07FFFFFF));
-	expect(SquareSet.backwardRanks(1)).toEqual(new SquareSet(0x1ff, 0x0, 0x0));
-	expect(SquareSet.backwardRanks(4)).toEqual(new SquareSet(0x7ffffff, 0x1ff, 0x0));
+  expect(SquareSet.backwardRanks(0)).toEqual(SquareSet.empty());
+  expect(SquareSet.backwardRanks(9)).toEqual(new SquareSet(0x07ffffff, 0x07ffffff, 0x07ffffff));
+  expect(SquareSet.backwardRanks(1)).toEqual(new SquareSet(0x1ff, 0x0, 0x0));
+  expect(SquareSet.backwardRanks(4)).toEqual(new SquareSet(0x7ffffff, 0x1ff, 0x0));
 });
 
 test('forwardRanks', () => {
-	expect(SquareSet.forwardRanks(0)).toEqual(new SquareSet(0x07FFFFFF, 0x07FFFFFF, 0x07FFFFFF));
-	expect(SquareSet.forwardRanks(9)).toEqual(SquareSet.empty());
-	expect(SquareSet.forwardRanks(5)).toEqual(new SquareSet(0x0, 0x7fc0000, 0x7ffffff));
-	expect(SquareSet.forwardRanks(8)).toEqual(new SquareSet(0x0, 0x0, 0x7fc0000));
+  expect(SquareSet.forwardRanks(0)).toEqual(new SquareSet(0x07ffffff, 0x07ffffff, 0x07ffffff));
+  expect(SquareSet.forwardRanks(9)).toEqual(SquareSet.empty());
+  expect(SquareSet.forwardRanks(5)).toEqual(new SquareSet(0x0, 0x7fc0000, 0x7ffffff));
+  expect(SquareSet.forwardRanks(8)).toEqual(new SquareSet(0x0, 0x0, 0x7fc0000));
 });
 
 test('more than one', () => {

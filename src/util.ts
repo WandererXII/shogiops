@@ -1,4 +1,16 @@
-import { FILE_NAMES, RANK_NAMES, Color, Square, Role, PocketRole, Move, isDrop, SquareName, PromotableRole, POCKET_ROLES } from './types';
+import {
+  FILE_NAMES,
+  RANK_NAMES,
+  Color,
+  Square,
+  Role,
+  PocketRole,
+  Move,
+  isDrop,
+  SquareName,
+  PromotableRole,
+  POCKET_ROLES,
+} from './types';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
@@ -17,73 +29,156 @@ export function squareFile(square: Square): number {
 }
 
 export function unpromote(role: Role): PocketRole | undefined {
-	switch (role)  {
-		case 'pawn':
-		case 'tokin': return 'pawn';
-		case 'lance':
-		case 'promoted_lance': return 'lance';
-		case 'knight':
-		case 'promoted_knight': return 'knight';
-		case 'silver':
-		case 'promoted_silver': return 'silver';
-		case 'bishop':
-		case 'horse': return 'bishop';
-		case 'rook':
-		case 'dragon': return 'rook';
-		default: return;
-	}
+  switch (role) {
+    case 'pawn':
+    case 'tokin':
+      return 'pawn';
+    case 'lance':
+    case 'promoted_lance':
+      return 'lance';
+    case 'knight':
+    case 'promoted_knight':
+      return 'knight';
+    case 'silver':
+    case 'promoted_silver':
+      return 'silver';
+    case 'bishop':
+    case 'horse':
+      return 'bishop';
+    case 'rook':
+    case 'dragon':
+      return 'rook';
+    default:
+      return;
+  }
 }
 
 export function promote(role: PromotableRole): Role {
-	switch (role) {
-		case 'pawn': return 'tokin';
-		case 'lance': return 'promoted_lance';
-		case 'knight': return 'promoted_knight';
-		case 'silver': return 'promoted_silver';
-		case 'bishop': return 'horse';
-		case 'rook': return 'dragon';
-	}
+  switch (role) {
+    case 'pawn':
+      return 'tokin';
+    case 'lance':
+      return 'promoted_lance';
+    case 'knight':
+      return 'promoted_knight';
+    case 'silver':
+      return 'promoted_silver';
+    case 'bishop':
+      return 'horse';
+    case 'rook':
+      return 'dragon';
+  }
 }
 
 export function roleToChar(role: Role): string {
   switch (role) {
-  case 'pawn': return 'p';
-  case 'lance': return 'l';
-  case 'knight': return 'n';
-  case 'silver': return 's';
-  case 'gold': return 'g';
-  case 'bishop': return 'b';
-  case 'rook': return 'r';
-  case "tokin": return '+p';
-  case "promoted_lance": return '+l';
-  case "promoted_knight": return '+n';
-  case "promoted_silver": return '+s';
-  case 'horse': return '+b';
-  case 'dragon': return '+r';
-  case 'king': return 'k';
+    case 'pawn':
+      return 'p';
+    case 'lance':
+      return 'l';
+    case 'knight':
+      return 'n';
+    case 'silver':
+      return 's';
+    case 'gold':
+      return 'g';
+    case 'bishop':
+      return 'b';
+    case 'rook':
+      return 'r';
+    case 'tokin':
+      return '+p';
+    case 'promoted_lance':
+      return '+l';
+    case 'promoted_knight':
+      return '+n';
+    case 'promoted_silver':
+      return '+s';
+    case 'horse':
+      return '+b';
+    case 'dragon':
+      return '+r';
+    case 'king':
+      return 'k';
   }
 }
 
-export function charToRole(ch: 'p' | 'l' | 'n' | 's' | 'g' | 'b' | 'r' | '+p' | '+l' | '+n' | '+s' | '+b' | '+r' |
-							   'P' | 'L' | 'N' | 'S' | 'G' | 'B' | 'R' | '+P' | '+L' | '+N' | '+S' | '+B' | '+R'): Role;
+export function charToRole(
+  ch:
+    | 'p'
+    | 'l'
+    | 'n'
+    | 's'
+    | 'g'
+    | 'b'
+    | 'r'
+    | '+p'
+    | '+l'
+    | '+n'
+    | '+s'
+    | '+b'
+    | '+r'
+    | 'P'
+    | 'L'
+    | 'N'
+    | 'S'
+    | 'G'
+    | 'B'
+    | 'R'
+    | '+P'
+    | '+L'
+    | '+N'
+    | '+S'
+    | '+B'
+    | '+R'
+): Role;
 export function charToRole(ch: string): Role | undefined;
 export function charToRole(ch: string): Role | undefined {
   switch (ch) {
-  case 'P': case 'p': return 'pawn';
-  case 'L': case 'l': return 'lance';
-  case 'N': case 'n': return 'knight';
-  case 'S': case 's': return 'silver';
-  case 'G': case 'g': return 'gold';
-  case 'B': case 'b': return 'bishop';
-  case 'R': case 'r': return 'rook';
-  case '+P': case '+p': return 'tokin';
-  case '+L': case '+l': return 'promoted_lance';
-  case '+N': case '+n': return 'promoted_knight';
-  case '+S': case '+s': return 'promoted_silver';
-  case '+B': case '+b': return 'horse';
-  case '+R': case '+r': return 'dragon';
-  case 'K': case 'k': return 'king';
-  default: return;
+    case 'P':
+    case 'p':
+      return 'pawn';
+    case 'L':
+    case 'l':
+      return 'lance';
+    case 'N':
+    case 'n':
+      return 'knight';
+    case 'S':
+    case 's':
+      return 'silver';
+    case 'G':
+    case 'g':
+      return 'gold';
+    case 'B':
+    case 'b':
+      return 'bishop';
+    case 'R':
+    case 'r':
+      return 'rook';
+    case '+P':
+    case '+p':
+      return 'tokin';
+    case '+L':
+    case '+l':
+      return 'promoted_lance';
+    case '+N':
+    case '+n':
+      return 'promoted_knight';
+    case '+S':
+    case '+s':
+      return 'promoted_silver';
+    case '+B':
+    case '+b':
+      return 'horse';
+    case '+R':
+    case '+r':
+      return 'dragon';
+    case 'K':
+    case 'k':
+      return 'king';
+    default:
+      return;
   }
 }
 
@@ -98,7 +193,7 @@ export function parseSquare(str: string): Square | undefined {
 }
 
 export function makeSquare(square: Square): SquareName {
-  return FILE_NAMES[squareFile(square)] + RANK_NAMES[squareRank(square)] as SquareName;
+  return (FILE_NAMES[squareFile(square)] + RANK_NAMES[squareRank(square)]) as SquareName;
 }
 
 export function parseUsi(str: string): Move | undefined {
@@ -108,8 +203,8 @@ export function parseUsi(str: string): Move | undefined {
     if (role && defined(to)) return { role, to };
   } else if (str.length === 4 || str.length === 5) {
     const from = parseSquare(str.slice(0, 2));
-	const to = parseSquare(str.slice(2, 4));
-	const promotion = str.length === 5 ? ( str[4] === '+' ? true : (str[4] === '=' ? false : undefined)) : undefined;
+    const to = parseSquare(str.slice(2, 4));
+    const promotion = str.length === 5 ? (str[4] === '+' ? true : str[4] === '=' ? false : undefined) : undefined;
     if (defined(from) && defined(to)) return { from, to, promotion };
   }
   return;

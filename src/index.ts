@@ -58,20 +58,9 @@ export {
 
 export { Board } from './board';
 
-export {
-  Material,
-  MaterialSide,
-  Setup,
-  defaultSetup,
-} from './setup';
+export { Material, MaterialSide, Setup, defaultSetup } from './setup';
 
-export {
-  IllegalSetup,
-  Shogi,
-  Position,
-  PositionError,
-  Context
-} from './shogi';
+export { IllegalSetup, Shogi, Position, PositionError, Context } from './shogi';
 
 export * as compat from './compat';
 

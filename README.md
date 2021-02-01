@@ -1,48 +1,44 @@
-# chessops
+# shogiops - WIP
 
-[![Test](https://github.com/niklasf/chessops/workflows/Test/badge.svg)](https://github.com/niklasf/chessops/actions)
-[![npm](https://img.shields.io/npm/v/chessops)](https://www.npmjs.com/package/chessops)
+[![Test](https://github.com/WandererXII/shogiops/workflows/Test/badge.svg)](https://github.com/WandererXII/shogiops/actions)
 
-Chess and chess variant rules and operations in TypeScript.
+Shogi and operations in TypeScript forked from [chessops](https://github.com/niklasf/chessops).
 
-## Documentation
-
-[View TypeDoc](https://niklasf.github.io/chessops/)
 
 ## Features
 
-- [Read and write FEN](https://niklasf.github.io/chessops/modules/_fen_.html)
+- Read and write SFEN
 - Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Castles, Setup,
   Position)
-- [Variant rules](https://niklasf.github.io/chessops/modules/_variant_.html): Standard chess, Crazyhouse, King of the Hill, Three-check,
-  Antichess, Atomic, Horde, Racing Kings
+- Shogi
   - Move making
   - Legal move and drop move generation
   - Game end and outcome
-  - Insufficient material
   - Setup validation
-- Supports Chess960
-- [Attacks and rays](https://niklasf.github.io/chessops/modules/_attacks_.html) using hyperbola quintessence
-- Read and write UCI move notation
-- [Read and write SAN](https://niklasf.github.io/chessops/modules/_san_.html)
+- Attacks and rays using hyperbola quintessence
+- Read and write USI move notation
+- [Compatibility with lishogi](https://lishogi.org)
+- [Compatibility with shogiground](https://github.com/WandererXII/shogiground)
+
+#### Not yet supported fully:
 - [Position hashing](https://niklasf.github.io/chessops/modules/_hash_.html)
 - [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
-- [Compatibility](https://niklasf.github.io/chessops/modules/_compat_.html): [chessground](https://github.com/ornicar/chessground) and [scalachess](https://github.com/ornicar/scalachess)
 
-[File an issue](https://github.com/niklasf/chessops/issues/new) to request more.
+[File an issue](https://github.com/WandererXII/shogiops/issues/new) to request more.
 
 ## Example
 
-```javascript
-import { parseFen } from 'chessops/fen';
-import { Chess } from 'chessops/chess';
+Look into test directory for more examples.
 
-const setup = parseFen('r1bqkbnr/ppp2Qpp/2np4/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4').unwrap();
-const pos = Chess.fromSetup(setup).unwrap();
-console.assert(pos.isCheckmate());
+```javascript
+import { parseUsi } from 'shogi/util';
+import { Shogi } from 'shogiops/shogi';
+
+const pos = Shogi.default(setup).unwrap();
+pos.play(parseUsi('7g7f')!);
 ```
 
 ## License
 
-chessops is licensed under the GNU General Public License 3 or any later
+shogiops is licensed under the GNU General Public License 3 or any later
 version at your choice. See LICENSE.txt for details.

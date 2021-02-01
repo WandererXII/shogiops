@@ -1,5 +1,6 @@
 import { Rules, SquareName, Move, isDrop, Square, Role, PocketRole } from './types';
-import { defined, squareFile, squareRank } from './util';
+import { defined, makeSquare, makeUsi, parseSquare, parseUsi, squareFile, squareRank } from './util';
+import { parsePockets, makePockets } from './fen';
 import { Position } from './shogi';
 
 export const C_FILE_NAMES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
@@ -12,6 +13,16 @@ export type ChessSquareName = `${ChessFileName}${ChessRankName}`;
 
 function makeChessSquare(square: Square): ChessSquareName {
   return (C_FILE_NAMES[squareFile(square)] + C_RANK_NAMES[squareRank(square)]) as ChessSquareName;
+}
+
+export function parseChessSquare(str: ChessSquareName): Square;
+export function parseChessSquare(str: string): Square | undefined;
+export function parseChessSquare(str: string): Square | undefined {
+  if (str.length !== 2) return;
+  const file = Math.abs(str.charCodeAt(0) - 'a'.charCodeAt(0));
+  const rank = Math.abs(str.charCodeAt(1) - '1'.charCodeAt(0));
+  if (file < 0 || file >= 9 || rank < 0 || rank >= 9) return;
+  return file + 9 * rank;
 }
 
 export function shogigroundDests(pos: Position): Map<ChessSquareName, ChessSquareName[]> {
@@ -38,25 +49,21 @@ export function lishogiVariantRules(variant: 'standard' | 'fromPosition'): Rules
   }
 }
 
-export function chessCoordToShogiCoord(str: ChessSquareName): SquareName {
-  return (String.fromCharCode('1'.charCodeAt(0) + ('i'.charCodeAt(0) - str[0].charCodeAt(0))) +
-    String.fromCharCode('1'.charCodeAt(0) + 'i'.charCodeAt(0) - str[1].charCodeAt(0))) as SquareName;
+export function chessCoordToShogiCoord(s: ChessSquareName): SquareName {
+  return makeSquare(parseChessSquare(s));
 }
 
 export function shogiCoordToChessCord(s: SquareName): ChessSquareName {
-  return (String.fromCharCode('a'.charCodeAt(0) + ('9'.charCodeAt(0) - s[0].charCodeAt(0))) +
-    String.fromCharCode('1'.charCodeAt(0) + 'i'.charCodeAt(0) - s[1].charCodeAt(0))) as ChessSquareName;
+  return makeChessSquare(parseSquare(s));
 }
 
 export function chessCoord(str: string): ChessSquareName | undefined {
-  str = str.toLowerCase();
   if (str.match(/^[1-9][a-i]$/)) return shogiCoordToChessCord(str as SquareName);
   if (str.match(/^[a-i][1-9]$/)) return str as ChessSquareName;
   return undefined;
 }
 
 export function shogiCoord(str: string): SquareName | undefined {
-  str = str.toLowerCase();
   if (str.match(/^[1-9][a-i]$/)) return str as SquareName;
   if (str.match(/^[a-i][1-9]$/)) return chessCoordToShogiCoord(str as ChessSquareName);
   else return undefined;
@@ -174,16 +181,6 @@ export function lishogiCharToRole(ch: string): Role | undefined {
   }
 }
 
-export function parseChessSquare(str: ChessSquareName): Square;
-export function parseChessSquare(str: string): Square | undefined;
-export function parseChessSquare(str: string): Square | undefined {
-  if (str.length !== 2) return;
-  const file = Math.abs(str.charCodeAt(0) - 'a'.charCodeAt(0));
-  const rank = Math.abs(str.charCodeAt(1) - '1'.charCodeAt(0));
-  if (file < 0 || file >= 9 || rank < 0 || rank >= 9) return;
-  return file + 9 * rank;
-}
-
 export function parseLishogiUci(str: string): Move | undefined {
   if (str[1] === '*' && str.length === 4) {
     const role = lishogiCharToRole(str[0]) as PocketRole;
@@ -198,7 +195,24 @@ export function parseLishogiUci(str: string): Move | undefined {
   return;
 }
 
-export function shogiBoardToLishogiBoard(board: string): string {
+export function makeLishogiUci(move: Move): string {
+  if (isDrop(move)) return `${roleToLishogiChar(move.role).toUpperCase()}*${makeChessSquare(move.to)}`;
+  return makeChessSquare(move.from) + makeChessSquare(move.to) + (move.promotion ? '+' : '');
+}
+
+export function assureUsi(str: string): string | undefined {
+  if (str.match(/^([1-9][a-i]|([RBGSNLP]\*))[1-9][a-i](\+|\=)?$/)) return str;
+  if (str.match(/^([a-i][1-9]|([RBGSNLP]\*))[a-i][1-9](\+|\=)?$/)) return makeUsi(parseLishogiUci(str)!);
+  return;
+}
+
+export function assureLishogiUci(str: string): string | undefined {
+  if (str.match(/^([a-i][1-9]|([RBGSNLP]\*))[a-i][1-9](\+|\=)?$/)) return str;
+  if (str.match(/^([1-9][a-i]|([RBGSNLP]\*))[1-9][a-i](\+|\=)?$/)) return makeLishogiUci(parseUsi(str)!);
+  return;
+}
+
+export function lishogiBoardToShogiBoard(board: string): string {
   return board
     .replace(/t/g, '+p')
     .replace(/u/g, '+l')
@@ -214,7 +228,7 @@ export function shogiBoardToLishogiBoard(board: string): string {
     .replace(/H/g, '+B');
 }
 
-export function lishogiBoardToShogiBoard(board: string): string {
+export function shogiBoardToLishogiBoard(board: string): string {
   return board
     .replace(/\+p/g, 't')
     .replace(/\+l/g, 'u')
@@ -246,40 +260,31 @@ export function switchColor(color: string): string {
 }
 
 export function fixPocket(pocket: string): string {
-  let newPocket = '';
-  ['R', 'B', 'G', 'S', 'N', 'L', 'P'].forEach(p => {
-    const re = new RegExp(p, 'g');
-    const nPieces = (pocket.match(re) || []).length;
-    newPocket += (nPieces > 1 ? nPieces : '') + (nPieces > 0 ? p : '');
-  });
-  ['r', 'b', 'g', 's', 'n', 'l', 'p'].forEach(p => {
-    const re = new RegExp(p, 'g');
-    const nPieces = (pocket.match(re) || []).length;
-    newPocket += (nPieces > 1 ? nPieces : '') + (nPieces > 0 ? p : '');
-  });
-  return newPocket ? newPocket : '-';
+  const material = parsePockets(pocket);
+  return material.unwrap(
+    value => makePockets(value),
+    _ => '-'
+  );
 }
 
 export function turnNumberToPlies(turn: string, color: string): string {
   const turnNumber = parseInt(turn);
   if (turnNumber) {
-    let ply = color === 'b' ? turnNumber * 2 - 1 : turnNumber * 2;
-    ply = ply > 0 ? ply : 1;
+    const ply = color === 'w' ? turnNumber * 2 - 1 : turnNumber * 2;
     return ply.toString();
   } else return turn;
 }
 
-export function pliesToTurnNumber(ply: string, color: string): string {
+export function pliesToTurnNumber(ply: string): string {
   const plyNumber = parseInt(ply);
   if (plyNumber) {
-    let turn = Math.floor(plyNumber / 2);
-    if (color === 'w') turn += 1; // assumes the old color
+    const turn = 1 + Math.floor((plyNumber - 1) / 2);
     return turn.toString();
   } else return ply;
 }
 
 // assumes the sfen is correct, doesn't check validity
-export function lishogiFen(sfen: string): string {
+export function makeLishogiFen(sfen: string): string {
   const sep = sfen.split(' ').length > 1 ? ' ' : '_';
   const parts = sfen.split(sep);
   let lFen = '';
@@ -301,12 +306,12 @@ export function lishogiFen(sfen: string): string {
 
   // Plies
   const plies = parts.shift();
-  if (plies) lFen += ' ' + pliesToTurnNumber(plies, color);
+  if (plies) lFen += ' ' + pliesToTurnNumber(plies);
 
   return lFen;
 }
 
-export function shogiFen(fen: string): string {
+export function makeShogiFen(fen: string): string {
   const sep = fen.split(' ').length > 1 ? ' ' : '_';
   const parts = fen.split(sep);
   let sFen = '';

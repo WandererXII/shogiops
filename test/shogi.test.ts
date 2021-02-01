@@ -65,7 +65,7 @@ test('starting perft', () => {
   expect(perft(pos, 2, false)).toBe(900);
   expect(perft(pos, 3, false)).toBe(25470);
   expect(perft(pos, 4, false)).toBe(719731);
-  expect(perft(pos, 5, false)).toBe(19861490);
+  //expect(perft(pos, 5, false)).toBe(19861490);
 });
 
 test.each(random)('random perft: %s: %s', (_, fen, d1, d2) => {

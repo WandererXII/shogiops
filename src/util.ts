@@ -204,7 +204,7 @@ export function parseUsi(str: string): Move | undefined {
   } else if (str.length === 4 || str.length === 5) {
     const from = parseSquare(str.slice(0, 2));
     const to = parseSquare(str.slice(2, 4));
-    const promotion = str.length === 5 ? (str[4] === '+' ? true : str[4] === '=' ? false : undefined) : undefined;
+    const promotion = str.length === 5 && str[4] === '+' ? true : false;
     if (defined(from) && defined(to)) return { from, to, promotion };
   }
   return;

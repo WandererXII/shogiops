@@ -188,7 +188,7 @@ export function parseLishogiUci(str: string): Move | undefined {
   if (str[1] === '*' && str.length === 4) {
     const role = lishogiCharToRole(str[0]) as PocketRole;
     const to = parseChessSquare(str.slice(2));
-    if (role && defined(to)) return { role, to };
+    if (defined(role) && defined(to)) return { role, to };
   } else if (str.length === 4 || str.length === 5) {
     const from = parseChessSquare(str.slice(0, 2));
     const to = parseChessSquare(str.slice(2, 4));
@@ -198,7 +198,7 @@ export function parseLishogiUci(str: string): Move | undefined {
   return;
 }
 
-export function shogiBoardToLishogiBoard(board: string) {
+export function shogiBoardToLishogiBoard(board: string): string {
   return board
     .replace(/t/g, '+p')
     .replace(/u/g, '+l')
@@ -214,7 +214,7 @@ export function shogiBoardToLishogiBoard(board: string) {
     .replace(/H/g, '+B');
 }
 
-export function lishogiBoardToShogiBoard(board: string) {
+export function lishogiBoardToShogiBoard(board: string): string {
   return board
     .replace(/\+p/g, 't')
     .replace(/\+l/g, 'u')

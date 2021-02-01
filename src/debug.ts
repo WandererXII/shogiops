@@ -1,5 +1,5 @@
-import { Square, Piece, Role, ROLES, POCKET_ROLES, PROMOTABLE_ROLES } from './types';
-import { opposite, squareRank, makeSquare, makeUsi } from './util';
+import { Square, Piece, PROMOTABLE_ROLES } from './types';
+import { makeSquare, makeUsi } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
@@ -77,7 +77,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     let nodes = 0;
     for (const [from, dests] of pos.allDests(ctx)) {
       for (const to of dests) {
-        let promotions: Array<boolean> = [];
+        const promotions: Array<boolean> = [];
         const role = pos.board.get(from)!.role;
         const canPromote: boolean =
           (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role!) &&

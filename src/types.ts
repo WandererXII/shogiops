@@ -52,7 +52,7 @@ export interface Piece {
 export interface NormalMove {
   from: Square;
   to: Square;
-  promotion?: Boolean;
+  promotion?: boolean;
 }
 
 export interface DropMove {

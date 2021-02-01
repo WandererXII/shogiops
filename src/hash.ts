@@ -1,5 +1,4 @@
 import { COLORS, POCKET_ROLES, ROLES } from './types';
-import { defined } from './util';
 import { Board } from './board';
 import { Setup, MaterialSide, Material } from './setup';
 

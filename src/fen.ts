@@ -62,7 +62,7 @@ export function parsePockets(pocketPart: string): Result<Material, FenError> {
     return Result.err(new FenError(InvalidFen.Pockets));
   const pockets = Material.empty();
   for (let i = 0; i < pocketPart.length; i++) {
-    let c = pocketPart[i];
+    const c = pocketPart[i];
     if (c === '-') break;
     const num = parseInt(c, 10);
     const count = num > 0 ? num : 1;
@@ -78,7 +78,7 @@ export function parseFen(fen: string): Result<Setup, FenError> {
 
   // Board
   const boardPart = parts.shift()!;
-  let board: Result<Board, FenError> = parseBoardFen(boardPart);
+  const board: Result<Board, FenError> = parseBoardFen(boardPart);
 
   // Turn
   const turnPart = parts.shift();

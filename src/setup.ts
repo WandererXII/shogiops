@@ -1,5 +1,4 @@
-import { Color, POCKET_ROLES, Square } from './types';
-import { SquareSet } from './squareSet';
+import { Color, POCKET_ROLES } from './types';
 import { Board } from './board';
 
 export class MaterialSide {

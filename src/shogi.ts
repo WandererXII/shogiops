@@ -12,7 +12,6 @@ import {
   PROMOTABLE_ROLES,
   PromotableRole,
   PocketRole,
-  DropMove,
 } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
@@ -139,7 +138,7 @@ export abstract class Position {
   clone(): Position {
     const pos = new (this as any).constructor();
     pos.board = this.board.clone();
-    pos.pockets = this.pockets?.clone();
+    pos.pockets = this.pockets.clone();
     pos.turn = this.turn;
     pos.fullmoves = this.fullmoves;
     pos.lastMove = this.lastMove;
@@ -148,9 +147,9 @@ export abstract class Position {
 
   equalsIgnoreMoves(other: Position): boolean {
     return (
-      this.rules === other.rules &&
+      // this.rules === other.rules // variants
       this.board.equals(other.board) &&
-      ((other.pockets && this.pockets?.equals(other.pockets)) || (!this.pockets && !other.pockets)) &&
+      this.pockets.equals(other.pockets) &&
       this.turn === other.turn
     );
   }
@@ -182,7 +181,7 @@ export abstract class Position {
   isLegal(move: Move, ctx?: Context): boolean {
     if (isDrop(move)) {
       const role = move.role as PocketRole;
-      if (!role || this.pockets[this.turn][role] <= 0) return false;
+      if (!defined(role) || this.pockets[this.turn][role] <= 0) return false;
       return this.dropDests(role, ctx).has(move.to);
     } else {
       const role = this.board.getRole(move.from);
@@ -199,7 +198,7 @@ export abstract class Position {
       // Checking whether the promotion must be forced
       if (
         !move.promotion &&
-        role &&
+        defined(role) &&
         (((role === 'pawn' || role === 'lance') && SquareSet.backrank(this.turn).has(move.to)) ||
           (role === 'knight' && SquareSet.backrank2(this.turn).has(move.to)))
       )

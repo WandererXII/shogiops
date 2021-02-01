@@ -9,7 +9,6 @@ import {
   isDrop,
   SquareName,
   PromotableRole,
-  POCKET_ROLES,
 } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
@@ -200,7 +199,7 @@ export function parseUsi(str: string): Move | undefined {
   if (str[1] === '*' && str.length === 4) {
     const role = charToRole(str[0]) as PocketRole;
     const to = parseSquare(str.slice(2));
-    if (role && defined(to)) return { role, to };
+    if (defined(role) && defined(to)) return { role, to };
   } else if (str.length === 4 || str.length === 5) {
     const from = parseSquare(str.slice(0, 2));
     const to = parseSquare(str.slice(2, 4));

@@ -1,8 +1,7 @@
 import { isDrop, Move, PocketRole, PROMOTABLE_ROLES } from './types';
-import { defined, parseSquare, makeSquare, opposite } from './util';
+import { defined, makeSquare } from './util';
 import { SquareSet } from './squareSet';
 import { Position } from './shogi';
-import { attacks } from './attacks';
 import { lishogiCharToRole, roleToLishogiChar, shogiCoordToChessCord, parseChessSquare } from './compat';
 
 function makeSanWithoutSuffix(pos: Position, move: Move): string {

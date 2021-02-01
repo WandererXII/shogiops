@@ -1,6 +1,7 @@
 import { parseFen } from '../src/fen';
 import { Shogi, IllegalSetup } from '../src/shogi';
 import { perft } from '../src/debug';
+import { parseUsi } from '../src/util';
 
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550&start=16
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550
@@ -27,19 +28,7 @@ const random: [string, string, number, number][] = [
   ['gentest-20', 'lr7/3g1kg2/p2pp2s+L/2Ps1ppp1/9/PP1P1BPS1/5P1P1/1G3B1g1/LN3KN1+r b SNNLPPPpp', 181, 12037],
   ['gentest-21', '7lk/9/8S/9/9/9/9/7L1/8K b P', 85, 639],
 ];
-//
-//test('play move', () => {
-//  const pos = Shogi.fromSetup(parseFen('lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1').unwrap()).unwrap();
-//
-//  const kd1 = pos.clone();
-//  kd1.play({ from: 4, to: 3 });
-//  expect(makeFen(kd1.toSetup())).toBe('8/8/8/5k2/3p4/8/4P3/3K4 b - - 1 1');
-//
-//  const e4 = pos.clone();
-//  e4.play({ from: 12, to: 28 });
-//  expect(makeFen(e4.toSetup())).toBe('8/8/8/5k2/3pP3/8/8/4K3 b - e3 0 1');
-//});
-//
+
 test('test promotions', () => {
   const pos = Shogi.fromSetup(parseFen('4k4/9/7S1/1+PG3NS1/9/9/9/9/4K3L b - 1').unwrap()).unwrap();
   expect(Shogi.default().isLegal({ from: 20, to: 29, promotion: true })).toBe(false); // promoting outside promotion zone
@@ -70,6 +59,15 @@ test.each(random)('random perft: %s: %s', (_, fen, d1, d2) => {
   const pos = Shogi.fromSetup(parseFen(fen).unwrap()).unwrap();
   expect(perft(pos, 1, false)).toBe(d1);
   expect(perft(pos, 2, false)).toBe(d2);
+});
+
+test('pawn checkmate', () => {
+  const pos = Shogi.fromSetup(parseFen('3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1').unwrap()).unwrap();
+  const pos2 = pos.clone();
+  pos.play(parseUsi('L*5b')!);
+  pos2.play(parseUsi('P*5b')!);
+  expect(pos.outcome()).toEqual({ winner: 'black' });
+  expect(pos2.outcome()).toEqual({ winner: 'white' });
 });
 
 const insufficientMaterial: [string, boolean, boolean][] = [

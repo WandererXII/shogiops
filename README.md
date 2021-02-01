@@ -4,7 +4,6 @@
 
 Shogi and operations in TypeScript forked from [chessops](https://github.com/niklasf/chessops).
 
-
 ## Features
 
 - Read and write SFEN
@@ -21,6 +20,7 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
 - [Compatibility with shogiground](https://github.com/WandererXII/shogiground)
 
 #### Not yet supported fully:
+
 - [Position hashing](https://niklasf.github.io/chessops/modules/_hash_.html)
 - [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
 

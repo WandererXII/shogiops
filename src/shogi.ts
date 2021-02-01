@@ -148,9 +148,7 @@ export abstract class Position {
   equalsIgnoreMoves(other: Position): boolean {
     return (
       // this.rules === other.rules // variants
-      this.board.equals(other.board) &&
-      this.pockets.equals(other.pockets) &&
-      this.turn === other.turn
+      this.board.equals(other.board) && this.pockets.equals(other.pockets) && this.turn === other.turn
     );
   }
 

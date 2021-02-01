@@ -1,7 +1,5 @@
-import { SquareSet } from '../src/squareSet';
-import { parseUsi } from '../src/util';
-import { parseFen, makeFen, INITIAL_FEN } from '../src/fen';
-import { Shogi, IllegalSetup } from '../src/Shogi';
+import { parseFen } from '../src/fen';
+import { Shogi, IllegalSetup } from '../src/shogi';
 import { perft } from '../src/debug';
 
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550&start=16

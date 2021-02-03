@@ -11,7 +11,7 @@ export type ChessRankName = typeof C_RANK_NAMES[number];
 
 export type ChessSquareName = `${ChessFileName}${ChessRankName}`;
 
-function makeChessSquare(square: Square): ChessSquareName {
+export function makeChessSquare(square: Square): ChessSquareName {
   return (C_FILE_NAMES[squareFile(square)] + C_RANK_NAMES[squareRank(square)]) as ChessSquareName;
 }
 

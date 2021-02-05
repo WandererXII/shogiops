@@ -12,7 +12,7 @@
     "typescript"
   ],
   "repository": "https://github.com/WandererXII/shogiops",
-  "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>(chessops), WanererXII(shogiops)",
+  "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>(chessops), WandererXII(shogiops)",
   "license": "GPL-3.0-or-later",
   "type": "commonjs",
   "dependencies": {

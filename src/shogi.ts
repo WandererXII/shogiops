@@ -297,20 +297,21 @@ export class Shogi extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup): Result<Shogi, PositionError> {
+  static fromSetup(setup: Setup, strict = true): Result<Shogi, PositionError> {
     const pos = new this();
     pos.board = setup.board.clone();
     pos.pockets = setup.pockets;
     pos.turn = setup.turn;
     pos.fullmoves = setup.fullmoves;
-    return pos.validate().map(_ => pos);
+    return pos.validate(strict).map(_ => pos);
   }
 
   clone(): Shogi {
     return super.clone() as Shogi;
   }
 
-  protected validate(): Result<undefined, PositionError> {
+  protected validate(strict: boolean): Result<undefined, PositionError> {
+    if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
 

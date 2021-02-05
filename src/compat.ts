@@ -87,11 +87,11 @@ export function roleToLishogiChar(role: Role): string {
       return 'r';
     case 'tokin':
       return 't';
-    case 'promoted_lance':
+    case 'promotedLance':
       return 'u';
-    case 'promoted_knight':
+    case 'promotedKnight':
       return 'm';
-    case 'promoted_silver':
+    case 'promotedSilver':
       return 'a';
     case 'horse':
       return 'h';
@@ -160,13 +160,13 @@ export function lishogiCharToRole(ch: string): Role | undefined {
       return 'tokin';
     case 'U':
     case 'u':
-      return 'promoted_lance';
+      return 'promotedLance';
     case 'M':
     case 'm':
-      return 'promoted_knight';
+      return 'promotedKnight';
     case 'A':
     case 'a':
-      return 'promoted_silver';
+      return 'promotedSilver';
     case 'H':
     case 'h':
       return 'horse';

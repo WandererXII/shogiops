@@ -53,9 +53,9 @@ function attacksTo(square: Square, attacker: Color, board: Board, occupied: Squa
       .union(silverAttacks(opposite(attacker), square).intersect(board.silver))
       .union(goldAttacks(opposite(attacker), square).intersect(board.gold))
       .union(goldAttacks(opposite(attacker), square).intersect(board.tokin))
-      .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_lance))
-      .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_knight))
-      .union(goldAttacks(opposite(attacker), square).intersect(board.promoted_silver))
+      .union(goldAttacks(opposite(attacker), square).intersect(board.promotedLance))
+      .union(goldAttacks(opposite(attacker), square).intersect(board.promotedKnight))
+      .union(goldAttacks(opposite(attacker), square).intersect(board.promotedSilver))
       .union(horseAttacks(square, occupied).intersect(board.horse))
       .union(dragonAttacks(square, occupied).intersect(board.dragon))
       .union(kingAttacks(square).intersect(board.king))
@@ -393,9 +393,9 @@ export class Shogi extends Position {
     else if (
       piece.role === 'gold' ||
       piece.role === 'tokin' ||
-      piece.role === 'promoted_lance' ||
-      piece.role === 'promoted_knight' ||
-      piece.role === 'promoted_silver'
+      piece.role === 'promotedLance' ||
+      piece.role === 'promotedKnight' ||
+      piece.role === 'promotedSilver'
     )
       pseudo = goldAttacks(this.turn, square);
     else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);

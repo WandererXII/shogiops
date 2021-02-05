@@ -15,9 +15,9 @@ export class Board implements Iterable<[Square, Piece]> {
   bishop: SquareSet;
   rook: SquareSet;
   tokin: SquareSet;
-  promoted_lance: SquareSet;
-  promoted_knight: SquareSet;
-  promoted_silver: SquareSet;
+  promotedLance: SquareSet;
+  promotedKnight: SquareSet;
+  promotedSilver: SquareSet;
   horse: SquareSet;
   dragon: SquareSet;
   king: SquareSet;
@@ -43,9 +43,9 @@ export class Board implements Iterable<[Square, Piece]> {
     this.rook = new SquareSet(0x10000, 0x0, 0x400);
     this.king = new SquareSet(0x10, 0x0, 0x400000);
     this.tokin = SquareSet.empty();
-    this.promoted_lance = SquareSet.empty();
-    this.promoted_knight = SquareSet.empty();
-    this.promoted_silver = SquareSet.empty();
+    this.promotedLance = SquareSet.empty();
+    this.promotedKnight = SquareSet.empty();
+    this.promotedSilver = SquareSet.empty();
     this.horse = SquareSet.empty();
     this.dragon = SquareSet.empty();
   }

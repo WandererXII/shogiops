@@ -33,13 +33,13 @@ export function unpromote(role: Role): PocketRole | undefined {
     case 'tokin':
       return 'pawn';
     case 'lance':
-    case 'promoted_lance':
+    case 'promotedLance':
       return 'lance';
     case 'knight':
-    case 'promoted_knight':
+    case 'promotedKnight':
       return 'knight';
     case 'silver':
-    case 'promoted_silver':
+    case 'promotedSilver':
       return 'silver';
     case 'bishop':
     case 'horse':
@@ -57,11 +57,11 @@ export function promote(role: PromotableRole): Role {
     case 'pawn':
       return 'tokin';
     case 'lance':
-      return 'promoted_lance';
+      return 'promotedLance';
     case 'knight':
-      return 'promoted_knight';
+      return 'promotedKnight';
     case 'silver':
-      return 'promoted_silver';
+      return 'promotedSilver';
     case 'bishop':
       return 'horse';
     case 'rook':
@@ -87,11 +87,11 @@ export function roleToChar(role: Role): string {
       return 'r';
     case 'tokin':
       return '+p';
-    case 'promoted_lance':
+    case 'promotedLance':
       return '+l';
-    case 'promoted_knight':
+    case 'promotedKnight':
       return '+n';
-    case 'promoted_silver':
+    case 'promotedSilver':
       return '+s';
     case 'horse':
       return '+b';
@@ -160,13 +160,13 @@ export function charToRole(ch: string): Role | undefined {
       return 'tokin';
     case '+L':
     case '+l':
-      return 'promoted_lance';
+      return 'promotedLance';
     case '+N':
     case '+n':
-      return 'promoted_knight';
+      return 'promotedKnight';
     case '+S':
     case '+s':
-      return 'promoted_silver';
+      return 'promotedSilver';
     case '+B':
     case '+b':
       return 'horse';

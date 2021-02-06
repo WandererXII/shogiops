@@ -1,4 +1,4 @@
-# shogiops - WIP
+# shogiops
 
 [![Test](https://github.com/WandererXII/shogiops/workflows/Test/badge.svg)](https://github.com/WandererXII/shogiops/actions)
 
@@ -19,23 +19,24 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
 - [Compatibility with lishogi](https://lishogi.org)
 - [Compatibility with shogiground](https://github.com/WandererXII/shogiground)
 
-#### Not yet supported fully:
+#### Not yet fully supported:
 
-- [Position hashing](https://niklasf.github.io/chessops/modules/_hash_.html)
-- [Transformations](https://niklasf.github.io/chessops/modules/_transform_.html): Mirroring and rotating
+- Position hashing
+- Transformations: Mirroring and rotating
 
 [File an issue](https://github.com/WandererXII/shogiops/issues/new) to request more.
 
 ## Example
 
-Look into test directory for more examples.
+Test directory has a lot of examples.
 
 ```javascript
-import { parseUsi } from 'shogi/util';
+import { parseUsi } from 'shogiops/util';
 import { Shogi } from 'shogiops/shogi';
 
-const pos = Shogi.default(setup).unwrap();
-pos.play(parseUsi('7g7f')!);
+const pos = Shogi.default();
+const move = parseUsi('7g7f');
+pos.play(move!);
 ```
 
 ## License

@@ -12,9 +12,9 @@ export function defaultPosition(rules: Rules): Position {
   }
 }
 
-export function setupPosition(rules: Rules, setup: Setup): Result<Position, PositionError> {
+export function setupPosition(rules: Rules, setup: Setup, strict = true): Result<Position, PositionError> {
   switch (rules) {
     case 'shogi':
-      return Shogi.fromSetup(setup);
+      return Shogi.fromSetup(setup, strict);
   }
 }

@@ -58,15 +58,17 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
 }
 
 export function parsePockets(pocketPart: string): Result<Material, FenError> {
-  if (pocketPart.length > 81 || pocketPart.toLowerCase().includes('k'))
-    return Result.err(new FenError(InvalidFen.Pockets));
+  if (pocketPart.toLowerCase().includes('k')) return Result.err(new FenError(InvalidFen.Pockets));
   const pockets = Material.empty();
   for (let i = 0; i < pocketPart.length; i++) {
-    const c = pocketPart[i];
-    if (c === '-') break;
-    const num = parseInt(c, 10);
-    const count = num > 0 ? num : 1;
-    const piece = num > 0 && i + 1 < pocketPart.length ? charToPiece(pocketPart[++i]) : charToPiece(c);
+    if (pocketPart[i] === '-') break;
+    // max 99
+    let count: number;
+    if (parseInt(pocketPart[i])) {
+      count = parseInt(pocketPart[i++], 10);
+      if (parseInt(pocketPart[i])) count = count * 10 + parseInt(pocketPart[i++], 10);
+    } else count = 1;
+    const piece = charToPiece(pocketPart[i]);
     if (!piece) return Result.err(new FenError(InvalidFen.Pockets));
     pockets[piece.color][piece.role as PocketRole] += count;
   }

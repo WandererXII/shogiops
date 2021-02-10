@@ -13,7 +13,6 @@ export function flipHorizontal(s: SquareSet): SquareSet {
   const c1 = new SquareSet(0x52a954a, 0x52a954a, 0x52a954a); // Right rows by 1
   const middle = s.intersect(SquareSet.fromFile(4));
   s = s.shl81(1).intersect(c1).union(s.intersect(c1).shr81(1));
-  console.log(middle);
   s = s.shl81(2).intersect(c2).union(s.intersect(c2).shr81(2));
   s = s.shl81(5).intersect(rh).union(s.intersect(rh).shr81(5));
   return s.union(middle);

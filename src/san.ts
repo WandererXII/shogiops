@@ -28,7 +28,11 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
     if (capture) san += 'x';
     san += shogiCoordToChessCord(makeSquare(move.to));
     if (move.promotion) san += '+';
-    else if (SquareSet.promotionZone(pos.turn).has(move.to)) san += '=';
+    else if (
+      (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role) &&
+      SquareSet.promotionZone(pos.turn).has(move.to)
+    )
+      san += '=';
   }
   return san;
 }

@@ -64,9 +64,9 @@ export function parsePockets(pocketPart: string): Result<Material, FenError> {
     if (pocketPart[i] === '-') break;
     // max 99
     let count: number;
-    if (parseInt(pocketPart[i])) {
+    if (parseInt(pocketPart[i]) >= 0) {
       count = parseInt(pocketPart[i++], 10);
-      if (parseInt(pocketPart[i])) count = count * 10 + parseInt(pocketPart[i++], 10);
+      if (parseInt(pocketPart[i]) >= 0) count = count * 10 + parseInt(pocketPart[i++], 10);
     } else count = 1;
     const piece = charToPiece(pocketPart[i]);
     if (!piece) return Result.err(new FenError(InvalidFen.Pockets));

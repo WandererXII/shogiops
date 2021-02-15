@@ -8,7 +8,7 @@ export const INITIAL_BOARD_FEN = 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' b -';
 export const INITIAL_FEN = INITIAL_EPD + ' 1';
 export const EMPTY_BOARD_FEN = '9/9/9/9/9/9/9/9/9';
-export const EMPTY_EPD = EMPTY_BOARD_FEN + '  b -';
+export const EMPTY_EPD = EMPTY_BOARD_FEN + ' b -';
 export const EMPTY_FEN = EMPTY_EPD + ' 1';
 
 export enum InvalidFen {

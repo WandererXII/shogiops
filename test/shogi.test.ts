@@ -55,6 +55,14 @@ test('starting perft', () => {
   //expect(perft(pos, 5, false)).toBe(19861490);
 });
 
+test('blockers perft', () => {
+  const posLance = Shogi.fromSetup(parseFen("4k4/4g4/9/4L4/9/9/9/4K4/9 w - 1").unwrap()).unwrap();
+  const posRook = Shogi.fromSetup(parseFen("4k4/4g4/9/4R4/9/9/9/4K4/9 w - 1").unwrap()).unwrap();
+  expect(perft(posLance, 1, false)).toBe(5);
+  expect(perft(posRook, 1, false)).toBe(5);
+});
+
+
 test.each(random)('random perft: %s: %s', (_, fen, d1, d2) => {
   const pos = Shogi.fromSetup(parseFen(fen).unwrap()).unwrap();
   expect(perft(pos, 1, false)).toBe(d1);

@@ -62,6 +62,12 @@ test('blockers perft', () => {
   expect(perft(posRook, 1, false)).toBe(5);
 });
 
+test('capturing', () => {
+  const pos = Shogi.fromSetup(parseFen("4k4/9/3g5/3K5/9/9/9/9/9 b - 1").unwrap()).unwrap();
+  pos.play(parseUsi("6d6c")!);
+  pos.play(parseUsi("5a4a")!);
+  expect(pos.isLegal(parseUsi("G*5e")!)).toBe(true);
+});
 
 test.each(random)('random perft: %s: %s', (_, fen, d1, d2) => {
   const pos = Shogi.fromSetup(parseFen(fen).unwrap()).unwrap();

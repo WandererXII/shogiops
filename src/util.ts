@@ -41,6 +41,8 @@ export function unpromote(role: Role): PocketRole | undefined {
     case 'silver':
     case 'promotedSilver':
       return 'silver';
+    case 'gold':
+      return 'gold';
     case 'bishop':
     case 'horse':
       return 'bishop';

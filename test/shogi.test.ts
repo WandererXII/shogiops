@@ -56,17 +56,17 @@ test('starting perft', () => {
 });
 
 test('blockers perft', () => {
-  const posLance = Shogi.fromSetup(parseFen("4k4/4g4/9/4L4/9/9/9/4K4/9 w - 1").unwrap()).unwrap();
-  const posRook = Shogi.fromSetup(parseFen("4k4/4g4/9/4R4/9/9/9/4K4/9 w - 1").unwrap()).unwrap();
+  const posLance = Shogi.fromSetup(parseFen('4k4/4g4/9/4L4/9/9/9/4K4/9 w - 1').unwrap()).unwrap();
+  const posRook = Shogi.fromSetup(parseFen('4k4/4g4/9/4R4/9/9/9/4K4/9 w - 1').unwrap()).unwrap();
   expect(perft(posLance, 1, false)).toBe(5);
   expect(perft(posRook, 1, false)).toBe(5);
 });
 
 test('capturing', () => {
-  const pos = Shogi.fromSetup(parseFen("4k4/9/3g5/3K5/9/9/9/9/9 b - 1").unwrap()).unwrap();
-  pos.play(parseUsi("6d6c")!);
-  pos.play(parseUsi("5a4a")!);
-  expect(pos.isLegal(parseUsi("G*5e")!)).toBe(true);
+  const pos = Shogi.fromSetup(parseFen('4k4/9/3g5/3K5/9/9/9/9/9 b - 1').unwrap()).unwrap();
+  pos.play(parseUsi('6d6c')!);
+  pos.play(parseUsi('5a4a')!);
+  expect(pos.isLegal(parseUsi('G*5e')!)).toBe(true);
 });
 
 test.each(random)('random perft: %s: %s', (_, fen, d1, d2) => {

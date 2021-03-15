@@ -95,22 +95,32 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   if (!defined(from)) return; // Illegal
 
   const promotionStr = match[4];
-  let promotion = !!promotionStr && promotionStr === '+';
+  let promotion: boolean | undefined = undefined;
+  if (promotionStr === '=') promotion = false;
+  else if (promotionStr === '+') promotion = true;
 
-  // role can't be promoted or it isn't in/from the promotion zone
+  // Promotion needs to be specified
   if (
-    promotion &&
+    promotion === undefined &&
+    (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role) &&
+    (SquareSet.promotionZone(pos.turn).has(to) || SquareSet.promotionZone(pos.turn).has(from))
+  )
+    return;
+
+  // role can't be promoted/unpromoted or it isn't in/from the promotion zone
+  if (
+    promotion !== undefined &&
     (!(PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role) ||
       (!SquareSet.promotionZone(pos.turn).has(to) && !SquareSet.promotionZone(pos.turn).has(from)))
   )
     return;
   // force promotion
   else if (
-    (!promotionStr || promotionStr === '=') &&
+    !promotion &&
     (((role === 'pawn' || role === 'lance') && SquareSet.backrank(pos.turn).has(to)) ||
       (role === 'knight' && SquareSet.backrank2(pos.turn).has(to)))
   )
-    promotion = true;
+    return;
 
   return {
     from,

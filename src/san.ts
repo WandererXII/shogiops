@@ -101,7 +101,7 @@ export function parseSan(pos: Position, san: string): Move | undefined {
 
   // Promotion needs to be specified in san
   if (
-    promotionStr === undefined &&
+    !defined(promotionStr) &&
     (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role) &&
     (SquareSet.promotionZone(pos.turn).has(to) || SquareSet.promotionZone(pos.turn).has(from))
   )
@@ -114,7 +114,6 @@ export function parseSan(pos: Position, san: string): Move | undefined {
       (!SquareSet.promotionZone(pos.turn).has(to) && !SquareSet.promotionZone(pos.turn).has(from)))
   )
     return;
-	
   // force promotion
   else if (
     !promotion &&

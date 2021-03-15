@@ -38,12 +38,12 @@ test('parse promotion san', () => {
   expect(parseSan(pos, 'Pb9=')).toBeUndefined();
   expect(parseSan(pos, 'Pc7')).toBeUndefined();
   expect(parseSan(pos, 'Pc7+')).toEqual(parseUsi('7d7c+'));
-  expect(parseSan(pos, 'Pc7=')).toEqual(parseUsi('7d7c='));
+  expect(parseSan(pos, 'Pc7=')).toEqual(parseUsi('7d7c'));
   expect(parseSan(pos, 'Be9+')).toEqual(parseUsi('6b5a+'));
-  expect(parseSan(pos, 'Be9=')).toEqual(parseUsi('6b5a='));
+  expect(parseSan(pos, 'Be9=')).toEqual(parseUsi('6b5a'));
   expect(parseSan(pos, 'Be9')).toBeUndefined();
   expect(parseSan(pos, 'Ba5+')).toEqual(parseUsi('6b9e+'));
-  expect(parseSan(pos, 'Ba5=')).toEqual(parseUsi('6b9e='));
+  expect(parseSan(pos, 'Ba5=')).toEqual(parseUsi('6b9e'));
   expect(parseSan(pos, 'Ba5')).toBeUndefined();
   expect(parseSan(pos, 'Nc9+')).toEqual(parseUsi('6c7a+'));
   expect(parseSan(pos, 'Nc9')).toBeUndefined();
@@ -55,7 +55,7 @@ test('parse promotion san', () => {
   expect(parseSan(pos, 'Lxf9')).toBeUndefined();
   expect(parseSan(pos, 'Lxf9=')).toBeUndefined();
   expect(parseSan(pos, 'Lxg7+')).toEqual(parseUsi('3i3c+'));
-  expect(parseSan(pos, 'Lxg7=')).toEqual(parseUsi('3i3c='));
+  expect(parseSan(pos, 'Lxg7=')).toEqual(parseUsi('3i3c'));
   expect(parseSan(pos, 'Lxg7')).toBeUndefined();
   expect(parseSan(pos, 'Lxh6')).toEqual(parseUsi('2i2d'));
   expect(parseSan(pos, 'Lxh6=')).toBeUndefined();

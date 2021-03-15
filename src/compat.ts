@@ -189,7 +189,7 @@ export function parseLishogiUci(str: string): Move | undefined {
   } else if (str.length === 4 || str.length === 5) {
     const from = parseChessSquare(str.slice(0, 2));
     const to = parseChessSquare(str.slice(2, 4));
-    const promotion = str[4] === '+' ? true : str[4] === '=' ? false : undefined;
+    const promotion = str[4] === '+' ? true : false;
     if (defined(from) && defined(to)) return { from, to, promotion };
   }
   return;
@@ -197,9 +197,7 @@ export function parseLishogiUci(str: string): Move | undefined {
 
 export function makeLishogiUci(move: Move): string {
   if (isDrop(move)) return `${roleToLishogiChar(move.role).toUpperCase()}*${makeChessSquare(move.to)}`;
-  return (
-    makeChessSquare(move.from) + makeChessSquare(move.to) + (move.promotion ? '+' : move.promotion === false ? '=' : '')
-  );
+  return makeChessSquare(move.from) + makeChessSquare(move.to) + (move.promotion ? '+' : '');
 }
 
 export function assureUsi(str: string): string | undefined {

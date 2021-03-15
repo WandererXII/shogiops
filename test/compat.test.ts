@@ -42,10 +42,10 @@ test('shogi coord', () => {
 });
 
 test('parse lishogi uci', () => {
-  expect(parseLishogiUci('a1i1')).toEqual({ from: 0, to: 8, promotion: undefined });
+  expect(parseLishogiUci('a1i1')).toEqual({ from: 0, to: 8, promotion: false });
   expect(parseLishogiUci('h2h7+')).toEqual({ from: 16, to: 61, promotion: true });
   expect(parseLishogiUci('h2h7=')).toEqual({ from: 16, to: 61, promotion: false });
-  expect(parseLishogiUci('h2h7')).toEqual({ from: 16, to: 61, promotion: undefined });
+  expect(parseLishogiUci('h2h7')).toEqual({ from: 16, to: 61, promotion: false });
   expect(parseLishogiUci('P*i3')).toEqual({ role: 'pawn', to: 26 });
 });
 
@@ -53,7 +53,7 @@ test('make lishogi uci', () => {
   expect(makeLishogiUci({ role: 'rook', to: 1 })).toBe('R*b1');
   expect(makeLishogiUci({ from: 2, to: 3 })).toBe('c1d1');
   expect(makeLishogiUci({ from: 0, to: 0, promotion: true })).toBe('a1a1+');
-  expect(makeLishogiUci({ from: 0, to: 0, promotion: false })).toBe('a1a1=');
+  expect(makeLishogiUci({ from: 0, to: 0, promotion: false })).toBe('a1a1');
   expect(makeLishogiUci({ from: 0, to: 0, promotion: undefined })).toBe('a1a1');
 });
 

@@ -37,6 +37,15 @@ export function shogigroundDests(pos: Position): Map<ChessSquareName, ChessSquar
   return result;
 }
 
+export function scalashogiCharPair(move: Move): string {
+  if (isDrop(move))
+    return String.fromCharCode(
+      34 + move.to,
+      34 + 81 + 128 + ['rook', 'bishop', 'knight', 'pawn', 'gold', 'silver', 'lance'].indexOf(move.role)
+    );
+  else return String.fromCharCode(34 + move.from, move.promotion ? 34 + move.to + 128 : 34 + move.to);
+}
+
 export function shogigroundMove(move: Move): ChessSquareName[] {
   return isDrop(move) ? [makeChessSquare(move.to)] : [makeChessSquare(move.from), makeChessSquare(move.to)];
 }

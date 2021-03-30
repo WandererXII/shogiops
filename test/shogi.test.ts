@@ -1,4 +1,4 @@
-import { parseFen } from '../src/fen';
+import { makeFen, parseFen } from '../src/fen';
 import { Shogi, IllegalSetup } from '../src/shogi';
 import { perft } from '../src/debug';
 import { parseUsi } from '../src/util';
@@ -67,6 +67,24 @@ test('capturing', () => {
   pos.play(parseUsi('6d6c')!);
   pos.play(parseUsi('5a4a')!);
   expect(pos.isLegal(parseUsi('G*5e')!)).toBe(true);
+});
+
+test('promotion', () => {
+  const pos = Shogi.default();
+  pos.play(parseUsi('1i1h')!);
+  expect(makeFen(pos)).toEqual('lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5RL/LNSGKGSN1 w - 2');
+
+  const pos2 = Shogi.fromSetup(
+    parseFen('lnsgkgsn1/1r5b1/pppppp1p1/6p2/8L/9/PPPPPPPP1/1B5R1/LNSGKGSN1 b LPp 9').unwrap()
+  ).unwrap();
+  pos2.play(parseUsi('1e1a')!);
+  expect(makeFen(pos2)).toEqual('lnsgkgsn+L/1r5b1/pppppp1p1/6p2/9/9/PPPPPPPP1/1B5R1/LNSGKGSN1 w LPp 10');
+
+  const pos3 = Shogi.fromSetup(
+    parseFen('lnsgkgsn1/1r5b1/pppppp1p1/6p2/8L/9/PPPPPPPP1/1B5R1/LNSGKGSN1 b LPp 9').unwrap()
+  ).unwrap();
+  pos3.play(parseUsi('1e1a+')!);
+  expect(makeFen(pos3)).toEqual('lnsgkgsn+L/1r5b1/pppppp1p1/6p2/9/9/PPPPPPPP1/1B5R1/LNSGKGSN1 w LPp 10');
 });
 
 test.each(random)('random perft: %s: %s', (_, fen, d1, d2) => {

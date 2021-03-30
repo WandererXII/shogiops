@@ -273,7 +273,11 @@ export abstract class Position {
       const piece = this.board.take(move.from);
       if (!piece) return;
       const role = piece.role;
-      if (move.promotion && (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)) {
+      if (
+        (move.promotion && (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)) ||
+        (role === 'knight' && SquareSet.backrank2(turn).has(move.to)) ||
+        ((role === 'pawn' || role === 'lance') && SquareSet.backrank(turn).has(move.to))
+      ) {
         piece.role = promote(role as PromotableRole);
       }
 

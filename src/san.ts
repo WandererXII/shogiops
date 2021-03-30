@@ -28,6 +28,12 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
     if (capture) san += 'x';
     san += shogiCoordToChessCord(makeSquare(move.to));
     if (move.promotion) san += '+';
+    // Do we need to force promotion?
+    else if (
+      (role === 'knight' && SquareSet.backrank2(pos.turn).has(move.to)) ||
+      ((role === 'pawn' || role === 'lance') && SquareSet.backrank(pos.turn).has(move.to))
+    )
+      san += '+';
     else if (
       (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role) &&
       SquareSet.promotionZone(pos.turn).has(move.to)

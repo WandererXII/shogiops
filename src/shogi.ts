@@ -97,7 +97,7 @@ export abstract class Position {
 
   protected playCaptureAt(square: Square, captured: Piece): void {
     const unpromotedRole = unpromote(captured.role);
-    if (unpromotedRole) this.pockets[opposite(captured.color)][unpromotedRole]++;
+    if (unpromotedRole !== 'king') this.pockets[opposite(captured.color)][unpromotedRole]++;
   }
 
   ctx(): Context {
@@ -278,7 +278,7 @@ export abstract class Position {
         (role === 'knight' && SquareSet.backrank2(turn).has(move.to)) ||
         ((role === 'pawn' || role === 'lance') && SquareSet.backrank(turn).has(move.to))
       ) {
-        piece.role = promote(role as PromotableRole);
+        piece.role = promote(role);
       }
 
       const capture = this.board.set(move.to, piece);
@@ -296,7 +296,7 @@ export class Shogi extends Position {
     const pos = new this();
     pos.board = Board.default();
     pos.pockets = Material.empty();
-    pos.turn = 'black';
+    pos.turn = 'sente';
     pos.fullmoves = 1;
     return pos;
   }
@@ -317,22 +317,19 @@ export class Shogi extends Position {
   protected validate(strict: boolean): Result<undefined, PositionError> {
     if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.king.size() !== 2) return Result.err(new PositionError(IllegalSetup.Kings));
-
-    if (!defined(this.board.kingOf(this.turn))) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.king.size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
 
     const otherKing = this.board.kingOf(opposite(this.turn));
-    if (!defined(otherKing)) return Result.err(new PositionError(IllegalSetup.Kings));
-    if (this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
+    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
     const b1 = this.board.pawn.union(this.board.lance);
 
     if (
-      SquareSet.backrank('black').intersect(b1.intersect(this.board['black'])).nonEmpty() ||
-      SquareSet.backrank('white').intersect(b1.intersect(this.board['white'])).nonEmpty() ||
-      SquareSet.backrank2('black').intersect(this.board.knight.intersect(this.board['black'])).nonEmpty() ||
-      SquareSet.backrank2('white').intersect(this.board.knight.intersect(this.board['white'])).nonEmpty()
+      SquareSet.backrank('sente').intersect(b1.intersect(this.board['sente'])).nonEmpty() ||
+      SquareSet.backrank('gote').intersect(b1.intersect(this.board['gote'])).nonEmpty() ||
+      SquareSet.backrank2('sente').intersect(this.board.knight.intersect(this.board['sente'])).nonEmpty() ||
+      SquareSet.backrank2('gote').intersect(this.board.knight.intersect(this.board['gote'])).nonEmpty()
     )
       return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
 
@@ -369,7 +366,7 @@ export class Shogi extends Position {
     // Checking for pawn checkmate
     if (defined(ctx.king) && role === 'pawn') {
       const king = this.board.pieces(opposite(this.turn), 'king');
-      const kingFront = (this.turn === 'black' ? king.shr81(9) : king.shl81(9)).singleSquare();
+      const kingFront = (this.turn === 'sente' ? king.shr81(9) : king.shl81(9)).singleSquare();
       if (kingFront && mask.has(kingFront)) {
         const child = this.clone();
         child.play({ role: 'pawn', to: kingFront });
@@ -440,6 +437,6 @@ export class Shogi extends Position {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
-    return this.board.occupied.intersect(this.board[color]).size() + this.pockets[color].count() < 2; // black king, white king and one other piece
+    return this.board.occupied.intersect(this.board[color]).size() + this.pockets[color].count() < 2; // sente king, gote king and one other piece
   }
 }

@@ -54,34 +54,34 @@ export class MaterialSide {
 }
 
 export class Material {
-  constructor(public white: MaterialSide, public black: MaterialSide) {}
+  constructor(public gote: MaterialSide, public sente: MaterialSide) {}
 
   static empty(): Material {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
   }
 
   static fromBoard(board: Board): Material {
-    return new Material(MaterialSide.fromBoard(board, 'white'), MaterialSide.fromBoard(board, 'black'));
+    return new Material(MaterialSide.fromBoard(board, 'gote'), MaterialSide.fromBoard(board, 'sente'));
   }
 
   clone(): Material {
-    return new Material(this.white.clone(), this.black.clone());
+    return new Material(this.gote.clone(), this.sente.clone());
   }
 
   equals(other: Material): boolean {
-    return this.white.equals(other.white) && this.black.equals(other.black);
+    return this.gote.equals(other.gote) && this.sente.equals(other.sente);
   }
 
   add(other: Material): Material {
-    return new Material(this.white.add(other.white), this.black.add(other.black));
+    return new Material(this.gote.add(other.gote), this.sente.add(other.sente));
   }
 
   count(): number {
-    return this.white.count() + this.black.count();
+    return this.gote.count() + this.sente.count();
   }
 
   isEmpty(): boolean {
-    return this.white.isEmpty() && this.black.isEmpty();
+    return this.gote.isEmpty() && this.sente.isEmpty();
   }
 
   nonEmpty(): boolean {
@@ -100,7 +100,7 @@ export function defaultSetup(): Setup {
   return {
     board: Board.default(),
     pockets: Material.empty(),
-    turn: 'black',
+    turn: 'sente',
     fullmoves: 1,
   };
 }

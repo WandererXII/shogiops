@@ -98,8 +98,8 @@ test('pawn checkmate', () => {
   const pos2 = pos.clone();
   pos.play(parseUsi('L*5b')!);
   pos2.play(parseUsi('P*5b')!);
-  expect(pos.outcome()).toEqual({ winner: 'black' });
-  expect(pos2.outcome()).toEqual({ winner: 'white' });
+  expect(pos.outcome()).toEqual({ winner: 'sente' });
+  expect(pos2.outcome()).toEqual({ winner: 'gote' });
 });
 
 const insufficientMaterial: [string, boolean, boolean][] = [
@@ -108,10 +108,10 @@ const insufficientMaterial: [string, boolean, boolean][] = [
   ['9/4k4/9/9/9/9/2G6/4K4/9 b - 1', false, true],
 ];
 
-test.each(insufficientMaterial)('insufficient material: %s', (fen, black, white) => {
+test.each(insufficientMaterial)('insufficient material: %s', (fen, sente, gote) => {
   const pos = Shogi.fromSetup(parseFen(fen).unwrap()).unwrap();
-  expect(pos.hasInsufficientMaterial('black')).toBe(black);
-  expect(pos.hasInsufficientMaterial('white')).toBe(white);
+  expect(pos.hasInsufficientMaterial('sente')).toBe(sente);
+  expect(pos.hasInsufficientMaterial('gote')).toBe(gote);
 });
 
 test('impossible checker alignment', () => {

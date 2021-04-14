@@ -21,20 +21,20 @@ function tabulate<T>(f: (square: Square) => T): BySquare<T> {
 
 const KING_ATTACKS = tabulate(sq => computeRange(sq, [-10, -9, -8, -1, 1, 8, 9, 10]));
 const KNIGHT_ATTACKS = {
-  black: tabulate(sq => computeRange(sq, [17, 19])),
-  white: tabulate(sq => computeRange(sq, [-17, -19])),
+  sente: tabulate(sq => computeRange(sq, [17, 19])),
+  gote: tabulate(sq => computeRange(sq, [-17, -19])),
 };
 const PAWN_ATTACKS = {
-  black: tabulate(sq => computeRange(sq, [9])),
-  white: tabulate(sq => computeRange(sq, [-9])),
+  sente: tabulate(sq => computeRange(sq, [9])),
+  gote: tabulate(sq => computeRange(sq, [-9])),
 };
 const SILVER_ATTACKS = {
-  black: tabulate(sq => computeRange(sq, [-10, -8, 8, 9, 10])),
-  white: tabulate(sq => computeRange(sq, [-10, -9, -8, 8, 10])),
+  sente: tabulate(sq => computeRange(sq, [-10, -8, 8, 9, 10])),
+  gote: tabulate(sq => computeRange(sq, [-10, -9, -8, 8, 10])),
 };
 const GOLD_ATTACKS = {
-  black: tabulate(sq => computeRange(sq, [-9, -1, 1, 8, 9, 10])),
-  white: tabulate(sq => computeRange(sq, [-10, -9, -8, -1, 1, 9])),
+  sente: tabulate(sq => computeRange(sq, [-9, -1, 1, 8, 9, 10])),
+  gote: tabulate(sq => computeRange(sq, [-10, -9, -8, -1, 1, 9])),
 };
 
 export function kingAttacks(square: Square): SquareSet {
@@ -106,7 +106,7 @@ export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
 }
 
 export function lanceAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
-  return color === 'black'
+  return color === 'sente'
     ? fileAttacks(square, occupied).intersect(FORW_RANGE[square])
     : fileAttacks(square, occupied).intersect(BACK_RANGE[square]);
 }

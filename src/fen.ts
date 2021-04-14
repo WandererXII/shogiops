@@ -27,7 +27,7 @@ function parseSmallUint(str: string): number | undefined {
 
 function charToPiece(ch: string): Piece | undefined {
   const role = charToRole(ch);
-  return role && { role, color: ch.toLowerCase() === ch ? 'white' : 'black' };
+  return role && { role, color: ch.toLowerCase() === ch ? 'gote' : 'sente' };
 }
 
 export function parseBoardFen(boardPart: string): Result<Board, FenError> {
@@ -85,8 +85,8 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   // Turn
   const turnPart = parts.shift();
   let turn: Color;
-  if (!defined(turnPart) || turnPart === 'b') turn = 'black';
-  else if (turnPart === 'w') turn = 'white';
+  if (!defined(turnPart) || turnPart === 'b') turn = 'sente';
+  else if (turnPart === 'w') turn = 'gote';
   else return Result.err(new FenError(InvalidFen.Turn));
 
   // Pocket
@@ -128,7 +128,7 @@ export function parsePiece(str: string): Piece | undefined {
 
 export function makePiece(piece: Piece): string {
   let r = roleToChar(piece.role);
-  if (piece.color === 'black') r = r.toUpperCase();
+  if (piece.color === 'sente') r = r.toUpperCase();
   return r;
 }
 
@@ -169,14 +169,14 @@ export function makePocket(material: MaterialSide): string {
 }
 
 export function makePockets(pocket: Material): string {
-  const pockets = makePocket(pocket.black).toUpperCase() + makePocket(pocket.white);
+  const pockets = makePocket(pocket.sente).toUpperCase() + makePocket(pocket.gote);
   return pockets === '' ? '-' : pockets;
 }
 
 export function makeFen(setup: Setup, opts?: FenOpts): string {
   return [
     makeBoardFen(setup.board),
-    setup.turn[0],
+    setup.turn === 'gote' ? 'w' : 'b',
     makePockets(setup.pockets),
     ...(opts?.epd ? [] : [Math.max(1, Math.min(setup.fullmoves, 9999))]),
   ].join(' ');

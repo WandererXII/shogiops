@@ -10,7 +10,7 @@ export type SquareName = `${FileName}${RankName}`;
 
 export type BySquare<T> = T[];
 
-export const COLORS = ['black', 'white'] as const;
+export const COLORS = ['sente', 'gote'] as const;
 
 export type Color = typeof COLORS[number];
 

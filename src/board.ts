@@ -4,8 +4,8 @@ import { SquareSet } from './squareSet';
 export class Board implements Iterable<[Square, Piece]> {
   occupied: SquareSet;
 
-  white: SquareSet;
-  black: SquareSet;
+  gote: SquareSet;
+  sente: SquareSet;
 
   pawn: SquareSet;
   lance: SquareSet;
@@ -32,8 +32,8 @@ export class Board implements Iterable<[Square, Piece]> {
 
   reset(): void {
     this.occupied = new SquareSet(0x7fd05ff, 0x0, 0x7fd05ff);
-    this.black = new SquareSet(0x7fd05ff, 0x0, 0x0);
-    this.white = new SquareSet(0x0, 0x0, 0x7fd05ff);
+    this.sente = new SquareSet(0x7fd05ff, 0x0, 0x0);
+    this.gote = new SquareSet(0x0, 0x0, 0x7fd05ff);
     this.pawn = new SquareSet(0x7fc0000, 0x0, 0x1ff);
     this.lance = new SquareSet(0x101, 0x0, 0x4040000);
     this.knight = new SquareSet(0x82, 0x0, 0x2080000);
@@ -71,13 +71,13 @@ export class Board implements Iterable<[Square, Piece]> {
   }
 
   equals(other: Board): boolean {
-    if (!this.white.equals(other.white)) return false;
+    if (!this.gote.equals(other.gote)) return false;
     return ROLES.every(role => this[role].equals(other[role]));
   }
 
   getColor(square: Square): Color | undefined {
-    if (this.black.has(square)) return 'black';
-    if (this.white.has(square)) return 'white';
+    if (this.sente.has(square)) return 'sente';
+    if (this.gote.has(square)) return 'gote';
     return;
   }
 

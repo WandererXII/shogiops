@@ -56,34 +56,34 @@ test('king attacks', () => {
 });
 
 test('knight attacks', () => {
-  expect(knightAttacks('black', 40)).toEqual(new SquareSet(0x0, 0x0, 0x28));
-  expect(knightAttacks('black', 70)).toEqual(SquareSet.empty());
-  expect(knightAttacks('white', 40)).toEqual(new SquareSet(0xa00000, 0x0, 0x0));
-  expect(knightAttacks('white', 15)).toEqual(SquareSet.empty());
+  expect(knightAttacks('sente', 40)).toEqual(new SquareSet(0x0, 0x0, 0x28));
+  expect(knightAttacks('sente', 70)).toEqual(SquareSet.empty());
+  expect(knightAttacks('gote', 40)).toEqual(new SquareSet(0xa00000, 0x0, 0x0));
+  expect(knightAttacks('gote', 15)).toEqual(SquareSet.empty());
 });
 
 test('silver attacks', () => {
-  expect(silverAttacks('black', 40)).toEqual(new SquareSet(0x0, 0xe00028, 0x0));
-  expect(silverAttacks('black', 49)).toEqual(new SquareSet(0x0, 0x5000, 0x38));
-  expect(silverAttacks('white', 40)).toEqual(new SquareSet(0x0, 0xa00038, 0x0));
+  expect(silverAttacks('sente', 40)).toEqual(new SquareSet(0x0, 0xe00028, 0x0));
+  expect(silverAttacks('sente', 49)).toEqual(new SquareSet(0x0, 0x5000, 0x38));
+  expect(silverAttacks('gote', 40)).toEqual(new SquareSet(0x0, 0xa00038, 0x0));
 });
 
 test('gold attacks', () => {
-  expect(goldAttacks('black', 40)).toEqual(new SquareSet(0x0, 0xe05010, 0x0));
-  expect(goldAttacks('black', 49)).toEqual(new SquareSet(0x0, 0xa02000, 0x38));
-  expect(goldAttacks('white', 40)).toEqual(new SquareSet(0x0, 0x405038, 0x0));
+  expect(goldAttacks('sente', 40)).toEqual(new SquareSet(0x0, 0xe05010, 0x0));
+  expect(goldAttacks('sente', 49)).toEqual(new SquareSet(0x0, 0xa02000, 0x38));
+  expect(goldAttacks('gote', 40)).toEqual(new SquareSet(0x0, 0x405038, 0x0));
 });
 
 test('lance attacks', () => {
-  expect(lanceAttacks('black', 0, SquareSet.empty())).toEqual(new SquareSet(0x40200, 0x40201, 0x40201));
-  expect(lanceAttacks('black', 22, SquareSet.empty())).toEqual(new SquareSet(0x0, 0x402010, 0x402010));
-  expect(lanceAttacks('black', 40, new SquareSet(0x0, 0x400000, 0x0))).toEqual(new SquareSet(0x0, 0x400000, 0x0));
-  expect(lanceAttacks('black', 15, new SquareSet(0x0, 0x814480, 0xe020))).toEqual(
+  expect(lanceAttacks('sente', 0, SquareSet.empty())).toEqual(new SquareSet(0x40200, 0x40201, 0x40201));
+  expect(lanceAttacks('sente', 22, SquareSet.empty())).toEqual(new SquareSet(0x0, 0x402010, 0x402010));
+  expect(lanceAttacks('sente', 40, new SquareSet(0x0, 0x400000, 0x0))).toEqual(new SquareSet(0x0, 0x400000, 0x0));
+  expect(lanceAttacks('sente', 15, new SquareSet(0x0, 0x814480, 0xe020))).toEqual(
     new SquareSet(0x1000000, 0x1008040, 0x8040)
   );
-  expect(lanceAttacks('white', 40, new SquareSet(0x0, 0x10, 0x0))).toEqual(new SquareSet(0x0, 0x10, 0x0));
-  expect(lanceAttacks('white', 58, SquareSet.empty())).toEqual(new SquareSet(0x402010, 0x402010, 0x0));
-  expect(lanceAttacks('white', 58, new SquareSet(0x400000, 0x0, 0x0))).toEqual(new SquareSet(0x400000, 0x402010, 0x0));
+  expect(lanceAttacks('gote', 40, new SquareSet(0x0, 0x10, 0x0))).toEqual(new SquareSet(0x0, 0x10, 0x0));
+  expect(lanceAttacks('gote', 58, SquareSet.empty())).toEqual(new SquareSet(0x402010, 0x402010, 0x0));
+  expect(lanceAttacks('gote', 58, new SquareSet(0x400000, 0x0, 0x0))).toEqual(new SquareSet(0x400000, 0x402010, 0x0));
 });
 
 test('dragon attacks', () => {

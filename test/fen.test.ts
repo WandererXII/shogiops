@@ -15,7 +15,7 @@ test('parse initial fen', () => {
   const setup = parseFen(INITIAL_FEN).unwrap();
   expect(setup.board).toEqual(Board.default());
   expect(setup.pockets).toEqual(Material.empty());
-  expect(setup.turn).toEqual('black');
+  expect(setup.turn).toEqual('sente');
   expect(setup.fullmoves).toEqual(1);
 });
 
@@ -23,7 +23,7 @@ test('partial fen', () => {
   const setup = parseFen(INITIAL_BOARD_FEN).unwrap();
   expect(setup.board).toEqual(Board.default());
   expect(setup.pockets).toEqual(Material.empty());
-  expect(setup.turn).toEqual('black');
+  expect(setup.turn).toEqual('sente');
   expect(setup.fullmoves).toEqual(1);
 });
 

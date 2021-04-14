@@ -11,7 +11,7 @@ export function fxhash32(word: number, state = 0): number {
 }
 
 export function hashBoard(board: Board, state = 0): number {
-  state = fxhash32(board.white.lo, fxhash32(board.white.mid, fxhash32(board.white.hi, state)));
+  state = fxhash32(board.gote.lo, fxhash32(board.gote.mid, fxhash32(board.gote.hi, state)));
   for (const role of ROLES)
     state = fxhash32(board[role].lo, fxhash32(board[role].mid, fxhash32(board[role].hi, state)));
   return state;
@@ -30,6 +30,6 @@ export function hashMaterial(material: Material, state = 0): number {
 export function hashSetup(setup: Setup, state = 0): number {
   state = hashBoard(setup.board, state);
   state = hashMaterial(setup.pockets, state);
-  if (setup.turn === 'black') state = fxhash32(1, state);
+  if (setup.turn === 'sente') state = fxhash32(1, state);
   return state;
 }

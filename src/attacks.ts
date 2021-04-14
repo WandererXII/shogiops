@@ -129,9 +129,9 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
       return knightAttacks(piece.color, square);
     case 'silver':
       return silverAttacks(piece.color, square);
-    case 'promotedKnight':
-    case 'promotedLance':
-    case 'promotedSilver':
+    case 'promotedknight':
+    case 'promotedlance':
+    case 'promotedsilver':
     case 'tokin':
     case 'gold':
       return goldAttacks(piece.color, square);

@@ -259,10 +259,10 @@ export function switchColor(color: string): string {
       return 'b';
     case 'b':
       return 'w';
-    case 'white':
-      return 'black';
-    case 'black':
-      return 'white';
+    case 'gote':
+      return 'sente';
+    case 'sente':
+      return 'gote';
     default:
       return color;
   }
@@ -290,59 +290,4 @@ export function pliesToTurnNumber(ply: string): string {
     const turn = 1 + Math.floor((plyNumber - 1) / 2);
     return turn.toString();
   } else return ply;
-}
-
-// assumes the sfen is correct, doesn't check validity
-export function makeLishogiFen(sfen: string): string {
-  const sep = sfen.split(' ').length > 1 ? ' ' : '_';
-  const parts = sfen.split(sep);
-  let lFen = '';
-
-  // Board
-  const board = parts.shift();
-  if (board) lFen = shogiBoardToLishogiBoard(board);
-  else return sfen;
-
-  // Color
-  const color = parts.shift();
-  if (color) lFen += ' ' + switchColor(color);
-  else return lFen;
-
-  // Pocket
-  const pocket = parts.shift();
-  if (pocket) lFen += ' ' + fixPocket(pocket);
-  else return lFen;
-
-  // Plies
-  const plies = parts.shift();
-  if (plies) lFen += ' ' + pliesToTurnNumber(plies);
-
-  return lFen;
-}
-
-export function makeShogiFen(fen: string): string {
-  const sep = fen.split(' ').length > 1 ? ' ' : '_';
-  const parts = fen.split(sep);
-  let sFen = '';
-
-  // Board
-  const board = parts.shift();
-  if (board) sFen = lishogiBoardToShogiBoard(board);
-  else return fen;
-
-  // Color
-  const color = parts.shift();
-  if (color) sFen += ' ' + switchColor(color);
-  else return sFen;
-
-  // Pocket
-  const pocket = parts.shift();
-  if (pocket) sFen += ' ' + fixPocket(pocket);
-  else return sFen;
-
-  // Turn Number
-  const turn = parts.shift();
-  if (turn) sFen += ' ' + turnNumberToPlies(turn, color);
-
-  return sFen;
 }

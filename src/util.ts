@@ -1,3 +1,4 @@
+import {SquareSet} from './squareSet';
 import {
   FILE_NAMES,
   RANK_NAMES,
@@ -9,6 +10,8 @@ import {
   isDrop,
   SquareName,
   PromotableRole,
+  Piece,
+  PROMOTABLE_ROLES,
 } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
@@ -16,7 +19,7 @@ export function defined<A>(v: A | undefined): v is A {
 }
 
 export function opposite(color: Color): Color {
-  return color === 'white' ? 'black' : 'white';
+  return color === 'gote' ? 'sente' : 'gote';
 }
 
 export function squareRank(square: Square): number {
@@ -27,7 +30,7 @@ export function squareFile(square: Square): number {
   return square % 9;
 }
 
-export function unpromote(role: Role): PocketRole | undefined {
+export function unpromote(role: Role): PocketRole | 'king' {
   switch (role) {
     case 'pawn':
     case 'tokin':
@@ -50,11 +53,11 @@ export function unpromote(role: Role): PocketRole | undefined {
     case 'dragon':
       return 'rook';
     default:
-      return;
+      return role;
   }
 }
 
-export function promote(role: PromotableRole): Role {
+export function promote(role: Role): Role {
   switch (role) {
     case 'pawn':
       return 'tokin';
@@ -68,6 +71,8 @@ export function promote(role: PromotableRole): Role {
       return 'horse';
     case 'rook':
       return 'dragon';
+    default:
+      return role;
   }
 }
 
@@ -214,4 +219,9 @@ export function parseUsi(str: string): Move | undefined {
 export function makeUsi(move: Move): string {
   if (isDrop(move)) return `${roleToChar(move.role).toUpperCase()}*${makeSquare(move.to)}`;
   return makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? '+' : '');
+}
+
+export function canPiecePromote(piece: Piece, from: Square, to: Square): boolean {
+  return (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(piece.role) &&
+    (SquareSet.promotionZone(piece.color).has(from) || SquareSet.promotionZone(piece.color).has(to));
 }

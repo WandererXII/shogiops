@@ -10,7 +10,6 @@ import {
   Outcome,
   POCKET_ROLES,
   PROMOTABLE_ROLES,
-  PromotableRole,
   PocketRole,
 } from './types';
 import { SquareSet } from './squareSet';

@@ -1,4 +1,4 @@
-import {SquareSet} from './squareSet';
+import { SquareSet } from './squareSet';
 import {
   FILE_NAMES,
   RANK_NAMES,
@@ -9,7 +9,6 @@ import {
   Move,
   isDrop,
   SquareName,
-  PromotableRole,
   Piece,
   PROMOTABLE_ROLES,
 } from './types';
@@ -222,6 +221,8 @@ export function makeUsi(move: Move): string {
 }
 
 export function canPiecePromote(piece: Piece, from: Square, to: Square): boolean {
-  return (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(piece.role) &&
-    (SquareSet.promotionZone(piece.color).has(from) || SquareSet.promotionZone(piece.color).has(to));
+  return (
+    (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(piece.role) &&
+    (SquareSet.promotionZone(piece.color).has(from) || SquareSet.promotionZone(piece.color).has(to))
+  );
 }

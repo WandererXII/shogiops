@@ -1,6 +1,5 @@
 import { Rules, SquareName, Move, isDrop, Square, Role, PocketRole } from './types';
 import { defined, makeSquare, makeUsi, parseSquare, parseUsi, squareFile, squareRank } from './util';
-import { parsePockets, makePockets } from './fen';
 import { Position } from './shogi';
 
 export const C_FILE_NAMES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
@@ -219,75 +218,4 @@ export function assureLishogiUci(str: string): string | undefined {
   if (str.match(/^([a-i][1-9]|([RBGSNLP]\*))[a-i][1-9](\+|\=)?$/)) return str;
   if (str.match(/^([1-9][a-i]|([RBGSNLP]\*))[1-9][a-i](\+|\=)?$/)) return makeLishogiUci(parseUsi(str)!);
   return;
-}
-
-export function lishogiBoardToShogiBoard(board: string): string {
-  return board
-    .replace(/t/g, '+p')
-    .replace(/u/g, '+l')
-    .replace(/a/g, '+s')
-    .replace(/m/g, '+n')
-    .replace(/d/g, '+r')
-    .replace(/h/g, '+b')
-    .replace(/T/g, '+P')
-    .replace(/U/g, '+L')
-    .replace(/A/g, '+S')
-    .replace(/M/g, '+N')
-    .replace(/D/g, '+R')
-    .replace(/H/g, '+B');
-}
-
-export function shogiBoardToLishogiBoard(board: string): string {
-  return board
-    .replace(/\+p/g, 't')
-    .replace(/\+l/g, 'u')
-    .replace(/\+s/g, 'a')
-    .replace(/\+n/g, 'm')
-    .replace(/\+r/g, 'd')
-    .replace(/\+b/g, 'h')
-    .replace(/\+P/g, 'T')
-    .replace(/\+L/g, 'U')
-    .replace(/\+S/g, 'A')
-    .replace(/\+N/g, 'M')
-    .replace(/\+R/g, 'D')
-    .replace(/\+B/g, 'H');
-}
-
-export function switchColor(color: string): string {
-  switch (color) {
-    case 'w':
-      return 'b';
-    case 'b':
-      return 'w';
-    case 'gote':
-      return 'sente';
-    case 'sente':
-      return 'gote';
-    default:
-      return color;
-  }
-}
-
-export function fixPocket(pocket: string): string {
-  const material = parsePockets(pocket);
-  return material.unwrap(
-    value => makePockets(value),
-    _ => '-'
-  );
-}
-
-export function turnNumberToPlies(turn: string, color: string): string {
-  const turnNumber = parseInt(turn);
-  if (turnNumber) {
-    const ply = color === 'w' ? turnNumber * 2 - 1 : turnNumber * 2;
-    return ply.toString();
-  } else return turn;
-}
-
-export function pliesToTurnNumber(ply: string): string {
-  const plyNumber = parseInt(ply);
-  if (plyNumber) {
-    const turn = 1 + Math.floor((plyNumber - 1) / 2);
-    return turn.toString();
-  } else return ply;
 }

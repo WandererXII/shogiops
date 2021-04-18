@@ -36,6 +36,26 @@ export function shogigroundDests(pos: Position): Map<ChessSquareName, ChessSquar
   return result;
 }
 
+export function shogigroundDropDests(pos: Position, role?: PocketRole): Map<PocketRole, ChessSquareName[]> {
+  const result = new Map();
+  if (role) {
+    const squares = pos.dropDests(role);
+    if (squares.nonEmpty()) {
+      const d = Array.from(squares, s => makeChessSquare(s));
+      result.set(role, d);
+    }
+  } else {
+    const ctx = pos.ctx();
+    for (const [r, squares] of pos.allDropDests(ctx)) {
+      if (squares.nonEmpty()) {
+        const d = Array.from(squares, s => makeChessSquare(s));
+        result.set(r, d);
+      }
+    }
+  }
+  return result;
+}
+
 export function scalashogiCharPair(move: Move): string {
   if (isDrop(move))
     return String.fromCharCode(

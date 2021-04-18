@@ -8,8 +8,10 @@ import {
   assureUsi,
   assureLishogiUci,
   scalashogiCharPair,
+  shogigroundDropDests,
 } from '../src/compat';
 import { parseUsi } from '../src/util';
+import { parseFen } from '../src/fen';
 
 test('scalashogiCharPair', () => {
   expect(scalashogiCharPair(parseUsi('1g1f')!)).toEqual('<E');
@@ -30,6 +32,30 @@ test('shogiground dests', () => {
   expect(dests.get('c3')).toContain('c4');
   expect(dests.get('e1')).toContain('d2');
   expect(dests.get('e1')).not.toContain('d1');
+});
+
+test('shogiground drop dests', () => {
+  const dests1 = shogigroundDropDests(Shogi.default());
+  expect(dests1.get('pawn')).toEqual(undefined);
+
+  const pos2 = Shogi.fromSetup(parseFen('9/9/5k3/9/9/9/9/4K4/9 b N 1').unwrap()).unwrap();
+  const dests2 = shogigroundDropDests(pos2);
+  expect(dests2.get('knight')).toContain('e1');
+  expect(dests2.get('knight')).not.toContain('e2');
+  expect(dests2.get('knight')).toContain('e3');
+  expect(dests2.get('knight')).toContain('e7');
+  expect(dests2.get('knight')).not.toContain('e8');
+  expect(dests2.get('knight')).not.toContain('e9');
+  expect(dests2.get('knight')).not.toContain('f7');
+
+  const pos3 = Shogi.fromSetup(parseFen('3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1').unwrap()).unwrap();
+  const dests3 = shogigroundDropDests(pos3);
+  const dests4 = shogigroundDropDests(pos3, 'pawn');
+  expect(dests3.get('pawn')).toContain('e7');
+  expect(dests4.get('pawn')).toContain('e7');
+  expect(dests3.get('pawn')).not.toContain('e8');
+  expect(dests4.get('pawn')).not.toContain('e8');
+  expect(dests3.get('lance')).toContain('e8');
 });
 
 test('chess coord', () => {

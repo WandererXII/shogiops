@@ -226,3 +226,19 @@ export function canPiecePromote(piece: Piece, from: Square, to: Square): boolean
     (SquareSet.promotionZone(piece.color).has(from) || SquareSet.promotionZone(piece.color).has(to))
   );
 }
+
+export function toBW(color: string): 'b' | 'w' {
+  // white, w, gote, g
+  if (color[0] === 'w' || color[0] === 'g') return 'w';
+  return 'b';
+}
+
+export function toBlackWhite(color: string): 'black' | 'white' {
+  if (color[0] === 'w' || color[0] === 'g') return 'white';
+  return 'black';
+}
+
+export function toColor(color: string): Color {
+  if (color[0] === 'w' || color[0] === 'g') return 'gote';
+  return 'sente';
+}

@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Piece, Color, POCKET_ROLES, PocketRole } from './types';
 import { Board } from './board';
 import { Setup, MaterialSide, Material } from './setup';
-import { defined, roleToChar, charToRole } from './util';
+import { defined, roleToChar, charToRole, toBW } from './util';
 
 export const INITIAL_BOARD_FEN = 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' b -';
@@ -176,7 +176,7 @@ export function makePockets(pocket: Material): string {
 export function makeFen(setup: Setup, opts?: FenOpts): string {
   return [
     makeBoardFen(setup.board),
-    setup.turn === 'gote' ? 'w' : 'b',
+    toBW(setup.turn),
     makePockets(setup.pockets),
     ...(opts?.epd ? [] : [Math.max(1, Math.min(setup.fullmoves, 9999))]),
   ].join(' ');

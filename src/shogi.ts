@@ -362,8 +362,8 @@ export class Shogi extends Position {
       }
     }
 
-    // Checking for pawn checkmate
-    if (defined(ctx.king) && role === 'pawn') {
+    // Checking for a pawn checkmate
+    if (role === 'pawn') {
       const king = this.board.pieces(opposite(this.turn), 'king');
       const kingFront = (this.turn === 'sente' ? king.shr81(9) : king.shl81(9)).singleSquare();
       if (kingFront && mask.has(kingFront)) {

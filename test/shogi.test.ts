@@ -96,10 +96,28 @@ test.each(random)('random perft: %s: %s', (_, fen, d1, d2) => {
 test('pawn checkmate', () => {
   const pos = Shogi.fromSetup(parseFen('3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1').unwrap()).unwrap();
   const pos2 = pos.clone();
+
+  expect(pos.isLegal(parseUsi('L*5b')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('P*5b')!)).toBe(false);
+
+  // If pawn checkmate is played, opponent is victorious
   pos.play(parseUsi('L*5b')!);
   pos2.play(parseUsi('P*5b')!);
   expect(pos.outcome()).toEqual({ winner: 'sente' });
   expect(pos2.outcome()).toEqual({ winner: 'gote' });
+
+  // Single king
+  const skPos = Shogi.fromSetup(parseFen('3rkr3/9/8p/4N4/1B7/9/1SG6/2S6/9 b LPp 1').unwrap()).unwrap();
+  const skPos2 = skPos.clone();
+
+  expect(skPos.isLegal(parseUsi('L*5b')!)).toBe(true);
+  expect(skPos.isLegal(parseUsi('P*5b')!)).toBe(false);
+
+  // If pawn checkmate is played, opponent is victorious
+  skPos.play(parseUsi('L*5b')!);
+  skPos2.play(parseUsi('P*5b')!);
+  expect(skPos.outcome()).toEqual({ winner: 'sente' });
+  expect(skPos2.outcome()).toEqual({ winner: 'gote' });
 });
 
 const insufficientMaterial: [string, boolean, boolean][] = [

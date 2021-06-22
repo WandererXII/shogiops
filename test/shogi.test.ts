@@ -145,3 +145,48 @@ test('impossible checker alignment', () => {
   // Checkers aligned with opponent king are fine.
   Shogi.fromSetup(parseFen('9/9/2s4k1/9/6N2/9/9/3K5/7L1 w - 2').unwrap()).unwrap();
 });
+
+test('impasse', () => {
+  const pos = Shogi.fromSetup(parseFen('2SGS4/+B+RGKGLLRB/3G5/9/7pp/8k/9/9/9 w - 2').unwrap()).unwrap();
+  expect(pos.isImpasse()).toBe(true);
+
+  // Only 27 points
+  const pos2 = Shogi.fromSetup(parseFen('G3+R3S/GG5SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 w - 2').unwrap()).unwrap();
+  expect(pos2.isImpasse()).toBe(false);
+
+  // Only 26 points
+  const pos3 = Shogi.fromSetup(parseFen('9/9/9/9/9/9/3r1lllg/+P+P1+bkssgg/K+P4ssg b r 1').unwrap()).unwrap();
+  expect(pos3.isImpasse()).toBe(false);
+
+  // Not 10+ pieces in prom zone
+  const pos4 = Shogi.fromSetup(parseFen('2SGS4/+B+RGKG2RB/9/9/7pp/8k/9/9/9 w g2s4n4l16p 2').unwrap()).unwrap();
+  expect(pos4.isImpasse()).toBe(false);
+
+  // King not in prom zone
+  const pos5 = Shogi.fromSetup(parseFen('2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 w - 2').unwrap()).unwrap();
+  expect(pos5.isImpasse()).toBe(false);
+
+  // King not in prom zone
+  const pos6 = Shogi.fromSetup(parseFen('2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 w - 2').unwrap()).unwrap();
+  expect(pos6.isImpasse()).toBe(false);
+
+  // Enough with pocket
+  const pos7 = Shogi.fromSetup(parseFen('G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 w 2R2B 2').unwrap()).unwrap();
+  expect(pos7.isImpasse()).toBe(true);
+
+  // 27 points gote
+  const pos8 = Shogi.fromSetup(parseFen('9/9/9/9/9/9/3r1llll/+P+P1+bkssgg/K+P3ssgg b r 1').unwrap()).unwrap();
+  expect(pos8.isImpasse()).toBe(true);
+
+  // 28 points sente
+  const pos9 = Shogi.fromSetup(parseFen('G3+R3S/GG2P2SS/GLPBKBPLS/9/9/7+p+p/7+pk/7+p+p/9 w - 2').unwrap()).unwrap();
+  expect(pos9.isImpasse()).toBe(true);
+
+  // opponent checked
+  const pos10 = Shogi.fromSetup(parseFen('2SGS4/+B+RGKGLLBR/3G5/9/7p1/8k/9/9/9 w - 2').unwrap()).unwrap();
+  expect(pos10.isImpasse()).toBe(true);
+
+  // player checked, it must be his turn
+  const pos11 = Shogi.fromSetup(parseFen('2SGS4/+B+RGKGLLBR/3G5/9/b6pp/8k/9/9/9 b - 2').unwrap()).unwrap();
+  expect(pos11.isImpasse()).toBe(false);
+});

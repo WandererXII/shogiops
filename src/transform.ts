@@ -18,17 +18,6 @@ export function flipHorizontal(s: SquareSet): SquareSet {
   return s.union(middle);
 }
 
-// todo
-//export function flipDiagonal(s: SquareSet): SquareSet {
-//  let t = s.xor(s.shl81(28)).intersect(new SquareSet(0x7c3e1f, 0x3e1f, 0x0));
-//  s = s.xor(t.xor(t.shr81(28)));
-//  t = s.xor(s.shl81(14)).intersect(new SquareSet(0x33330000, 0x33330000, 0));
-//  s = s.xor(t.xor(t.shr81(14)));
-//  t = s.xor(s.shl81(7)).intersect(new SquareSet(0x55005500, 0x55005500, 0));
-//  s = s.xor(t.xor(t.shr81(7)));
-//  return s;
-//}
-
 export function rotate180(s: SquareSet): SquareSet {
   return s.rbit81();
 }

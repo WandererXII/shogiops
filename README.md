@@ -16,13 +16,13 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
   - Setup validation
 - Attacks and rays using hyperbola quintessence
 - Read and write USI move notation
+- Transformations: Mirroring and rotating
 - [Compatibility with lishogi](https://lishogi.org)
 - [Compatibility with shogiground](https://github.com/WandererXII/shogiground)
 
 #### Not yet fully supported:
 
 - Position hashing
-- Transformations: Mirroring and rotating
 
 [File an issue](https://github.com/WandererXII/shogiops/issues/new) to request more.
 

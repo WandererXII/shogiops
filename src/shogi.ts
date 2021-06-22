@@ -232,8 +232,8 @@ export abstract class Position {
     ctx = ctx || this.ctx();
     if (this.isCheckmate(ctx) && !(this.lastMove && isDrop(this.lastMove) && this.lastMove.role === 'pawn'))
       return { winner: opposite(this.turn) };
-    else if (this.isCheckmate(ctx)) return { winner: this.turn };
-    else if (this.isInsufficientMaterial() || this.isStalemate(ctx)) return { winner: undefined };
+    else if (this.isCheckmate(ctx) || this.isStalemate(ctx)) return { winner: this.turn };
+    else if (this.isInsufficientMaterial()) return { winner: undefined };
     else return;
   }
 

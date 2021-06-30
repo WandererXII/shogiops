@@ -227,26 +227,24 @@ export abstract class Position {
   }
 
   isImpasse(): boolean {
-    const lastMoveColor = opposite(this.turn);
-
-    const allPiecesInPromotionZone = SquareSet.promotionZone(lastMoveColor).intersect(this.board[lastMoveColor]);
+    const allPiecesInPromotionZone = SquareSet.promotionZone(this.turn).intersect(this.board[this.turn]);
     const majorPiecesInPromotionZone = allPiecesInPromotionZone.intersect(
       this.board.bishop.union(this.board.rook).union(this.board.horse).union(this.board.dragon)
     );
-    const king = this.board.kingOf(lastMoveColor);
+    const king = this.board.kingOf(this.turn);
 
     const impasseValue =
       allPiecesInPromotionZone.size() -
       1 +
       majorPiecesInPromotionZone.size() * 4 +
-      this.pockets[lastMoveColor].count() +
-      (this.pockets[lastMoveColor].bishop + this.pockets[lastMoveColor].rook) * 4;
+      this.pockets[this.turn].count() +
+      (this.pockets[this.turn].bishop + this.pockets[this.turn].rook) * 4;
 
     return (
       defined(king) &&
       allPiecesInPromotionZone.has(king) &&
       allPiecesInPromotionZone.size() > 10 &&
-      impasseValue >= (lastMoveColor === 'sente' ? 28 : 27)
+      impasseValue >= (this.turn === 'sente' ? 28 : 27)
     );
   }
 

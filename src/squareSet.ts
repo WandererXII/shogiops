@@ -223,7 +223,7 @@ export class SquareSet implements Iterable<Square> {
 
   first(): Square | undefined {
     if (this.lo !== 0) return 26 - Math.clz32(this.lo & -this.lo) + 5;
-    if (this.mid !== 0) return 53 - Math.clz32(this.lo & -this.lo) + 5;
+    if (this.mid !== 0) return 53 - Math.clz32(this.mid & -this.mid) + 5;
     if (this.hi !== 0) return 80 - Math.clz32(this.hi & -this.hi) + 5;
     return;
   }

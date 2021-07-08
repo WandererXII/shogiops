@@ -3,10 +3,10 @@ import {
   chessCoord,
   shogiCoord,
   shogigroundDests,
-  parseLishogiUci,
-  makeLishogiUci,
+  parseLishogiUsi,
+  makeLishogiUsi,
   assureUsi,
-  assureLishogiUci,
+  assureLishogiUsi,
   scalashogiCharPair,
   shogigroundDropDests,
 } from '../src/compat';
@@ -80,29 +80,29 @@ test('shogi coord', () => {
   expect(shogiCoord('d7')).toEqual('6c');
 });
 
-test('parse lishogi uci', () => {
-  expect(parseLishogiUci('a1i1')).toEqual({ from: 0, to: 8, promotion: false });
-  expect(parseLishogiUci('h2h7+')).toEqual({ from: 16, to: 61, promotion: true });
-  expect(parseLishogiUci('h2h7=')).toEqual({ from: 16, to: 61, promotion: false });
-  expect(parseLishogiUci('h2h7')).toEqual({ from: 16, to: 61, promotion: false });
-  expect(parseLishogiUci('P*i3')).toEqual({ role: 'pawn', to: 26 });
+test('parse lishogi usi', () => {
+  expect(parseLishogiUsi('a1i1')).toEqual({ from: 0, to: 8, promotion: false });
+  expect(parseLishogiUsi('h2h7+')).toEqual({ from: 16, to: 61, promotion: true });
+  expect(parseLishogiUsi('h2h7=')).toEqual({ from: 16, to: 61, promotion: false });
+  expect(parseLishogiUsi('h2h7')).toEqual({ from: 16, to: 61, promotion: false });
+  expect(parseLishogiUsi('P*i3')).toEqual({ role: 'pawn', to: 26 });
 });
 
-test('make lishogi uci', () => {
-  expect(makeLishogiUci({ role: 'rook', to: 1 })).toBe('R*b1');
-  expect(makeLishogiUci({ from: 2, to: 3 })).toBe('c1d1');
-  expect(makeLishogiUci({ from: 0, to: 0, promotion: true })).toBe('a1a1+');
-  expect(makeLishogiUci({ from: 0, to: 0, promotion: false })).toBe('a1a1');
-  expect(makeLishogiUci({ from: 0, to: 0, promotion: undefined })).toBe('a1a1');
+test('make lishogi usi', () => {
+  expect(makeLishogiUsi({ role: 'rook', to: 1 })).toBe('R*b1');
+  expect(makeLishogiUsi({ from: 2, to: 3 })).toBe('c1d1');
+  expect(makeLishogiUsi({ from: 0, to: 0, promotion: true })).toBe('a1a1+');
+  expect(makeLishogiUsi({ from: 0, to: 0, promotion: false })).toBe('a1a1');
+  expect(makeLishogiUsi({ from: 0, to: 0, promotion: undefined })).toBe('a1a1');
 });
 
-test('assure usi/uci', () => {
+test('assure usi/usi', () => {
   expect(assureUsi('7g7f')).toBe('7g7f');
   expect(assureUsi('c3c4')).toBe('7g7f');
   expect(assureUsi('P*1a')).toBe('P*1a');
   expect(assureUsi('P*i9')).toBe('P*1a');
-  expect(assureLishogiUci('c3c4')).toBe('c3c4');
-  expect(assureLishogiUci('7g7f')).toBe('c3c4');
-  expect(assureLishogiUci('P*i9')).toBe('P*i9');
-  expect(assureLishogiUci('P*1a')).toBe('P*i9');
+  expect(assureLishogiUsi('c3c4')).toBe('c3c4');
+  expect(assureLishogiUsi('7g7f')).toBe('c3c4');
+  expect(assureLishogiUsi('P*i9')).toBe('P*i9');
+  expect(assureLishogiUsi('P*1a')).toBe('P*i9');
 });

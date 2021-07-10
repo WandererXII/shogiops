@@ -2,6 +2,7 @@ import {
   rookAttacks,
   bishopAttacks,
   knightAttacks,
+  pawnAttacks,
   kingAttacks,
   silverAttacks,
   goldAttacks,
@@ -60,6 +61,11 @@ test('knight attacks', () => {
   expect(knightAttacks('sente', 70)).toEqual(SquareSet.empty());
   expect(knightAttacks('gote', 40)).toEqual(new SquareSet(0xa00000, 0x0, 0x0));
   expect(knightAttacks('gote', 15)).toEqual(SquareSet.empty());
+});
+
+test('pawn attacks', () => {
+  expect(pawnAttacks('sente', 40)).toEqual(new SquareSet(0x0, 0x400000, 0x0));
+  expect(pawnAttacks('gote', 40)).toEqual(new SquareSet(0x0, 0x10, 0x0));
 });
 
 test('silver attacks', () => {

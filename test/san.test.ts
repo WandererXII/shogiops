@@ -13,7 +13,7 @@ test('make variation with king move', () => {
 test('make variation with fen', () => {
   const setup = parseFen('lnsgkg1nl/1r5s1/pppppp1pp/6p2/9/2P6/PP1PPPPPP/7R1/LNSGKGSNL b - 3').unwrap();
   const pos = Shogi.fromSetup(setup).unwrap();
-  const variation = 'B*5f 4a5b 5f3d'.split(' ').map(uci => parseUsi(uci)!);
+  const variation = 'B*5f 4a5b 5f3d'.split(' ').map(usi => parseUsi(usi)!);
   expect(makeSanVariation(pos, variation)).toBe('3. B*e4 4. Gf9e8 5. Bxg6');
   expect(pos).toEqual(Shogi.fromSetup(setup).unwrap());
 });

@@ -209,7 +209,7 @@ export function lishogiCharToRole(ch: string): Role | undefined {
   }
 }
 
-export function parseLishogiUsi(str: string): Move | undefined {
+export function parseUsi(str: string): Move | undefined {
   if (str[1] === '*' && str.length === 4) {
     const role = lishogiCharToRole(str[0]) as PocketRole;
     const to = parseChessSquare(str.slice(2));
@@ -223,19 +223,19 @@ export function parseLishogiUsi(str: string): Move | undefined {
   return;
 }
 
-export function makeLishogiUsi(move: Move): string {
+export function makeUsi(move: Move): string {
   if (isDrop(move)) return `${roleToLishogiChar(move.role).toUpperCase()}*${makeChessSquare(move.to)}`;
   return makeChessSquare(move.from) + makeChessSquare(move.to) + (move.promotion ? '+' : '');
 }
 
 export function assureUsi(str: string): string | undefined {
   if (str.match(/^([1-9][a-i]|([RBGSNLP]\*))[1-9][a-i](\+|\=)?$/)) return str;
-  if (str.match(/^([a-i][1-9]|([RBGSNLP]\*))[a-i][1-9](\+|\=)?$/)) return makeUsi(parseLishogiUsi(str)!);
+  if (str.match(/^([a-i][1-9]|([RBGSNLP]\*))[a-i][1-9](\+|\=)?$/)) return makeUsi(parseUsi(str)!);
   return;
 }
 
-export function assureLishogiUsi(str: string): string | undefined {
+export function assureUsi(str: string): string | undefined {
   if (str.match(/^([a-i][1-9]|([RBGSNLP]\*))[a-i][1-9](\+|\=)?$/)) return str;
-  if (str.match(/^([1-9][a-i]|([RBGSNLP]\*))[1-9][a-i](\+|\=)?$/)) return makeLishogiUsi(parseUsi(str)!);
+  if (str.match(/^([1-9][a-i]|([RBGSNLP]\*))[1-9][a-i](\+|\=)?$/)) return makeUsi(parseUsi(str)!);
   return;
 }

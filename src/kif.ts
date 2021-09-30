@@ -240,6 +240,7 @@ export function makeKifVariation(
   lastDest: Square | undefined = undefined,
   startTurn = 1
 ): string {
+  pos = pos.clone();
   const line = [];
   const padding = (startTurn + variation.length - 1).toString().length;
   for (const m of variation) {

@@ -154,7 +154,6 @@ test('parse kif moves', () => {
     '10 ８五歩(84)',
     '11 ７三角成(55)',
   ];
-  parseKifMoves(line);
   for (const m of parseKifMoves(line)) pos.play(m);
   expect(pos.isCheckmate()).toBe(true);
 });

@@ -116,7 +116,7 @@ export function parseKifPositionHeader(kif: string): Result<Setup, KifError> {
           board,
           pockets: new Material(gPocket, sPocket),
           turn,
-          fullmoves: turn === 'sente' ? 1 : 2,
+          fullmoves: 1,
         };
       })
     )
@@ -147,6 +147,7 @@ export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
           prom = true;
           break;
         default:
+          if (file > 9 || rank < 0) return Result.err(new KifError(InvalidKif.Board));
           const role = kanjiToRole(c);
           if (defined(role)) {
             const square = file + rank * 9;
@@ -155,7 +156,6 @@ export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
             prom = false;
             gote = false;
             file++;
-            if (file === 9) break;
           }
       }
     }

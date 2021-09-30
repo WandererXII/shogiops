@@ -31,7 +31,7 @@ test('make kif header from handicap position', () => {
 });
 
 test('parse kif header with kif board', () => {
-  const setup = parseFen('lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 2').unwrap();
+  const setup = parseFen('lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1').unwrap();
   const kifHeader = `後手の持駒：飛二 角二 金二 銀 桂 香三 歩十五 
   ９ ８ ７ ６ ５ ４ ３ ２ １
 +---------------------------+
@@ -52,7 +52,7 @@ test('parse kif header with kif board', () => {
 });
 
 test('parse kif header with handicap', () => {
-  const setup = parseFen('lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 2').unwrap();
+  const setup = parseFen('lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1').unwrap();
   const kifHeader = `手合割：飛車落ち
   先手：
   後手：

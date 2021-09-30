@@ -1,7 +1,7 @@
 import { Result } from '@badrap/result';
 import { Board } from './board';
 import { INITIAL_FEN, makeFen, parseFen } from './fen';
-import { handicapNameToSfen, sfenToHandicapName } from './handicaps';
+import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps';
 import { Material, MaterialSide, Setup } from './setup';
 import { Position } from './shogi';
 import { Color, isDrop, Move, PocketRole, POCKET_ROLES, Square } from './types';

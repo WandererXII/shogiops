@@ -68,7 +68,7 @@ export * as debug from './debug';
 
 export * as fen from './fen';
 
-export * as handicaps from './handicaps';
+export * as handicaps from './kifHandicaps';
 
 export * as hash from './hash';
 

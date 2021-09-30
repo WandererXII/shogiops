@@ -1,5 +1,13 @@
 import { parseFen } from '../src/fen';
-import { makeKifHeader, makeKifMove, makeKifVariation, parseKifHeader, parseKifMove, parseKifMoves } from '../src/kif';
+import {
+  makeKifHeader,
+  makeKifMove,
+  makeKifVariation,
+  parseKifHeader,
+  parseKifMove,
+  parseKifMoves,
+  parseTags,
+} from '../src/kif';
 import { defaultSetup } from '../src/setup';
 import { Shogi } from '../src/shogi';
 import { parseUsi } from '../src/util';
@@ -156,4 +164,15 @@ test('parse kif moves', () => {
   ];
   for (const m of parseKifMoves(line)) pos.play(m);
   expect(pos.isCheckmate()).toBe(true);
+});
+
+test('parse tags', () => {
+  expect(
+    parseTags(`
+    先手：Sova
+    後手：Raze`)
+  ).toEqual([
+    ['先手', 'Sova'],
+    ['後手', 'Raze'],
+  ]);
 });

@@ -183,6 +183,12 @@ export function parseKifHand(pocketPart: string): Result<MaterialSide, KifError>
   return Result.ok(pockets);
 }
 
+export function parseTags(kif: string): [string, string][] {
+  return normalizedKifLines(kif)
+    .filter(l => !l.startsWith('#') && !l.startsWith('*'))
+    .map(l => l.replace('：', ':').split(/:(.*)/, 2) as [string, string]);
+}
+
 //
 // KIF MOVES
 //

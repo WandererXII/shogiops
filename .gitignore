@@ -9,6 +9,8 @@ yarn.lock
 /board.js
 /shogi.js
 /compat.js
+/csa.js
+/csaUtil.js
 /variant.js
 /transform.js
 /setup.js
@@ -28,6 +30,8 @@ yarn.lock
 /board.d.ts
 /shogi.d.ts
 /compat.d.ts
+/csa.d.ts
+/csaUtil.d.ts
 /variant.d.ts
 /transform.d.ts
 /setup.d.ts
@@ -47,6 +51,8 @@ yarn.lock
 /board.js.map
 /shogi.js.map
 /compat.js.map
+/csa.js.map
+/csaUtil.js.map
 /variant.js.map
 /transform.js.map
 /setup.js.map

@@ -108,6 +108,74 @@ export function roleToChar(role: Role): string {
   }
 }
 
+export function roleToCsa(role: Role): string {
+  switch (role) {
+    case 'pawn':
+      return 'FU';
+    case 'lance':
+      return 'KY';
+    case 'knight':
+      return 'KE';
+    case 'silver':
+      return 'GI';
+    case 'gold':
+      return 'KI';
+    case 'bishop':
+      return 'KA';
+    case 'rook':
+      return 'HI';
+    case 'tokin':
+      return 'TO';
+    case 'promotedlance':
+      return 'NY';
+    case 'promotedknight':
+      return 'NK';
+    case 'promotedsilver':
+      return 'NG';
+    case 'horse':
+      return 'UM';
+    case 'dragon':
+      return 'RY';
+    case 'king':
+      return 'OU';
+  }
+}
+
+export function csaToRole(str: string): Role | undefined {
+  switch (str) {
+    case 'FU':
+      return 'pawn';
+    case 'KY':
+      return 'lance';
+    case 'KE':
+      return 'knight';
+    case 'GI':
+      return 'silver';
+    case 'KI':
+      return 'gold';
+    case 'KA':
+      return 'bishop';
+    case 'HI':
+      return 'rook';
+    case 'TO':
+      return 'tokin';
+    case 'NY':
+      return 'promotedlance';
+    case 'NK':
+      return 'promotedknight';
+    case 'NG':
+      return 'promotedsilver';
+    case 'UM':
+      return 'horse';
+    case 'RY':
+      return 'dragon';
+    case 'OU':
+      return 'king';
+    default:
+      return undefined;
+  }
+}
+
 export function roleTo1Kanji(role: Role): string {
   switch (role) {
     case 'pawn':

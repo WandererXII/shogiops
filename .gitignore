@@ -22,7 +22,7 @@ yarn.lock
 /san.js
 /hash.js
 /index.js
-/handicaps.js
+/kifHandicaps.js
 /kif.js
 /kifUtil.js
 
@@ -43,7 +43,7 @@ yarn.lock
 /san.d.ts
 /hash.d.ts
 /index.d.ts
-/handicaps.d.ts
+/kifHandicaps.d.ts
 /kif.d.ts
 /kifUtil.d.ts
 
@@ -64,6 +64,6 @@ yarn.lock
 /san.js.map
 /hash.js.map
 /index.js.map
-/handicaps.js.map
+/kifHandicaps.js.map
 /kif.js.map
 /kifUtil.js.map

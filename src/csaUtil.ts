@@ -1,4 +1,5 @@
-import { Square, squareFile, squareRank } from '.';
+import { Square } from './types';
+import { squareFile, squareRank } from './util';
 
 export function parseCsaSquare(str: string): Square | undefined {
   if (str.length !== 2) return;

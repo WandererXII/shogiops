@@ -27,7 +27,9 @@ export function makeCsaHeader(setup: Setup): string {
     makeCsaPocket(setup.pockets.sente, 'P+'),
     makeCsaPocket(setup.pockets.gote, 'P-'),
     setup.turn === 'gote' ? '-' : '+',
-  ].join('\n');
+  ]
+    .filter(p => p.length > 0)
+    .join('\n');
 }
 
 export function makeCsaBoard(board: Board): string {

@@ -1,4 +1,4 @@
-import { parseFen } from '../src/fen';
+import { INITIAL_FEN, parseFen } from '../src/fen';
 import {
   makeCsaHeader,
   makeCsaMove,
@@ -12,6 +12,22 @@ import { Shogi } from '../src/shogi';
 import { parseUsi } from '../src/util';
 
 // tests from ./kif edited for csa
+
+test('make csa header from starting position', () => {
+  const setup = parseFen(INITIAL_FEN).unwrap();
+  expect(makeCsaHeader(setup)).toEqual(
+    `P1-KY-KE-GI-KI-OU-KI-GI-KE-KY
+P2 * -HI *  *  *  *  * -KA * 
+P3-FU-FU-FU-FU-FU-FU-FU-FU-FU
+P4 *  *  *  *  *  *  *  *  * 
+P5 *  *  *  *  *  *  *  *  * 
+P6 *  *  *  *  *  *  *  *  * 
+P7+FU+FU+FU+FU+FU+FU+FU+FU+FU
+P8 * +KA *  *  *  *  * +HI * 
+P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
++`
+  );
+});
 
 test('make csa header from some random position', () => {
   const setup = parseFen('lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p').unwrap();

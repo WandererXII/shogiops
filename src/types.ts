@@ -71,7 +71,7 @@ export function isNormal(v: Move): v is NormalMove {
 }
 
 // variant will be added later, once lishogi supports them
-export const RULES = ['shogi'] as const;
+export const RULES = ['shogi', 'minishogi'] as const;
 export type Rules = typeof RULES[number];
 
 export interface Outcome {

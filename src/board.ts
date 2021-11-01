@@ -2,6 +2,9 @@ import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
 import { SquareSet } from './squareSet';
 
 export class Board implements Iterable<[Square, Piece]> {
+  numberOfFiles: number;
+  numberOfRanks: number;
+
   occupied: SquareSet;
 
   gote: SquareSet;
@@ -31,6 +34,8 @@ export class Board implements Iterable<[Square, Piece]> {
   }
 
   reset(): void {
+    this.numberOfFiles = 9;
+    this.numberOfRanks = 9;
     this.occupied = new SquareSet(0x7fd05ff, 0x0, 0x7fd05ff);
     this.sente = new SquareSet(0x7fd05ff, 0x0, 0x0);
     this.gote = new SquareSet(0x0, 0x0, 0x7fd05ff);
@@ -50,6 +55,30 @@ export class Board implements Iterable<[Square, Piece]> {
     this.dragon = SquareSet.empty();
   }
 
+  static minishogi(): Board {
+    const board = new Board();
+    board.numberOfFiles = 5;
+    board.numberOfRanks = 5;
+    board.occupied = new SquareSet(0x0, 0x43e000, 0x7c20000);
+    board.sente = new SquareSet(0x0, 0x43e000, 0x0);
+    board.gote = new SquareSet(0x0, 0x0, 0x7c20000);
+    board.pawn = new SquareSet(0x0, 0x400000, 0x20000);
+    board.lance = new SquareSet(0x0, 0x0, 0x0);
+    board.knight = new SquareSet(0x0, 0x0, 0x0);
+    board.silver = new SquareSet(0x0, 0x8000, 0x1000000);
+    board.gold = new SquareSet(0x0, 0x4000, 0x2000000);
+    board.bishop = new SquareSet(0x0, 0x10000, 0x800000);
+    board.rook = new SquareSet(0x0, 0x20000, 0x400000);
+    board.tokin = new SquareSet(0x0, 0, 0);
+    board.promotedlance = new SquareSet(0x0, 0x0, 0x0);
+    board.promotedknight = new SquareSet(0x0, 0x0, 0x0);
+    board.promotedsilver = new SquareSet(0x0, 0x0, 0x0);
+    board.horse = new SquareSet(0x0, 0x0, 0x0);
+    board.dragon = new SquareSet(0x0, 0x0, 0x0);
+    board.king = new SquareSet(0x0, 0x2000, 0x4000000);
+    return board;
+  }
+
   static empty(): Board {
     const board = new Board();
     board.clear();
@@ -57,6 +86,8 @@ export class Board implements Iterable<[Square, Piece]> {
   }
 
   clear(): void {
+    this.numberOfFiles = 9;
+    this.numberOfRanks = 9;
     this.occupied = SquareSet.empty();
     for (const color of COLORS) this[color] = SquareSet.empty();
     for (const role of ROLES) this[role] = SquareSet.empty();
@@ -65,6 +96,8 @@ export class Board implements Iterable<[Square, Piece]> {
   clone(): Board {
     const board = new Board();
     board.occupied = this.occupied;
+    board.numberOfFiles = this.numberOfFiles;
+    board.numberOfRanks = this.numberOfRanks;
     for (const color of COLORS) board[color] = this[color];
     for (const role of ROLES) board[role] = this[role];
     return board;
@@ -72,6 +105,7 @@ export class Board implements Iterable<[Square, Piece]> {
 
   equals(other: Board): boolean {
     if (!this.gote.equals(other.gote)) return false;
+    if (this.numberOfFiles !== other.numberOfFiles || this.numberOfRanks !== other.numberOfRanks) return false;
     return ROLES.every(role => this[role].equals(other[role]));
   }
 

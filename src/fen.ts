@@ -32,12 +32,18 @@ function charToPiece(ch: string): Piece | undefined {
 
 export function parseBoardFen(boardPart: string): Result<Board, FenError> {
   const board = Board.empty();
+  const ranks = boardPart.split('/');
+  board.numberOfRanks = ranks.length;
+  // we assume the board is square
+  // since that's good enough for now...
+  board.numberOfFiles = board.numberOfRanks;
+  const offset = 9 - board.numberOfFiles;
   let rank = 8;
-  let file = 0;
+  let file = offset;
   for (let i = 0; i < boardPart.length; i++) {
     let c = boardPart[i];
     if (c === '/' && file === 9) {
-      file = 0;
+      file = offset;
       rank--;
     } else {
       const step = parseInt(c, 10);
@@ -53,7 +59,7 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
       }
     }
   }
-  if (rank !== 0 || file !== 9) return Result.err(new FenError(InvalidFen.Board));
+  if (rank !== offset || file !== 9) return Result.err(new FenError(InvalidFen.Board));
   return Result.ok(board);
 }
 
@@ -135,8 +141,8 @@ export function makePiece(piece: Piece): string {
 export function makeBoardFen(board: Board): string {
   let fen = '';
   let empty = 0;
-  for (let rank = 8; rank >= 0; rank--) {
-    for (let file = 0; file < 9; file++) {
+  for (let rank = 8; rank >= 9 - board.numberOfRanks; rank--) {
+    for (let file = 9 - board.numberOfFiles; file < 9; file++) {
       const square = file + rank * 9;
       const piece = board.get(square);
       if (!piece) empty++;
@@ -153,7 +159,7 @@ export function makeBoardFen(board: Board): string {
           fen += empty;
           empty = 0;
         }
-        if (rank !== 0) fen += '/';
+        if (rank !== 9 - board.numberOfRanks) fen += '/';
       }
     }
   }

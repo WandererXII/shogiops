@@ -1,6 +1,7 @@
 import { parseFen, makeFen, makeBoardFen, INITIAL_FEN, INITIAL_BOARD_FEN, EMPTY_BOARD_FEN } from '../src/fen';
 import { Board } from '../src/board';
 import { defaultSetup, Material } from '../src/setup';
+import { defaultPosition, setupPosition } from '../src/variant';
 
 test('make board fen', () => {
   expect(makeBoardFen(Board.default())).toEqual(INITIAL_BOARD_FEN);
@@ -40,4 +41,11 @@ test.each([
 ])('parse and make fen', fen => {
   const setup = parseFen(fen).unwrap();
   expect(makeFen(setup)).toEqual(fen);
+});
+
+test('minishogi sfen', () => {
+  const setup = parseFen('rbsgk/4p/5/P4/KGSBR b - 1').unwrap();
+  expect(setupPosition('minishogi', setup).unwrap()).toEqual(defaultPosition('minishogi'));
+  expect(makeBoardFen(defaultPosition('minishogi').board)).toEqual('rbsgk/4p/5/P4/KGSBR');
+  expect(makeBoardFen(setup.board)).toEqual('rbsgk/4p/5/P4/KGSBR');
 });

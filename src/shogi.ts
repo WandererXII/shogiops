@@ -90,6 +90,9 @@ export abstract class Position {
   abstract variantOutcome(ctx?: Context): Outcome | undefined;
   abstract hasInsufficientMaterial(color: Color): boolean;
 
+  abstract promotionZone(color: Color): SquareSet;
+  abstract backrank(color: Color): SquareSet;
+
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
@@ -196,7 +199,7 @@ export abstract class Position {
       if (
         !move.promotion &&
         defined(role) &&
-        (((role === 'pawn' || role === 'lance') && SquareSet.backrank(this.turn).has(move.to)) ||
+        (((role === 'pawn' || role === 'lance') && this.backrank(this.turn).has(move.to)) ||
           (role === 'knight' && SquareSet.backrank2(this.turn).has(move.to)))
       )
         return false;
@@ -297,7 +300,7 @@ export abstract class Position {
       if (
         (move.promotion && (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)) ||
         (role === 'knight' && SquareSet.backrank2(turn).has(move.to)) ||
-        ((role === 'pawn' || role === 'lance') && SquareSet.backrank(turn).has(move.to))
+        ((role === 'pawn' || role === 'lance') && this.backrank(turn).has(move.to))
       ) {
         piece.role = promote(role);
       }
@@ -347,8 +350,8 @@ export class Shogi extends Position {
     const b1 = this.board.pawn.union(this.board.lance);
 
     if (
-      SquareSet.backrank('sente').intersect(b1.intersect(this.board['sente'])).nonEmpty() ||
-      SquareSet.backrank('gote').intersect(b1.intersect(this.board['gote'])).nonEmpty() ||
+      this.backrank('sente').intersect(b1.intersect(this.board['sente'])).nonEmpty() ||
+      this.backrank('gote').intersect(b1.intersect(this.board['gote'])).nonEmpty() ||
       SquareSet.backrank2('sente').intersect(this.board.knight.intersect(this.board['sente'])).nonEmpty() ||
       SquareSet.backrank2('gote').intersect(this.board.knight.intersect(this.board['gote'])).nonEmpty()
     )
@@ -372,7 +375,7 @@ export class Shogi extends Position {
     let mask = this.board.occupied.complement();
     ctx = ctx || this.ctx();
     // Removing backranks, where no legal moves would be possible
-    if (role === 'pawn' || role === 'lance') mask = mask.diff(SquareSet.backrank(this.turn));
+    if (role === 'pawn' || role === 'lance') mask = mask.diff(this.backrank(this.turn));
     if (role === 'knight') mask = mask.diff(SquareSet.backrank2(this.turn));
 
     // Checking for double pawns
@@ -459,5 +462,13 @@ export class Shogi extends Position {
 
   hasInsufficientMaterial(color: Color): boolean {
     return this.board.occupied.intersect(this.board[color]).size() + this.pockets[color].count() < 2; // sente king, gote king and one other piece
+  }
+
+  promotionZone(color: Color): SquareSet {
+    return SquareSet.promotionZone(color);
+  }
+
+  backrank(color: Color): SquareSet {
+    return SquareSet.backrank(color);
   }
 }

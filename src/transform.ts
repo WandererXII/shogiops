@@ -24,6 +24,8 @@ export function rotate180(s: SquareSet): SquareSet {
 
 export function transformBoard(board: Board, f: (s: SquareSet) => SquareSet): Board {
   const b = Board.empty();
+  b.numberOfFiles = board.numberOfFiles;
+  b.numberOfRanks = board.numberOfRanks;
   b.occupied = f(board.occupied);
   for (const color of COLORS) b[color] = f(board[color]);
   for (const role of ROLES) b[role] = f(board[role]);

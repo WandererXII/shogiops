@@ -53,66 +53,44 @@ export function perft(pos: Position, depth: number, log = false): number {
   const ctx = pos.ctx();
   const dropDests = pos.allDropDests(ctx);
 
-  if (!log && depth === 1 && pos.pockets.isEmpty()) {
-    // Optimization for leaf nodes.
-    let nodes = 0;
-    for (const [from, to] of pos.allDests(ctx)) {
-      nodes += to.size();
-      const role = pos.board.getRole(from);
-      if ((PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role!)) {
-        const promMoves = SquareSet.promotionZone(pos.turn).has(from)
-          ? to
-          : to.intersect(SquareSet.promotionZone(pos.turn));
-        const forceProm =
-          role === 'pawn' || role === 'lance'
-            ? SquareSet.backrank(pos.turn)
-            : role === 'knight'
-            ? SquareSet.backrank2(pos.turn)
-            : SquareSet.empty();
-        nodes += promMoves.diff(forceProm).size();
-      }
-    }
-    return nodes;
-  } else {
-    let nodes = 0;
-    for (const [from, dests] of pos.allDests(ctx)) {
-      for (const to of dests) {
-        const promotions: Array<boolean> = [];
-        const role = pos.board.get(from)!.role;
-        const canPromote: boolean =
-          (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role!) &&
-          (SquareSet.promotionZone(pos.turn).has(to) || SquareSet.promotionZone(pos.turn).has(from));
-        if (canPromote) {
-          promotions.push(true);
-          if (
-            !(
-              ((role === 'pawn' || role === 'lance') && SquareSet.backrank(pos.turn).has(to)) ||
-              (role === 'knight' && SquareSet.backrank2(pos.turn).has(to))
-            )
+  let nodes = 0;
+  for (const [from, dests] of pos.allDests(ctx)) {
+    for (const to of dests) {
+      const promotions: Array<boolean> = [];
+      const role = pos.board.get(from)!.role;
+      const canPromote: boolean =
+        (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role!) &&
+        (pos.promotionZone(pos.turn).has(to) || pos.promotionZone(pos.turn).has(from));
+      if (canPromote) {
+        promotions.push(true);
+        if (
+          !(
+            ((role === 'pawn' || role === 'lance') && pos.backrank(pos.turn).has(to)) ||
+            (role === 'knight' && SquareSet.backrank2(pos.turn).has(to))
           )
-            promotions.push(false);
-        } else promotions.push(false);
+        )
+          promotions.push(false);
+      } else promotions.push(false);
 
-        for (const promotion of promotions) {
-          const child = pos.clone();
-          const move = { from, to, promotion };
-          child.play(move);
-          const children = perft(child, depth - 1, false);
-          if (log) console.log(makeUsi(move), children);
-          nodes += children;
-        }
-      }
-    }
-    for (const [role, dropDestsOfRole] of dropDests) {
-      for (const to of dropDestsOfRole) {
+      for (const promotion of promotions) {
         const child = pos.clone();
-        const move = { role, to };
+        const move = { from, to, promotion };
         child.play(move);
         const children = perft(child, depth - 1, false);
-        if (log) console.log(makeUsi(move), children);
+        if (log) console.log(makeUsi(move), children, '(', depth, ')');
         nodes += children;
       }
     }
-    return nodes;
   }
+  for (const [role, dropDestsOfRole] of dropDests) {
+    for (const to of dropDestsOfRole) {
+      const child = pos.clone();
+      const move = { role, to };
+      child.play(move);
+      const children = perft(child, depth - 1, false);
+      if (log) console.log(makeUsi(move), children, '(', depth, ')');
+      nodes += children;
+    }
+  }
+  return nodes;
 }

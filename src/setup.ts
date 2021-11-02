@@ -18,12 +18,6 @@ export class MaterialSide {
     return m;
   }
 
-  static fromBoard(board: Board, color: Color): MaterialSide {
-    const m = new MaterialSide();
-    for (const role of POCKET_ROLES) m[role] = board.pieces(color, role).size();
-    return m;
-  }
-
   clone(): MaterialSide {
     const m = new MaterialSide();
     for (const role of POCKET_ROLES) m[role] = this[role];
@@ -58,10 +52,6 @@ export class Material {
 
   static empty(): Material {
     return new Material(MaterialSide.empty(), MaterialSide.empty());
-  }
-
-  static fromBoard(board: Board): Material {
-    return new Material(MaterialSide.fromBoard(board, 'gote'), MaterialSide.fromBoard(board, 'sente'));
   }
 
   clone(): Material {

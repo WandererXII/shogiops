@@ -5,7 +5,7 @@ import {
   Color,
   Square,
   Role,
-  PocketRole,
+  HandRole,
   Move,
   isDrop,
   SquareName,
@@ -29,7 +29,7 @@ export function squareFile(square: Square): number {
   return square % 9;
 }
 
-export function unpromote(role: Role): PocketRole | 'king' {
+export function unpromote(role: Role): HandRole | 'king' {
   switch (role) {
     case 'pawn':
     case 'tokin':
@@ -356,7 +356,7 @@ export function makeSquare(square: Square): SquareName {
 
 export function parseUsi(str: string): Move | undefined {
   if (str[1] === '*' && str.length === 4) {
-    const role = charToRole(str[0]) as PocketRole;
+    const role = charToRole(str[0]) as HandRole;
     const to = parseSquare(str.slice(2));
     if (defined(role) && defined(to)) return { role, to };
   } else if (str.length === 4 || str.length === 5) {

@@ -1,27 +1,28 @@
 import { Result } from '@badrap/result';
-import { Color, PocketRole, Rules, Square } from './types';
-import { Material, Setup } from './setup';
+import { Color, HandRole, Rules, Square } from './types';
+import { Setup } from './setup';
 import { PositionError, Position, IllegalSetup, Context, Shogi } from './shogi';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
+import { Hands } from './hand';
 
 export { Position, PositionError, IllegalSetup, Context, Shogi };
 
 export function defaultPosition(rules: Rules): Position {
   switch (rules) {
-    case 'shogi':
-      return Shogi.default();
     case 'minishogi':
       return Minishogi.default();
+    default:
+      return Shogi.default();
   }
 }
 
 export function setupPosition(rules: Rules, setup: Setup, strict = true): Result<Position, PositionError> {
   switch (rules) {
-    case 'shogi':
-      return Shogi.fromSetup(setup, strict);
     case 'minishogi':
       return Minishogi.fromSetup(setup, strict);
+    default:
+      return Shogi.fromSetup(setup, strict);
   }
 }
 
@@ -33,7 +34,7 @@ export class Minishogi extends Shogi {
   static default(): Minishogi {
     const pos = new this();
     pos.board = Board.minishogi();
-    pos.pockets = Material.empty();
+    pos.hands = Hands.empty();
     pos.turn = 'sente';
     pos.fullmoves = 1;
     return pos;
@@ -51,7 +52,7 @@ export class Minishogi extends Shogi {
     return super.dests(square, ctx).intersect(new SquareSet(0x0, 0x7c3e000, 0x7c3e1f0));
   }
 
-  dropDests(role: PocketRole, ctx?: Context): SquareSet {
+  dropDests(role: HandRole, ctx?: Context): SquareSet {
     return super.dropDests(role, ctx).intersect(new SquareSet(0x0, 0x7c3e000, 0x7c3e1f0));
   }
 

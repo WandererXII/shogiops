@@ -1,8 +1,9 @@
 import { Result } from '@badrap/result';
-import { Piece, Color, POCKET_ROLES, PocketRole } from './types';
+import { Piece, Color, HAND_ROLES, HandRole } from './types';
 import { Board } from './board';
-import { Setup, MaterialSide, Material } from './setup';
+import { Setup } from './setup';
 import { defined, roleToChar, charToRole, toBW } from './util';
+import { Hand, Hands } from './hand';
 
 export const INITIAL_BOARD_FEN = 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' b -';
@@ -14,7 +15,7 @@ export const EMPTY_FEN = EMPTY_EPD + ' 1';
 export enum InvalidFen {
   Fen = 'ERR_FEN',
   Board = 'ERR_BOARD',
-  Pockets = 'ERR_POCKETS',
+  Hands = 'ERR_HANDS',
   Turn = 'ERR_TURN',
   Fullmoves = 'ERR_FULLMOVES',
 }
@@ -63,22 +64,22 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
   return Result.ok(board);
 }
 
-export function parsePockets(pocketPart: string): Result<Material, FenError> {
-  if (pocketPart.toLowerCase().includes('k')) return Result.err(new FenError(InvalidFen.Pockets));
-  const pockets = Material.empty();
-  for (let i = 0; i < pocketPart.length; i++) {
-    if (pocketPart[i] === '-') break;
+export function parseHands(handsPart: string): Result<Hands, FenError> {
+  if (handsPart.toLowerCase().includes('k')) return Result.err(new FenError(InvalidFen.Hands));
+  const hands = Hands.empty();
+  for (let i = 0; i < handsPart.length; i++) {
+    if (handsPart[i] === '-') break;
     // max 99
     let count: number;
-    if (parseInt(pocketPart[i]) >= 0) {
-      count = parseInt(pocketPart[i++], 10);
-      if (parseInt(pocketPart[i]) >= 0) count = count * 10 + parseInt(pocketPart[i++], 10);
+    if (parseInt(handsPart[i]) >= 0) {
+      count = parseInt(handsPart[i++], 10);
+      if (parseInt(handsPart[i]) >= 0) count = count * 10 + parseInt(handsPart[i++], 10);
     } else count = 1;
-    const piece = charToPiece(pocketPart[i]);
-    if (!piece) return Result.err(new FenError(InvalidFen.Pockets));
-    pockets[piece.color][piece.role as PocketRole] += count;
+    const piece = charToPiece(handsPart[i]);
+    if (!piece) return Result.err(new FenError(InvalidFen.Hands));
+    hands[piece.color][piece.role as HandRole] += count;
   }
-  return Result.ok(pockets);
+  return Result.ok(hands);
 }
 
 export function parseFen(fen: string): Result<Setup, FenError> {
@@ -95,11 +96,11 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   else if (turnPart === 'w') turn = 'gote';
   else return Result.err(new FenError(InvalidFen.Turn));
 
-  // Pocket
-  const pocketPart = parts.shift();
-  let pockets: Result<Material, FenError>;
-  if (!defined(pocketPart)) pockets = Result.ok(Material.empty());
-  else pockets = parsePockets(pocketPart);
+  // Hands
+  const handsPart = parts.shift();
+  let hands: Result<Hands, FenError>;
+  if (!defined(handsPart)) hands = Result.ok(Hands.empty());
+  else hands = parseHands(handsPart);
 
   // Turn
   const fullmovesPart = parts.shift();
@@ -109,10 +110,10 @@ export function parseFen(fen: string): Result<Setup, FenError> {
   if (parts.length > 0) return Result.err(new FenError(InvalidFen.Fen));
 
   return board.chain(board =>
-    pockets.map(pockets => {
+    hands.map(hands => {
       return {
         board,
-        pockets,
+        hands,
         turn,
         fullmoves: Math.max(1, fullmoves),
       };
@@ -166,24 +167,24 @@ export function makeBoardFen(board: Board): string {
   return fen;
 }
 
-export function makePocket(material: MaterialSide): string {
-  return POCKET_ROLES.map(role => {
+export function makeHand(hand: Hand): string {
+  return HAND_ROLES.map(role => {
     const r = roleToChar(role);
-    const n = material[role];
+    const n = hand[role];
     return n > 1 ? n + r : n === 1 ? r : '';
   }).join('');
 }
 
-export function makePockets(pocket: Material): string {
-  const pockets = makePocket(pocket.sente).toUpperCase() + makePocket(pocket.gote);
-  return pockets === '' ? '-' : pockets;
+export function makeHands(hands: Hands): string {
+  const handsStr = makeHand(hands.sente).toUpperCase() + makeHand(hands.gote);
+  return handsStr === '' ? '-' : handsStr;
 }
 
 export function makeFen(setup: Setup, opts?: FenOpts): string {
   return [
     makeBoardFen(setup.board),
     toBW(setup.turn),
-    makePockets(setup.pockets),
+    makeHands(setup.hands),
     ...(opts?.epd ? [] : [Math.max(1, Math.min(setup.fullmoves, 9999))]),
   ].join(' ');
 }

@@ -35,7 +35,7 @@ export function transformBoard(board: Board, f: (s: SquareSet) => SquareSet): Bo
 export function transformSetup(setup: Setup, f: (s: SquareSet) => SquareSet): Setup {
   return {
     board: transformBoard(setup.board, f),
-    pockets: setup.pockets.clone(),
+    hands: setup.hands.clone(),
     turn: setup.turn,
     fullmoves: setup.fullmoves,
   };

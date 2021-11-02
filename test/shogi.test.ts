@@ -170,7 +170,7 @@ test('impasse', () => {
   const pos6 = Shogi.fromSetup(parseFen('2SGS4/+B+RG1G2RB/3G5/9/7pp/8k/9/9/4K4 b - 1').unwrap()).unwrap();
   expect(pos6.isImpasse()).toBe(false);
 
-  // Enough with pocket
+  // Enough with hand
   const pos7 = Shogi.fromSetup(parseFen('G8/4K4/PPPPPPPPP/9/9/7ss/7sk/9/9 b 2R2B 1').unwrap()).unwrap();
   expect(pos7.isImpasse()).toBe(true);
 

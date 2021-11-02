@@ -1,10 +1,11 @@
 import { Result } from '@badrap/result';
 import { Board } from './board';
-import { Material, MaterialSide, Setup } from './setup';
+import { Setup } from './setup';
 import { Position } from './shogi';
-import { Color, isDrop, Move, PocketRole, POCKET_ROLES } from './types';
+import { Color, isDrop, Move, HandRole, HAND_ROLES } from './types';
 import { csaToRole, defined, promote, roleToCsa } from './util';
 import { makeCsaSquare, parseCsaSquare } from './csaUtil';
+import { Hand, Hands } from './hand';
 
 //
 // CSA HEADER
@@ -14,7 +15,7 @@ export enum InvalidCsa {
   CSA = 'ERR_CSA',
   Board = 'ERR_BOARD',
   Handicap = 'ERR_HANDICAP',
-  Pockets = 'ERR_POCKETS',
+  Hands = 'ERR_HANDS',
   AdditionalInfo = 'ERR_ADDITIONAL',
 }
 
@@ -24,8 +25,8 @@ export class CsaError extends Error {}
 export function makeCsaHeader(setup: Setup): string {
   return [
     makeCsaBoard(setup.board),
-    makeCsaPocket(setup.pockets.sente, 'P+'),
-    makeCsaPocket(setup.pockets.gote, 'P-'),
+    makeCsaHand(setup.hands.sente, 'P+'),
+    makeCsaHand(setup.hands.gote, 'P-'),
     setup.turn === 'gote' ? '-' : '+',
   ]
     .filter(p => p.length > 0)
@@ -50,13 +51,13 @@ export function makeCsaBoard(board: Board): string {
   return csaBoard;
 }
 
-export function makeCsaPocket(material: MaterialSide, prefix: string): string {
-  if (material.isEmpty()) return '';
+export function makeCsaHand(hand: Hand, prefix: string): string {
+  if (hand.isEmpty()) return '';
   return (
     prefix +
-    POCKET_ROLES.map(role => {
+    HAND_ROLES.map(role => {
       const r = roleToCsa(role);
-      const n = material[role];
+      const n = hand[role];
       return ('00' + r).repeat(Math.min(n, 18));
     })
       .filter(p => p.length > 0)
@@ -75,7 +76,7 @@ export function parseCsaHeader(csa: string): Result<Setup, CsaError> {
   return baseBoard.chain(board => {
     const setup = {
       board: board,
-      pockets: Material.empty(),
+      hands: Hands.empty(),
       turn: turn,
       fullmoves: 1,
     };
@@ -135,9 +136,8 @@ function parseAdditions(initialSetup: Setup, additions: string[]): Result<Setup,
       const role = csaToRole(sp.substring(2, 4));
       if (defined(sq) && defined(role)) {
         if (sq === 0) {
-          if (!(POCKET_ROLES as ReadonlyArray<string>).includes(role))
-            return Result.err(new CsaError(InvalidCsa.Pockets));
-          initialSetup.pockets[color][role as PocketRole]++;
+          if (!(HAND_ROLES as ReadonlyArray<string>).includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
+          initialSetup.hands[color][role as HandRole]++;
         } else {
           initialSetup.board.set(sq, { role: role, color: color });
         }
@@ -166,7 +166,7 @@ export function parseCsaMove(pos: Position, csaMove: string): Move | undefined {
     const match = csaMove.match(/(?:[\+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)/);
     if (!match) return;
     const drop = {
-      role: csaToRole(match[2]) as PocketRole,
+      role: csaToRole(match[2]) as HandRole,
       to: parseCsaSquare(match[1])!,
     };
     return drop;

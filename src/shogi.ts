@@ -1,20 +1,8 @@
 import { Result } from '@badrap/result';
-import {
-  Rules,
-  Color,
-  COLORS,
-  Square,
-  Move,
-  isDrop,
-  Piece,
-  Outcome,
-  POCKET_ROLES,
-  PROMOTABLE_ROLES,
-  PocketRole,
-} from './types';
+import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, HAND_ROLES, HandRole } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
-import { Setup, Material } from './setup';
+import { Setup } from './setup';
 import {
   bishopAttacks,
   rookAttacks,
@@ -30,6 +18,7 @@ import {
   dragonAttacks,
 } from './attacks';
 import { opposite, defined, unpromote, promote } from './util';
+import { Hands } from './hand';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
@@ -72,7 +61,7 @@ export interface Context {
 
 export abstract class Position {
   board: Board;
-  pockets: Material;
+  hands: Hands;
   turn: Color;
   fullmoves: number;
   lastMove: Move | undefined;
@@ -82,9 +71,13 @@ export abstract class Position {
   // When subclassing:
   // - static default()
   // - static fromSetup()
+  // - static promote()
+  // - static unpromote()
+  // - static promotable
+  // - static handRoles
   // - Proper signature for clone()
 
-  abstract dropDests(role: PocketRole, ctx?: Context): SquareSet;
+  abstract dropDests(role: HandRole, ctx?: Context): SquareSet;
   abstract dests(square: Square, ctx?: Context): SquareSet;
   abstract isVariantEnd(): boolean;
   abstract variantOutcome(ctx?: Context): Outcome | undefined;
@@ -97,9 +90,9 @@ export abstract class Position {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
-  protected playCaptureAt(square: Square, captured: Piece): void {
+  protected playCaptureAt(captured: Piece): void {
     const unpromotedRole = unpromote(captured.role);
-    if (unpromotedRole !== 'king') this.pockets[opposite(captured.color)][unpromotedRole]++;
+    if (unpromotedRole !== 'king') this.hands[opposite(captured.color)][unpromotedRole]++;
   }
 
   ctx(): Context {
@@ -140,7 +133,7 @@ export abstract class Position {
   clone(): Position {
     const pos = new (this as any).constructor();
     pos.board = this.board.clone();
-    pos.pockets = this.pockets.clone();
+    pos.hands = this.hands.clone();
     pos.turn = this.turn;
     pos.fullmoves = this.fullmoves;
     pos.lastMove = this.lastMove;
@@ -149,15 +142,17 @@ export abstract class Position {
 
   equalsIgnoreMoves(other: Position): boolean {
     return (
-      // this.rules === other.rules // variants
-      this.board.equals(other.board) && this.pockets.equals(other.pockets) && this.turn === other.turn
+      this.rules === other.rules &&
+      this.board.equals(other.board) &&
+      this.hands.equals(other.hands) &&
+      this.turn === other.turn
     );
   }
 
   toSetup(): Setup {
     return {
       board: this.board.clone(),
-      pockets: this.pockets.clone(),
+      hands: this.hands.clone(),
       turn: this.turn,
       fullmoves: Math.min(Math.max(this.fullmoves, 1), 9999),
     };
@@ -172,37 +167,25 @@ export abstract class Position {
     for (const square of this.board[this.turn]) {
       if (this.dests(square, ctx).nonEmpty()) return true;
     }
-    for (const prole of POCKET_ROLES) {
-      if (this.pockets[this.turn][prole] > 0 && this.dropDests(prole, ctx).nonEmpty()) return true;
+    for (const prole of HAND_ROLES) {
+      if (this.hands[this.turn][prole] > 0 && this.dropDests(prole, ctx).nonEmpty()) return true;
     }
     return false;
   }
 
   isLegal(move: Move, ctx?: Context): boolean {
     if (isDrop(move)) {
-      const role = move.role as PocketRole;
-      if (!defined(role) || this.pockets[this.turn][role] <= 0) return false;
+      const role = move.role as HandRole;
+      if (!defined(role) || this.hands[this.turn][role] <= 0) return false;
       return this.dropDests(role, ctx).has(move.to);
     } else {
-      const role = this.board.getRole(move.from);
-      if (!role) return false;
+      const piece = this.board.get(move.from);
+      if (!piece) return false;
 
-      // Checking whether this role can be promoted
-      if (move.promotion && !(PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)) return false;
-      // Checking whether piece is entering/leaving the promotion zone
-      if (
-        move.promotion &&
-        !(SquareSet.promotionZone(this.turn).has(move.to) || SquareSet.promotionZone(this.turn).has(move.from))
-      )
-        return false;
-      // Checking whether the promotion must be forced
-      if (
-        !move.promotion &&
-        defined(role) &&
-        (((role === 'pawn' || role === 'lance') && this.backrank(this.turn).has(move.to)) ||
-          (role === 'knight' && SquareSet.backrank2(this.turn).has(move.to)))
-      )
-        return false;
+      // Checking whether we can promote
+      if (move.promotion && !this.canPromote(piece, move.from, move.to)) return false;
+
+      if (!move.promotion && this.pieceInDeadZone(piece)) return false;
 
       const dests = this.dests(move.from, ctx);
       return dests.has(move.to);
@@ -240,8 +223,8 @@ export abstract class Position {
       allPiecesInPromotionZone.size() -
       1 +
       majorPiecesInPromotionZone.size() * 4 +
-      this.pockets[this.turn].count() +
-      (this.pockets[this.turn].bishop + this.pockets[this.turn].rook) * 4;
+      this.hands[this.turn].count() +
+      (this.hands[this.turn].bishop + this.hands[this.turn].rook) * 4;
 
     return (
       defined(king) &&
@@ -272,12 +255,12 @@ export abstract class Position {
     return d;
   }
 
-  allDropDests(ctx?: Context): Map<PocketRole, SquareSet> {
+  allDropDests(ctx?: Context): Map<HandRole, SquareSet> {
     ctx = ctx || this.ctx();
     const d = new Map();
     if (ctx.variantEnd) return d;
-    for (const prole of POCKET_ROLES) {
-      if (this.pockets[this.turn][prole] > 0) d.set(prole, this.dropDests(prole, ctx));
+    for (const prole of HAND_ROLES) {
+      if (this.hands[this.turn][prole] > 0) d.set(prole, this.dropDests(prole, ctx));
       else d.set(prole, SquareSet.empty());
     }
     return d;
@@ -292,21 +275,16 @@ export abstract class Position {
 
     if (isDrop(move)) {
       this.board.set(move.to, { role: move.role, color: turn });
-      this.pockets[turn][move.role]--;
+      this.hands[turn][move.role]--;
     } else {
       const piece = this.board.take(move.from);
       if (!piece) return;
       const role = piece.role;
-      if (
-        (move.promotion && (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role)) ||
-        (role === 'knight' && SquareSet.backrank2(turn).has(move.to)) ||
-        ((role === 'pawn' || role === 'lance') && this.backrank(turn).has(move.to))
-      ) {
+      if ((move.promotion && this.canPromote(piece, move.from, move.to)) || this.pieceInDeadZone(piece))
         piece.role = promote(role);
-      }
 
       const capture = this.board.set(move.to, piece);
-      if (capture) this.playCaptureAt(move.to, capture);
+      if (capture) this.playCaptureAt(capture);
     }
   }
 }
@@ -319,7 +297,7 @@ export class Shogi extends Position {
   static default(): Shogi {
     const pos = new this();
     pos.board = Board.default();
-    pos.pockets = Material.empty();
+    pos.hands = Hands.empty();
     pos.turn = 'sente';
     pos.fullmoves = 1;
     return pos;
@@ -328,7 +306,7 @@ export class Shogi extends Position {
   static fromSetup(setup: Setup, strict = true): Result<Shogi, PositionError> {
     const pos = new this();
     pos.board = setup.board.clone();
-    pos.pockets = setup.pockets;
+    pos.hands = setup.hands;
     pos.turn = setup.turn;
     pos.fullmoves = setup.fullmoves;
     return pos.validate(strict).map(_ => pos);
@@ -371,7 +349,7 @@ export class Shogi extends Position {
     return Result.ok(undefined);
   }
 
-  dropDests(role: PocketRole, ctx?: Context): SquareSet {
+  dropDests(role: HandRole, ctx?: Context): SquareSet {
     let mask = this.board.occupied.complement();
     ctx = ctx || this.ctx();
     // Removing backranks, where no legal moves would be possible
@@ -461,7 +439,7 @@ export class Shogi extends Position {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
-    return this.board.occupied.intersect(this.board[color]).size() + this.pockets[color].count() < 2; // sente king, gote king and one other piece
+    return this.board.occupied.intersect(this.board[color]).size() + this.hands[color].count() < 2; // sente king, gote king and one other piece
   }
 
   promotionZone(color: Color): SquareSet {

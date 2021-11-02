@@ -1,7 +1,8 @@
 import { parseFen, makeFen, makeBoardFen, INITIAL_FEN, INITIAL_BOARD_FEN, EMPTY_BOARD_FEN } from '../src/fen';
 import { Board } from '../src/board';
-import { defaultSetup, Material } from '../src/setup';
+import { defaultSetup } from '../src/setup';
 import { defaultPosition, setupPosition } from '../src/variant';
+import { Hands } from '../src/hand';
 
 test('make board fen', () => {
   expect(makeBoardFen(Board.default())).toEqual(INITIAL_BOARD_FEN);
@@ -15,7 +16,7 @@ test('make initial fen', () => {
 test('parse initial fen', () => {
   const setup = parseFen(INITIAL_FEN).unwrap();
   expect(setup.board).toEqual(Board.default());
-  expect(setup.pockets).toEqual(Material.empty());
+  expect(setup.hands).toEqual(Hands.empty());
   expect(setup.turn).toEqual('sente');
   expect(setup.fullmoves).toEqual(1);
 });
@@ -23,7 +24,7 @@ test('parse initial fen', () => {
 test('partial fen', () => {
   const setup = parseFen(INITIAL_BOARD_FEN).unwrap();
   expect(setup.board).toEqual(Board.default());
-  expect(setup.pockets).toEqual(Material.empty());
+  expect(setup.hands).toEqual(Hands.empty());
   expect(setup.turn).toEqual('sente');
   expect(setup.fullmoves).toEqual(1);
 });

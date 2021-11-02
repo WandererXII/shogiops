@@ -2,9 +2,9 @@ import { Result } from '@badrap/result';
 import { Board } from './board';
 import { INITIAL_FEN, makeFen, parseFen } from './fen';
 import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps';
-import { Material, MaterialSide, Setup } from './setup';
+import { Setup } from './setup';
 import { Position } from './shogi';
-import { Color, isDrop, Move, PocketRole, POCKET_ROLES, Square } from './types';
+import { Color, isDrop, Move, HandRole, HAND_ROLES, Square } from './types';
 import { defined, kanjiToRole, promote, roleTo1Kanji, roleTo2Kanji } from './util';
 
 import {
@@ -15,6 +15,7 @@ import {
   numberToKanji,
   parseKifSquare,
 } from './kifUtil';
+import { Hand, Hands } from './hand';
 
 //
 // KIF HEADER
@@ -24,7 +25,7 @@ export enum InvalidKif {
   Kif = 'ERR_KIF',
   Board = 'ERR_BOARD',
   Handicap = 'ERR_HANDICAP',
-  Pockets = 'ERR_POCKETS',
+  Hands = 'ERR_HANDS',
 }
 
 export class KifError extends Error {}
@@ -38,9 +39,9 @@ export function makeKifHeader(setup: Setup): string {
 
 export function makeKifPositionHeader(setup: Setup): string {
   return [
-    '後手の持駒：' + makeKifPocket(setup.pockets.gote),
+    '後手の持駒：' + makeKifHand(setup.hands.gote),
     makeKifBoard(setup.board),
-    '先手の持駒：' + makeKifPocket(setup.pockets.sente),
+    '先手の持駒：' + makeKifHand(setup.hands.sente),
     ...(setup.turn === 'gote' ? ['後手番'] : []),
   ].join('\n');
 }
@@ -68,11 +69,11 @@ export function makeKifBoard(board: Board): string {
   return kifBoard;
 }
 
-export function makeKifPocket(material: MaterialSide): string {
-  if (material.isEmpty()) return 'なし';
-  return POCKET_ROLES.map(role => {
+export function makeKifHand(hand: Hand): string {
+  if (hand.isEmpty()) return 'なし';
+  return HAND_ROLES.map(role => {
     const r = roleTo1Kanji(role);
-    const n = material[role];
+    const n = hand[role];
     return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
   })
     .filter(p => p.length > 0)
@@ -96,25 +97,21 @@ export function parseKifHeader(kif: string): Result<Setup, KifError> {
 export function parseKifPositionHeader(kif: string): Result<Setup, KifError> {
   const lines = normalizedKifLines(kif);
 
-  const gotePocketStr = lines.find(l => l.startsWith('後手の持駒：'));
-  const sentePocketStr = lines.find(l => l.startsWith('先手の持駒：'));
+  const goteHandStr = lines.find(l => l.startsWith('後手の持駒：'));
+  const senteHandStr = lines.find(l => l.startsWith('先手の持駒：'));
   const turn = lines.some(l => l.startsWith('後手番')) ? 'gote' : 'sente';
 
   const board: Result<Board, KifError> = parseKifBoard(kif);
 
-  const gotePocket = defined(gotePocketStr)
-    ? parseKifHand(gotePocketStr.split('：')[1])
-    : Result.ok(MaterialSide.empty());
-  const sentePocket = defined(sentePocketStr)
-    ? parseKifHand(sentePocketStr.split('：')[1])
-    : Result.ok(MaterialSide.empty());
+  const goteHand = defined(goteHandStr) ? parseKifHand(goteHandStr.split('：')[1]) : Result.ok(Hand.empty());
+  const senteHand = defined(senteHandStr) ? parseKifHand(senteHandStr.split('：')[1]) : Result.ok(Hand.empty());
 
   return board.chain(board =>
-    gotePocket.chain(gPocket =>
-      sentePocket.map(sPocket => {
+    goteHand.chain(gHand =>
+      senteHand.map(sHand => {
         return {
           board,
-          pockets: new Material(gPocket, sPocket),
+          hands: new Hands(gHand, sHand),
           turn,
           fullmoves: 1,
         };
@@ -164,23 +161,23 @@ export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
   return Result.ok(board);
 }
 
-export function parseKifHand(pocketPart: string): Result<MaterialSide, KifError> {
-  const pockets = MaterialSide.empty();
-  const pieces = pocketPart.replace(/　/g, ' ').trim().split(' ');
+export function parseKifHand(handPart: string): Result<Hand, KifError> {
+  const hand = Hand.empty();
+  const pieces = handPart.replace(/　/g, ' ').trim().split(' ');
 
-  if (pocketPart.includes('なし')) return Result.ok(pockets);
+  if (handPart.includes('なし')) return Result.ok(hand);
   for (const piece of pieces) {
     for (let i = 0; i < piece.length; i++) {
       const role = kanjiToRole(piece[i++]);
-      if (!role) return Result.err(new KifError(InvalidKif.Pockets));
+      if (!role) return Result.err(new KifError(InvalidKif.Hands));
       let countStr = '';
       while (i < piece.length && ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'].includes(piece[i]))
         countStr += piece[i++];
       const count = kanjiToNumber(countStr) || 1;
-      pockets[role as PocketRole] += count;
+      hand[role as HandRole] += count;
     }
   }
-  return Result.ok(pockets);
+  return Result.ok(hand);
 }
 
 export function parseTags(kif: string): [string, string][] {
@@ -204,7 +201,7 @@ export function parseKifMove(kifMove: string, lastDest: Square | undefined = und
     const match = kifMove.match(/((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(飛|角|金|銀|桂|香|歩)打/);
     if (!match) return;
     const move = {
-      role: kanjiToRole(match[2]) as PocketRole,
+      role: kanjiToRole(match[2]) as HandRole,
       to: parseKifSquare(match[1]) ?? lastDest!,
     };
     return move;

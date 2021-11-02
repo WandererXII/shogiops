@@ -11,7 +11,7 @@ export {
   ByColor,
   Role,
   ROLES,
-  POCKET_ROLES,
+  HAND_ROLES,
   PROMOTABLE_ROLES,
   ByRole,
   Piece,
@@ -58,7 +58,7 @@ export {
 
 export { Board } from './board';
 
-export { Material, MaterialSide, Setup, defaultSetup } from './setup';
+export { Setup, defaultSetup } from './setup';
 
 export { IllegalSetup, Shogi, Position, PositionError, Context } from './shogi';
 
@@ -69,6 +69,8 @@ export * as debug from './debug';
 export * as fen from './fen';
 
 export * as handicaps from './kifHandicaps';
+
+export * as hand from './hand';
 
 export * as hash from './hash';
 

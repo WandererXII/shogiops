@@ -34,10 +34,10 @@ export const ROLES = [
   'dragon',
   'king',
 ] as const;
-export const POCKET_ROLES = ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'] as const;
+export const HAND_ROLES = ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'] as const;
 export const PROMOTABLE_ROLES = ['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'] as const;
 export type Role = typeof ROLES[number];
-export type PocketRole = typeof POCKET_ROLES[number];
+export type HandRole = typeof HAND_ROLES[number];
 export type PromotableRole = typeof PROMOTABLE_ROLES[number];
 
 export type ByRole<T> = {
@@ -56,7 +56,7 @@ export interface NormalMove {
 }
 
 export interface DropMove {
-  role: PocketRole;
+  role: HandRole;
   to: Square;
 }
 

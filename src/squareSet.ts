@@ -1,4 +1,4 @@
-import { Square, Color } from './types';
+import { Square } from './types';
 
 function popcnt27(n: number): number {
   n = trimTo27(n);

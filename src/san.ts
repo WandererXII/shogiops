@@ -1,4 +1,4 @@
-import { isDrop, Move, HandRole, PROMOTABLE_ROLES } from './types';
+import { isDrop, Move, HandRole } from './types';
 import { defined, makeSquare } from './util';
 import { SquareSet } from './squareSet';
 import { Position } from './shogi';

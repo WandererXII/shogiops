@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Color, HandRole, Rules, Square } from './types';
+import { HandRole, Rules, Square } from './types';
 import { Setup } from './setup';
 import { PositionError, Position, IllegalSetup, Context, Shogi } from './shogi';
 import { SquareSet } from './squareSet';

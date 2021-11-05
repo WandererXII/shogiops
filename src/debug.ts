@@ -1,4 +1,4 @@
-import { Square, Piece, PROMOTABLE_ROLES } from './types';
+import { Square, Piece } from './types';
 import { makeSquare, makeUsi } from './util';
 import { makePiece } from './fen';
 import { SquareSet } from './squareSet';

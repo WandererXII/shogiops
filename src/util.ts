@@ -1,5 +1,5 @@
-import { Rules, SquareSet } from '.';
-import { FILE_NAMES, RANK_NAMES, Color, Square, Role, HandRole, Move, isDrop, SquareName } from './types';
+import { SquareSet } from './squareSet';
+import { FILE_NAMES, RANK_NAMES, Color, Square, Role, HandRole, Move, isDrop, SquareName, Rules } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;

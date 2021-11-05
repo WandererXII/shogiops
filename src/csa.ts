@@ -3,9 +3,10 @@ import { Board } from './board';
 import { Setup } from './setup';
 import { Position } from './shogi';
 import { Color, isDrop, Move, HandRole, HAND_ROLES } from './types';
-import { csaToRole, defined, promote, roleToCsa } from './util';
+import { csaToRole, defined, roleToCsa } from './util';
 import { makeCsaSquare, parseCsaSquare } from './csaUtil';
 import { Hand, Hands } from './hand';
+import { promote } from './variantUtil';
 
 //
 // CSA HEADER

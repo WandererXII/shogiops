@@ -5,7 +5,7 @@ import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps';
 import { Setup } from './setup';
 import { Position } from './shogi';
 import { Color, isDrop, Move, HandRole, HAND_ROLES, Square } from './types';
-import { defined, kanjiToRole, promote, roleTo1Kanji, roleTo2Kanji } from './util';
+import { defined, kanjiToRole, roleTo1Kanji, roleTo2Kanji } from './util';
 
 import {
   kanjiToNumber,
@@ -16,6 +16,7 @@ import {
   parseKifSquare,
 } from './kifUtil';
 import { Hand, Hands } from './hand';
+import { promote } from './variantUtil';
 
 //
 // KIF HEADER

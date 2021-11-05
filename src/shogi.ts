@@ -29,8 +29,9 @@ import {
   horseAttacks,
   dragonAttacks,
 } from './attacks';
-import { opposite, defined, promote, unpromote, backrank, promotionZone } from './util';
+import { opposite, defined } from './util';
 import { Hands } from './hand';
+import { backrank, promote, promotionZone, unpromote } from './variantUtil';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',

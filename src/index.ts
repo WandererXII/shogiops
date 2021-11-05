@@ -87,3 +87,5 @@ export * as san from './san';
 export * as transform from './transform';
 
 export * as variant from './variant';
+
+export * as variantUtil from './variantUtil';

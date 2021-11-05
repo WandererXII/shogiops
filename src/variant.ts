@@ -55,13 +55,4 @@ export class Minishogi extends Shogi {
   dropDests(role: HandRole, ctx?: Context): SquareSet {
     return super.dropDests(role, ctx).intersect(new SquareSet(0x0, 0x7c3e000, 0x7c3e1f0));
   }
-
-  promotionZone(color: Color): SquareSet {
-    if (color === 'sente') return SquareSet.fromRank(8);
-    return SquareSet.fromRank(4);
-  }
-
-  backrank(color: Color): SquareSet {
-    return this.promotionZone(color);
-  }
 }

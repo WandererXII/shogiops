@@ -20,6 +20,7 @@ yarn.lock
 /debug.js
 /fen.js
 /san.js
+/hand.js
 /hash.js
 /index.js
 /kifHandicaps.js
@@ -41,6 +42,7 @@ yarn.lock
 /debug.d.ts
 /fen.d.ts
 /san.d.ts
+/hand.d.ts
 /hash.d.ts
 /index.d.ts
 /kifHandicaps.d.ts
@@ -62,6 +64,7 @@ yarn.lock
 /debug.js.map
 /fen.js.map
 /san.js.map
+/hand.js.map
 /hash.js.map
 /index.js.map
 /kifHandicaps.js.map

@@ -9,15 +9,15 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
   if (isDrop(move)) {
     san = roleToLishogiChar(move.role).toUpperCase() + '*' + shogiCoordToChessCord(makeSquare(move.to));
   } else {
-    const role = pos.board.getRole(move.from);
-    if (!role) return '--';
+    const piece = pos.board.get(move.from);
+    if (!piece) return '--';
     const capture = pos.board.occupied.has(move.to);
-    san = roleToLishogiChar(role).toUpperCase();
+    san = roleToLishogiChar(piece.role).toUpperCase();
 
-    if (role !== 'pawn' && role !== 'lance' && role !== 'king') {
+    if (piece.role !== 'pawn' && piece.role !== 'lance' && piece.role !== 'king') {
       // Disambiguation
       let others = SquareSet.empty();
-      for (const s of pos.board.pieces(pos.turn, role)) {
+      for (const s of pos.board.pieces(pos.turn, piece.role)) {
         if (pos.dests(s).has(move.to)) others = others.union(SquareSet.fromSquare(s));
       }
       others = others.without(move.from);
@@ -27,18 +27,8 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
     }
     if (capture) san += 'x';
     san += shogiCoordToChessCord(makeSquare(move.to));
-    if (move.promotion) san += '+';
-    // Do we need to force promotion?
-    else if (
-      (role === 'knight' && SquareSet.backrank2(pos.turn).has(move.to)) ||
-      ((role === 'pawn' || role === 'lance') && SquareSet.backrank(pos.turn).has(move.to))
-    )
-      san += '+';
-    else if (
-      (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role) &&
-      SquareSet.promotionZone(pos.turn).has(move.to)
-    )
-      san += '=';
+    if (move.promotion || pos.pieceInDeadZone(piece, move.to)) san += '+';
+    else if (pos.pieceCanPromote(piece, move.from, move.to)) san += '=';
   }
   return san;
 }
@@ -99,6 +89,7 @@ export function parseSan(pos: Position, san: string): Move | undefined {
     }
   }
   if (!defined(from)) return; // Illegal
+  const piece = pos.board.get(from)!;
 
   const promotionStr = match[4];
   let promotion: boolean;
@@ -106,27 +97,12 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   else promotion = false;
 
   // Promotion needs to be specified in san
-  if (
-    !defined(promotionStr) &&
-    (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role) &&
-    (SquareSet.promotionZone(pos.turn).has(to) || SquareSet.promotionZone(pos.turn).has(from))
-  )
+  if (defined(promotionStr) !== pos.pieceCanPromote(piece, from, to)) {
     return;
+  }
 
-  // role can't be promoted/unpromoted or it isn't in/from the promotion zone
-  if (
-    promotionStr &&
-    (!(PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role) ||
-      (!SquareSet.promotionZone(pos.turn).has(to) && !SquareSet.promotionZone(pos.turn).has(from)))
-  )
-    return;
   // force promotion
-  else if (
-    !promotion &&
-    (((role === 'pawn' || role === 'lance') && SquareSet.backrank(pos.turn).has(to)) ||
-      (role === 'knight' && SquareSet.backrank2(pos.turn).has(to)))
-  )
-    return;
+  else if (!promotion && pos.pieceInDeadZone(piece, to)) return;
 
   return {
     from,

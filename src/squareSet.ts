@@ -68,23 +68,6 @@ export class SquareSet implements Iterable<Square> {
     return new SquareSet(0x00000101, 0, 0x04040000);
   }
 
-  static promotionZones(): SquareSet {
-    // backranks
-    return new SquareSet(0x07ffffff, 0, 0x07ffffff);
-  }
-
-  static promotionZone(color: Color): SquareSet {
-    return color === 'sente' ? new SquareSet(0, 0, 0x07ffffff) : new SquareSet(0x07ffffff, 0, 0);
-  }
-
-  static backrank(color: Color): SquareSet {
-    return color === 'sente' ? SquareSet.fromRank(8) : SquareSet.fromRank(0);
-  }
-
-  static backrank2(color: Color): SquareSet {
-    return (color === 'sente' ? SquareSet.fromRank(7) : SquareSet.fromRank(1)).union(this.backrank(color));
-  }
-
   complement(): SquareSet {
     return new SquareSet(~this.lo, ~this.mid, ~this.hi);
   }

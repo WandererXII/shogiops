@@ -57,19 +57,10 @@ export function perft(pos: Position, depth: number, log = false): number {
   for (const [from, dests] of pos.allDests(ctx)) {
     for (const to of dests) {
       const promotions: Array<boolean> = [];
-      const role = pos.board.get(from)!.role;
-      const canPromote: boolean =
-        (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(role!) &&
-        (pos.promotionZone(pos.turn).has(to) || pos.promotionZone(pos.turn).has(from));
-      if (canPromote) {
+      const piece = pos.board.get(from)!;
+      if (pos.pieceCanPromote(piece, from, to)) {
         promotions.push(true);
-        if (
-          !(
-            ((role === 'pawn' || role === 'lance') && pos.backrank(pos.turn).has(to)) ||
-            (role === 'knight' && SquareSet.backrank2(pos.turn).has(to))
-          )
-        )
-          promotions.push(false);
+        if (!pos.pieceInDeadZone(piece, to)) promotions.push(false);
       } else promotions.push(false);
 
       for (const promotion of promotions) {

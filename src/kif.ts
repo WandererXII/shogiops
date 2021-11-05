@@ -148,7 +148,7 @@ export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
           const role = kanjiToRole(c);
           if (defined(role)) {
             const square = file + rank * 9;
-            const piece = { role: prom ? promote(role) : role, color: (gote ? 'gote' : 'sente') as Color };
+            const piece = { role: prom ? promote('shogi')(role) : role, color: (gote ? 'gote' : 'sente') as Color };
             board.set(square, piece);
             prom = false;
             gote = false;

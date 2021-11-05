@@ -1,5 +1,17 @@
 import { Result } from '@badrap/result';
-import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, HAND_ROLES, HandRole } from './types';
+import {
+  Rules,
+  Color,
+  COLORS,
+  Square,
+  Move,
+  isDrop,
+  Piece,
+  Outcome,
+  HAND_ROLES,
+  HandRole,
+  PROMOTABLE_ROLES,
+} from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup } from './setup';
@@ -17,7 +29,7 @@ import {
   horseAttacks,
   dragonAttacks,
 } from './attacks';
-import { opposite, defined, unpromote, promote } from './util';
+import { opposite, defined, promote, unpromote, backrank, promotionZone } from './util';
 import { Hands } from './hand';
 
 export enum IllegalSetup {
@@ -71,8 +83,6 @@ export abstract class Position {
   // When subclassing:
   // - static default()
   // - static fromSetup()
-  // - static promote()
-  // - static unpromote()
   // - static promotable
   // - static handRoles
   // - Proper signature for clone()
@@ -83,16 +93,16 @@ export abstract class Position {
   abstract variantOutcome(ctx?: Context): Outcome | undefined;
   abstract hasInsufficientMaterial(color: Color): boolean;
 
-  abstract promotionZone(color: Color): SquareSet;
-  abstract backrank(color: Color): SquareSet;
+  abstract pieceCanPromote(piece: Piece, from: Square, to: Square): boolean;
+  abstract pieceInDeadZone(piece: Piece, sq: Square): boolean;
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
   protected playCaptureAt(captured: Piece): void {
-    const unpromotedRole = unpromote(captured.role);
-    if (unpromotedRole !== 'king') this.hands[opposite(captured.color)][unpromotedRole]++;
+    const unpromotedRole = unpromote(this.rules)(captured.role) as HandRole;
+    this.hands[opposite(captured.color)][unpromotedRole]++;
   }
 
   ctx(): Context {
@@ -183,9 +193,9 @@ export abstract class Position {
       if (!piece) return false;
 
       // Checking whether we can promote
-      if (move.promotion && !this.canPromote(piece, move.from, move.to)) return false;
+      if (move.promotion && !this.pieceCanPromote(piece, move.from, move.to)) return false;
 
-      if (!move.promotion && this.pieceInDeadZone(piece)) return false;
+      if (!move.promotion && this.pieceInDeadZone(piece, move.to)) return false;
 
       const dests = this.dests(move.from, ctx);
       return dests.has(move.to);
@@ -213,7 +223,7 @@ export abstract class Position {
   }
 
   isImpasse(): boolean {
-    const allPiecesInPromotionZone = SquareSet.promotionZone(this.turn).intersect(this.board[this.turn]);
+    const allPiecesInPromotionZone = promotionZone(this.rules)(this.turn).intersect(this.board[this.turn]);
     const majorPiecesInPromotionZone = allPiecesInPromotionZone.intersect(
       this.board.bishop.union(this.board.rook).union(this.board.horse).union(this.board.dragon)
     );
@@ -280,8 +290,8 @@ export abstract class Position {
       const piece = this.board.take(move.from);
       if (!piece) return;
       const role = piece.role;
-      if ((move.promotion && this.canPromote(piece, move.from, move.to)) || this.pieceInDeadZone(piece))
-        piece.role = promote(role);
+      if ((move.promotion && this.pieceCanPromote(piece, move.from, move.to)) || this.pieceInDeadZone(piece, move.to))
+        piece.role = promote(this.rules)(role);
 
       const capture = this.board.set(move.to, piece);
       if (capture) this.playCaptureAt(capture);
@@ -316,6 +326,10 @@ export class Shogi extends Position {
     return super.clone() as Shogi;
   }
 
+  protected backrank2(color: Color): SquareSet {
+    return (color === 'sente' ? SquareSet.fromRank(7) : SquareSet.fromRank(1)).union(backrank(this.rules)(color));
+  }
+
   protected validate(strict: boolean): Result<undefined, PositionError> {
     if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
@@ -325,15 +339,10 @@ export class Shogi extends Position {
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
-    const b1 = this.board.pawn.union(this.board.lance);
-
-    if (
-      this.backrank('sente').intersect(b1.intersect(this.board['sente'])).nonEmpty() ||
-      this.backrank('gote').intersect(b1.intersect(this.board['gote'])).nonEmpty() ||
-      SquareSet.backrank2('sente').intersect(this.board.knight.intersect(this.board['sente'])).nonEmpty() ||
-      SquareSet.backrank2('gote').intersect(this.board.knight.intersect(this.board['gote'])).nonEmpty()
-    )
-      return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
+    for (const sp of this.board) {
+      if (this.pieceInDeadZone(sp[1], sp[0]))
+        return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
+    }
 
     return this.validateCheckers();
   }
@@ -352,9 +361,9 @@ export class Shogi extends Position {
   dropDests(role: HandRole, ctx?: Context): SquareSet {
     let mask = this.board.occupied.complement();
     ctx = ctx || this.ctx();
-    // Removing backranks, where no legal moves would be possible
-    if (role === 'pawn' || role === 'lance') mask = mask.diff(this.backrank(this.turn));
-    if (role === 'knight') mask = mask.diff(SquareSet.backrank2(this.turn));
+    // Removing backranks, where no legal drop would be possible
+    if (role === 'pawn' || role === 'lance') mask = mask.diff(backrank(this.rules)(this.turn));
+    if (role === 'knight') mask = mask.diff(this.backrank2(this.turn));
 
     // Checking for double pawns
     if (role === 'pawn') {
@@ -442,11 +451,17 @@ export class Shogi extends Position {
     return this.board.occupied.intersect(this.board[color]).size() + this.hands[color].count() < 2; // sente king, gote king and one other piece
   }
 
-  promotionZone(color: Color): SquareSet {
-    return SquareSet.promotionZone(color);
+  pieceCanPromote(piece: Piece, from: Square, to: Square): boolean {
+    return (
+      (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(piece.role) &&
+      (promotionZone(this.rules)(piece.color).has(from) || promotionZone(this.rules)(piece.color).has(to))
+    );
   }
 
-  backrank(color: Color): SquareSet {
-    return SquareSet.backrank(color);
+  pieceInDeadZone(piece: Piece, sq: Square): boolean {
+    if (piece.role === 'lance' || piece.role === 'pawn')
+      return backrank(this.rules)(piece.color).intersect(SquareSet.fromSquare(sq)).nonEmpty();
+    else if (piece.role === 'knight') return this.backrank2(piece.color).intersect(SquareSet.fromSquare(sq)).nonEmpty();
+    return false;
   }
 }

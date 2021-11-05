@@ -16,7 +16,7 @@ test.each(variantPerfts)('variant perft: %s (%s): %s', (rules, fen, depth, res) 
   expect(perft(pos, depth, false)).toBe(res);
 });
 
-test('minishogi checkamte', () => {
+test('minishogi checkmate', () => {
   const pos = setupPosition('minishogi', parseFen('4r1s1k/6b1g/9/4r1G1B/4KPS2/9/9/9/9 b p').unwrap()).unwrap();
   expect(pos.isCheckmate()).toBe(true);
 });

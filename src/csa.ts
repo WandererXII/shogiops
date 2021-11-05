@@ -199,7 +199,9 @@ export function makeCsaMove(pos: Position, move: Move): string {
   } else {
     const role = pos.board.getRole(move.from);
     if (!role) return '%ERROR';
-    return makeCsaSquare(move.from) + makeCsaSquare(move.to) + roleToCsa(move.promotion ? promote(role) : role);
+    return (
+      makeCsaSquare(move.from) + makeCsaSquare(move.to) + roleToCsa(move.promotion ? promote('shogi')(role) : role)
+    );
   }
 }
 

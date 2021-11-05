@@ -1,17 +1,5 @@
-import { SquareSet } from './squareSet';
-import {
-  FILE_NAMES,
-  RANK_NAMES,
-  Color,
-  Square,
-  Role,
-  HandRole,
-  Move,
-  isDrop,
-  SquareName,
-  Piece,
-  PROMOTABLE_ROLES,
-} from './types';
+import { Rules, SquareSet } from '.';
+import { FILE_NAMES, RANK_NAMES, Color, Square, Role, HandRole, Move, isDrop, SquareName } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
@@ -29,7 +17,43 @@ export function squareFile(square: Square): number {
   return square % 9;
 }
 
-export function unpromote(role: Role): HandRole | 'king' {
+export function promote(rules: Rules): (role: Role) => Role {
+  switch (rules) {
+    case 'minishogi':
+      return standardPromote;
+    default:
+      return standardPromote;
+  }
+}
+
+export function unpromote(rules: Rules): (role: Role) => HandRole | 'king' {
+  switch (rules) {
+    case 'minishogi':
+      return standardUnpromote;
+    default:
+      return standardUnpromote;
+  }
+}
+
+export function promotionZone(rules: Rules): (color: Color) => SquareSet {
+  switch (rules) {
+    case 'minishogi':
+      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(8) : SquareSet.fromRank(4));
+    default:
+      return (color: Color) => (color === 'sente' ? new SquareSet(0, 0, 0x07ffffff) : new SquareSet(0x07ffffff, 0, 0));
+  }
+}
+
+export function backrank(rules: Rules): (color: Color) => SquareSet {
+  switch (rules) {
+    case 'minishogi':
+      return promotionZone(rules);
+    default:
+      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(8) : SquareSet.fromRank(0));
+  }
+}
+
+function standardUnpromote(role: Role): HandRole | 'king' {
   switch (role) {
     case 'pawn':
     case 'tokin':
@@ -56,7 +80,7 @@ export function unpromote(role: Role): HandRole | 'king' {
   }
 }
 
-export function promote(role: Role): Role {
+function standardPromote(role: Role): Role {
   switch (role) {
     case 'pawn':
       return 'tokin';
@@ -371,13 +395,6 @@ export function parseUsi(str: string): Move | undefined {
 export function makeUsi(move: Move): string {
   if (isDrop(move)) return `${roleToChar(move.role).toUpperCase()}*${makeSquare(move.to)}`;
   return makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? '+' : '');
-}
-
-export function canPiecePromote(piece: Piece, from: Square, to: Square): boolean {
-  return (
-    (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(piece.role) &&
-    (SquareSet.promotionZone(piece.color).has(from) || SquareSet.promotionZone(piece.color).has(to))
-  );
 }
 
 export function toBW(color: string): 'b' | 'w' {

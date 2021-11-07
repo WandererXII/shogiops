@@ -1,5 +1,47 @@
 import { SquareSet } from './squareSet';
-import { Color, HandRole, Role, Rules } from './types';
+import { Color, Role, Rules } from './types';
+
+export function allRoles(rules: Rules): Role[] {
+  switch (rules) {
+    case 'minishogi':
+      return ['rook', 'bishop', 'gold', 'silver', 'pawn', 'king', 'dragon', 'horse', 'promotedsilver', 'tokin'];
+    default:
+      return [
+        'rook',
+        'bishop',
+        'gold',
+        'silver',
+        'knight',
+        'lance',
+        'pawn',
+        'dragon',
+        'horse',
+        'tokin',
+        'promotedsilver',
+        'promotedknight',
+        'promotedlance',
+        'king',
+      ];
+  }
+}
+
+export function handRoles(rules: Rules): Role[] {
+  switch (rules) {
+    case 'minishogi':
+      return ['rook', 'bishop', 'gold', 'silver', 'pawn'];
+    default:
+      return ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'];
+  }
+}
+
+export function promotableRoles(rules: Rules): Role[] {
+  switch (rules) {
+    case 'minishogi':
+      return ['pawn', 'silver', 'bishop', 'rook'];
+    default:
+      return ['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'];
+  }
+}
 
 export function promote(rules: Rules): (role: Role) => Role {
   switch (rules) {
@@ -10,7 +52,7 @@ export function promote(rules: Rules): (role: Role) => Role {
   }
 }
 
-export function unpromote(rules: Rules): (role: Role) => HandRole | 'king' {
+export function unpromote(rules: Rules): (role: Role) => Role {
   switch (rules) {
     case 'minishogi':
       return standardUnpromote;
@@ -37,7 +79,7 @@ export function backrank(rules: Rules): (color: Color) => SquareSet {
   }
 }
 
-function standardUnpromote(role: Role): HandRole | 'king' {
+function standardUnpromote(role: Role): Role {
   switch (role) {
     case 'pawn':
     case 'tokin':

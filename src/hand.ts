@@ -1,5 +1,7 @@
-import { HAND_ROLES } from './types';
+import { Role, ROLES } from './types';
 
+// Hand alone can store anything
+// let the variants decide what to store and what not
 export class Hand {
   pawn: number;
   lance: number;
@@ -8,33 +10,40 @@ export class Hand {
   gold: number;
   bishop: number;
   rook: number;
+  tokin: number;
+  promotedlance: number;
+  promotedknight: number;
+  promotedsilver: number;
+  horse: number;
+  dragon: number;
+  king: number;
 
   private constructor() {}
 
   static empty(): Hand {
     const m = new Hand();
-    for (const role of HAND_ROLES) m[role] = 0;
+    for (const role of ROLES) m[role] = 0;
     return m;
   }
 
   clone(): Hand {
     const m = new Hand();
-    for (const role of HAND_ROLES) m[role] = this[role];
+    for (const role of ROLES) m[role] = this[role];
     return m;
   }
 
   equals(other: Hand): boolean {
-    return HAND_ROLES.every(role => this[role] === other[role]);
+    return ROLES.every(role => this[role] === other[role]);
   }
 
   add(other: Hand): Hand {
     const m = new Hand();
-    for (const role of HAND_ROLES) m[role] = this[role] + other[role];
+    for (const role of ROLES) m[role] = this[role] + other[role];
     return m;
   }
 
   nonEmpty(): boolean {
-    return HAND_ROLES.some(role => this[role] > 0);
+    return ROLES.some(role => this[role] > 0);
   }
 
   isEmpty(): boolean {
@@ -42,7 +51,13 @@ export class Hand {
   }
 
   count(): number {
-    return this.pawn + this.lance + this.knight + this.silver + this.gold + this.bishop + this.rook;
+    return ROLES.map(role => this[role]).reduce((acc, cur) => acc + cur);
+  }
+
+  *[Symbol.iterator](): Iterator<[Role, number]> {
+    for (const role of ROLES.filter(r => this[r] > 0)) {
+      yield [role, this[role]];
+    }
   }
 }
 

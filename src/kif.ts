@@ -4,7 +4,7 @@ import { INITIAL_FEN, makeFen, parseFen } from './fen';
 import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps';
 import { Setup } from './setup';
 import { Position } from './shogi';
-import { Color, isDrop, Move, HandRole, HAND_ROLES, Square } from './types';
+import { Color, isDrop, Move, Square } from './types';
 import { defined, kanjiToRole, roleTo1Kanji, roleTo2Kanji } from './util';
 
 import {
@@ -16,7 +16,7 @@ import {
   parseKifSquare,
 } from './kifUtil';
 import { Hand, Hands } from './hand';
-import { promote } from './variantUtil';
+import { allRoles, handRoles, promote } from './variantUtil';
 
 //
 // KIF HEADER
@@ -72,11 +72,12 @@ export function makeKifBoard(board: Board): string {
 
 export function makeKifHand(hand: Hand): string {
   if (hand.isEmpty()) return 'なし';
-  return HAND_ROLES.map(role => {
-    const r = roleTo1Kanji(role);
-    const n = hand[role];
-    return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
-  })
+  return handRoles('shogi')
+    .map(role => {
+      const r = roleTo1Kanji(role);
+      const n = hand[role];
+      return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
+    })
     .filter(p => p.length > 0)
     .join(' ');
 }
@@ -147,7 +148,7 @@ export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
         default:
           if (file > 9 || rank < 0) return Result.err(new KifError(InvalidKif.Board));
           const role = kanjiToRole(c);
-          if (defined(role)) {
+          if (defined(role) && allRoles('shogi').includes(role)) {
             const square = file + rank * 9;
             const piece = { role: prom ? promote('shogi')(role) : role, color: (gote ? 'gote' : 'sente') as Color };
             board.set(square, piece);
@@ -170,12 +171,12 @@ export function parseKifHand(handPart: string): Result<Hand, KifError> {
   for (const piece of pieces) {
     for (let i = 0; i < piece.length; i++) {
       const role = kanjiToRole(piece[i++]);
-      if (!role) return Result.err(new KifError(InvalidKif.Hands));
+      if (!role || !handRoles('shogi').includes(role)) return Result.err(new KifError(InvalidKif.Hands));
       let countStr = '';
       while (i < piece.length && ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'].includes(piece[i]))
         countStr += piece[i++];
       const count = kanjiToNumber(countStr) || 1;
-      hand[role as HandRole] += count;
+      hand[role] += count;
     }
   }
   return Result.ok(hand);
@@ -202,7 +203,7 @@ export function parseKifMove(kifMove: string, lastDest: Square | undefined = und
     const match = kifMove.match(/((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(飛|角|金|銀|桂|香|歩)打/);
     if (!match) return;
     const move = {
-      role: kanjiToRole(match[2]) as HandRole,
+      role: kanjiToRole(match[2])!,
       to: parseKifSquare(match[1]) ?? lastDest!,
     };
     return move;

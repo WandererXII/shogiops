@@ -1,4 +1,4 @@
-import { COLORS, HAND_ROLES, ROLES } from './types';
+import { COLORS, ROLES } from './types';
 import { Board } from './board';
 import { Setup } from './setup';
 import { Hand, Hands } from './hand';
@@ -19,7 +19,7 @@ export function hashBoard(board: Board, state = 0): number {
 }
 
 export function hashHand(hand: Hand, state = 0): number {
-  for (const role of HAND_ROLES) state = fxhash32(hand[role], state);
+  for (const role of ROLES) state = fxhash32(hand[role], state);
   return state;
 }
 

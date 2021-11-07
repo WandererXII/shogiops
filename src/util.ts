@@ -1,5 +1,4 @@
-import { SquareSet } from './squareSet';
-import { FILE_NAMES, RANK_NAMES, Color, Square, Role, HandRole, Move, isDrop, SquareName, Rules } from './types';
+import { FILE_NAMES, RANK_NAMES, Color, Square, Role, Move, isDrop, SquareName } from './types';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
@@ -298,7 +297,7 @@ export function makeSquare(square: Square): SquareName {
 
 export function parseUsi(str: string): Move | undefined {
   if (str[1] === '*' && str.length === 4) {
-    const role = charToRole(str[0]) as HandRole;
+    const role = charToRole(str[0]);
     const to = parseSquare(str.slice(2));
     if (defined(role) && defined(to)) return { role, to };
   } else if (str.length === 4 || str.length === 5) {

@@ -1,4 +1,4 @@
-import { isDrop, Move, HandRole } from './types';
+import { isDrop, Move } from './types';
 import { defined, makeSquare } from './util';
 import { SquareSet } from './squareSet';
 import { Position } from './shogi';
@@ -68,7 +68,7 @@ export function parseSan(pos: Position, san: string): Move | undefined {
     const match = san.match(/^([PLNSGBRplsgbr])\*([a-i][1-9])$/);
     if (!match) return;
     const move = {
-      role: lishogiCharToRole(match[1]) as HandRole,
+      role: lishogiCharToRole(match[1])!,
       to: parseChessSquare(match[2])!,
     };
     return pos.isLegal(move, ctx) ? move : undefined;

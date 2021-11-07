@@ -18,27 +18,24 @@ export type ByColor<T> = {
   [color in Color]: T;
 };
 
+// correct order for sfen hand exporting
 export const ROLES = [
-  'pawn',
-  'lance',
-  'knight',
-  'silver',
-  'gold',
-  'bishop',
   'rook',
-  'tokin',
-  'promotedlance',
-  'promotedknight',
-  'promotedsilver',
-  'horse',
+  'bishop',
+  'gold',
+  'silver',
+  'knight',
+  'lance',
+  'pawn',
   'dragon',
+  'horse',
+  'tokin',
+  'promotedsilver',
+  'promotedknight',
+  'promotedlance',
   'king',
 ] as const;
-export const HAND_ROLES = ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'] as const;
-export const PROMOTABLE_ROLES = ['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'] as const;
 export type Role = typeof ROLES[number];
-export type HandRole = typeof HAND_ROLES[number];
-export type PromotableRole = typeof PROMOTABLE_ROLES[number];
 
 export type ByRole<T> = {
   [role in Role]: T;
@@ -56,7 +53,7 @@ export interface NormalMove {
 }
 
 export interface DropMove {
-  role: HandRole;
+  role: Role;
   to: Square;
 }
 

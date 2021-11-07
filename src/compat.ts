@@ -1,4 +1,4 @@
-import { Rules, SquareName, Move, isDrop, Square, Role, HandRole } from './types';
+import { Rules, SquareName, Move, isDrop, Square, Role } from './types';
 import { defined, makeSquare, makeUsi, parseSquare, parseUsi, squareFile, squareRank } from './util';
 import { Position } from './shogi';
 
@@ -36,7 +36,7 @@ export function shogigroundDests(pos: Position): Map<ChessSquareName, ChessSquar
   return result;
 }
 
-export function shogigroundDropDests(pos: Position, role?: HandRole): Map<HandRole, ChessSquareName[]> {
+export function shogigroundDropDests(pos: Position, role?: Role): Map<Role, ChessSquareName[]> {
   const result = new Map();
   if (role) {
     const squares = pos.dropDests(role);
@@ -213,7 +213,7 @@ export function lishogiCharToRole(ch: string): Role | undefined {
 
 export function parseLishogiUci(str: string): Move | undefined {
   if (str[1] === '*' && str.length === 4) {
-    const role = lishogiCharToRole(str[0]) as HandRole;
+    const role = lishogiCharToRole(str[0]);
     const to = parseChessSquare(str.slice(2));
     if (defined(role) && defined(to)) return { role, to };
   } else if (str.length === 4 || str.length === 5) {

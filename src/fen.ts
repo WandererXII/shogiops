@@ -1,9 +1,10 @@
 import { Result } from '@badrap/result';
-import { Piece, Color, HAND_ROLES, HandRole } from './types';
+import { Piece, Color } from './types';
 import { Board } from './board';
 import { Setup } from './setup';
 import { defined, roleToChar, charToRole, toBW } from './util';
 import { Hand, Hands } from './hand';
+import { ROLES } from './types';
 
 export const INITIAL_BOARD_FEN = 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL';
 export const INITIAL_EPD = INITIAL_BOARD_FEN + ' b -';
@@ -65,7 +66,6 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
 }
 
 export function parseHands(handsPart: string): Result<Hands, FenError> {
-  if (handsPart.toLowerCase().includes('k')) return Result.err(new FenError(InvalidFen.Hands));
   const hands = Hands.empty();
   for (let i = 0; i < handsPart.length; i++) {
     if (handsPart[i] === '-') break;
@@ -77,7 +77,7 @@ export function parseHands(handsPart: string): Result<Hands, FenError> {
     } else count = 1;
     const piece = charToPiece(handsPart[i]);
     if (!piece) return Result.err(new FenError(InvalidFen.Hands));
-    hands[piece.color][piece.role as HandRole] += count;
+    hands[piece.color][piece.role] += count;
   }
   return Result.ok(hands);
 }
@@ -168,7 +168,7 @@ export function makeBoardFen(board: Board): string {
 }
 
 export function makeHand(hand: Hand): string {
-  return HAND_ROLES.map(role => {
+  return ROLES.map(role => {
     const r = roleToChar(role);
     const n = hand[role];
     return n > 1 ? n + r : n === 1 ? r : '';

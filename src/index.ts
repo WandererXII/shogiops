@@ -11,8 +11,6 @@ export {
   ByColor,
   Role,
   ROLES,
-  HAND_ROLES,
-  PROMOTABLE_ROLES,
   ByRole,
   Piece,
   NormalMove,

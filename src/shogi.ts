@@ -1,17 +1,5 @@
 import { Result } from '@badrap/result';
-import {
-  Rules,
-  Color,
-  COLORS,
-  Square,
-  Move,
-  isDrop,
-  Piece,
-  Outcome,
-  HAND_ROLES,
-  HandRole,
-  PROMOTABLE_ROLES,
-} from './types';
+import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, Role } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup } from './setup';
@@ -31,12 +19,14 @@ import {
 } from './attacks';
 import { opposite, defined } from './util';
 import { Hands } from './hand';
-import { backrank, promote, promotionZone, unpromote } from './variantUtil';
+import { allRoles, backrank, handRoles, promotableRoles, promote, promotionZone, unpromote } from './variantUtil';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
   ImpossibleCheck = 'ERR_IMPOSSIBLE_CHECK',
+  InvalidPieces = 'ERR_INVALID_PIECE',
+  InvalidPiecesHand = 'ERR_INVALID_PIECE_IN_HAND',
   InvalidPiecesPromotionZone = 'ERR_PIECES_MUST_PROMOTE',
   Kings = 'ERR_KINGS',
   Variant = 'ERR_VARIANT',
@@ -88,7 +78,7 @@ export abstract class Position {
   // - static handRoles
   // - Proper signature for clone()
 
-  abstract dropDests(role: HandRole, ctx?: Context): SquareSet;
+  abstract dropDests(role: Role, ctx?: Context): SquareSet;
   abstract dests(square: Square, ctx?: Context): SquareSet;
   abstract isVariantEnd(): boolean;
   abstract variantOutcome(ctx?: Context): Outcome | undefined;
@@ -102,7 +92,7 @@ export abstract class Position {
   }
 
   protected playCaptureAt(captured: Piece): void {
-    const unpromotedRole = unpromote(this.rules)(captured.role) as HandRole;
+    const unpromotedRole = unpromote(this.rules)(captured.role);
     this.hands[opposite(captured.color)][unpromotedRole]++;
   }
 
@@ -178,7 +168,7 @@ export abstract class Position {
     for (const square of this.board[this.turn]) {
       if (this.dests(square, ctx).nonEmpty()) return true;
     }
-    for (const prole of HAND_ROLES) {
+    for (const prole of handRoles(this.rules)) {
       if (this.hands[this.turn][prole] > 0 && this.dropDests(prole, ctx).nonEmpty()) return true;
     }
     return false;
@@ -186,12 +176,12 @@ export abstract class Position {
 
   isLegal(move: Move, ctx?: Context): boolean {
     if (isDrop(move)) {
-      const role = move.role as HandRole;
-      if (!defined(role) || this.hands[this.turn][role] <= 0) return false;
+      const role = move.role;
+      if (!defined(role) || !handRoles(this.rules).includes(role) || this.hands[this.turn][role] <= 0) return false;
       return this.dropDests(role, ctx).has(move.to);
     } else {
       const piece = this.board.get(move.from);
-      if (!piece) return false;
+      if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
 
       // Checking whether we can promote
       if (move.promotion && !this.pieceCanPromote(piece, move.from, move.to)) return false;
@@ -266,11 +256,11 @@ export abstract class Position {
     return d;
   }
 
-  allDropDests(ctx?: Context): Map<HandRole, SquareSet> {
+  allDropDests(ctx?: Context): Map<Role, SquareSet> {
     ctx = ctx || this.ctx();
     const d = new Map();
     if (ctx.variantEnd) return d;
-    for (const prole of HAND_ROLES) {
+    for (const prole of handRoles(this.rules)) {
       if (this.hands[this.turn][prole] > 0) d.set(prole, this.dropDests(prole, ctx));
       else d.set(prole, SquareSet.empty());
     }
@@ -340,7 +330,13 @@ export class Shogi extends Position {
     if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
+    for (const rn of this.hands.sente)
+      if (!handRoles(this.rules).includes(rn[0])) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+    for (const rn of this.hands.gote)
+      if (!handRoles(this.rules).includes(rn[0])) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+
     for (const sp of this.board) {
+      if (!allRoles(this.rules).includes(sp[1].role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
       if (this.pieceInDeadZone(sp[1], sp[0]))
         return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
     }
@@ -359,7 +355,7 @@ export class Shogi extends Position {
     return Result.ok(undefined);
   }
 
-  dropDests(role: HandRole, ctx?: Context): SquareSet {
+  dropDests(role: Role, ctx?: Context): SquareSet {
     let mask = this.board.occupied.complement();
     ctx = ctx || this.ctx();
     // Removing backranks, where no legal drop would be possible
@@ -454,7 +450,7 @@ export class Shogi extends Position {
 
   pieceCanPromote(piece: Piece, from: Square, to: Square): boolean {
     return (
-      (PROMOTABLE_ROLES as ReadonlyArray<string>).includes(piece.role) &&
+      promotableRoles(this.rules).includes(piece.role) &&
       (promotionZone(this.rules)(piece.color).has(from) || promotionZone(this.rules)(piece.color).has(to))
     );
   }

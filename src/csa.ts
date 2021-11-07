@@ -2,11 +2,11 @@ import { Result } from '@badrap/result';
 import { Board } from './board';
 import { Setup } from './setup';
 import { Position } from './shogi';
-import { Color, isDrop, Move, HandRole, HAND_ROLES } from './types';
+import { Color, isDrop, Move } from './types';
 import { csaToRole, defined, roleToCsa } from './util';
 import { makeCsaSquare, parseCsaSquare } from './csaUtil';
 import { Hand, Hands } from './hand';
-import { promote } from './variantUtil';
+import { allRoles, handRoles, promote } from './variantUtil';
 
 //
 // CSA HEADER
@@ -56,11 +56,12 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
   if (hand.isEmpty()) return '';
   return (
     prefix +
-    HAND_ROLES.map(role => {
-      const r = roleToCsa(role);
-      const n = hand[role];
-      return ('00' + r).repeat(Math.min(n, 18));
-    })
+    handRoles('shogi')
+      .map(role => {
+        const r = roleToCsa(role);
+        const n = hand[role];
+        return ('00' + r).repeat(Math.min(n, 18));
+      })
       .filter(p => p.length > 0)
       .join('')
   );
@@ -116,7 +117,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
       else {
         if (file >= 9 || rank < 0) return Result.err(new CsaError(InvalidCsa.Board));
         const role = csaToRole(s.substring(1));
-        if (defined(role)) {
+        if (defined(role) && allRoles('shogi').includes(role)) {
           const square = file + rank * 9;
           const piece = { role: role, color: (s.startsWith('-') ? 'gote' : 'sente') as Color };
           board.set(square, piece);
@@ -137,8 +138,8 @@ function parseAdditions(initialSetup: Setup, additions: string[]): Result<Setup,
       const role = csaToRole(sp.substring(2, 4));
       if (defined(sq) && defined(role)) {
         if (sq === 0) {
-          if (!(HAND_ROLES as ReadonlyArray<string>).includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
-          initialSetup.hands[color][role as HandRole]++;
+          if (!handRoles('shogi').includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
+          initialSetup.hands[color][role]++;
         } else {
           initialSetup.board.set(sq, { role: role, color: color });
         }
@@ -167,7 +168,7 @@ export function parseCsaMove(pos: Position, csaMove: string): Move | undefined {
     const match = csaMove.match(/(?:[\+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)/);
     if (!match) return;
     const drop = {
-      role: csaToRole(match[2]) as HandRole,
+      role: csaToRole(match[2])!,
       to: parseCsaSquare(match[1])!,
     };
     return drop;

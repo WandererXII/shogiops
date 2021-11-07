@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { HandRole, Rules, Square } from './types';
+import { Role, Rules, Square } from './types';
 import { Setup } from './setup';
 import { PositionError, Position, IllegalSetup, Context, Shogi } from './shogi';
 import { SquareSet } from './squareSet';
@@ -52,7 +52,7 @@ export class Minishogi extends Shogi {
     return super.dests(square, ctx).intersect(new SquareSet(0x0, 0x7c3e000, 0x7c3e1f0));
   }
 
-  dropDests(role: HandRole, ctx?: Context): SquareSet {
+  dropDests(role: Role, ctx?: Context): SquareSet {
     return super.dropDests(role, ctx).intersect(new SquareSet(0x0, 0x7c3e000, 0x7c3e1f0));
   }
 }

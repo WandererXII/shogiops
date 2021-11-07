@@ -3,6 +3,7 @@ import { defined, makeSquare } from './util';
 import { SquareSet } from './squareSet';
 import { Position } from './shogi';
 import { lishogiCharToRole, roleToLishogiChar, shogiCoordToChessCord, parseChessSquare } from './compat';
+import { pieceCanPromote, pieceInDeadZone } from './variantUtil';
 
 function makeSanWithoutSuffix(pos: Position, move: Move): string {
   let san = '';
@@ -27,8 +28,8 @@ function makeSanWithoutSuffix(pos: Position, move: Move): string {
     }
     if (capture) san += 'x';
     san += shogiCoordToChessCord(makeSquare(move.to));
-    if (move.promotion || pos.pieceInDeadZone(piece, move.to)) san += '+';
-    else if (pos.pieceCanPromote(piece, move.from, move.to)) san += '=';
+    if (move.promotion || pieceInDeadZone(pos.rules)(piece, move.to)) san += '+';
+    else if (pieceCanPromote(pos.rules)(piece, move.from, move.to)) san += '=';
   }
   return san;
 }
@@ -97,12 +98,12 @@ export function parseSan(pos: Position, san: string): Move | undefined {
   else promotion = false;
 
   // Promotion needs to be specified in san
-  if (defined(promotionStr) !== pos.pieceCanPromote(piece, from, to)) {
+  if (defined(promotionStr) !== pieceCanPromote(pos.rules)(piece, from, to)) {
     return;
   }
 
   // force promotion
-  else if (!promotion && pos.pieceInDeadZone(piece, to)) return;
+  else if (!promotion && pieceInDeadZone(pos.rules)(piece, to)) return;
 
   return {
     from,

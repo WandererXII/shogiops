@@ -1,5 +1,30 @@
+import { Piece, Square } from '.';
 import { SquareSet } from './squareSet';
 import { Color, Role, Rules } from './types';
+
+export function pieceCanPromote(rules: Rules): (piece: Piece, from: Square, to: Square) => boolean {
+  switch (rules) {
+    default:
+      return (piece: Piece, from: Square, to: Square) =>
+        promotableRoles(rules).includes(piece.role) &&
+        (promotionZone(rules)(piece.color).has(from) || promotionZone(rules)(piece.color).has(to));
+  }
+}
+export function pieceInDeadZone(rules: Rules): (piece: Piece, sq: Square) => boolean {
+  switch (rules) {
+    default:
+      return (piece: Piece, sq: Square) => {
+        if (piece.role === 'lance' || piece.role === 'pawn')
+          return backrank(rules)(piece.color).intersect(SquareSet.fromSquare(sq)).nonEmpty();
+        if (piece.role === 'knight')
+          return secondBackrank(rules)(piece.color)
+            .union(backrank(rules)(piece.color))
+            .intersect(SquareSet.fromSquare(sq))
+            .nonEmpty();
+        return false;
+      };
+  }
+}
 
 export function allRoles(rules: Rules): Role[] {
   switch (rules) {
@@ -76,6 +101,15 @@ export function backrank(rules: Rules): (color: Color) => SquareSet {
       return promotionZone(rules);
     default:
       return (color: Color) => (color === 'sente' ? SquareSet.fromRank(8) : SquareSet.fromRank(0));
+  }
+}
+
+export function secondBackrank(rules: Rules): (color: Color) => SquareSet {
+  switch (rules) {
+    case 'minishogi':
+      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(7) : SquareSet.fromRank(5));
+    default:
+      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(7) : SquareSet.fromRank(1));
   }
 }
 

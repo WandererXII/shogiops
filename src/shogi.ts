@@ -19,7 +19,17 @@ import {
 } from './attacks';
 import { opposite, defined } from './util';
 import { Hands } from './hand';
-import { allRoles, backrank, handRoles, promotableRoles, promote, promotionZone, unpromote } from './variantUtil';
+import {
+  allRoles,
+  backrank,
+  handRoles,
+  pieceCanPromote,
+  pieceInDeadZone,
+  promote,
+  promotionZone,
+  secondBackrank,
+  unpromote,
+} from './variantUtil';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
@@ -83,9 +93,6 @@ export abstract class Position {
   abstract isVariantEnd(): boolean;
   abstract variantOutcome(ctx?: Context): Outcome | undefined;
   abstract hasInsufficientMaterial(color: Color): boolean;
-
-  abstract pieceCanPromote(piece: Piece, from: Square, to: Square): boolean;
-  abstract pieceInDeadZone(piece: Piece, sq: Square): boolean;
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
@@ -184,9 +191,8 @@ export abstract class Position {
       if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
 
       // Checking whether we can promote
-      if (move.promotion && !this.pieceCanPromote(piece, move.from, move.to)) return false;
-
-      if (!move.promotion && this.pieceInDeadZone(piece, move.to)) return false;
+      if (move.promotion && !pieceCanPromote(this.rules)(piece, move.from, move.to)) return false;
+      if (!move.promotion && pieceInDeadZone(this.rules)(piece, move.to)) return false;
 
       const dests = this.dests(move.from, ctx);
       return dests.has(move.to);
@@ -281,7 +287,10 @@ export abstract class Position {
       const piece = this.board.take(move.from);
       if (!piece) return;
       const role = piece.role;
-      if ((move.promotion && this.pieceCanPromote(piece, move.from, move.to)) || this.pieceInDeadZone(piece, move.to))
+      if (
+        (move.promotion && pieceCanPromote(this.rules)(piece, move.from, move.to)) ||
+        pieceInDeadZone(this.rules)(piece, move.to)
+      )
         piece.role = promote(this.rules)(role);
 
       const capture = this.board.set(move.to, piece);
@@ -317,10 +326,6 @@ export class Shogi extends Position {
     return super.clone() as Shogi;
   }
 
-  protected backrank2(color: Color): SquareSet {
-    return (color === 'sente' ? SquareSet.fromRank(7) : SquareSet.fromRank(1)).union(backrank(this.rules)(color));
-  }
-
   protected validate(strict: boolean): Result<undefined, PositionError> {
     if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
@@ -337,7 +342,7 @@ export class Shogi extends Position {
 
     for (const sp of this.board) {
       if (!allRoles(this.rules).includes(sp[1].role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
-      if (this.pieceInDeadZone(sp[1], sp[0]))
+      if (pieceInDeadZone(this.rules)(sp[1], sp[0]))
         return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
     }
 
@@ -359,8 +364,8 @@ export class Shogi extends Position {
     let mask = this.board.occupied.complement();
     ctx = ctx || this.ctx();
     // Removing backranks, where no legal drop would be possible
-    if (role === 'pawn' || role === 'lance') mask = mask.diff(backrank(this.rules)(this.turn));
-    if (role === 'knight') mask = mask.diff(this.backrank2(this.turn));
+    if (role === 'pawn' || role === 'lance' || role === 'knight') mask = mask.diff(backrank(this.rules)(this.turn));
+    if (role === 'knight') mask = mask.diff(secondBackrank(this.rules)(this.turn));
 
     // Checking for double pawns
     if (role === 'pawn') {
@@ -446,19 +451,5 @@ export class Shogi extends Position {
 
   hasInsufficientMaterial(color: Color): boolean {
     return this.board.occupied.intersect(this.board[color]).size() + this.hands[color].count() < 2; // sente king, gote king and one other piece
-  }
-
-  pieceCanPromote(piece: Piece, from: Square, to: Square): boolean {
-    return (
-      promotableRoles(this.rules).includes(piece.role) &&
-      (promotionZone(this.rules)(piece.color).has(from) || promotionZone(this.rules)(piece.color).has(to))
-    );
-  }
-
-  pieceInDeadZone(piece: Piece, sq: Square): boolean {
-    if (piece.role === 'lance' || piece.role === 'pawn')
-      return backrank(this.rules)(piece.color).intersect(SquareSet.fromSquare(sq)).nonEmpty();
-    else if (piece.role === 'knight') return this.backrank2(piece.color).intersect(SquareSet.fromSquare(sq)).nonEmpty();
-    return false;
   }
 }

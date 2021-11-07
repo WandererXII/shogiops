@@ -4,6 +4,7 @@ import { makePiece } from './fen';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Position } from './shogi';
+import { pieceCanPromote, pieceInDeadZone } from './variantUtil';
 
 export function squareSet(squares: SquareSet): string {
   const r = [];
@@ -58,9 +59,9 @@ export function perft(pos: Position, depth: number, log = false): number {
     for (const to of dests) {
       const promotions: Array<boolean> = [];
       const piece = pos.board.get(from)!;
-      if (pos.pieceCanPromote(piece, from, to)) {
+      if (pieceCanPromote(pos.rules)(piece, from, to)) {
         promotions.push(true);
-        if (!pos.pieceInDeadZone(piece, to)) promotions.push(false);
+        if (!pieceInDeadZone(pos.rules)(piece, to)) promotions.push(false);
       } else promotions.push(false);
 
       for (const promotion of promotions) {

@@ -31,6 +31,9 @@ export class Minishogi extends Shogi {
     super('minishogi');
   }
 
+  numberOfRanks = 5;
+  numberOfFiles = 5;
+
   static default(): Minishogi {
     const pos = new this();
     pos.board = Board.minishogi();

@@ -98,6 +98,9 @@ export abstract class Position {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
+  abstract numberOfFiles: number;
+  abstract numberOfRanks: number;
+
   protected playCaptureAt(captured: Piece): void {
     const unpromotedRole = unpromote(this.rules)(captured.role);
     this.hands[opposite(captured.color)][unpromotedRole]++;
@@ -304,6 +307,9 @@ export class Shogi extends Position {
     super(rules || 'shogi');
   }
 
+  numberOfRanks = 9;
+  numberOfFiles = 9;
+
   static default(): Shogi {
     const pos = new this();
     pos.board = Board.default();
@@ -327,6 +333,8 @@ export class Shogi extends Position {
   }
 
   protected validate(strict: boolean): Result<undefined, PositionError> {
+    if (this.board.numberOfRanks !== this.numberOfRanks || this.board.numberOfFiles !== this.numberOfFiles)
+      return Result.err(new PositionError(IllegalSetup.Empty));
     if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));

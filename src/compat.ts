@@ -69,13 +69,12 @@ export function shogigroundMove(move: Move): ChessSquareName[] {
   return isDrop(move) ? [makeChessSquare(move.to)] : [makeChessSquare(move.from), makeChessSquare(move.to)];
 }
 
-export function lishogiVariantRules(variant: 'standard' | 'fromPosition' | 'minishogi'): Rules {
+export function lishogiVariantRules(variant: string): Rules {
   switch (variant) {
-    case 'standard':
-    case 'fromPosition':
-      return 'shogi';
     case 'minishogi':
       return 'minishogi';
+    default:
+      return 'shogi';
   }
 }
 

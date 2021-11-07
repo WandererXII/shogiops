@@ -33,6 +33,23 @@ test('make kif header from some random position', () => {
   );
 });
 
+test('make minishogi kif header', () => {
+  const setup = parseFen('rbsgk/4p/P4/5/KGSBR w - 2').unwrap();
+  expect(makeKifHeader(setup)).toEqual(
+    `後手の持駒：なし
+  ５ ４ ３ ２ １
++---------------+
+|v飛v角v銀v金v玉|一
+| ・ ・ ・ ・v歩|二
+| 歩 ・ ・ ・ ・|三
+| ・ ・ ・ ・ ・|四
+| 玉 金 銀 角 飛|五
++---------------+
+先手の持駒：なし
+後手番`
+  );
+});
+
 test('make kif header from handicap position', () => {
   const setup = parseFen('3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1').unwrap();
   expect(makeKifHeader(setup)).toEqual(`手合割：八枚落ち`);
@@ -54,6 +71,23 @@ test('parse kif header with kif board', () => {
 | ・ ・ ・ ・ ・ ・ ・ ・ ・|九
 +---------------------------+
 先手の持駒：金 銀 
+後手番`;
+  const kifSetup = parseKifHeader(kifHeader).unwrap();
+  expect(kifSetup).toEqual(setup);
+});
+
+test('parse kif minishogi header with kif board', () => {
+  const setup = parseFen('rbsgk/4p/P4/5/KGSBR w - 1').unwrap();
+  const kifHeader = `後手の持駒：なし
+５ ４ ３ ２ １
++---------------+
+|v飛v角v銀v金v玉|一
+| ・ ・ ・ ・v歩|二
+| 歩 ・ ・ ・ ・|三
+| ・ ・ ・ ・ ・|四
+| 玉 金 銀 角 飛|五
++---------------+
+先手の持駒：なし
 後手番`;
   const kifSetup = parseKifHeader(kifHeader).unwrap();
   expect(kifSetup).toEqual(setup);

@@ -48,12 +48,15 @@ export function makeKifPositionHeader(setup: Setup): string {
 }
 
 export function makeKifBoard(board: Board): string {
-  let kifBoard = '  ９ ８ ７ ６ ５ ４ ３ ２ １\n+---------------------------+\n';
-  for (let rank = 8; rank >= 0; rank--) {
-    for (let file = 0; file < 9; file++) {
+  const kifFiles = ' ９ ８ ７ ６ ５ ４ ３ ２ １'.slice(-(board.numberOfFiles * 2));
+  const separator = '+' + '-'.repeat(board.numberOfFiles * 3) + '+';
+  const offset = 9 - board.numberOfFiles;
+  let kifBoard = ' ' + kifFiles + `\n${separator}\n`;
+  for (let rank = 8; rank >= 9 - board.numberOfRanks; rank--) {
+    for (let file = offset; file < 9; file++) {
       const square = file + rank * 9;
       const piece = board.get(square);
-      if (file === 0) {
+      if (file === offset) {
         kifBoard += '|';
       }
       if (!piece) kifBoard += ' ・';
@@ -66,7 +69,7 @@ export function makeKifBoard(board: Board): string {
       }
     }
   }
-  kifBoard += '+---------------------------+';
+  kifBoard += separator;
   return kifBoard;
 }
 
@@ -124,13 +127,19 @@ export function parseKifPositionHeader(kif: string): Result<Setup, KifError> {
 
 export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
   const lines = normalizedKifLines(kifBoard).filter(l => l.startsWith('|'));
-  if (lines.length !== 9) return Result.err(new KifError(InvalidKif.Board));
+  if (lines.length === 0) return Result.err(new KifError(InvalidKif.Board));
   const board = Board.empty();
-  let file = 0;
+
+  // assuming square board
+  board.numberOfRanks = lines.length;
+  board.numberOfFiles = lines.length;
+
+  const offset = 9 - lines.length;
+  let file = offset;
   let rank = 9;
 
   for (const l of lines) {
-    file = 0;
+    file = offset;
     rank--;
     let gote = false;
     let prom = false;
@@ -159,7 +168,7 @@ export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
       }
     }
   }
-  if (rank !== 0 || file !== 9) return Result.err(new KifError(InvalidKif.Board));
+  if (rank !== 9 - lines.length || file !== 9) return Result.err(new KifError(InvalidKif.Board));
   return Result.ok(board);
 }
 

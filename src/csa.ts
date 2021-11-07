@@ -8,6 +8,8 @@ import { makeCsaSquare, parseCsaSquare } from './csaUtil';
 import { Hand, Hands } from './hand';
 import { allRoles, handRoles, promote } from './variantUtil';
 
+// Olny supports standard shogi no variants
+
 //
 // CSA HEADER
 //

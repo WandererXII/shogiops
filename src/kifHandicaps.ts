@@ -23,6 +23,9 @@ export function sfenToHandicapName(sfen: string): string | undefined {
       return '八枚落ち';
     case '4k4/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w -':
       return '十枚落ち';
+    // minishogi
+    case 'rbsgk/4p/5/P4/KGSBR b -':
+      return '五々将棋';
     default:
       return undefined;
   }
@@ -79,6 +82,8 @@ export function handicapNameToSfen(name: string): string | undefined {
       return '2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2N2L 1';
     case '八枚得':
       return '3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2S2N2L 1';
+    case '五々将棋':
+      return 'rbsgk/4p/5/P4/KGSBR b - 1';
     default:
       return undefined;
   }

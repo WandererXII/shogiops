@@ -20,7 +20,6 @@ yarn.lock
 /util.js
 /debug.js
 /fen.js
-/san.js
 /hand.js
 /hash.js
 /index.js
@@ -43,7 +42,6 @@ yarn.lock
 /util.d.ts
 /debug.d.ts
 /fen.d.ts
-/san.d.ts
 /hand.d.ts
 /hash.d.ts
 /index.d.ts
@@ -66,7 +64,6 @@ yarn.lock
 /util.js.map
 /debug.js.map
 /fen.js.map
-/san.js.map
 /hand.js.map
 /hash.js.map
 /index.js.map

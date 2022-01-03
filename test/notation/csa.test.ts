@@ -1,17 +1,30 @@
-import { INITIAL_FEN, parseFen } from '../src/fen';
+import { INITIAL_FEN, parseFen } from '../../src/fen';
 import {
   makeCsaHeader,
   makeCsaMove,
-  makeCsaVariation,
   parseCsaHeader,
   parseCsaMove,
   parseCsaMoves,
   parseTags,
-} from '../src/csa';
-import { Shogi } from '../src/shogi';
-import { parseUsi } from '../src/util';
+} from '../../src/notation/csa/csa';
+import { makeNumberSquare, parseNumberSquare } from '../../src/notation/notationUtil';
+import { Shogi } from '../../src/shogi';
+import { parseSquare, parseUsi } from '../../src/util';
 
-// tests from ./kif edited for csa
+test('parse csa square', () => {
+  expect(parseNumberSquare('11')).toEqual(parseSquare('1a'));
+  expect(parseNumberSquare('12')).toEqual(parseSquare('1b'));
+  expect(parseNumberSquare('66')).toEqual(parseSquare('6f'));
+  expect(parseNumberSquare('89')).toEqual(parseSquare('8i'));
+  expect(parseNumberSquare('99')).toEqual(parseSquare('9i'));
+});
+
+test('all squares', () => {
+  for (let i = 0; i < 81; i++) {
+    expect(parseNumberSquare(makeNumberSquare(i))).toEqual(i);
+    expect(parseNumberSquare(makeNumberSquare(i))).toEqual(i);
+  }
+});
 
 test('make csa header from starting position', () => {
   const setup = parseFen(INITIAL_FEN).unwrap();
@@ -110,31 +123,13 @@ test('make CSA moves individually', () => {
   pos2.play(line.shift()!);
 });
 
-test('make csa move variation - sequence', () => {
-  const pos = Shogi.default();
-  const line = ['7g7f', '8c8d', '5g5f', '5c5d', '2h5h', '3a4b', '5f5e', '5d5e', '8h5e', '8d8e', '5e7c+'].map(
-    m => parseUsi(m)!
-  );
-  expect(makeCsaVariation(pos, line)).toEqual(`+7776FU
--8384FU
-+5756FU
--5354FU
-+2858HI
--3142GI
-+5655FU
--5455FU
-+8855KA
--8485FU
-+5573UM`);
-});
-
 test('parse csa moves one by one', () => {
   const pos = Shogi.default();
   const line = ['7g7f', '8c8d', '5g5f', '5c5d', '2h5h', '3a4b', '5f5e', '5d5e', '8h5e', '8d8e', '5e7c+'].map(
     m => parseUsi(m)!
   );
   for (const m of line) {
-    expect(parseCsaMove(pos, makeCsaMove(pos, m))).toEqual(m);
+    expect(parseCsaMove(pos, makeCsaMove(pos, m)!)).toEqual(m);
     pos.play(m);
   }
   expect(pos.isCheckmate()).toBe(true);

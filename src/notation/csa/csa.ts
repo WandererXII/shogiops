@@ -1,12 +1,12 @@
 import { Result } from '@badrap/result';
-import { Board } from './board';
-import { Setup } from './setup';
-import { Position } from './shogi';
-import { Color, isDrop, Move } from './types';
-import { csaToRole, defined, roleToCsa } from './util';
-import { makeCsaSquare, parseCsaSquare } from './csaUtil';
-import { Hand, Hands } from './hand';
-import { allRoles, handRoles, promote } from './variantUtil';
+import { Board } from '../../board';
+import { Setup } from '../../setup';
+import { Position } from '../../shogi';
+import { Color, isDrop, Move } from '../../types';
+import { csaToRole, defined, roleToCsa } from '../../util';
+import { Hand, Hands } from '../../hand';
+import { allRoles, handRoles, promote } from '../../variantUtil';
+import { makeNumberSquare, parseNumberSquare } from '../notationUtil';
 
 // Olny supports standard shogi no variants
 
@@ -95,7 +95,7 @@ export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
   const splitted = handicap.substring(2).match(/.{4}/g) || [];
   const intitalBoard = Board.default();
   for (const s of splitted) {
-    const sq = parseCsaSquare(s.substring(0, 2));
+    const sq = parseNumberSquare(s.substring(0, 2));
     if (defined(sq)) {
       intitalBoard.take(sq);
     } else {
@@ -136,10 +136,11 @@ function parseAdditions(initialSetup: Setup, additions: string[]): Result<Setup,
   for (const line of additions) {
     const color: Color = line[1] === '+' ? 'sente' : 'gote';
     for (const sp of line.substring(2).match(/.{4}/g) || []) {
-      const sq = parseCsaSquare(sp.substring(0, 2));
+      const sqString = sp.substring(0, 2);
+      const sq = parseNumberSquare(sqString);
       const role = csaToRole(sp.substring(2, 4));
-      if (defined(sq) && defined(role)) {
-        if (sq === 0) {
+      if ((defined(sq) || sqString === '00') && defined(role)) {
+        if (!defined(sq)) {
           if (!handRoles('shogi').includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
           initialSetup.hands[color][role]++;
         } else {
@@ -157,6 +158,14 @@ export function parseTags(csa: string): [string, string][] {
     .map(l => l.substring(1).split(/:(.*)/, 2) as [string, string]);
 }
 
+export function normalizedCsaLines(csa: string): string[] {
+  return csa
+    .replace(/,/g, '\n')
+    .split(/[\r\n]+/)
+    .map(l => l.trim())
+    .filter(l => l);
+}
+
 //
 // CSA MOVES
 //
@@ -171,15 +180,15 @@ export function parseCsaMove(pos: Position, csaMove: string): Move | undefined {
     if (!match) return;
     const drop = {
       role: csaToRole(match[2])!,
-      to: parseCsaSquare(match[1])!,
+      to: parseNumberSquare(match[1])!,
     };
     return drop;
   }
   const role = csaToRole(match[3])!;
-  const orig = parseCsaSquare(match[1])!;
+  const orig = parseNumberSquare(match[1])!;
   return {
     from: orig,
-    to: parseCsaSquare(match[2])!,
+    to: parseNumberSquare(match[2])!,
     promotion: pos.board.get(orig)?.role !== role,
   };
 }
@@ -197,32 +206,16 @@ export function parseCsaMoves(pos: Position, csaMoves: string[]): Move[] {
 }
 
 // Making CSA formatted moves
-export function makeCsaMove(pos: Position, move: Move): string {
+export function makeCsaMove(pos: Position, move: Move): string | undefined {
   if (isDrop(move)) {
-    return '00' + makeCsaSquare(move.to) + roleToCsa(move.role);
+    return '00' + makeNumberSquare(move.to) + roleToCsa(move.role);
   } else {
     const role = pos.board.getRole(move.from);
-    if (!role) return '%ERROR';
+    if (!role) return undefined;
     return (
-      makeCsaSquare(move.from) + makeCsaSquare(move.to) + roleToCsa(move.promotion ? promote('shogi')(role) : role)
+      makeNumberSquare(move.from) +
+      makeNumberSquare(move.to) +
+      roleToCsa(move.promotion ? promote('shogi')(role) : role)
     );
   }
-}
-
-export function makeCsaVariation(pos: Position, variation: Move[]): string {
-  pos = pos.clone();
-  const line = [];
-  for (const m of variation) {
-    line.push((pos.turn === 'sente' ? '+' : '-') + makeCsaMove(pos, m));
-    pos.play(m);
-  }
-  return line.join('\n');
-}
-
-export function normalizedCsaLines(csa: string): string[] {
-  return csa
-    .replace(/,/g, '\n')
-    .split(/[\r\n]+/)
-    .map(l => l.trim())
-    .filter(l => l);
 }

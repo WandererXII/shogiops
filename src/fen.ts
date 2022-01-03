@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Piece, Color } from './types';
 import { Board } from './board';
 import { Setup } from './setup';
-import { defined, roleToChar, charToRole, toBW } from './util';
+import { defined, roleToString, stringToRole, toBW } from './util';
 import { Hand, Hands } from './hand';
 import { ROLES } from './types';
 
@@ -27,9 +27,9 @@ function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
 }
 
-function charToPiece(ch: string): Piece | undefined {
-  const role = charToRole(ch);
-  return role && { role, color: ch.toLowerCase() === ch ? 'gote' : 'sente' };
+function stringToPiece(s: string): Piece | undefined {
+  const role = stringToRole(s);
+  return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
 }
 
 export function parseBoardFen(boardPart: string): Result<Board, FenError> {
@@ -54,7 +54,7 @@ export function parseBoardFen(boardPart: string): Result<Board, FenError> {
         if (file >= 9 || rank < 0) return Result.err(new FenError(InvalidFen.Board));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
         const square = file + rank * 9;
-        const piece = charToPiece(c);
+        const piece = stringToPiece(c);
         if (!piece) return Result.err(new FenError(InvalidFen.Board));
         board.set(square, piece);
         file++;
@@ -75,7 +75,7 @@ export function parseHands(handsPart: string): Result<Hands, FenError> {
       count = parseInt(handsPart[i++], 10);
       if (parseInt(handsPart[i]) >= 0) count = count * 10 + parseInt(handsPart[i++], 10);
     } else count = 1;
-    const piece = charToPiece(handsPart[i]);
+    const piece = stringToPiece(handsPart[i]);
     if (!piece) return Result.err(new FenError(InvalidFen.Hands));
     hands[piece.color][piece.role] += count;
   }
@@ -127,14 +127,14 @@ interface FenOpts {
 
 export function parsePiece(str: string): Piece | undefined {
   if (!str) return;
-  const piece = charToPiece(str[0]);
+  const piece = stringToPiece(str[0]);
   if (!piece) return;
   else if (str.length > 1 && str[1] !== '+') return;
   return piece;
 }
 
 export function makePiece(piece: Piece): string {
-  let r = roleToChar(piece.role);
+  let r = roleToString(piece.role);
   if (piece.color === 'sente') r = r.toUpperCase();
   return r;
 }
@@ -169,7 +169,7 @@ export function makeBoardFen(board: Board): string {
 
 export function makeHand(hand: Hand): string {
   return ROLES.map(role => {
-    const r = roleToChar(role);
+    const r = roleToString(role);
     const n = hand[role];
     return n > 1 ? n + r : n === 1 ? r : '';
   }).join('');

@@ -43,12 +43,12 @@ export function scalashogiCharPair(move: Move): string {
   else return String.fromCharCode(34 + move.from, move.promotion ? 34 + move.to + 128 : 34 + move.to);
 }
 
-export function usiToShogigroundMove(usi: string): SquareName[] {
+export function usiToSquareNames(usi: string): SquareName[] {
   const move = parseUsi(usi);
-  return defined(move) ? shogigroundMove(move) : [];
+  return defined(move) ? moveToSquareNames(move) : [];
 }
 
-export function shogigroundMove(move: Move): SquareName[] {
+export function moveToSquareNames(move: Move): SquareName[] {
   return isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
 }
 

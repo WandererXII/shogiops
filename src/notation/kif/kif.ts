@@ -1,22 +1,21 @@
 import { Result } from '@badrap/result';
-import { Board } from './board';
-import { INITIAL_FEN, makeFen, parseFen } from './fen';
+import { Board } from '../../board';
+import { INITIAL_FEN, makeFen, parseFen } from '../../fen';
 import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps';
-import { Setup } from './setup';
-import { Position } from './shogi';
-import { Color, isDrop, Move, Square } from './types';
-import { defined, kanjiToRole, roleTo1Kanji, roleTo2Kanji } from './util';
+import { Setup } from '../../setup';
+import { Position } from '../../shogi';
+import { Color, isDrop, Move, Square } from '../../types';
+import { defined, kanjiToRole, roleTo1Kanji, roleTo2Kanji } from '../../util';
 
+import { Hand, Hands } from '../../hand';
+import { allRoles, handRoles, promote } from '../../variantUtil';
 import {
   kanjiToNumber,
-  kifDestSquare,
-  kifOrigSquare,
-  normalizedKifLines,
+  makeJapaneseSquare,
+  makeNumberSquare,
   numberToKanji,
-  parseKifSquare,
-} from './kifUtil';
-import { Hand, Hands } from './hand';
-import { allRoles, handRoles, promote } from './variantUtil';
+  parseJapaneseSquare,
+} from '../notationUtil';
 
 //
 // KIF HEADER
@@ -197,6 +196,15 @@ export function parseTags(kif: string): [string, string][] {
     .map(l => l.replace('：', ':').split(/:(.*)/, 2) as [string, string]);
 }
 
+export function normalizedKifLines(kif: string): string[] {
+  return kif
+    .replace(/:/g, '：')
+    .replace(/　/g, ' ') // full-width space to normal space
+    .split(/[\r\n]+/)
+    .map(l => l.trim())
+    .filter(l => l);
+}
+
 //
 // KIF MOVES
 //
@@ -213,14 +221,14 @@ export function parseKifMove(kifMove: string, lastDest: Square | undefined = und
     if (!match) return;
     const move = {
       role: kanjiToRole(match[2])!,
-      to: parseKifSquare(match[1]) ?? lastDest!,
+      to: parseJapaneseSquare(match[1]) ?? lastDest!,
     };
     return move;
   }
 
   return {
-    from: parseKifSquare(match[4])!,
-    to: parseKifSquare(match[1]) ?? lastDest!,
+    from: parseJapaneseSquare(match[4])!,
+    to: parseJapaneseSquare(match[1]) ?? lastDest!,
     promotion: !!match[3],
   };
 }
@@ -237,30 +245,13 @@ export function parseKifMoves(kifMoves: string[], lastDest: Square | undefined =
 }
 
 // Making kif formatted moves
-export function makeKifMove(pos: Position, move: Move, same = false): string {
-  const moveDest = same ? '同　' : kifDestSquare(move.to);
+export function makeKifMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
+  const moveDest = lastDest === move.to ? '同　' : makeJapaneseSquare(move.to);
   if (isDrop(move)) {
     return moveDest + roleTo1Kanji(move.role) + '打';
   } else {
     const role = pos.board.getRole(move.from);
-    if (!role) return '反則';
-    return moveDest + roleTo2Kanji(role) + (move.promotion ? '成' : '') + '(' + kifOrigSquare(move.from) + ')';
+    if (!role) return undefined;
+    return moveDest + roleTo2Kanji(role) + (move.promotion ? '成' : '') + '(' + makeNumberSquare(move.from) + ')';
   }
-}
-
-export function makeKifVariation(
-  pos: Position,
-  variation: Move[],
-  lastDest: Square | undefined = undefined,
-  startTurn = 1
-): string {
-  pos = pos.clone();
-  const line = [];
-  const padding = (startTurn + variation.length - 1).toString().length;
-  for (const m of variation) {
-    line.push((startTurn++).toString().padStart(padding) + ' ' + makeKifMove(pos, m, m.to === lastDest));
-    pos.play(m);
-    lastDest = m.to;
-  }
-  return line.join('\n');
 }

@@ -5,6 +5,8 @@ package-lock.json
 yarn.lock
 .vscode/
 
+/notation/
+
 /attacks.js
 /board.js
 /shogi.js

@@ -8,6 +8,7 @@ export function opposite(color: Color): Color {
   return color === 'gote' ? 'sente' : 'gote';
 }
 
+// coordinate system starts at bottom left
 export function squareRank(square: Square): number {
   return Math.floor(square / 9);
 }
@@ -16,7 +17,7 @@ export function squareFile(square: Square): number {
   return square % 9;
 }
 
-export function roleToChar(role: Role): string {
+export function roleToString(role: Role): string {
   switch (role) {
     case 'pawn':
       return 'p';
@@ -202,7 +203,7 @@ export function kanjiToRole(str: string): Role | undefined {
   }
 }
 
-export function charToRole(
+export function stringToRole(
   ch:
     | 'p'
     | 'l'
@@ -231,8 +232,8 @@ export function charToRole(
     | '+B'
     | '+R'
 ): Role;
-export function charToRole(ch: string): Role | undefined;
-export function charToRole(ch: string): Role | undefined {
+export function stringToRole(ch: string): Role | undefined;
+export function stringToRole(ch: string): Role | undefined {
   switch (ch) {
     case 'P':
     case 'p':
@@ -297,7 +298,7 @@ export function makeSquare(square: Square): SquareName {
 
 export function parseUsi(str: string): Move | undefined {
   if (str[1] === '*' && str.length === 4) {
-    const role = charToRole(str[0]);
+    const role = stringToRole(str[0]);
     const to = parseSquare(str.slice(2));
     if (defined(role) && defined(to)) return { role, to };
   } else if (str.length === 4 || str.length === 5) {
@@ -310,7 +311,7 @@ export function parseUsi(str: string): Move | undefined {
 }
 
 export function makeUsi(move: Move): string {
-  if (isDrop(move)) return `${roleToChar(move.role).toUpperCase()}*${makeSquare(move.to)}`;
+  if (isDrop(move)) return `${roleToString(move.role).toUpperCase()}*${makeSquare(move.to)}`;
   return makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? '+' : '');
 }
 

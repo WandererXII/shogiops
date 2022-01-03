@@ -1,16 +1,15 @@
-import { parseFen } from '../src/fen';
+import { parseFen } from '../../src/fen';
 import {
   makeKifHeader,
   makeKifMove,
-  makeKifVariation,
   parseKifHeader,
   parseKifMove,
   parseKifMoves,
   parseTags,
-} from '../src/kif';
-import { defaultSetup } from '../src/setup';
-import { Shogi } from '../src/shogi';
-import { parseUsi } from '../src/util';
+} from '../../src/notation/kif/kif';
+import { defaultSetup } from '../../src/setup';
+import { Shogi } from '../../src/shogi';
+import { parseUsi } from '../../src/util';
 
 test('make kif header from some random position', () => {
   const setup = parseFen('lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p').unwrap();
@@ -151,31 +150,13 @@ test('make kif moves individually', () => {
   pos2.play(line.shift()!);
 });
 
-test('make kif move variation - sequence', () => {
-  const pos = Shogi.default();
-  const line = ['7g7f', '8c8d', '5g5f', '5c5d', '2h5h', '3a4b', '5f5e', '5d5e', '8h5e', '8d8e', '5e7c+'].map(
-    m => parseUsi(m)!
-  );
-  expect(makeKifVariation(pos, line)).toEqual(` 1 ７六歩(77)
- 2 ８四歩(83)
- 3 ５六歩(57)
- 4 ５四歩(53)
- 5 ５八飛(28)
- 6 ４二銀(31)
- 7 ５五歩(56)
- 8 同　歩(54)
- 9 同　角(88)
-10 ８五歩(84)
-11 ７三角成(55)`);
-});
-
 test('parse kif moves one by one', () => {
   const pos = Shogi.default();
   const line = ['7g7f', '8c8d', '5g5f', '5c5d', '2h5h', '3a4b', '5f5e', '5d5e', '8h5e', '8d8e', '5e7c+'].map(
     m => parseUsi(m)!
   );
   for (const m of line) {
-    expect(parseKifMove(makeKifMove(pos, m))).toEqual(m);
+    expect(parseKifMove(makeKifMove(pos, m)!)).toEqual(m);
     pos.play(m);
   }
   expect(pos.isCheckmate()).toBe(true);

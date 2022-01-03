@@ -24,14 +24,14 @@ export {
 } from './types';
 
 export {
-  charToRole,
+  stringToRole,
   defined,
   makeSquare,
   makeUsi,
   opposite,
   parseSquare,
   parseUsi,
-  roleToChar,
+  roleToString,
   squareFile,
   squareRank,
 } from './util';
@@ -66,19 +66,23 @@ export * as debug from './debug';
 
 export * as fen from './fen';
 
-export * as handicaps from './kifHandicaps';
+export * as handicaps from './notation/kif/kifHandicaps';
 
 export * as hand from './hand';
 
 export * as hash from './hash';
 
-export * as kif from './kif';
+export * as japanese from './notation/japanese';
 
-export * as kifUtil from './kifUtil';
+export * as kitaoKawasaki from './notation/kitaoKawasaki';
 
-export * as csa from './csa';
+export * as western from './notation/western';
 
-export * as csaUtil from './csaUtil';
+export * as westernEngine from './notation/westernEngine';
+
+export * as kif from './notation/kif/kif';
+
+export * as csa from './notation/csa/csa';
 
 export * as transform from './transform';
 

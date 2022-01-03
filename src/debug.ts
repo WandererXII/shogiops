@@ -1,6 +1,6 @@
 import { Square, Piece } from './types';
 import { makeSquare, makeUsi } from './util';
-import { makePiece } from './fen';
+import { makePiece } from './sfen';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Position } from './shogi';

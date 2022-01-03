@@ -1,6 +1,6 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board';
-import { INITIAL_FEN, makeFen, parseFen } from '../../fen';
+import { INITIAL_SFEN, makeSfen, parseSfen } from '../../sfen';
 import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps';
 import { Setup } from '../../setup';
 import { Position } from '../../shogi';
@@ -32,7 +32,7 @@ export class KifError extends Error {}
 
 // Export
 export function makeKifHeader(setup: Setup): string {
-  const handicap = sfenToHandicapName(makeFen(setup, { epd: true }));
+  const handicap = sfenToHandicapName(makeSfen(setup, { epd: true }));
   if (defined(handicap)) return '手合割：' + handicap;
   return makeKifPositionHeader(setup);
 }
@@ -88,12 +88,12 @@ export function makeKifHand(hand: Hand): string {
 export function parseKifHeader(kif: string): Result<Setup, KifError> {
   const lines = normalizedKifLines(kif);
   const handicap = lines.find(l => l.startsWith('手合割：'));
-  const hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : INITIAL_FEN;
+  const hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : INITIAL_SFEN;
   return parseKifPositionHeader(kif).unwrap(
     kifBoard => Result.ok(kifBoard),
     () => {
       if (!defined(hSfen)) return Result.err(new KifError(InvalidKif.Handicap));
-      return parseFen(hSfen);
+      return parseSfen(hSfen);
     }
   );
 }

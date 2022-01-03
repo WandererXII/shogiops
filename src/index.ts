@@ -64,7 +64,7 @@ export * as compat from './compat';
 
 export * as debug from './debug';
 
-export * as fen from './fen';
+export * as sfen from './sfen';
 
 export * as handicaps from './notation/kif/kifHandicaps';
 

@@ -1,28 +1,28 @@
-import { parseFen, makeFen, makeBoardFen, INITIAL_FEN, INITIAL_BOARD_FEN, EMPTY_BOARD_FEN } from '../src/fen';
+import { parseSfen, makeSfen, makeBoardSfen, INITIAL_SFEN, INITIAL_BOARD_SFEN, EMPTY_BOARD_SFEN } from '../src/sfen';
 import { Board } from '../src/board';
 import { defaultSetup } from '../src/setup';
 import { defaultPosition, setupPosition } from '../src/variant';
 import { Hands } from '../src/hand';
 
-test('make board fen', () => {
-  expect(makeBoardFen(Board.default())).toEqual(INITIAL_BOARD_FEN);
-  expect(makeBoardFen(Board.empty())).toEqual(EMPTY_BOARD_FEN);
+test('make board sfen', () => {
+  expect(makeBoardSfen(Board.default())).toEqual(INITIAL_BOARD_SFEN);
+  expect(makeBoardSfen(Board.empty())).toEqual(EMPTY_BOARD_SFEN);
 });
 
-test('make initial fen', () => {
-  expect(makeFen(defaultSetup())).toEqual(INITIAL_FEN);
+test('make initial sfen', () => {
+  expect(makeSfen(defaultSetup())).toEqual(INITIAL_SFEN);
 });
 
-test('parse initial fen', () => {
-  const setup = parseFen(INITIAL_FEN).unwrap();
+test('parse initial sfen', () => {
+  const setup = parseSfen(INITIAL_SFEN).unwrap();
   expect(setup.board).toEqual(Board.default());
   expect(setup.hands).toEqual(Hands.empty());
   expect(setup.turn).toEqual('sente');
   expect(setup.fullmoves).toEqual(1);
 });
 
-test('partial fen', () => {
-  const setup = parseFen(INITIAL_BOARD_FEN).unwrap();
+test('partial sfen', () => {
+  const setup = parseSfen(INITIAL_BOARD_SFEN).unwrap();
   expect(setup.board).toEqual(Board.default());
   expect(setup.hands).toEqual(Hands.empty());
   expect(setup.turn).toEqual('sente');
@@ -39,14 +39,14 @@ test.each([
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b 15p 10',
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b 10p 10',
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b 15R10P10p 10',
-])('parse and make fen', fen => {
-  const setup = parseFen(fen).unwrap();
-  expect(makeFen(setup)).toEqual(fen);
+])('parse and make sfen', sfen => {
+  const setup = parseSfen(sfen).unwrap();
+  expect(makeSfen(setup)).toEqual(sfen);
 });
 
 test('minishogi sfen', () => {
-  const setup = parseFen('rbsgk/4p/5/P4/KGSBR b - 1').unwrap();
+  const setup = parseSfen('rbsgk/4p/5/P4/KGSBR b - 1').unwrap();
   expect(setupPosition('minishogi', setup).unwrap()).toEqual(defaultPosition('minishogi'));
-  expect(makeBoardFen(defaultPosition('minishogi').board)).toEqual('rbsgk/4p/5/P4/KGSBR');
-  expect(makeBoardFen(setup.board)).toEqual('rbsgk/4p/5/P4/KGSBR');
+  expect(makeBoardSfen(defaultPosition('minishogi').board)).toEqual('rbsgk/4p/5/P4/KGSBR');
+  expect(makeBoardSfen(setup.board)).toEqual('rbsgk/4p/5/P4/KGSBR');
 });

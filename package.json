@@ -12,9 +12,7 @@
   "repository": "https://github.com/WandererXII/shogiops",
   "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>(chessops), WandererXII(shogiops)",
   "license": "GPL-3.0-or-later",
-  "module": "index.js",
-  "types": "index.d.ts",
-  "type": "module",
+  "type": "commonjs",
   "sideEffects": false,
   "dependencies": {
     "@badrap/result": "^0.2"
@@ -22,7 +20,7 @@
   "devDependencies": {
     "@types/jest": "^27",
     "@typescript-eslint/eslint-plugin": "^5",
-    "@typescript-eslint/parser": "^5.9.0",
+    "@typescript-eslint/parser": "^5",
     "eslint": "^8",
     "jest": "^27",
     "prettier": "^2",

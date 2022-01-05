@@ -7,8 +7,7 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
 ## Features
 
 - Read and write SFEN
-- Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Castles, Setup,
-  Position)
+- Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Setup, Position)
 - Shogi
   - Move making
   - Legal move and drop move generation
@@ -18,15 +17,15 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
 - Read and write USI move notation
 - Read and write KIF notation
 - Read and write CSA notation
-- Transformations: Mirroring and rotating
+- Write various move notations
 - [Compatibility with lishogi](https://lishogi.org)
-- [Compatibility with shogiground](https://github.com/WandererXII/shogiground)
+- [Compatibility with shogiground](https://github.com/WandererXII/lishogi/tree/master/ui/shogiground)
 
 #### Not yet fully supported:
 
 - Position hashing
 
-[File an issue](https://github.com/WandererXII/shogiops/issues/new) to request more.
+[File an issue](https://github.com/WandererXII/shogiops/issues/new) to request more or report a bug.
 
 ## Example
 
@@ -37,8 +36,8 @@ import { parseUsi } from 'shogiops/util';
 import { Shogi } from 'shogiops/shogi';
 
 const pos = Shogi.default();
-const move = parseUsi('7g7f');
-pos.play(move!);
+const move = parseUsi('7g7f')!;
+pos.play(move);
 ```
 
 ## License

@@ -34,15 +34,6 @@ export function shogigroundDropDests(pos: Position, role?: Role): Map<Role, Squa
   return result;
 }
 
-export function scalashogiCharPair(move: Move): string {
-  if (isDrop(move))
-    return String.fromCharCode(
-      34 + move.to,
-      34 + 81 + 128 + ['rook', 'bishop', 'knight', 'pawn', 'gold', 'silver', 'lance'].indexOf(move.role)
-    );
-  else return String.fromCharCode(34 + move.from, move.promotion ? 34 + move.to + 128 : 34 + move.to);
-}
-
 export function usiToSquareNames(usi: string): SquareName[] {
   const move = parseUsi(usi);
   return defined(move) ? moveToSquareNames(move) : [];

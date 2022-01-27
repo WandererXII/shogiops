@@ -84,8 +84,6 @@ export * as kif from './notation/kif/kif';
 
 export * as csa from './notation/csa/csa';
 
-export * as transform from './transform';
-
 export * as variant from './variant';
 
 export * as variantUtil from './variantUtil';

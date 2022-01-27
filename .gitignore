@@ -15,7 +15,6 @@ yarn.lock
 /csaUtil.js
 /variant.js
 /variantUtil.js
-/transform.js
 /setup.js
 /squareSet.js
 /types.js
@@ -37,7 +36,6 @@ yarn.lock
 /csaUtil.d.ts
 /variant.d.ts
 /variantUtil.d.ts
-/transform.d.ts
 /setup.d.ts
 /squareSet.d.ts
 /types.d.ts
@@ -59,7 +57,6 @@ yarn.lock
 /csaUtil.js.map
 /variant.js.map
 /variantUtil.js.map
-/transform.js.map
 /setup.js.map
 /squareSet.js.map
 /types.js.map

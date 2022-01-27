@@ -11,11 +11,10 @@ yarn.lock
 /board.js
 /shogi.js
 /compat.js
-/csa.js
-/csaUtil.js
 /variant.js
 /variantUtil.js
 /setup.js
+/largeSquareSet.js
 /squareSet.js
 /types.js
 /util.js
@@ -24,19 +23,15 @@ yarn.lock
 /hand.js
 /hash.js
 /index.js
-/kifHandicaps.js
-/kif.js
-/kifUtil.js
 
 /attacks.d.ts
 /board.d.ts
 /shogi.d.ts
 /compat.d.ts
-/csa.d.ts
-/csaUtil.d.ts
 /variant.d.ts
 /variantUtil.d.ts
 /setup.d.ts
+/largeSquareSet.d.ts
 /squareSet.d.ts
 /types.d.ts
 /util.d.ts
@@ -45,19 +40,15 @@ yarn.lock
 /hand.d.ts
 /hash.d.ts
 /index.d.ts
-/kifHandicaps.d.ts
-/kif.d.ts
-/kifUtil.d.ts
 
 /attacks.js.map
 /board.js.map
 /shogi.js.map
 /compat.js.map
-/csa.js.map
-/csaUtil.js.map
 /variant.js.map
 /variantUtil.js.map
 /setup.js.map
+/largeSquareSet.js.map
 /squareSet.js.map
 /types.js.map
 /util.js.map
@@ -66,6 +57,3 @@ yarn.lock
 /hand.js.map
 /hash.js.map
 /index.js.map
-/kifHandicaps.js.map
-/kif.js.map
-/kifUtil.js.map

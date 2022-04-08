@@ -3,7 +3,7 @@ import { Board } from '../../board';
 import { Setup } from '../../setup';
 import { Position } from '../../shogi';
 import { Color, isDrop, Move } from '../../types';
-import { csaToRole, defined, roleToCsa } from '../../util';
+import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util';
 import { Hand, Hands } from '../../hand';
 import { allRoles, handRoles, promote } from '../../variantUtil';
 import { makeNumberSquare, parseNumberSquare } from '../notationUtil';
@@ -38,17 +38,17 @@ export function makeCsaHeader(setup: Setup): string {
 
 export function makeCsaBoard(board: Board): string {
   let csaBoard = '';
-  for (let rank = 8; rank >= 0; rank--) {
-    csaBoard += 'P' + (9 - rank);
-    for (let file = 0; file < 9; file++) {
-      const square = file + rank * 9;
+  for (let rank = 0; rank < 9; rank++) {
+    csaBoard += 'P' + (rank + 1);
+    for (let file = 8; file >= 0; file--) {
+      const square = parseCoordinates(file, rank)!;
       const piece = board.get(square);
       if (!piece) csaBoard += ' * ';
       else {
         const colorSign = piece.color === 'gote' ? '-' : '+';
         csaBoard += colorSign + roleToCsa(piece.role);
       }
-      if (file === 8 && rank > 0) csaBoard += '\n';
+      if (file === 0 && rank < 8) csaBoard += '\n';
     }
   }
   return csaBoard;
@@ -107,28 +107,27 @@ export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
 
 function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   if (csaBoard.length !== 9) return Result.err(new CsaError(InvalidCsa.Board));
-  const board = Board.empty();
-  let file = 0;
-  let rank = 9;
+  const board = Board.empty({ files: 9, ranks: 9 });
+  let rank = 0;
 
   for (const r of csaBoard.map(r => r.substring(2))) {
-    file = 0;
-    rank--;
+    let file = 8;
     for (const s of r.match(/.{1,3}/g) || []) {
-      if (s.includes('*')) file++;
+      if (s.includes('*')) file--;
       else {
-        if (file >= 9 || rank < 0) return Result.err(new CsaError(InvalidCsa.Board));
+        const square = parseCoordinates(file, rank);
+        if (!defined(square)) return Result.err(new CsaError(InvalidCsa.Board));
         const role = csaToRole(s.substring(1));
         if (defined(role) && allRoles('shogi').includes(role)) {
-          const square = file + rank * 9;
           const piece = { role: role, color: (s.startsWith('-') ? 'gote' : 'sente') as Color };
           board.set(square, piece);
-          file++;
+          file--;
         }
       }
     }
+    rank++;
   }
-  if (rank !== 0 || file !== 9) return Result.err(new CsaError(InvalidCsa.Board));
+
   return Result.ok(board);
 }
 

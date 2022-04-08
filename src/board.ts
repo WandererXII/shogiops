@@ -1,9 +1,8 @@
-import { Square, Color, Role, Piece, COLORS, ROLES } from './types';
+import { Square, Color, Role, Piece, COLORS, ROLES, Dimensions } from './types';
 import { SquareSet } from './squareSet';
 
 export class Board implements Iterable<[Square, Piece]> {
-  numberOfFiles: number;
-  numberOfRanks: number;
+  dimensions: Dimensions;
 
   occupied: SquareSet;
 
@@ -34,19 +33,18 @@ export class Board implements Iterable<[Square, Piece]> {
   }
 
   reset(): void {
-    this.numberOfFiles = 9;
-    this.numberOfRanks = 9;
-    this.occupied = new SquareSet(0x7fd05ff, 0x0, 0x7fd05ff);
-    this.sente = new SquareSet(0x7fd05ff, 0x0, 0x0);
-    this.gote = new SquareSet(0x0, 0x0, 0x7fd05ff);
-    this.pawn = new SquareSet(0x7fc0000, 0x0, 0x1ff);
-    this.lance = new SquareSet(0x101, 0x0, 0x4040000);
-    this.knight = new SquareSet(0x82, 0x0, 0x2080000);
-    this.silver = new SquareSet(0x44, 0x0, 0x1100000);
-    this.gold = new SquareSet(0x28, 0x0, 0xa00000);
-    this.bishop = new SquareSet(0x400, 0x0, 0x10000);
-    this.rook = new SquareSet(0x10000, 0x0, 0x400);
-    this.king = new SquareSet(0x10, 0x0, 0x400000);
+    this.dimensions = { files: 9, ranks: 9 };
+    this.occupied = new SquareSet([0x8201ff, 0x1ff, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0]);
+    this.sente = new SquareSet([0x0, 0x0, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0]);
+    this.gote = new SquareSet([0x8201ff, 0x1ff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    this.pawn = new SquareSet([0x0, 0x1ff, 0x0, 0x1ff, 0x0, 0x0, 0x0, 0x0]);
+    this.lance = new SquareSet([0x101, 0x0, 0x0, 0x0, 0x101, 0x0, 0x0, 0x0]);
+    this.knight = new SquareSet([0x82, 0x0, 0x0, 0x0, 0x82, 0x0, 0x0, 0x0]);
+    this.silver = new SquareSet([0x44, 0x0, 0x0, 0x0, 0x44, 0x0, 0x0, 0x0]);
+    this.gold = new SquareSet([0x28, 0x0, 0x0, 0x0, 0x28, 0x0, 0x0, 0x0]);
+    this.bishop = new SquareSet([0x20000, 0x0, 0x0, 0x800000, 0x0, 0x0, 0x0, 0x0]);
+    this.rook = new SquareSet([0x800000, 0x0, 0x0, 0x20000, 0x0, 0x0, 0x0, 0x0]);
+    this.king = new SquareSet([0x10, 0x0, 0x0, 0x0, 0x10, 0x0, 0x0, 0x0]);
     this.tokin = SquareSet.empty();
     this.promotedlance = SquareSet.empty();
     this.promotedknight = SquareSet.empty();
@@ -57,47 +55,40 @@ export class Board implements Iterable<[Square, Piece]> {
 
   static minishogi(): Board {
     const board = new Board();
-    board.numberOfFiles = 5;
-    board.numberOfRanks = 5;
-    board.occupied = new SquareSet(0x0, 0x43e000, 0x7c20000);
-    board.sente = new SquareSet(0x0, 0x43e000, 0x0);
-    board.gote = new SquareSet(0x0, 0x0, 0x7c20000);
-    board.pawn = new SquareSet(0x0, 0x400000, 0x20000);
-    board.lance = new SquareSet(0x0, 0x0, 0x0);
-    board.knight = new SquareSet(0x0, 0x0, 0x0);
-    board.silver = new SquareSet(0x0, 0x8000, 0x1000000);
-    board.gold = new SquareSet(0x0, 0x4000, 0x2000000);
-    board.bishop = new SquareSet(0x0, 0x10000, 0x800000);
-    board.rook = new SquareSet(0x0, 0x20000, 0x400000);
-    board.tokin = new SquareSet(0x0, 0, 0);
-    board.promotedlance = new SquareSet(0x0, 0x0, 0x0);
-    board.promotedknight = new SquareSet(0x0, 0x0, 0x0);
-    board.promotedsilver = new SquareSet(0x0, 0x0, 0x0);
-    board.horse = new SquareSet(0x0, 0x0, 0x0);
-    board.dragon = new SquareSet(0x0, 0x0, 0x0);
-    board.king = new SquareSet(0x0, 0x2000, 0x4000000);
+    board.dimensions = { files: 5, ranks: 5 };
+    board.occupied = new SquareSet([0x1001f, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.sente = new SquareSet([0x0, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.gote = new SquareSet([0x1001f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.pawn = new SquareSet([0x10000, 0x100000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.lance = SquareSet.empty();
+    board.knight = SquareSet.empty();
+    board.silver = new SquareSet([0x4, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.gold = new SquareSet([0x2, 0x0, 0x8, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.bishop = new SquareSet([0x8, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.rook = new SquareSet([0x10, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.king = new SquareSet([0x1, 0x0, 0x10, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    board.tokin = SquareSet.empty();
+    board.promotedlance = SquareSet.empty();
+    board.promotedknight = SquareSet.empty();
+    board.promotedsilver = SquareSet.empty();
+    board.horse = SquareSet.empty();
+    board.dragon = SquareSet.empty();
     return board;
   }
 
-  static empty(): Board {
+  static empty(dims: Dimensions): Board {
     const board = new Board();
-    board.clear();
+    board.dimensions = dims;
+    board.occupied = SquareSet.empty();
+    for (const color of COLORS) board[color] = SquareSet.empty();
+    for (const role of ROLES) board[role] = SquareSet.empty();
     return board;
-  }
-
-  clear(): void {
-    this.numberOfFiles = 9;
-    this.numberOfRanks = 9;
-    this.occupied = SquareSet.empty();
-    for (const color of COLORS) this[color] = SquareSet.empty();
-    for (const role of ROLES) this[role] = SquareSet.empty();
   }
 
   clone(): Board {
     const board = new Board();
     board.occupied = this.occupied;
-    board.numberOfFiles = this.numberOfFiles;
-    board.numberOfRanks = this.numberOfRanks;
+    board.dimensions = this.dimensions;
     for (const color of COLORS) board[color] = this[color];
     for (const role of ROLES) board[role] = this[role];
     return board;
@@ -105,7 +96,8 @@ export class Board implements Iterable<[Square, Piece]> {
 
   equals(other: Board): boolean {
     if (!this.gote.equals(other.gote)) return false;
-    if (this.numberOfFiles !== other.numberOfFiles || this.numberOfRanks !== other.numberOfRanks) return false;
+    if (this.dimensions.files !== other.dimensions.files || this.dimensions.ranks !== other.dimensions.ranks)
+      return false;
     return ROLES.every(role => this[role].equals(other[role]));
   }
 

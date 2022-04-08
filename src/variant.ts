@@ -31,8 +31,7 @@ export class Minishogi extends Shogi {
     super('minishogi');
   }
 
-  numberOfRanks = 5;
-  numberOfFiles = 5;
+  dimensions = { files: 5, ranks: 5 };
 
   static default(): Minishogi {
     const pos = new this();
@@ -52,10 +51,10 @@ export class Minishogi extends Shogi {
   }
 
   dests(square: Square, ctx?: Context): SquareSet {
-    return super.dests(square, ctx).intersect(new SquareSet(0x0, 0x7c3e000, 0x7c3e1f0));
+    return super.dests(square, ctx).intersect(new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]));
   }
 
   dropDests(role: Role, ctx?: Context): SquareSet {
-    return super.dropDests(role, ctx).intersect(new SquareSet(0x0, 0x7c3e000, 0x7c3e1f0));
+    return super.dropDests(role, ctx).intersect(new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]));
   }
 }

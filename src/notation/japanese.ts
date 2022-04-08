@@ -30,8 +30,8 @@ function disambiguate(piece: Piece, orig: Square, dest: Square, others: SquareSe
   const destRank = squareRank(dest);
   const destFile = squareFile(dest);
 
-  const movingUp = myRank < destRank;
-  const movingDown = myRank > destRank;
+  const movingUp = myRank > destRank;
+  const movingDown = myRank < destRank;
 
   // special case if gold/silver like piece is moving directly forward
   if (
@@ -42,19 +42,19 @@ function disambiguate(piece: Piece, orig: Square, dest: Square, others: SquareSe
     return '直';
 
   // is this the only piece moving in certain vertical direction (up, down, horizontally)
-  if (![...others].map(squareRank).some(r => r > destRank === movingDown && r < destRank === movingUp))
+  if (![...others].map(squareRank).some(r => r < destRank === movingDown && r > destRank === movingUp))
     return verticalDisambiguation(piece, movingUp, movingDown);
 
   const othersFiles = [...others].map(squareFile);
-  const rightest = othersFiles.reduce((prev, cur) => (prev > cur ? prev : cur));
-  const leftest = othersFiles.reduce((prev, cur) => (prev < cur ? prev : cur));
+  const rightest = othersFiles.reduce((prev, cur) => (prev < cur ? prev : cur));
+  const leftest = othersFiles.reduce((prev, cur) => (prev > cur ? prev : cur));
 
   // is this piece positioned most on one side, not in the middle
-  if (rightest < myFile || leftest > myFile || (others.size() === 2 && rightest > myFile && leftest < myFile))
-    return sideDisambiguation(piece, rightest < squareFile(orig), leftest > squareFile(orig));
+  if (rightest > myFile || leftest < myFile || (others.size() === 2 && rightest < myFile && leftest > myFile))
+    return sideDisambiguation(piece, rightest > squareFile(orig), leftest < squareFile(orig));
 
   return (
-    sideDisambiguation(piece, rightest <= squareFile(orig), leftest >= squareFile(orig)) +
+    sideDisambiguation(piece, rightest >= squareFile(orig), leftest <= squareFile(orig)) +
     verticalDisambiguation(piece, movingUp, movingDown)
   );
 }

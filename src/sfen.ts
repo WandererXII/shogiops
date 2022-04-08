@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Piece, Color } from './types';
 import { Board } from './board';
 import { Setup } from './setup';
-import { defined, roleToString, stringToRole, toBW } from './util';
+import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util';
 import { Hand, Hands } from './hand';
 import { ROLES } from './types';
 
@@ -33,35 +33,39 @@ function stringToPiece(s: string): Piece | undefined {
 }
 
 export function parseBoardSfen(boardPart: string): Result<Board, SfenError> {
-  const board = Board.empty();
   const ranks = boardPart.split('/');
-  board.numberOfRanks = ranks.length;
   // we assume the board is square
   // since that's good enough for now...
-  board.numberOfFiles = board.numberOfRanks;
-  const offset = 9 - board.numberOfFiles;
-  let rank = 8;
-  let file = offset;
+  const board = Board.empty({ files: ranks.length, ranks: ranks.length });
+  let empty = 0;
+  let rank = 0;
+  let file = board.dimensions.files - 1;
   for (let i = 0; i < boardPart.length; i++) {
     let c = boardPart[i];
-    if (c === '/' && file === 9) {
-      file = offset;
-      rank--;
+    if (c === '/' && file < 0) {
+      empty = 0;
+      file = board.dimensions.files - 1;
+      rank++;
     } else {
       const step = parseInt(c, 10);
-      if (step > 0) file += step;
-      else {
-        if (file >= 9 || rank < 0) return Result.err(new SfenError(InvalidSfen.Board));
+      if (step) {
+        file = file + empty - (empty * 10 + step);
+        empty = empty * 10 + step;
+      } else {
+        if (file < 0 || file >= board.dimensions.files || rank < 0 || rank >= board.dimensions.ranks)
+          return Result.err(new SfenError(InvalidSfen.Board));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
-        const square = file + rank * 9;
+        const square = parseCoordinates(file, rank)!;
         const piece = stringToPiece(c);
         if (!piece) return Result.err(new SfenError(InvalidSfen.Board));
         board.set(square, piece);
-        file++;
+        empty = 0;
+        file--;
       }
     }
   }
-  if (rank !== offset || file !== 9) return Result.err(new SfenError(InvalidSfen.Board));
+
+  if (rank !== board.dimensions.ranks - 1 || file !== -1) return Result.err(new SfenError(InvalidSfen.Board));
   return Result.ok(board);
 }
 
@@ -70,10 +74,13 @@ export function parseHands(handsPart: string): Result<Hands, SfenError> {
   for (let i = 0; i < handsPart.length; i++) {
     if (handsPart[i] === '-') break;
     // max 99
-    let count: number;
-    if (parseInt(handsPart[i]) >= 0) {
-      count = parseInt(handsPart[i++], 10);
-      if (parseInt(handsPart[i]) >= 0) count = count * 10 + parseInt(handsPart[i++], 10);
+    let count = parseInt(handsPart[i]);
+    if (!isNaN(count)) {
+      const secondNum = parseInt(handsPart[++i]);
+      if (!isNaN(secondNum)) {
+        count = count * 10 + secondNum;
+        i++;
+      }
     } else count = 1;
     const piece = stringToPiece(handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
@@ -142,9 +149,9 @@ export function makePiece(piece: Piece): string {
 export function makeBoardSfen(board: Board): string {
   let sfen = '';
   let empty = 0;
-  for (let rank = 8; rank >= 9 - board.numberOfRanks; rank--) {
-    for (let file = 9 - board.numberOfFiles; file < 9; file++) {
-      const square = file + rank * 9;
+  for (let rank = 0; rank < board.dimensions.ranks; rank++) {
+    for (let file = board.dimensions.files - 1; file >= 0; file--) {
+      const square = parseCoordinates(file, rank)!;
       const piece = board.get(square);
       if (!piece) empty++;
       else {
@@ -155,12 +162,12 @@ export function makeBoardSfen(board: Board): string {
         sfen += makePiece(piece);
       }
 
-      if (file === 8) {
+      if (file === 0) {
         if (empty > 0) {
           sfen += empty;
           empty = 0;
         }
-        if (rank !== 9 - board.numberOfRanks) sfen += '/';
+        if (rank !== board.dimensions.ranks - 1) sfen += '/';
       }
     }
   }

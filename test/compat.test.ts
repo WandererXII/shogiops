@@ -1,20 +1,6 @@
 import { Shogi } from '../src/shogi';
-import { shogigroundDests, scalashogiCharPair, shogigroundDropDests } from '../src/compat';
-import { parseUsi } from '../src/util';
+import { shogigroundDests, shogigroundDropDests } from '../src/compat';
 import { parseSfen } from '../src/sfen';
-
-test('scalashogiCharPair', () => {
-  expect(scalashogiCharPair(parseUsi('1g1f')!)).toEqual('<E');
-  expect(scalashogiCharPair(parseUsi('7c7d')!)).toEqual('ZQ');
-  expect(scalashogiCharPair(parseUsi('7g7f')!)).toEqual('6?');
-  expect(scalashogiCharPair(parseUsi('3c3d')!)).toEqual('^U');
-  expect(scalashogiCharPair(parseUsi('8h2b+')!)).toEqual(',è');
-  expect(scalashogiCharPair(parseUsi('3a2b')!)).toEqual('ph');
-  expect(scalashogiCharPair(parseUsi('B*5e')!)).toEqual('Jô');
-  expect(scalashogiCharPair(parseUsi('L*1a')!)).toEqual('rù');
-  expect(scalashogiCharPair(parseUsi('S*1i')!)).toEqual('*ø');
-  expect(scalashogiCharPair(parseUsi('P*1g')!)).toEqual('<ö');
-});
 
 test('shogiground dests', () => {
   const pos = Shogi.default();

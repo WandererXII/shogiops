@@ -19,13 +19,6 @@ test('parse csa square', () => {
   expect(parseNumberSquare('99')).toEqual(parseSquare('9i'));
 });
 
-test('all squares', () => {
-  for (let i = 0; i < 81; i++) {
-    expect(parseNumberSquare(makeNumberSquare(i))).toEqual(i);
-    expect(parseNumberSquare(makeNumberSquare(i))).toEqual(i);
-  }
-});
-
 test('make csa header from starting position', () => {
   const setup = parseSfen(INITIAL_SFEN).unwrap();
   expect(makeCsaHeader(setup)).toEqual(

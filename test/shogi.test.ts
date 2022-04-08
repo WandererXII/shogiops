@@ -32,16 +32,16 @@ const random: [string, string, number, number][] = [
 test('test promotions', () => {
   const pos = Shogi.fromSetup(parseSfen('4k4/9/7S1/1+PG3NS1/9/9/9/9/4K3L b - 1').unwrap()).unwrap();
   expect(Shogi.default().isLegal({ from: 20, to: 29, promotion: true })).toBe(false); // promoting outside promotion zone
-  expect(pos.isLegal({ from: 46, to: 55, promotion: true })).toBe(false); // promoting tokin
-  expect(pos.isLegal({ from: 47, to: 56, promotion: true })).toBe(false); // promoting gold
-  expect(pos.isLegal({ from: 8, to: 80, promotion: false })).toBe(false); // not promoting lance on last rank
-  expect(pos.isLegal({ from: 8, to: 80, promotion: true })).toBe(true);
-  expect(pos.isLegal({ from: 51, to: 70, promotion: false })).toBe(false); // not promoting knight on second last rank
-  expect(pos.isLegal({ from: 51, to: 70, promotion: true })).toBe(true);
-  expect(pos.isLegal({ from: 61, to: 53, promotion: true })).toBe(true); // promoting while leaving the promotion zone
-  expect(pos.isLegal({ from: 61, to: 53, promotion: false })).toBe(true);
-  expect(pos.isLegal({ from: 52, to: 62, promotion: true })).toBe(true); // promoting while entering the promotion zone
-  expect(pos.isLegal({ from: 52, to: 62, promotion: false })).toBe(true);
+  expect(pos.isLegal(parseUsi('8d8c+')!)).toBe(false); // promoting tokin
+  expect(pos.isLegal(parseUsi('7d7c+')!)).toBe(false); // promoting gold
+  expect(pos.isLegal(parseUsi('1i1a')!)).toBe(false); // not promoting lance on last rank
+  expect(pos.isLegal(parseUsi('1i1a+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('3d2b')!)).toBe(false); // not promoting knight on second last rank
+  expect(pos.isLegal(parseUsi('3d2b+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('2c1d+')!)).toBe(true); // promoting while leaving the promotion zone
+  expect(pos.isLegal(parseUsi('2c1d')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('2d1c+')!)).toBe(true); // promoting while entering the promotion zone
+  expect(pos.isLegal(parseUsi('2d1c')!)).toBe(true);
 });
 
 // http://www.talkchess.com/forum3/viewtopic.php?t=60445

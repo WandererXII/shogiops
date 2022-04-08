@@ -5,7 +5,7 @@ import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps';
 import { Setup } from '../../setup';
 import { Position } from '../../shogi';
 import { Color, isDrop, Move, Square } from '../../types';
-import { defined, kanjiToRole, roleTo1Kanji, roleTo2Kanji } from '../../util';
+import { defined, kanjiToRole, parseCoordinates, roleTo1Kanji, roleTo2Kanji } from '../../util';
 
 import { Hand, Hands } from '../../hand';
 import { allRoles, handRoles, promote } from '../../variantUtil';
@@ -15,6 +15,7 @@ import {
   makeNumberSquare,
   numberToKanji,
   parseJapaneseSquare,
+  parseNumberSquare,
 } from '../notationUtil';
 
 //
@@ -47,13 +48,13 @@ export function makeKifPositionHeader(setup: Setup): string {
 }
 
 export function makeKifBoard(board: Board): string {
-  const kifFiles = ' ９ ８ ７ ６ ５ ４ ３ ２ １'.slice(-(board.numberOfFiles * 2));
-  const separator = '+' + '-'.repeat(board.numberOfFiles * 3) + '+';
-  const offset = 9 - board.numberOfFiles;
+  const kifFiles = ' ９ ８ ７ ６ ５ ４ ３ ２ １'.slice(-(board.dimensions.files * 2));
+  const separator = '+' + '-'.repeat(board.dimensions.files * 3) + '+';
+  const offset = board.dimensions.files - 1;
   let kifBoard = ' ' + kifFiles + `\n${separator}\n`;
-  for (let rank = 8; rank >= 9 - board.numberOfRanks; rank--) {
-    for (let file = offset; file < 9; file++) {
-      const square = file + rank * 9;
+  for (let rank = 0; rank < board.dimensions.ranks; rank++) {
+    for (let file = offset; file >= 0; file--) {
+      const square = parseCoordinates(file, rank)!;
       const piece = board.get(square);
       if (file === offset) {
         kifBoard += '|';
@@ -63,8 +64,8 @@ export function makeKifBoard(board: Board): string {
         if (piece.color === 'gote') kifBoard += 'v' + roleTo1Kanji(piece.role);
         else kifBoard += ' ' + roleTo1Kanji(piece.role);
       }
-      if (file === 8) {
-        kifBoard += '|' + numberToKanji(9 - rank) + '\n';
+      if (file === 0) {
+        kifBoard += '|' + numberToKanji(rank + 1) + '\n';
       }
     }
   }
@@ -127,25 +128,20 @@ export function parseKifPositionHeader(kif: string): Result<Setup, KifError> {
 export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
   const lines = normalizedKifLines(kifBoard).filter(l => l.startsWith('|'));
   if (lines.length === 0) return Result.err(new KifError(InvalidKif.Board));
-  const board = Board.empty();
+  const board = Board.empty({ files: lines.length, ranks: lines.length });
 
-  // assuming square board
-  board.numberOfRanks = lines.length;
-  board.numberOfFiles = lines.length;
-
-  const offset = 9 - lines.length;
+  const offset = lines.length - 1;
   let file = offset;
-  let rank = 9;
+  let rank = 0;
 
   for (const l of lines) {
     file = offset;
-    rank--;
     let gote = false;
     let prom = false;
     for (const c of l) {
       switch (c) {
         case '・':
-          file++;
+          file--;
           break;
         case 'v':
           gote = true;
@@ -154,20 +150,20 @@ export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
           prom = true;
           break;
         default:
-          if (file > 9 || rank < 0) return Result.err(new KifError(InvalidKif.Board));
           const role = kanjiToRole(c);
           if (defined(role) && allRoles('shogi').includes(role)) {
-            const square = file + rank * 9;
+            const square = parseCoordinates(file, rank);
+            if (!defined(square)) return Result.err(new KifError(InvalidKif.Board));
             const piece = { role: prom ? promote('shogi')(role) : role, color: (gote ? 'gote' : 'sente') as Color };
             board.set(square, piece);
             prom = false;
             gote = false;
-            file++;
+            file--;
           }
       }
     }
+    rank++;
   }
-  if (rank !== 9 - lines.length || file !== 9) return Result.err(new KifError(InvalidKif.Board));
   return Result.ok(board);
 }
 
@@ -227,7 +223,7 @@ export function parseKifMove(kifMove: string, lastDest: Square | undefined = und
   }
 
   return {
-    from: parseJapaneseSquare(match[4])!,
+    from: parseNumberSquare(match[4])!,
     to: parseJapaneseSquare(match[1]) ?? lastDest!,
     promotion: !!match[3],
   };

@@ -8,13 +8,12 @@ export function opposite(color: Color): Color {
   return color === 'gote' ? 'sente' : 'gote';
 }
 
-// coordinate system starts at bottom left
 export function squareRank(square: Square): number {
-  return Math.floor(square / 9);
+  return square >>> 4;
 }
 
 export function squareFile(square: Square): number {
-  return square % 9;
+  return square & 15;
 }
 
 export function roleToString(role: Role): string {
@@ -282,14 +281,19 @@ export function stringToRole(ch: string): Role | undefined {
   }
 }
 
+export function parseCoordinates(file: number, rank: number): Square | undefined {
+  if (file >= 0 && file < 16 && rank >= 0 && rank < 16) return file + rank * 16;
+  return;
+}
+
 export function parseSquare(str: SquareName): Square;
 export function parseSquare(str: string): Square | undefined;
 export function parseSquare(str: string): Square | undefined {
-  if (str.length !== 2) return;
-  const file = Math.abs(str.charCodeAt(0) - '9'.charCodeAt(0));
-  const rank = Math.abs(str.charCodeAt(1) - 'i'.charCodeAt(0));
-  if (file < 0 || file >= 9 || rank < 0 || rank >= 9) return;
-  return file + 9 * rank;
+  if (str.length !== 2 && str.length !== 3) return;
+  const file = parseInt(str.slice(0, -1)) - 1;
+  const rank = str.slice(-1).charCodeAt(0) - 'a'.charCodeAt(0);
+  if (isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
+  return file + 16 * rank;
 }
 
 export function makeSquare(square: Square): SquareName {
@@ -297,14 +301,16 @@ export function makeSquare(square: Square): SquareName {
 }
 
 export function parseUsi(str: string): Move | undefined {
-  if (str[1] === '*' && str.length === 4) {
+  if (str[1] === '*') {
     const role = stringToRole(str[0]);
     const to = parseSquare(str.slice(2));
     if (defined(role) && defined(to)) return { role, to };
-  } else if (str.length === 4 || str.length === 5) {
-    const from = parseSquare(str.slice(0, 2));
-    const to = parseSquare(str.slice(2, 4));
-    const promotion = str[4] === '+' ? true : false;
+  } else if (str.length >= 4 && str.length <= 7) {
+    const fromOffset = parseInt(str[2]) ? 2 : 3;
+    const toOffset = parseInt(str[fromOffset + 1]) ? 3 : 2;
+    const from = parseSquare(str.slice(0, fromOffset));
+    const to = parseSquare(str.slice(fromOffset, fromOffset + toOffset));
+    const promotion = str[fromOffset + toOffset] === '+' ? true : false;
     if (defined(from) && defined(to)) return { from, to, promotion };
   }
   return;

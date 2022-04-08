@@ -1,91 +1,143 @@
 import { Square } from './types';
 
-function popcnt27(n: number): number {
-  n = trimTo27(n);
-  n = n - ((n >>> 1) & 0x5555_5555);
-  n = (n & 0x3333_3333) + ((n >>> 2) & 0x3333_3333);
-  return Math.imul((n + (n >>> 4)) & 0x0f0f_0f0f, 0x0101_0101) >> 24;
+function popcnt32(n: number): number {
+  n = n - ((n >>> 1) & 0x55555555);
+  n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
+  return Math.imul((n + (n >>> 4)) & 0x0f0f0f0f, 0x01010101) >> 24;
 }
 
-function rowSwap27(n: number): number {
-  const firstRow = 0x000001ff & n;
-  const midRow = 0x0003fe00 & n;
-  const lastRow = 0x07fc0000 & n;
-  return (firstRow << 18) | midRow | (lastRow >> 18);
+function bswap32(n: number): number {
+  n = ((n >>> 8) & 0x00ff00ff) | ((n & 0x00ff00ff) << 8);
+  return rowSwap32(n);
 }
 
-function rbit27(n: number): number {
-  n = ((n & 0x783c1e0) >> 5) | ((n & 0x3c1e0f) << 5) | (n & 0x402010);
-  n = ((n & 0x633198c) >> 2) | ((n & 0x18cc663) << 2) | (n & 0x402010);
-  n = ((n & 0x52a954a) >> 1) | ((n & 0x2954aa5) << 1) | (n & 0x402010);
-  return rowSwap27(n);
+function rowSwap32(n: number): number {
+  return ((n >>> 16) & 0xffff) | ((n & 0xffff) << 16);
 }
 
-function trimTo27(n: number) {
-  return n & 0x07ffffff;
+function rbit32(n: number): number {
+  n = ((n >>> 1) & 0x55555555) | ((n & 0x55555555) << 1);
+  n = ((n >>> 2) & 0x33333333) | ((n & 0x33333333) << 2);
+  n = ((n >>> 4) & 0x0f0f0f0f) | ((n & 0x0f0f0f0f) << 4);
+  return bswap32(n);
 }
 
+export type BitRows = [number, number, number, number, number, number, number, number];
+
+// Coordination system starts at top right - square 0
+// Assumes POV of sente player - up is smaller rank, down is greater rank, left is smaller file, right is greater file
+// Each element represents two ranks - board size 16x16
 export class SquareSet implements Iterable<Square> {
-  constructor(readonly lo: number, readonly mid: number, readonly hi: number) {
-    this.lo = trimTo27(lo) | 0;
-    this.mid = trimTo27(mid) | 0;
-    this.hi = trimTo27(hi) | 0;
-  }
-
-  static fromSquare(square: Square): SquareSet {
-    return square >= 54
-      ? new SquareSet(0, 0, 1 << (square - 54))
-      : square >= 27
-      ? new SquareSet(0, 1 << (square - 27), 0)
-      : new SquareSet(1 << square, 0, 0);
-  }
-
-  static fromRank(rank: number): SquareSet {
-    return new SquareSet(0x000001ff, 0, 0).shl81(9 * rank);
-  }
-
-  static fromFile(file: number): SquareSet {
-    return new SquareSet(0x00040201 << file, 0x00040201 << file, 0x00040201 << file);
-  }
-
-  static backwardRanks(rank: number): SquareSet {
-    return new SquareSet(0x07ffffff, 0x07ffffff, 0x07ffffff).shr81(9 * (9 - rank));
-  }
-
-  static forwardRanks(rank: number): SquareSet {
-    return this.backwardRanks(9 - rank).bswap81();
-  }
-
-  static empty(): SquareSet {
-    return new SquareSet(0, 0, 0);
+  constructor(readonly dRows: BitRows) {
+    this.dRows = [...dRows];
   }
 
   static full(): SquareSet {
-    return new SquareSet(0x07ffffff, 0x07ffffff, 0x07ffffff);
+    return new SquareSet([
+      0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
+    ]);
   }
 
-  static corners(): SquareSet {
-    return new SquareSet(0x00000101, 0, 0x04040000);
+  static empty(): SquareSet {
+    return new SquareSet([0, 0, 0, 0, 0, 0, 0, 0]);
+  }
+
+  static fromSquare(square: Square): SquareSet {
+    if (square >= 256 || square < 0) return SquareSet.empty();
+    const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
+    const index = square >>> 5;
+    newRows[index] = 1 << (square - index * 32);
+    return new SquareSet(newRows);
+  }
+
+  static fromRank(rank: number): SquareSet {
+    return new SquareSet([0xffff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).shl256(16 * rank);
+  }
+
+  static fromFile(file: number): SquareSet {
+    return new SquareSet([
+      0x10001 << file,
+      0x10001 << file,
+      0x10001 << file,
+      0x10001 << file,
+      0x10001 << file,
+      0x10001 << file,
+      0x10001 << file,
+      0x10001 << file,
+    ]);
+  }
+
+  static ranksAbove(rank: number): SquareSet {
+    return SquareSet.full().shr256(16 * (16 - rank));
+  }
+
+  static ranksBelow(rank: number): SquareSet {
+    return SquareSet.full().shl256(16 * (rank + 1));
   }
 
   complement(): SquareSet {
-    return new SquareSet(~this.lo, ~this.mid, ~this.hi);
+    return new SquareSet([
+      ~this.dRows[0],
+      ~this.dRows[1],
+      ~this.dRows[2],
+      ~this.dRows[3],
+      ~this.dRows[4],
+      ~this.dRows[5],
+      ~this.dRows[6],
+      ~this.dRows[7],
+    ]);
   }
 
   xor(other: SquareSet): SquareSet {
-    return new SquareSet(this.lo ^ other.lo, this.mid ^ other.mid, this.hi ^ other.hi);
+    return new SquareSet([
+      this.dRows[0] ^ other.dRows[0],
+      this.dRows[1] ^ other.dRows[1],
+      this.dRows[2] ^ other.dRows[2],
+      this.dRows[3] ^ other.dRows[3],
+      this.dRows[4] ^ other.dRows[4],
+      this.dRows[5] ^ other.dRows[5],
+      this.dRows[6] ^ other.dRows[6],
+      this.dRows[7] ^ other.dRows[7],
+    ]);
   }
 
   union(other: SquareSet): SquareSet {
-    return new SquareSet(this.lo | other.lo, this.mid | other.mid, this.hi | other.hi);
+    return new SquareSet([
+      this.dRows[0] | other.dRows[0],
+      this.dRows[1] | other.dRows[1],
+      this.dRows[2] | other.dRows[2],
+      this.dRows[3] | other.dRows[3],
+      this.dRows[4] | other.dRows[4],
+      this.dRows[5] | other.dRows[5],
+      this.dRows[6] | other.dRows[6],
+      this.dRows[7] | other.dRows[7],
+    ]);
   }
 
   intersect(other: SquareSet): SquareSet {
-    return new SquareSet(this.lo & other.lo, this.mid & other.mid, this.hi & other.hi);
+    return new SquareSet([
+      this.dRows[0] & other.dRows[0],
+      this.dRows[1] & other.dRows[1],
+      this.dRows[2] & other.dRows[2],
+      this.dRows[3] & other.dRows[3],
+      this.dRows[4] & other.dRows[4],
+      this.dRows[5] & other.dRows[5],
+      this.dRows[6] & other.dRows[6],
+      this.dRows[7] & other.dRows[7],
+    ]);
   }
 
   diff(other: SquareSet): SquareSet {
-    return new SquareSet(this.lo & ~other.lo, this.mid & ~other.mid, this.hi & ~other.hi);
+    return new SquareSet([
+      this.dRows[0] & ~other.dRows[0],
+      this.dRows[1] & ~other.dRows[1],
+      this.dRows[2] & ~other.dRows[2],
+      this.dRows[3] & ~other.dRows[3],
+      this.dRows[4] & ~other.dRows[4],
+      this.dRows[5] & ~other.dRows[5],
+      this.dRows[6] & ~other.dRows[6],
+      this.dRows[7] & ~other.dRows[7],
+    ]);
   }
 
   intersects(other: SquareSet): boolean {
@@ -104,71 +156,102 @@ export class SquareSet implements Iterable<Square> {
     return this.diff(other).isEmpty();
   }
 
-  shr81(shift: number): SquareSet {
-    if (shift >= 81) return SquareSet.empty();
-    if (shift >= 54) return new SquareSet(this.hi >>> (shift - 54), 0, 0);
-    if (shift >= 27)
-      return new SquareSet((this.mid >>> (shift - 27)) ^ (this.hi << (54 - shift)), this.hi >>> (shift - 27), 0);
-    if (shift > 0)
-      return new SquareSet(
-        (this.lo >>> shift) ^ (this.mid << (27 - shift)),
-        (this.mid >>> shift) ^ (this.hi << (27 - shift)),
-        this.hi >>> shift
-      );
+  // right and up
+  shr256(shift: number): SquareSet {
+    if (shift >= 256) return SquareSet.empty();
+    if (shift > 0) {
+      const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
+      const cutoff = shift >>> 5;
+      const shift1 = shift & 0x1f;
+      const shift2 = 32 - shift1;
+
+      for (let i = 0; i < 8 - cutoff; i++) {
+        newRows[i] = this.dRows[i + cutoff] >>> shift1;
+        if (shift2 < 32) newRows[i] ^= this.dRows[i + cutoff + 1] << shift2;
+      }
+      return new SquareSet(newRows);
+    }
     return this;
   }
 
-  shl81(shift: number): SquareSet {
-    if (shift >= 81) return SquareSet.empty();
-    if (shift >= 54) return new SquareSet(0, 0, this.lo << (shift - 54));
-    if (shift >= 27)
-      return new SquareSet(0, this.lo << (shift - 27), (this.mid << (shift - 27)) ^ (this.lo >>> (54 - shift)));
-    if (shift > 0)
-      return new SquareSet(
-        this.lo << shift,
-        (this.mid << shift) ^ (this.lo >>> (27 - shift)),
-        (this.hi << shift) ^ (this.mid >>> (27 - shift))
-      );
+  // left and down
+  shl256(shift: number): SquareSet {
+    if (shift >= 256) return SquareSet.empty();
+    if (shift > 0) {
+      const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
+      const cutoff = shift >>> 5;
+      const shift1 = shift & 0x1f;
+      const shift2 = 32 - shift1;
+
+      for (let i = cutoff; i < 8; i++) {
+        newRows[i] = this.dRows[i - cutoff] << shift1;
+        if (shift2 < 32) newRows[i] ^= this.dRows[i - cutoff - 1] >>> shift2;
+      }
+      return new SquareSet(newRows);
+    }
     return this;
   }
 
-  bswap81(): SquareSet {
-    return new SquareSet(rowSwap27(this.hi), rowSwap27(this.mid), rowSwap27(this.lo));
+  rowSwap256(): SquareSet {
+    return new SquareSet([
+      rowSwap32(this.dRows[7]),
+      rowSwap32(this.dRows[6]),
+      rowSwap32(this.dRows[5]),
+      rowSwap32(this.dRows[4]),
+      rowSwap32(this.dRows[3]),
+      rowSwap32(this.dRows[2]),
+      rowSwap32(this.dRows[1]),
+      rowSwap32(this.dRows[0]),
+    ]);
   }
 
-  rbit81(): SquareSet {
-    return new SquareSet(rbit27(this.hi), rbit27(this.mid), rbit27(this.lo));
+  rbit256(): SquareSet {
+    return new SquareSet([
+      rbit32(this.dRows[7]),
+      rbit32(this.dRows[6]),
+      rbit32(this.dRows[5]),
+      rbit32(this.dRows[4]),
+      rbit32(this.dRows[3]),
+      rbit32(this.dRows[2]),
+      rbit32(this.dRows[1]),
+      rbit32(this.dRows[0]),
+    ]);
   }
 
-  minus81(other: SquareSet): SquareSet {
-    const lo = this.lo - other.lo;
-    const c = (lo & 0x8000000) >>> 27;
-    const mid = this.mid - (other.mid + c);
-    const c2 = (mid & 0x8000000) >>> 27;
-    return new SquareSet(lo, mid, this.hi - (other.hi + c2));
+  minus256(other: SquareSet): SquareSet {
+    let c = 0;
+    const newRows: BitRows = [...this.dRows];
+
+    for (let i = 0; i < 8; i++) {
+      const otherWithC = other.dRows[i] + c;
+      newRows[i] -= otherWithC;
+      c = ((newRows[i] & otherWithC & 1) + (otherWithC >>> 1) + (newRows[i] >>> 1)) >>> 31;
+    }
+    return new SquareSet(newRows);
   }
 
   equals(other: SquareSet): boolean {
-    return this.lo === other.lo && this.mid === other.mid && this.hi === other.hi;
+    return this.dRows.every((value, index) => value === other.dRows[index]);
   }
 
   size(): number {
-    return popcnt27(this.lo) + popcnt27(this.mid) + popcnt27(this.hi);
+    return this.dRows.reduce((prev, cur) => prev + popcnt32(cur), 0);
   }
 
   isEmpty(): boolean {
-    return this.lo === 0 && this.mid === 0 && this.hi === 0;
+    return !this.nonEmpty();
   }
 
   nonEmpty(): boolean {
-    return this.lo !== 0 || this.mid !== 0 || this.hi !== 0;
+    return this.dRows.some(r => r !== 0);
   }
 
   has(square: Square): boolean {
-    if (square >= 81) return false;
-    if (square >= 54) return (this.hi & (1 << (square - 54))) !== 0;
-    if (square >= 27) return (this.mid & (1 << (square - 27))) !== 0;
-    if (square >= 0) return (this.lo & (1 << square)) !== 0;
+    if (square >= 256) return false;
+    if (square >= 0) {
+      const index = square >>> 5;
+      return (this.dRows[index] & (1 << (square - 32 * index))) !== 0;
+    }
     return false;
   }
 
@@ -177,55 +260,57 @@ export class SquareSet implements Iterable<Square> {
   }
 
   with(square: Square): SquareSet {
-    if (square >= 54) return new SquareSet(this.lo, this.mid, this.hi | (1 << (square - 54)));
-    if (square >= 27) return new SquareSet(this.lo, this.mid | (1 << (square - 27)), this.hi);
-    if (square >= 0) return new SquareSet(this.lo | (1 << square), this.mid, this.hi);
-    return this;
+    if (square >= 256 || square < 0) return this;
+    const index = square >>> 5;
+    const newDRows: BitRows = [...this.dRows];
+    newDRows[index] = newDRows[index] | (1 << (square - index * 32));
+    return new SquareSet(newDRows);
   }
 
   without(square: Square): SquareSet {
-    if (square >= 54) return new SquareSet(this.lo, this.mid, this.hi & ~(1 << (square - 54)));
-    if (square >= 27) return new SquareSet(this.lo, this.mid & ~(1 << (square - 27)), this.hi);
-    if (square >= 0) return new SquareSet(this.lo & ~(1 << square), this.mid, this.hi);
-    return this;
+    if (square >= 256 || square < 0) return this;
+    const index = square >>> 5;
+    const newDRows: BitRows = [...this.dRows];
+    newDRows[index] = newDRows[index] & ~(1 << (square - index * 32));
+    return new SquareSet(newDRows);
   }
 
   toggle(square: Square): SquareSet {
-    if (square >= 54) return new SquareSet(this.lo, this.mid, this.hi ^ (1 << (square - 54)));
-    if (square >= 27) return new SquareSet(this.lo, this.mid ^ (1 << (square - 27)), this.hi);
-    if (square >= 0) return new SquareSet(this.lo ^ (1 << square), this.mid, this.hi);
-    return this;
-  }
-
-  last(): Square | undefined {
-    if (this.hi !== 0) return 80 - Math.clz32(this.hi) + 5;
-    if (this.mid !== 0) return 53 - Math.clz32(this.mid) + 5;
-    if (this.lo !== 0) return 26 - Math.clz32(this.lo) + 5;
-    return;
+    if (square >= 256 || square < 0) return this;
+    const index = square >>> 5;
+    const newDRows: BitRows = [...this.dRows];
+    newDRows[index] = newDRows[index] ^ (1 << (square - index * 32));
+    return new SquareSet(newDRows);
   }
 
   first(): Square | undefined {
-    if (this.lo !== 0) return 26 - Math.clz32(this.lo & -this.lo) + 5;
-    if (this.mid !== 0) return 53 - Math.clz32(this.mid & -this.mid) + 5;
-    if (this.hi !== 0) return 80 - Math.clz32(this.hi & -this.hi) + 5;
+    for (let i = 0; i < 8; i++) {
+      if (this.dRows[i] !== 0) return (i + 1) * 32 - 1 - Math.clz32(this.dRows[i] & -this.dRows[i]);
+    }
+    return;
+  }
+
+  last(): Square | undefined {
+    for (let i = 7; i >= 0; i--) {
+      if (this.dRows[i] !== 0) return (i + 1) * 32 - 1 - Math.clz32(this.dRows[i]);
+    }
     return;
   }
 
   withoutFirst(): SquareSet {
-    if (this.lo !== 0) return new SquareSet(this.lo & (this.lo - 1), this.mid, this.hi);
-    if (this.mid !== 0) return new SquareSet(0, this.mid & (this.mid - 1), this.hi);
-    return new SquareSet(0, 0, this.hi & (this.hi - 1));
+    const newDRows: BitRows = [...this.dRows];
+    for (let i = 0; i < 8; i++) {
+      if (this.dRows[i] !== 0) {
+        newDRows[i] = newDRows[i] & (newDRows[i] - 1);
+        return new SquareSet(newDRows);
+      }
+    }
+    return this;
   }
 
   moreThanOne(): boolean {
-    return (
-      (this.hi !== 0 && this.mid !== 0) ||
-      (this.hi !== 0 && this.lo !== 0) ||
-      (this.mid !== 0 && this.lo !== 0) ||
-      (this.lo & (this.lo - 1)) !== 0 ||
-      (this.mid & (this.mid - 1)) !== 0 ||
-      (this.hi & (this.hi - 1)) !== 0
-    );
+    const occ = this.dRows.filter(r => r !== 0);
+    return occ.length > 1 || occ.some(r => (r & (r - 1)) !== 0);
   }
 
   singleSquare(): Square | undefined {
@@ -236,45 +321,42 @@ export class SquareSet implements Iterable<Square> {
     return this.nonEmpty() && !this.moreThanOne();
   }
 
+  visual(): string {
+    let str = '';
+    for (let y = 0; y < 8; y++) {
+      for (let x = 15; x >= 0; x--) {
+        const sq = 32 * y + x;
+        str += this.has(sq) ? ' 1' : ' 0';
+        str += sq % 16 === 0 ? '\n' : '';
+      }
+      for (let x = 31; x >= 16; x--) {
+        const sq = 32 * y + x;
+        str += this.has(sq) ? ' 1' : ' 0';
+        str += sq % 16 === 0 ? '\n' : '';
+      }
+    }
+    return str;
+  }
+
   *[Symbol.iterator](): Iterator<Square> {
-    let lo = this.lo;
-    let mid = this.mid;
-    let hi = this.hi;
-    while (lo !== 0) {
-      const idx = 26 - Math.clz32(lo & -lo) + 5;
-      lo ^= 1 << idx;
-      yield idx;
-    }
-    while (mid !== 0) {
-      const idx = 26 - Math.clz32(mid & -mid) + 5;
-      mid ^= 1 << idx;
-      yield 27 + idx;
-    }
-    while (hi !== 0) {
-      const idx = 26 - Math.clz32(hi & -hi) + 5;
-      hi ^= 1 << idx;
-      yield 54 + idx;
+    for (let i = 0; i < 8; i++) {
+      let tmp = this.dRows[i];
+      while (tmp !== 0) {
+        const idx = 31 - Math.clz32(tmp & -tmp);
+        tmp ^= 1 << idx;
+        yield 32 * i + idx;
+      }
     }
   }
 
   *reversed(): Iterable<Square> {
-    let lo = this.lo;
-    let mid = this.mid;
-    let hi = this.hi;
-    while (hi !== 0) {
-      const idx = 26 - Math.clz32(hi) + 5;
-      hi ^= 1 << idx;
-      yield 54 + idx;
-    }
-    while (mid !== 0) {
-      const idx = 26 - Math.clz32(mid) + 5;
-      mid ^= 1 << idx;
-      yield 27 + idx;
-    }
-    while (lo !== 0) {
-      const idx = 26 - Math.clz32(lo) + 5;
-      lo ^= 1 << idx;
-      yield idx;
+    for (let i = 7; i >= 0; i--) {
+      let tmp = this.dRows[i];
+      while (tmp !== 0) {
+        const idx = 31 - Math.clz32(tmp);
+        tmp ^= 1 << idx;
+        yield 32 * i + idx;
+      }
     }
   }
 }

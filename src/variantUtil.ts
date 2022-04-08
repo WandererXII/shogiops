@@ -89,9 +89,12 @@ export function unpromote(rules: Rules): (role: Role) => Role {
 export function promotionZone(rules: Rules): (color: Color) => SquareSet {
   switch (rules) {
     case 'minishogi':
-      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(8) : SquareSet.fromRank(4));
+      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(0) : SquareSet.fromRank(4));
     default:
-      return (color: Color) => (color === 'sente' ? new SquareSet(0, 0, 0x07ffffff) : new SquareSet(0x07ffffff, 0, 0));
+      return (color: Color) =>
+        color === 'sente'
+          ? new SquareSet([0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])
+          : new SquareSet([0x0, 0x0, 0x0, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]);
   }
 }
 
@@ -100,16 +103,16 @@ export function backrank(rules: Rules): (color: Color) => SquareSet {
     case 'minishogi':
       return promotionZone(rules);
     default:
-      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(8) : SquareSet.fromRank(0));
+      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(0) : SquareSet.fromRank(8));
   }
 }
 
 export function secondBackrank(rules: Rules): (color: Color) => SquareSet {
   switch (rules) {
     case 'minishogi':
-      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(7) : SquareSet.fromRank(5));
+      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(1) : SquareSet.fromRank(3));
     default:
-      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(7) : SquareSet.fromRank(1));
+      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(1) : SquareSet.fromRank(7));
   }
 }
 

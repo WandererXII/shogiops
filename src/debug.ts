@@ -2,38 +2,11 @@ import { Square, Piece } from './types';
 import { makeSquare, makeUsi } from './util';
 import { makePiece } from './sfen';
 import { SquareSet } from './squareSet';
-import { Board } from './board';
 import { Position } from './shogi';
 import { pieceCanPromote, pieceInDeadZone } from './variantUtil';
 
-export function squareSet(squares: SquareSet): string {
-  const r = [];
-  for (let y = 8; y >= 0; y--) {
-    for (let x = 0; x < 9; x++) {
-      const square = x + y * 9;
-      r.push(squares.has(square) ? '1' : '.');
-      r.push(x < 8 ? ' ' : '\n');
-    }
-  }
-  return r.join('');
-}
-
 export function piece(piece: Piece): string {
   return makePiece(piece);
-}
-
-export function board(board: Board): string {
-  const r = [];
-  for (let y = 8; y >= 0; y--) {
-    for (let x = 0; x < 9; x++) {
-      const square = x + y * 9;
-      const p = board.get(square);
-      const col = p ? piece(p) : '.';
-      r.push(col);
-      r.push(x < 8 ? (col.length < 2 ? ' ' : '') : '\n');
-    }
-  }
-  return r.join('');
 }
 
 export function square(sq: Square): string {

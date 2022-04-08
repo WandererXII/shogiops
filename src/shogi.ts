@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, Role } from './types';
+import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, Role, Dimensions } from './types';
 import { SquareSet } from './squareSet';
 import { Board } from './board';
 import { Setup } from './setup';
@@ -98,8 +98,7 @@ export abstract class Position {
     return attacksTo(square, attacker, this.board, occupied);
   }
 
-  abstract numberOfFiles: number;
-  abstract numberOfRanks: number;
+  abstract dimensions: Dimensions;
 
   protected playCaptureAt(captured: Piece): void {
     const unpromotedRole = unpromote(this.rules)(captured.role);
@@ -246,11 +245,12 @@ export abstract class Position {
 
   outcome(ctx?: Context): Outcome | undefined {
     const variantOutcome = this.variantOutcome(ctx);
-    if (variantOutcome) return variantOutcome;
+    if (defined(variantOutcome)) return variantOutcome;
     ctx = ctx || this.ctx();
-    if (this.isCheckmate(ctx) && !(this.lastMove && isDrop(this.lastMove) && this.lastMove.role === 'pawn'))
+    const checkmateStalemate = this.isCheckmate(ctx) || this.isStalemate(ctx);
+    if (checkmateStalemate && !(this.lastMove && isDrop(this.lastMove) && this.lastMove.role === 'pawn'))
       return { winner: opposite(this.turn) };
-    else if (this.isCheckmate(ctx) || this.isStalemate(ctx)) return { winner: this.turn };
+    else if (checkmateStalemate) return { winner: this.turn };
     else if (this.isInsufficientMaterial()) return { winner: undefined };
     else return;
   }
@@ -307,8 +307,7 @@ export class Shogi extends Position {
     super(rules || 'shogi');
   }
 
-  numberOfRanks = 9;
-  numberOfFiles = 9;
+  dimensions = { files: 9, ranks: 9 };
 
   static default(): Shogi {
     const pos = new this();
@@ -333,7 +332,7 @@ export class Shogi extends Position {
   }
 
   protected validate(strict: boolean): Result<undefined, PositionError> {
-    if (this.board.numberOfRanks !== this.numberOfRanks || this.board.numberOfFiles !== this.numberOfFiles)
+    if (this.board.dimensions.ranks !== this.dimensions.ranks || this.board.dimensions.files !== this.dimensions.files)
       return Result.err(new PositionError(IllegalSetup.Empty));
     if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
@@ -369,7 +368,9 @@ export class Shogi extends Position {
   }
 
   dropDests(role: Role, ctx?: Context): SquareSet {
-    let mask = this.board.occupied.complement();
+    let mask = this.board.occupied
+      .complement()
+      .intersect(new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]));
     ctx = ctx || this.ctx();
     // Removing backranks, where no legal drop would be possible
     if (role === 'pawn' || role === 'lance' || role === 'knight') mask = mask.diff(backrank(this.rules)(this.turn));
@@ -387,7 +388,7 @@ export class Shogi extends Position {
     // Checking for a pawn checkmate
     if (role === 'pawn') {
       const king = this.board.pieces(opposite(this.turn), 'king');
-      const kingFront = (this.turn === 'sente' ? king.shr81(9) : king.shl81(9)).singleSquare();
+      const kingFront = (this.turn === 'sente' ? king.shl256(16) : king.shr256(16)).singleSquare();
       if (kingFront && mask.has(kingFront)) {
         const child = this.clone();
         child.play({ role: 'pawn', to: kingFront });
@@ -435,7 +436,7 @@ export class Shogi extends Position {
         for (const to of pseudo) {
           if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
         }
-        return pseudo;
+        return pseudo.intersect(new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]));
       }
 
       if (ctx.checkers.nonEmpty()) {
@@ -446,7 +447,7 @@ export class Shogi extends Position {
 
       if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     }
-    return pseudo;
+    return pseudo.intersect(new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]));
   }
 
   isVariantEnd(): boolean {

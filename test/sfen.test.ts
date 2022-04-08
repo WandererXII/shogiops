@@ -6,7 +6,7 @@ import { Hands } from '../src/hand';
 
 test('make board sfen', () => {
   expect(makeBoardSfen(Board.default())).toEqual(INITIAL_BOARD_SFEN);
-  expect(makeBoardSfen(Board.empty())).toEqual(EMPTY_BOARD_SFEN);
+  expect(makeBoardSfen(Board.empty({ files: 9, ranks: 9 }))).toEqual(EMPTY_BOARD_SFEN);
 });
 
 test('make initial sfen', () => {

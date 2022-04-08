@@ -70,8 +70,6 @@ export * as handicaps from './notation/kif/kifHandicaps';
 
 export * as hand from './hand';
 
-export * as hash from './hash';
-
 export * as japanese from './notation/japanese';
 
 export * as kitaoKawasaki from './notation/kitaoKawasaki';

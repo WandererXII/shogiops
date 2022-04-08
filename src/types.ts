@@ -1,7 +1,24 @@
-export const FILE_NAMES = ['9', '8', '7', '6', '5', '4', '3', '2', '1'] as const;
+export const FILE_NAMES = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  '15',
+  '16',
+] as const;
 export type FileName = typeof FILE_NAMES[number];
 
-export const RANK_NAMES = ['i', 'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'] as const;
+export const RANK_NAMES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'] as const;
 export type RankName = typeof RANK_NAMES[number];
 
 export type Square = number;
@@ -13,6 +30,11 @@ export type BySquare<T> = T[];
 export const COLORS = ['sente', 'gote'] as const;
 
 export type Color = typeof COLORS[number];
+
+export interface Dimensions {
+  ranks: number;
+  files: number;
+}
 
 export type ByColor<T> = {
   [color in Color]: T;
@@ -67,7 +89,6 @@ export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 
-// variant will be added later, once lishogi supports them
 export const RULES = ['shogi', 'minishogi'] as const;
 export type Rules = typeof RULES[number];
 

@@ -1,8 +1,8 @@
-import { roleToString } from '../util';
-import { Position } from '../shogi';
-import { Move, isDrop } from '../types';
-import { pieceCanPromote } from '../variantUtil';
-import { makeNumberSquare, piecesAiming } from './notationUtil';
+import { roleToString } from '../util.js';
+import { Position } from '../shogi.js';
+import { Move, isDrop } from '../types.js';
+import { pieceCanPromote } from '../variantUtil.js';
+import { makeNumberSquare, piecesAiming } from './notationUtil.js';
 
 // P-76
 export function makeWesternMove(pos: Position, move: Move): string | undefined {

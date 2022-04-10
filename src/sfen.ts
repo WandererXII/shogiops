@@ -1,10 +1,10 @@
 import { Result } from '@badrap/result';
-import { Piece, Color } from './types';
-import { Board } from './board';
-import { Setup } from './setup';
-import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util';
-import { Hand, Hands } from './hand';
-import { ROLES } from './types';
+import { Piece, Color } from './types.js';
+import { Board } from './board.js';
+import { Setup } from './setup.js';
+import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
+import { Hand, Hands } from './hand.js';
+import { ROLES } from './types.js';
 
 export const INITIAL_BOARD_SFEN = 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL';
 export const INITIAL_EPD = INITIAL_BOARD_SFEN + ' b -';

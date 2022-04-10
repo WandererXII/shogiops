@@ -1,14 +1,13 @@
 import { Result } from '@badrap/result';
-import { Board } from '../../board';
-import { INITIAL_SFEN, makeSfen, parseSfen } from '../../sfen';
-import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps';
-import { Setup } from '../../setup';
-import { Position } from '../../shogi';
-import { Color, isDrop, Move, Square } from '../../types';
-import { defined, kanjiToRole, parseCoordinates, roleTo1Kanji, roleTo2Kanji } from '../../util';
-
-import { Hand, Hands } from '../../hand';
-import { allRoles, handRoles, promote } from '../../variantUtil';
+import { Board } from '../../board.js';
+import { INITIAL_SFEN, makeSfen, parseSfen } from '../../sfen.js';
+import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps.js';
+import { Setup } from '../../setup.js';
+import { Position } from '../../shogi.js';
+import { Color, isDrop, Move, Square } from '../../types.js';
+import { defined, kanjiToRole, parseCoordinates, roleTo1Kanji, roleTo2Kanji } from '../../util.js';
+import { Hand, Hands } from '../../hand.js';
+import { allRoles, handRoles, promote } from '../../variantUtil.js';
 import {
   kanjiToNumber,
   makeJapaneseSquare,
@@ -16,7 +15,7 @@ import {
   numberToKanji,
   parseJapaneseSquare,
   parseNumberSquare,
-} from '../notationUtil';
+} from '../notationUtil.js';
 
 //
 // KIF HEADER

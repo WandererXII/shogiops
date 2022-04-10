@@ -1,9 +1,9 @@
-import { roleTo2Kanji, squareFile, squareRank } from '../util';
-import { Position } from '../shogi';
-import { Move, isDrop, Square, Piece } from '../types';
-import { pieceCanPromote } from '../variantUtil';
-import { makeJapaneseSquare, piecesAiming } from './notationUtil';
-import { SquareSet } from '../squareSet';
+import { roleTo2Kanji, squareFile, squareRank } from '../util.js';
+import { Position } from '../shogi.js';
+import { Move, isDrop, Square, Piece } from '../types.js';
+import { pieceCanPromote } from '../variantUtil.js';
+import { makeJapaneseSquare, piecesAiming } from './notationUtil.js';
+import { SquareSet } from '../squareSet.js';
 
 // ７六歩
 export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): string | undefined {

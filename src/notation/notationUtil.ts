@@ -1,7 +1,7 @@
-import { Position } from '../shogi';
-import { Piece, Square } from '../types';
-import { squareFile, squareRank } from '../util';
-import { SquareSet } from '../squareSet';
+import { Position } from '../shogi.js';
+import { Piece, Square } from '../types.js';
+import { squareFile, squareRank } from '../util.js';
+import { SquareSet } from '../squareSet.js';
 
 export function piecesAiming(pos: Position, piece: Piece, to: Square): SquareSet {
   // Disambiguation

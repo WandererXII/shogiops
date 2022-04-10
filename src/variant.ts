@@ -1,10 +1,10 @@
 import { Result } from '@badrap/result';
-import { Role, Rules, Square } from './types';
-import { Setup } from './setup';
-import { PositionError, Position, IllegalSetup, Context, Shogi } from './shogi';
-import { SquareSet } from './squareSet';
-import { Board } from './board';
-import { Hands } from './hand';
+import { Role, Rules, Square } from './types.js';
+import { Setup } from './setup.js';
+import { PositionError, Position, IllegalSetup, Context, Shogi } from './shogi.js';
+import { SquareSet } from './squareSet.js';
+import { Board } from './board.js';
+import { Hands } from './hand.js';
 
 export { Position, PositionError, IllegalSetup, Context, Shogi };
 

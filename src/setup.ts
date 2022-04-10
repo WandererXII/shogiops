@@ -1,6 +1,6 @@
-import { Color } from './types';
-import { Board } from './board';
-import { Hands } from './hand';
+import { Color } from './types.js';
+import { Board } from './board.js';
+import { Hands } from './hand.js';
 
 export interface Setup {
   board: Board;

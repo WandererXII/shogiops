@@ -1,8 +1,8 @@
-import { makeSquare, roleToString } from '../util';
-import { Position } from '../shogi';
-import { Move, isDrop } from '../types';
-import { pieceCanPromote } from '../variantUtil';
-import { piecesAiming } from './notationUtil';
+import { makeSquare, roleToString } from '../util.js';
+import { Position } from '../shogi.js';
+import { Move, isDrop } from '../types.js';
+import { pieceCanPromote } from '../variantUtil.js';
+import { piecesAiming } from './notationUtil.js';
 
 // P-7f
 export function makeWesternEngineMove(pos: Position, move: Move): string | undefined {

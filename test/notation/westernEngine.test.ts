@@ -1,6 +1,6 @@
-import { parseUsi } from '../../src';
 import { Shogi } from '../../src/shogi';
 import { makeWesternEngineMove } from '../../src/notation/westernEngine';
+import { parseUsi } from '../../src/util';
 
 test('basic moves', () => {
   const pos = Shogi.default();

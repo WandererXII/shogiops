@@ -1,4 +1,4 @@
-import { Role, ROLES } from './types';
+import { Role, ROLES } from './types.js';
 
 // Hand alone can store anything
 // let the variants decide what to store and what not

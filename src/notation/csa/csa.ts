@@ -1,12 +1,12 @@
 import { Result } from '@badrap/result';
-import { Board } from '../../board';
-import { Setup } from '../../setup';
-import { Position } from '../../shogi';
-import { Color, isDrop, Move } from '../../types';
-import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util';
-import { Hand, Hands } from '../../hand';
-import { allRoles, handRoles, promote } from '../../variantUtil';
-import { makeNumberSquare, parseNumberSquare } from '../notationUtil';
+import { Board } from '../../board.js';
+import { Setup } from '../../setup.js';
+import { Position } from '../../shogi.js';
+import { Color, isDrop, Move } from '../../types.js';
+import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util.js';
+import { Hand, Hands } from '../../hand.js';
+import { allRoles, handRoles, promote } from '../../variantUtil.js';
+import { makeNumberSquare, parseNumberSquare } from '../notationUtil.js';
 
 // Olny supports standard shogi no variants
 

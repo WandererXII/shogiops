@@ -21,7 +21,7 @@ export {
   Rules,
   RULES,
   Outcome,
-} from './types';
+} from './types.js';
 
 export {
   stringToRole,
@@ -34,9 +34,9 @@ export {
   roleToString,
   squareFile,
   squareRank,
-} from './util';
+} from './util.js';
 
-export { SquareSet } from './squareSet';
+export { SquareSet } from './squareSet.js';
 
 export {
   attacks,
@@ -54,34 +54,34 @@ export {
   rookAttacks,
 } from './attacks';
 
-export { Board } from './board';
+export { Board } from './board.js';
 
-export { Setup, defaultSetup } from './setup';
+export { Setup, defaultSetup } from './setup.js';
 
-export { IllegalSetup, Shogi, Position, PositionError, Context } from './shogi';
+export { IllegalSetup, Shogi, Position, PositionError, Context } from './shogi.js';
 
-export * as compat from './compat';
+export * as compat from './compat.js';
 
-export * as debug from './debug';
+export * as debug from './debug.js';
 
-export * as sfen from './sfen';
+export * as sfen from './sfen.js';
 
-export * as handicaps from './notation/kif/kifHandicaps';
+export * as handicaps from './notation/kif/kifHandicaps.js';
 
-export * as hand from './hand';
+export * as hand from './hand.js';
 
-export * as japanese from './notation/japanese';
+export * as japanese from './notation/japanese.js';
 
-export * as kitaoKawasaki from './notation/kitaoKawasaki';
+export * as kitaoKawasaki from './notation/kitaoKawasaki.js';
 
-export * as western from './notation/western';
+export * as western from './notation/western.js';
 
-export * as westernEngine from './notation/westernEngine';
+export * as westernEngine from './notation/westernEngine.js';
 
-export * as kif from './notation/kif/kif';
+export * as kif from './notation/kif/kif.js';
 
-export * as csa from './notation/csa/csa';
+export * as csa from './notation/csa/csa.js';
 
-export * as variant from './variant';
+export * as variant from './variant.js';
 
-export * as variantUtil from './variantUtil';
+export * as variantUtil from './variantUtil.js';

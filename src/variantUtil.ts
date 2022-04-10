@@ -1,6 +1,5 @@
-import { Piece, Square } from '.';
-import { SquareSet } from './squareSet';
-import { Color, Role, Rules } from './types';
+import { SquareSet } from './squareSet.js';
+import { Color, Role, Rules, Piece, Square } from './types.js';
 
 export function pieceCanPromote(rules: Rules): (piece: Piece, from: Square, to: Square) => boolean {
   switch (rules) {

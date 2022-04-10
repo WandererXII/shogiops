@@ -1,6 +1,6 @@
-import { squareFile, squareRank } from './util';
-import { Square, Piece, Color, BySquare } from './types';
-import { SquareSet } from './squareSet';
+import { squareFile, squareRank } from './util.js';
+import { Square, Piece, Color, BySquare } from './types.js';
+import { SquareSet } from './squareSet.js';
 
 function computeRange(square: Square, deltas: number[]): SquareSet {
   let range = SquareSet.empty();

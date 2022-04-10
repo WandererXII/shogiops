@@ -12,7 +12,9 @@
   "repository": "https://github.com/WandererXII/shogiops",
   "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>(chessops), WandererXII(shogiops)",
   "license": "GPL-3.0-or-later",
-  "type": "commonjs",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "type": "module",
   "sideEffects": false,
   "dependencies": {
     "@badrap/result": "^0.2"
@@ -29,7 +31,7 @@
     "typescript": "^4"
   },
   "scripts": {
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "compile": "tsc",
     "prepare": "tsc",
     "doc": "typedoc src/index.ts",
@@ -133,6 +135,17 @@
   "jest": {
     "transform": {
       "\\.ts$": "ts-jest"
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     }
   }
 }

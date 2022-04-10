@@ -1,8 +1,8 @@
 import { Result } from '@badrap/result';
-import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, Role, Dimensions } from './types';
-import { SquareSet } from './squareSet';
-import { Board } from './board';
-import { Setup } from './setup';
+import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, Role, Dimensions } from './types.js';
+import { SquareSet } from './squareSet.js';
+import { Board } from './board.js';
+import { Setup } from './setup.js';
 import {
   bishopAttacks,
   rookAttacks,
@@ -16,9 +16,9 @@ import {
   goldAttacks,
   horseAttacks,
   dragonAttacks,
-} from './attacks';
-import { opposite, defined } from './util';
-import { Hands } from './hand';
+} from './attacks.js';
+import { opposite, defined } from './util.js';
+import { Hands } from './hand.js';
 import {
   allRoles,
   backrank,
@@ -29,7 +29,7 @@ import {
   promotionZone,
   secondBackrank,
   unpromote,
-} from './variantUtil';
+} from './variantUtil.js';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',

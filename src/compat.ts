@@ -42,12 +42,3 @@ export function usiToSquareNames(usi: string): SquareName[] {
 export function moveToSquareNames(move: Move): SquareName[] {
   return isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
 }
-
-export function lishogiVariantRules(variant: string): Rules {
-  switch (variant) {
-    case 'minishogi':
-      return 'minishogi';
-    default:
-      return 'shogi';
-  }
-}

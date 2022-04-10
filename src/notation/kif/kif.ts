@@ -74,7 +74,7 @@ export function makeKifBoard(board: Board): string {
 
 export function makeKifHand(hand: Hand): string {
   if (hand.isEmpty()) return 'なし';
-  return handRoles('shogi')
+  return handRoles('standard')
     .map(role => {
       const r = roleTo1Kanji(role);
       const n = hand[role];
@@ -87,11 +87,11 @@ export function makeKifHand(hand: Hand): string {
 // Import
 export function parseKifHeader(kif: string): Result<Setup, KifError> {
   const lines = normalizedKifLines(kif);
-  const handicap = lines.find(l => l.startsWith('手合割：'));
-  const hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : INITIAL_SFEN;
   return parseKifPositionHeader(kif).unwrap(
     kifBoard => Result.ok(kifBoard),
     () => {
+      const handicap = lines.find(l => l.startsWith('手合割：'));
+      const hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : INITIAL_SFEN;
       if (!defined(hSfen)) return Result.err(new KifError(InvalidKif.Handicap));
       return parseSfen(hSfen);
     }
@@ -150,10 +150,10 @@ export function parseKifBoard(kifBoard: string): Result<Board, KifError> {
           break;
         default:
           const role = kanjiToRole(c);
-          if (defined(role) && allRoles('shogi').includes(role)) {
+          if (defined(role) && allRoles('standard').includes(role)) {
             const square = parseCoordinates(file, rank);
             if (!defined(square)) return Result.err(new KifError(InvalidKif.Board));
-            const piece = { role: prom ? promote('shogi')(role) : role, color: (gote ? 'gote' : 'sente') as Color };
+            const piece = { role: prom ? promote('standard')(role) : role, color: (gote ? 'gote' : 'sente') as Color };
             board.set(square, piece);
             prom = false;
             gote = false;
@@ -174,7 +174,7 @@ export function parseKifHand(handPart: string): Result<Hand, KifError> {
   for (const piece of pieces) {
     for (let i = 0; i < piece.length; i++) {
       const role = kanjiToRole(piece[i++]);
-      if (!role || !handRoles('shogi').includes(role)) return Result.err(new KifError(InvalidKif.Hands));
+      if (!role || !handRoles('standard').includes(role)) return Result.err(new KifError(InvalidKif.Hands));
       let countStr = '';
       while (i < piece.length && ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'].includes(piece[i]))
         countStr += piece[i++];

@@ -304,7 +304,7 @@ export abstract class Position {
 
 export class Shogi extends Position {
   protected constructor(rules?: Rules) {
-    super(rules || 'shogi');
+    super(rules || 'standard');
   }
 
   dimensions = { files: 9, ranks: 9 };

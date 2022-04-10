@@ -58,7 +58,7 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
   if (hand.isEmpty()) return '';
   return (
     prefix +
-    handRoles('shogi')
+    handRoles('standard')
       .map(role => {
         const r = roleToCsa(role);
         const n = hand[role];
@@ -118,7 +118,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
         const square = parseCoordinates(file, rank);
         if (!defined(square)) return Result.err(new CsaError(InvalidCsa.Board));
         const role = csaToRole(s.substring(1));
-        if (defined(role) && allRoles('shogi').includes(role)) {
+        if (defined(role) && allRoles('standard').includes(role)) {
           const piece = { role: role, color: (s.startsWith('-') ? 'gote' : 'sente') as Color };
           board.set(square, piece);
           file--;
@@ -140,7 +140,7 @@ function parseAdditions(initialSetup: Setup, additions: string[]): Result<Setup,
       const role = csaToRole(sp.substring(2, 4));
       if ((defined(sq) || sqString === '00') && defined(role)) {
         if (!defined(sq)) {
-          if (!handRoles('shogi').includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
+          if (!handRoles('standard').includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
           initialSetup.hands[color][role]++;
         } else {
           initialSetup.board.set(sq, { role: role, color: color });
@@ -214,7 +214,7 @@ export function makeCsaMove(pos: Position, move: Move): string | undefined {
     return (
       makeNumberSquare(move.from) +
       makeNumberSquare(move.to) +
-      roleToCsa(move.promotion ? promote('shogi')(role) : role)
+      roleToCsa(move.promotion ? promote('standard')(role) : role)
     );
   }
 }

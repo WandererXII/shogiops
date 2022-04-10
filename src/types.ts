@@ -89,7 +89,7 @@ export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 
-export const RULES = ['shogi', 'minishogi'] as const;
+export const RULES = ['standard', 'minishogi'] as const;
 export type Rules = typeof RULES[number];
 
 export interface Outcome {

@@ -1,4 +1,4 @@
-import { Square, Color, Role, Piece, COLORS, ROLES, Dimensions } from './types.js';
+import { Square, Color, Role, Piece, COLORS, ROLES } from './types.js';
 import { SquareSet } from './squareSet.js';
 
 export class Board implements Iterable<[Square, Piece]> {

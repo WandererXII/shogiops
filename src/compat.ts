@@ -1,4 +1,4 @@
-import { Rules, SquareName, Move, isDrop, Role } from './types.js';
+import { SquareName, Move, isDrop, Role } from './types.js';
 import { defined, makeSquare, parseUsi } from './util.js';
 import { Position } from './shogi.js';
 

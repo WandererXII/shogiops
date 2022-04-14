@@ -1,5 +1,5 @@
 import { SquareSet } from './squareSet.js';
-import { Color, Role, Rules, Piece, Square } from './types.js';
+import { Color, Role, Rules, Piece, Square, Dimensions } from './types.js';
 
 export function pieceCanPromote(rules: Rules): (piece: Piece, from: Square, to: Square) => boolean {
   switch (rules) {
@@ -94,6 +94,15 @@ export function promotionZone(rules: Rules): (color: Color) => SquareSet {
         color === 'sente'
           ? new SquareSet([0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])
           : new SquareSet([0x0, 0x0, 0x0, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]);
+  }
+}
+
+export function dimensions(rules: Rules): Dimensions {
+  switch (rules) {
+    case 'minishogi':
+      return { files: 5, ranks: 5 };
+    default:
+      return { files: 9, ranks: 9 };
   }
 }
 

@@ -56,8 +56,6 @@ export {
 
 export { Board } from './board.js';
 
-export { Setup, defaultSetup } from './setup.js';
-
 export { IllegalSetup, Shogi, Position, PositionError, Context } from './shogi.js';
 
 export * as compat from './compat.js';

@@ -1,6 +1,5 @@
 import { Rules } from '../src/types';
 import { perft } from '../src/debug';
-import { setupPosition } from '../src/variant';
 import { parseSfen } from '../src/sfen';
 
 const variantPerfts: [Rules, string, number, number][] = [
@@ -12,11 +11,11 @@ const variantPerfts: [Rules, string, number, number][] = [
 ];
 
 test.each(variantPerfts)('variant perft: %s (%s): %s', (rules, sfen, depth, res) => {
-  const pos = setupPosition(rules, parseSfen(sfen).unwrap()).unwrap();
+  const pos = parseSfen(rules, sfen).unwrap();
   expect(perft(pos, depth, false)).toBe(res);
 });
 
 test('minishogi checkmate', () => {
-  const pos = setupPosition('minishogi', parseSfen('r1s1k/2b1g/5/r1G1B/KPS2 b p').unwrap()).unwrap();
+  const pos = parseSfen('minishogi', 'r1s1k/2b1g/5/r1G1B/KPS2 b p').unwrap();
   expect(pos.isCheckmate()).toBe(true);
 });

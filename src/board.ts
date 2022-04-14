@@ -2,8 +2,6 @@ import { Square, Color, Role, Piece, COLORS, ROLES, Dimensions } from './types.j
 import { SquareSet } from './squareSet.js';
 
 export class Board implements Iterable<[Square, Piece]> {
-  dimensions: Dimensions;
-
   occupied: SquareSet;
 
   gote: SquareSet;
@@ -33,7 +31,6 @@ export class Board implements Iterable<[Square, Piece]> {
   }
 
   reset(): void {
-    this.dimensions = { files: 9, ranks: 9 };
     this.occupied = new SquareSet([0x8201ff, 0x1ff, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0]);
     this.sente = new SquareSet([0x0, 0x0, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0]);
     this.gote = new SquareSet([0x8201ff, 0x1ff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
@@ -55,7 +52,6 @@ export class Board implements Iterable<[Square, Piece]> {
 
   static minishogi(): Board {
     const board = new Board();
-    board.dimensions = { files: 5, ranks: 5 };
     board.occupied = new SquareSet([0x1001f, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
     board.sente = new SquareSet([0x0, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
     board.gote = new SquareSet([0x1001f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
@@ -76,9 +72,8 @@ export class Board implements Iterable<[Square, Piece]> {
     return board;
   }
 
-  static empty(dims: Dimensions): Board {
+  static empty(): Board {
     const board = new Board();
-    board.dimensions = dims;
     board.occupied = SquareSet.empty();
     for (const color of COLORS) board[color] = SquareSet.empty();
     for (const role of ROLES) board[role] = SquareSet.empty();
@@ -88,7 +83,6 @@ export class Board implements Iterable<[Square, Piece]> {
   clone(): Board {
     const board = new Board();
     board.occupied = this.occupied;
-    board.dimensions = this.dimensions;
     for (const color of COLORS) board[color] = this[color];
     for (const role of ROLES) board[role] = this[role];
     return board;
@@ -96,8 +90,6 @@ export class Board implements Iterable<[Square, Piece]> {
 
   equals(other: Board): boolean {
     if (!this.gote.equals(other.gote)) return false;
-    if (this.dimensions.files !== other.dimensions.files || this.dimensions.ranks !== other.dimensions.ranks)
-      return false;
     return ROLES.every(role => this[role].equals(other[role]));
   }
 

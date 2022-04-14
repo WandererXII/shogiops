@@ -1,8 +1,7 @@
 import { Result } from '@badrap/result';
-import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, Role, Dimensions } from './types.js';
+import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, Role } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
-import { Setup } from './setup.js';
 import {
   bishopAttacks,
   rookAttacks,
@@ -83,9 +82,7 @@ export abstract class Position {
 
   // When subclassing:
   // - static default()
-  // - static fromSetup()
-  // - static promotable
-  // - static handRoles
+  // - static initializePosition()
   // - Proper signature for clone()
 
   abstract dropDests(role: Role, ctx?: Context): SquareSet;
@@ -97,8 +94,6 @@ export abstract class Position {
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     return attacksTo(square, attacker, this.board, occupied);
   }
-
-  abstract dimensions: Dimensions;
 
   protected playCaptureAt(captured: Piece): void {
     const unpromotedRole = unpromote(this.rules)(captured.role);
@@ -157,15 +152,6 @@ export abstract class Position {
       this.hands.equals(other.hands) &&
       this.turn === other.turn
     );
-  }
-
-  toSetup(): Setup {
-    return {
-      board: this.board.clone(),
-      hands: this.hands.clone(),
-      turn: this.turn,
-      fullmoves: Math.min(Math.max(this.fullmoves, 1), 9999),
-    };
   }
 
   isInsufficientMaterial(): boolean {
@@ -307,8 +293,6 @@ export class Shogi extends Position {
     super(rules || 'standard');
   }
 
-  dimensions = { files: 9, ranks: 9 };
-
   static default(): Shogi {
     const pos = new this();
     pos.board = Board.default();
@@ -318,12 +302,18 @@ export class Shogi extends Position {
     return pos;
   }
 
-  static fromSetup(setup: Setup, strict = true): Result<Shogi, PositionError> {
+  static initialize(
+    board: Board,
+    hands: Hands,
+    turn: Color,
+    moveNumber: number,
+    strict = true
+  ): Result<Shogi, PositionError> {
     const pos = new this();
-    pos.board = setup.board.clone();
-    pos.hands = setup.hands;
-    pos.turn = setup.turn;
-    pos.fullmoves = setup.fullmoves;
+    pos.board = board.clone();
+    pos.hands = hands.clone();
+    pos.turn = turn;
+    pos.fullmoves = moveNumber;
     return pos.validate(strict).map(_ => pos);
   }
 
@@ -332,8 +322,6 @@ export class Shogi extends Position {
   }
 
   protected validate(strict: boolean): Result<undefined, PositionError> {
-    if (this.board.dimensions.ranks !== this.dimensions.ranks || this.board.dimensions.files !== this.dimensions.files)
-      return Result.err(new PositionError(IllegalSetup.Empty));
     if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));

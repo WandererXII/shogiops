@@ -1,6 +1,5 @@
 import { Result } from '@badrap/result';
-import { Role, Rules, Square } from './types.js';
-import { Setup } from './setup.js';
+import { Color, Role, Rules, Square } from './types.js';
 import { PositionError, Position, IllegalSetup, Context, Shogi } from './shogi.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
@@ -17,12 +16,19 @@ export function defaultPosition(rules: Rules): Position {
   }
 }
 
-export function setupPosition(rules: Rules, setup: Setup, strict = true): Result<Position, PositionError> {
+export function initializePosition(
+  rules: Rules,
+  board: Board,
+  hands: Hands,
+  turn: Color,
+  moveNumber: number,
+  strict = true
+): Result<Position, PositionError> {
   switch (rules) {
     case 'minishogi':
-      return Minishogi.fromSetup(setup, strict);
+      return Minishogi.initialize(board, hands, turn, moveNumber, strict);
     default:
-      return Shogi.fromSetup(setup, strict);
+      return Shogi.initialize(board, hands, turn, moveNumber, strict);
   }
 }
 
@@ -30,8 +36,6 @@ export class Minishogi extends Shogi {
   protected constructor() {
     super('minishogi');
   }
-
-  dimensions = { files: 5, ranks: 5 };
 
   static default(): Minishogi {
     const pos = new this();
@@ -42,8 +46,14 @@ export class Minishogi extends Shogi {
     return pos;
   }
 
-  static fromSetup(setup: Setup, strict: boolean): Result<Minishogi, PositionError> {
-    return super.fromSetup(setup, strict) as Result<Minishogi, PositionError>;
+  static initialize(
+    board: Board,
+    hands: Hands,
+    turn: Color,
+    moveNumber: number,
+    strict: boolean
+  ): Result<Minishogi, PositionError> {
+    return super.initialize(board, hands, turn, moveNumber, strict) as Result<Minishogi, PositionError>;
   }
 
   clone(): Minishogi {

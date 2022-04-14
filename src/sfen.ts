@@ -1,10 +1,12 @@
 import { Result } from '@badrap/result';
-import { Piece, Color } from './types.js';
+import { Piece, Color, Rules } from './types.js';
 import { Board } from './board.js';
-import { Setup } from './setup.js';
 import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
 import { Hand, Hands } from './hand.js';
 import { ROLES } from './types.js';
+import { Position } from './shogi.js';
+import { initializePosition } from './variant.js';
+import { dimensions } from './variantUtil.js';
 
 export const INITIAL_BOARD_SFEN = 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL';
 export const INITIAL_EPD = INITIAL_BOARD_SFEN + ' b -';
@@ -32,19 +34,22 @@ function stringToPiece(s: string): Piece | undefined {
   return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
 }
 
-export function parseBoardSfen(boardPart: string): Result<Board, SfenError> {
+export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, SfenError> {
   const ranks = boardPart.split('/');
-  // we assume the board is square
-  // since that's good enough for now...
-  const board = Board.empty({ files: ranks.length, ranks: ranks.length });
+  // we assume the board is square, since that's good enough for all current variants...
+  const dims = { files: ranks.length, ranks: ranks.length },
+    ruleDims = dimensions(rules);
+  if (dims.files !== ruleDims.files || dims.ranks !== ruleDims.ranks)
+    return Result.err(new SfenError(InvalidSfen.Board));
+  const board = Board.empty();
   let empty = 0;
   let rank = 0;
-  let file = board.dimensions.files - 1;
+  let file = dims.files - 1;
   for (let i = 0; i < boardPart.length; i++) {
     let c = boardPart[i];
     if (c === '/' && file < 0) {
       empty = 0;
-      file = board.dimensions.files - 1;
+      file = dims.files - 1;
       rank++;
     } else {
       const step = parseInt(c, 10);
@@ -52,7 +57,7 @@ export function parseBoardSfen(boardPart: string): Result<Board, SfenError> {
         file = file + empty - (empty * 10 + step);
         empty = empty * 10 + step;
       } else {
-        if (file < 0 || file >= board.dimensions.files || rank < 0 || rank >= board.dimensions.ranks)
+        if (file < 0 || file >= dims.files || rank < 0 || rank >= dims.ranks)
           return Result.err(new SfenError(InvalidSfen.Board));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
         const square = parseCoordinates(file, rank)!;
@@ -65,7 +70,7 @@ export function parseBoardSfen(boardPart: string): Result<Board, SfenError> {
     }
   }
 
-  if (rank !== board.dimensions.ranks - 1 || file !== -1) return Result.err(new SfenError(InvalidSfen.Board));
+  if (rank !== dims.ranks - 1 || file !== -1) return Result.err(new SfenError(InvalidSfen.Board));
   return Result.ok(board);
 }
 
@@ -89,12 +94,12 @@ export function parseHands(handsPart: string): Result<Hands, SfenError> {
   return Result.ok(hands);
 }
 
-export function parseSfen(sfen: string): Result<Setup, SfenError> {
+export function parseSfen(rules: Rules, sfen: string, strict?: boolean): Result<Position, SfenError> {
   const parts = sfen.split(' ');
 
   // Board
   const boardPart = parts.shift()!;
-  const board: Result<Board, SfenError> = parseBoardSfen(boardPart);
+  const board: Result<Board, SfenError> = parseBoardSfen(rules, boardPart);
 
   // Turn
   const turnPart = parts.shift();
@@ -117,19 +122,10 @@ export function parseSfen(sfen: string): Result<Setup, SfenError> {
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
 
   return board.chain(board =>
-    hands.map(hands => {
-      return {
-        board,
-        hands,
-        turn,
-        fullmoves: Math.max(1, fullmoves),
-      };
+    hands.chain(hands => {
+      return initializePosition(rules, board, hands, turn, Math.max(1, fullmoves), strict);
     })
   );
-}
-
-interface SfenOpts {
-  epd?: boolean;
 }
 
 export function parsePiece(str: string): Piece | undefined {
@@ -146,11 +142,12 @@ export function makePiece(piece: Piece): string {
   return r;
 }
 
-export function makeBoardSfen(board: Board): string {
+export function makeBoardSfen(rules: Rules, board: Board): string {
+  const dims = dimensions(rules);
   let sfen = '';
   let empty = 0;
-  for (let rank = 0; rank < board.dimensions.ranks; rank++) {
-    for (let file = board.dimensions.files - 1; file >= 0; file--) {
+  for (let rank = 0; rank < dims.ranks; rank++) {
+    for (let file = dims.files - 1; file >= 0; file--) {
       const square = parseCoordinates(file, rank)!;
       const piece = board.get(square);
       if (!piece) empty++;
@@ -167,7 +164,7 @@ export function makeBoardSfen(board: Board): string {
           sfen += empty;
           empty = 0;
         }
-        if (rank !== board.dimensions.ranks - 1) sfen += '/';
+        if (rank !== dims.ranks - 1) sfen += '/';
       }
     }
   }
@@ -187,11 +184,11 @@ export function makeHands(hands: Hands): string {
   return handsStr === '' ? '-' : handsStr;
 }
 
-export function makeSfen(setup: Setup, opts?: SfenOpts): string {
+export function makeSfen(pos: Position): string {
   return [
-    makeBoardSfen(setup.board),
-    toBW(setup.turn),
-    makeHands(setup.hands),
-    ...(opts?.epd ? [] : [Math.max(1, Math.min(setup.fullmoves, 9999))]),
+    makeBoardSfen(pos.rules, pos.board),
+    toBW(pos.turn),
+    makeHands(pos.hands),
+    Math.max(1, Math.min(pos.fullmoves, 9999)),
   ].join(' ');
 }

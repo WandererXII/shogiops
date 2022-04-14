@@ -1,12 +1,12 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
-import { Setup } from '../../setup.js';
 import { Position } from '../../shogi.js';
 import { Color, isDrop, Move } from '../../types.js';
 import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util.js';
 import { Hand, Hands } from '../../hand.js';
-import { allRoles, handRoles, promote } from '../../variantUtil.js';
+import { allRoles, dimensions, handRoles, promote } from '../../variantUtil.js';
 import { makeNumberSquare, parseNumberSquare } from '../notationUtil.js';
+import { initializePosition } from '../../variant.js';
 
 // Olny supports standard shogi no variants
 
@@ -25,12 +25,12 @@ export enum InvalidCsa {
 export class CsaError extends Error {}
 
 // exporting handicaps differently is prob not worth it, so let's always go with the whole board
-export function makeCsaHeader(setup: Setup): string {
+export function makeCsaHeader(pos: Position): string {
   return [
-    makeCsaBoard(setup.board),
-    makeCsaHand(setup.hands.sente, 'P+'),
-    makeCsaHand(setup.hands.gote, 'P-'),
-    setup.turn === 'gote' ? '-' : '+',
+    makeCsaBoard(pos.board),
+    makeCsaHand(pos.hands.sente, 'P+'),
+    makeCsaHand(pos.hands.gote, 'P-'),
+    pos.turn === 'gote' ? '-' : '+',
   ]
     .filter(p => p.length > 0)
     .join('\n');
@@ -70,7 +70,7 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
 }
 
 // Import
-export function parseCsaHeader(csa: string): Result<Setup, CsaError> {
+export function parseCsaHeader(csa: string): Result<Position, CsaError> {
   const lines = normalizedCsaLines(csa);
   const handicap = lines.find(l => l.startsWith('PI'));
   const isWholeBoard = lines.some(l => l.startsWith('P1'));
@@ -78,15 +78,11 @@ export function parseCsaHeader(csa: string): Result<Setup, CsaError> {
     defined(handicap) && !isWholeBoard ? parseCsaHandicap(handicap) : parseCsaBoard(lines.filter(l => /^P\d/.test(l)));
   const turn: Color = lines.some(l => l === '-') ? 'gote' : 'sente';
   return baseBoard.chain(board => {
-    const setup = {
-      board: board,
-      hands: Hands.empty(),
-      turn: turn,
-      fullmoves: 1,
-    };
-    return parseAdditions(
-      setup,
-      lines.filter(l => /P[\+|-]/.test(l))
+    return initializePosition('standard', board, Hands.empty(), turn, 1).chain(pos =>
+      parseAdditions(
+        pos,
+        lines.filter(l => /P[\+|-]/.test(l))
+      )
     );
   });
 }
@@ -107,7 +103,7 @@ export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
 
 function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   if (csaBoard.length !== 9) return Result.err(new CsaError(InvalidCsa.Board));
-  const board = Board.empty({ files: 9, ranks: 9 });
+  const board = Board.empty();
   let rank = 0;
 
   for (const r of csaBoard.map(r => r.substring(2))) {
@@ -131,7 +127,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   return Result.ok(board);
 }
 
-function parseAdditions(initialSetup: Setup, additions: string[]): Result<Setup, CsaError> {
+function parseAdditions(initialPos: Position, additions: string[]): Result<Position, CsaError> {
   for (const line of additions) {
     const color: Color = line[1] === '+' ? 'sente' : 'gote';
     for (const sp of line.substring(2).match(/.{4}/g) || []) {
@@ -141,14 +137,14 @@ function parseAdditions(initialSetup: Setup, additions: string[]): Result<Setup,
       if ((defined(sq) || sqString === '00') && defined(role)) {
         if (!defined(sq)) {
           if (!handRoles('standard').includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
-          initialSetup.hands[color][role]++;
+          initialPos.hands[color][role]++;
         } else {
-          initialSetup.board.set(sq, { role: role, color: color });
+          initialPos.board.set(sq, { role: role, color: color });
         }
       } else return Result.err(new CsaError(InvalidCsa.AdditionalInfo));
     }
   }
-  return Result.ok(initialSetup);
+  return Result.ok(initialPos);
 }
 
 export function parseTags(csa: string): [string, string][] {

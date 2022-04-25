@@ -210,7 +210,7 @@ export function makeCsaMove(pos: Position, move: Move): string | undefined {
     return (
       makeNumberSquare(move.from) +
       makeNumberSquare(move.to) +
-      roleToCsa(move.promotion ? promote('standard')(role) : role)
+      roleToCsa((move.promotion && promote('standard')(role)) || role)
     );
   }
 }

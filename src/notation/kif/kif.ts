@@ -150,7 +150,7 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
           if (defined(role) && allRoles(rules).includes(role)) {
             const square = parseCoordinates(file, rank);
             if (!defined(square)) return Result.err(new KifError(InvalidKif.Board));
-            const piece = { role: prom ? promote(rules)(role) : role, color: (gote ? 'gote' : 'sente') as Color };
+            const piece = { role: (prom && promote(rules)(role)) || role, color: (gote ? 'gote' : 'sente') as Color };
             board.set(square, piece);
             prom = false;
             gote = false;

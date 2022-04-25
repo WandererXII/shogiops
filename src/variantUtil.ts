@@ -67,7 +67,7 @@ export function promotableRoles(rules: Rules): Role[] {
   }
 }
 
-export function promote(rules: Rules): (role: Role) => Role {
+export function promote(rules: Rules): (role: Role) => Role | undefined {
   switch (rules) {
     case 'minishogi':
       return standardPromote;
@@ -76,7 +76,7 @@ export function promote(rules: Rules): (role: Role) => Role {
   }
 }
 
-export function unpromote(rules: Rules): (role: Role) => Role {
+export function unpromote(rules: Rules): (role: Role) => Role | undefined {
   switch (rules) {
     case 'minishogi':
       return standardUnpromote;
@@ -124,34 +124,26 @@ export function secondBackrank(rules: Rules): (color: Color) => SquareSet {
   }
 }
 
-function standardUnpromote(role: Role): Role {
+function standardUnpromote(role: Role): Role | undefined {
   switch (role) {
-    case 'pawn':
     case 'tokin':
       return 'pawn';
-    case 'lance':
     case 'promotedlance':
       return 'lance';
-    case 'knight':
     case 'promotedknight':
       return 'knight';
-    case 'silver':
     case 'promotedsilver':
       return 'silver';
-    case 'gold':
-      return 'gold';
-    case 'bishop':
     case 'horse':
       return 'bishop';
-    case 'rook':
     case 'dragon':
       return 'rook';
     default:
-      return role;
+      return undefined;
   }
 }
 
-function standardPromote(role: Role): Role {
+function standardPromote(role: Role): Role | undefined {
   switch (role) {
     case 'pawn':
       return 'tokin';
@@ -166,6 +158,6 @@ function standardPromote(role: Role): Role {
     case 'rook':
       return 'dragon';
     default:
-      return role;
+      return undefined;
   }
 }

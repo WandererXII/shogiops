@@ -96,7 +96,7 @@ export abstract class Position {
   }
 
   protected playCaptureAt(captured: Piece): void {
-    const unpromotedRole = unpromote(this.rules)(captured.role);
+    const unpromotedRole = unpromote(this.rules)(captured.role) || captured.role;
     this.hands[opposite(captured.color)][unpromotedRole]++;
   }
 
@@ -275,12 +275,11 @@ export abstract class Position {
     } else {
       const piece = this.board.take(move.from);
       if (!piece) return;
-      const role = piece.role;
       if (
         (move.promotion && pieceCanPromote(this.rules)(piece, move.from, move.to)) ||
         pieceInDeadZone(this.rules)(piece, move.to)
       )
-        piece.role = promote(this.rules)(role);
+        piece.role = promote(this.rules)(piece.role) || piece.role;
 
       const capture = this.board.set(move.to, piece);
       if (capture) this.playCaptureAt(capture);

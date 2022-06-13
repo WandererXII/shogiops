@@ -1,7 +1,7 @@
 # shogiops
 
 [![Test](https://github.com/WandererXII/shogiops/workflows/Test/badge.svg)](https://github.com/WandererXII/shogiops/actions)
-[![npm](https://img.shields.io/npm/v/shogiops)](https://www.npmjs.com/package/shogiground)
+[![npm](https://img.shields.io/npm/v/shogiops)](https://www.npmjs.com/package/shogiops)
 
 Shogi and operations in TypeScript forked from [chessops](https://github.com/niklasf/chessops), rewritten for shogi.
 

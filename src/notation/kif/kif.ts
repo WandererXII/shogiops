@@ -1,6 +1,6 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
-import { INITIAL_SFEN, makeSfen, parseSfen } from '../../sfen.js';
+import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
 import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps.js';
 import { Position } from '../../shogi.js';
 import { Color, isDrop, Move, ROLES, Rules, Square } from '../../types.js';
@@ -91,7 +91,7 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
     kifBoard => Result.ok(kifBoard),
     () => {
       const handicap = lines.find(l => l.startsWith('手合割：'));
-      const hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : INITIAL_SFEN;
+      const hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : initialSfen('standard');
       if (!defined(hSfen)) return Result.err(new KifError(InvalidKif.Handicap));
       const rules = hSfen.split('/').length === 5 ? 'minishogi' : 'standard';
       return parseSfen(rules, hSfen);

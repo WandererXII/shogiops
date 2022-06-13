@@ -1,4 +1,4 @@
-import { INITIAL_SFEN, parseSfen } from '../../src/sfen';
+import { initialSfen, parseSfen } from '../../src/sfen';
 import {
   makeCsaHeader,
   makeCsaMove,
@@ -20,7 +20,7 @@ test('parse csa square', () => {
 });
 
 test('make csa header from starting position', () => {
-  const pos = parseSfen('standard', INITIAL_SFEN).unwrap();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   expect(makeCsaHeader(pos)).toEqual(
     `P1-KY-KE-GI-KI-OU-KI-GI-KE-KY
 P2 * -HI *  *  *  *  * -KA * 

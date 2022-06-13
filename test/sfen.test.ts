@@ -1,19 +1,19 @@
-import { parseSfen, makeSfen, makeBoardSfen, INITIAL_SFEN, INITIAL_BOARD_SFEN, EMPTY_BOARD_SFEN } from '../src/sfen';
+import { parseSfen, makeSfen, makeBoardSfen, initialSfen } from '../src/sfen';
 import { Board } from '../src/board';
 import { defaultPosition } from '../src/variant';
 import { Hands } from '../src/hand';
 
 test('make board sfen', () => {
-  expect(makeBoardSfen('standard', Board.default())).toEqual(INITIAL_BOARD_SFEN);
-  expect(makeBoardSfen('standard', Board.empty())).toEqual(EMPTY_BOARD_SFEN);
+  expect(makeBoardSfen('standard', Board.default())).toEqual(initialSfen('standard').split(' ')[0]);
+  expect(makeBoardSfen('standard', Board.empty())).toEqual('9/9/9/9/9/9/9/9/9');
 });
 
 test('make initial sfen', () => {
-  expect(makeSfen(defaultPosition('standard'))).toEqual(INITIAL_SFEN);
+  expect(makeSfen(defaultPosition('standard'))).toEqual(initialSfen('standard'));
 });
 
 test('parse initial sfen', () => {
-  const pos = parseSfen('standard', INITIAL_SFEN).unwrap();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   expect(pos.board).toEqual(Board.default());
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
@@ -21,7 +21,7 @@ test('parse initial sfen', () => {
 });
 
 test('partial sfen', () => {
-  const pos = parseSfen('standard', INITIAL_BOARD_SFEN).unwrap();
+  const pos = parseSfen('standard', initialSfen('standard').split(' ')[0]).unwrap();
   expect(pos.board).toEqual(Board.default());
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');

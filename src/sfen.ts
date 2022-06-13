@@ -8,19 +8,21 @@ import { Position } from './shogi.js';
 import { initializePosition } from './variant.js';
 import { dimensions } from './variantUtil.js';
 
-export const INITIAL_BOARD_SFEN = 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL';
-export const INITIAL_EPD = INITIAL_BOARD_SFEN + ' b -';
-export const INITIAL_SFEN = INITIAL_EPD + ' 1';
-export const EMPTY_BOARD_SFEN = '9/9/9/9/9/9/9/9/9';
-export const EMPTY_EPD = EMPTY_BOARD_SFEN + ' b -';
-export const EMPTY_SFEN = EMPTY_EPD + ' 1';
-
 export enum InvalidSfen {
   Sfen = 'ERR_SFEN',
   Board = 'ERR_BOARD',
   Hands = 'ERR_HANDS',
   Turn = 'ERR_TURN',
   Fullmoves = 'ERR_FULLMOVES',
+}
+
+export function initialSfen(rules: Rules): string {
+  switch (rules) {
+    case 'minishogi':
+      return 'rbsgk/4p/5/P4/KGSBR b - 1';
+    default:
+      return 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1';
+  }
 }
 
 export class SfenError extends Error {}

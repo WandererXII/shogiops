@@ -1,7 +1,8 @@
 # Changelog for shogiops
 
-## v0.7.1
+## v0.8.0
 
+- SFEN consts were removed, now use `initialSfen(rules)`
 - `promote` returns undefined for roles that can't be promoted
 - `unpromote` returns undefined for roles that can't be unpromoted
 

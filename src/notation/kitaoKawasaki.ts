@@ -7,11 +7,11 @@ import { makeNumberSquare, piecesAiming } from './notationUtil.js';
 // 歩-76
 export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
   if (isDrop(move)) {
-    return roleTo2Kanji(move.role).toUpperCase() + '*' + makeNumberSquare(move.to);
+    return roleTo2Kanji(move.role) + '*' + makeNumberSquare(move.to);
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleTo2Kanji(piece.role).toUpperCase();
+      const roleStr = roleTo2Kanji(piece.role).replace('成', '+');
       const ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty()
         ? ''
         : `(${makeNumberSquare(move.from)})`;

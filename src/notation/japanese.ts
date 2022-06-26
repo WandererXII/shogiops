@@ -9,12 +9,12 @@ import { SquareSet } from '../squareSet.js';
 export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
   if (isDrop(move)) {
     const ambStr = piecesAiming(pos, { role: move.role, color: pos.turn }, move.to).isEmpty() ? '' : '打';
-    return `${makeJapaneseSquare(move.to)}${roleTo2Kanji(move.role).toUpperCase()}${ambStr}`;
+    return `${makeJapaneseSquare(move.to)}${roleTo2Kanji(move.role)}${ambStr}`;
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
       const destStr = lastDest === move.to ? '同　' : makeJapaneseSquare(move.to);
-      const roleStr = roleTo2Kanji(piece.role).toUpperCase();
+      const roleStr = roleTo2Kanji(piece.role);
       const ambPieces = piecesAiming(pos, piece, move.to).without(move.from);
       const ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces);
       const promStr = move.promotion ? '成' : pieceCanPromote(pos.rules)(piece, move.from, move.to) ? '不成' : '';

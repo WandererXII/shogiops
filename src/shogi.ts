@@ -25,7 +25,6 @@ import {
   pieceCanPromote,
   pieceInDeadZone,
   promote,
-  promotionZone,
   secondBackrank,
   unpromote,
 } from './variantUtil.js';
@@ -205,28 +204,6 @@ export abstract class Position {
   isStalemate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     return !ctx.variantEnd && ctx.checkers.isEmpty() && !this.hasDests(ctx);
-  }
-
-  isImpasse(): boolean {
-    const allPiecesInPromotionZone = promotionZone(this.rules)(this.turn).intersect(this.board[this.turn]);
-    const majorPiecesInPromotionZone = allPiecesInPromotionZone.intersect(
-      this.board.bishop.union(this.board.rook).union(this.board.horse).union(this.board.dragon)
-    );
-    const king = this.board.kingOf(this.turn);
-
-    const impasseValue =
-      allPiecesInPromotionZone.size() -
-      1 +
-      majorPiecesInPromotionZone.size() * 4 +
-      this.hands[this.turn].count() +
-      (this.hands[this.turn].bishop + this.hands[this.turn].rook) * 4;
-
-    return (
-      defined(king) &&
-      allPiecesInPromotionZone.has(king) &&
-      allPiecesInPromotionZone.size() > 10 &&
-      impasseValue >= (this.turn === 'sente' ? 28 : 27)
-    );
   }
 
   outcome(ctx?: Context): Outcome | undefined {

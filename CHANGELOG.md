@@ -1,15 +1,19 @@
 # Changelog for shogiops
 
+## v0.9.0
+
+- Remove `isImpasse`, wasn't used, doesn't account for handicaps, and uses only a specific rule anyway - might not be what people expect.
+
 ## v0.8.0
 
-- SFEN consts were removed, now use `initialSfen(rules)`
-- `promote` returns undefined for roles that can't be promoted
-- `unpromote` returns undefined for roles that can't be unpromoted
+- SFEN consts were removed, now use `initialSfen(rules)`.
+- `promote` returns undefined for roles that can't be promoted.
+- `unpromote` returns undefined for roles that can't be unpromoted.
 
 ## v0.7.0
 
 - Remove `Setup`, use `Position` instead. `ParseSfen` and similar functions now require rules as the first parameter.
-- Remove `dimensions` from `Board`
+- Remove `dimensions` from `Board`.
 - Rename rules 'shogi' to 'standard'.
 - Rewrite `Squareset` to support boards upto 16x16.
 - Remove transform functions.

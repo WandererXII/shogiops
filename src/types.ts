@@ -51,10 +51,10 @@ export const ROLES = [
   'pawn',
   'dragon',
   'horse',
-  'tokin',
   'promotedsilver',
   'promotedknight',
   'promotedlance',
+  'tokin',
   'king',
 ] as const;
 export type Role = typeof ROLES[number];

@@ -29,7 +29,16 @@ export type BitRows = [number, number, number, number, number, number, number, n
 // Each element represents two ranks - board size 16x16
 export class SquareSet implements Iterable<Square> {
   constructor(readonly dRows: BitRows) {
-    this.dRows = [...dRows];
+    this.dRows = [
+      dRows[0] >>> 0,
+      dRows[1] >>> 0,
+      dRows[2] >>> 0,
+      dRows[3] >>> 0,
+      dRows[4] >>> 0,
+      dRows[5] >>> 0,
+      dRows[6] >>> 0,
+      dRows[7] >>> 0,
+    ];
   }
 
   static full(): SquareSet {

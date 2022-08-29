@@ -111,11 +111,9 @@ export abstract class Position {
         mustCapture: false,
       };
     const snipers = rookAttacks(king, SquareSet.empty())
-      .intersect(this.board.rook)
-      .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishop))
+      .intersect(this.board.rook.union(this.board.dragon))
+      .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishop.union(this.board.horse)))
       .union(lanceAttacks(this.turn, king, SquareSet.empty()).intersect(this.board.lance))
-      .union(horseAttacks(king, SquareSet.empty()).intersect(this.board.horse))
-      .union(dragonAttacks(king, SquareSet.empty()).intersect(this.board.dragon))
       .intersect(this.board[opposite(this.turn)]);
     let blockers = SquareSet.empty();
     for (const sniper of snipers) {

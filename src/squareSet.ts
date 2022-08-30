@@ -28,7 +28,8 @@ export type BitRows = [number, number, number, number, number, number, number, n
 // Assumes POV of sente player - up is smaller rank, down is greater rank, left is smaller file, right is greater file
 // Each element represents two ranks - board size 16x16
 export class SquareSet implements Iterable<Square> {
-  constructor(readonly dRows: BitRows) {
+  readonly dRows: BitRows;
+  constructor(dRows: BitRows) {
     this.dRows = [
       dRows[0] >>> 0,
       dRows[1] >>> 0,
@@ -56,6 +57,17 @@ export class SquareSet implements Iterable<Square> {
     const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
     const index = square >>> 5;
     newRows[index] = 1 << (square - index * 32);
+    return new SquareSet(newRows);
+  }
+
+  static fromSquares(squares: Square[]): SquareSet {
+    const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
+    for (const square of squares) {
+      if (square < 256 && square >= 0) {
+        const index = square >>> 5;
+        newRows[index] = newRows[index] | (1 << (square - index * 32));
+      }
+    }
     return new SquareSet(newRows);
   }
 
@@ -276,11 +288,33 @@ export class SquareSet implements Iterable<Square> {
     return new SquareSet(newDRows);
   }
 
+  withMany(squares: Square[]): SquareSet {
+    const newDRows: BitRows = [...this.dRows];
+    for (const square of squares) {
+      if (square < 256 && square >= 0) {
+        const index = square >>> 5;
+        newDRows[index] = newDRows[index] | (1 << (square - index * 32));
+      }
+    }
+    return new SquareSet(newDRows);
+  }
+
   without(square: Square): SquareSet {
     if (square >= 256 || square < 0) return this;
     const index = square >>> 5;
     const newDRows: BitRows = [...this.dRows];
     newDRows[index] = newDRows[index] & ~(1 << (square - index * 32));
+    return new SquareSet(newDRows);
+  }
+
+  withoutMany(squares: Square[]): SquareSet {
+    const newDRows: BitRows = [...this.dRows];
+    for (const square of squares) {
+      if (square < 256 && square >= 0) {
+        const index = square >>> 5;
+        newDRows[index] = newDRows[index] & ~(1 << (square - index * 32));
+      }
+    }
     return new SquareSet(newDRows);
   }
 

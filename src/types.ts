@@ -25,8 +25,6 @@ export type Square = number;
 
 export type SquareName = `${FileName}${RankName}`;
 
-export type BySquare<T> = T[];
-
 export const COLORS = ['sente', 'gote'] as const;
 
 export type Color = typeof COLORS[number];

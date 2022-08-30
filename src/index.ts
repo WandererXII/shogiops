@@ -5,7 +5,6 @@ export {
   RankName,
   Square,
   SquareName,
-  BySquare,
   Color,
   COLORS,
   ByColor,

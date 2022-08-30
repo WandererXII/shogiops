@@ -1,79 +1,68 @@
 import { squareFile, squareRank } from './util.js';
-import { Square, Piece, Color, BySquare } from './types.js';
+import { Square, Piece, Color } from './types.js';
 import { SquareSet } from './squareSet.js';
 
 function computeRange(square: Square, deltas: number[]): SquareSet {
-  let range = SquareSet.empty();
-  for (const delta of deltas) {
-    const sq = square + delta;
-    if (0 <= sq && sq < 256 && Math.abs(squareFile(square) - squareFile(sq)) <= 2) {
-      range = range.with(sq);
-    }
-  }
-  return range;
+  const file = squareFile(square),
+    dests: Square[] = deltas.map(delta => square + delta).filter(sq => Math.abs(file - squareFile(sq)) <= 2);
+  return SquareSet.fromSquares(dests);
 }
 
-function tabulate<T>(f: (square: Square) => T): BySquare<T> {
+function tabulateSquares(f: (square: Square) => SquareSet): SquareSet[] {
   const table = [];
   for (let square = 0; square < 256; square++) table[square] = f(square);
   return table;
 }
 
-const KING_ATTACKS = tabulate(sq => computeRange(sq, [-17, -16, -15, -1, 1, 15, 16, 17]));
-const KNIGHT_ATTACKS = {
-  sente: tabulate(sq => computeRange(sq, [-31, -33])),
-  gote: tabulate(sq => computeRange(sq, [31, 33])),
-};
-const PAWN_ATTACKS = {
-  sente: tabulate(sq => computeRange(sq, [-16])),
-  gote: tabulate(sq => computeRange(sq, [16])),
-};
-const SILVER_ATTACKS = {
-  sente: tabulate(sq => computeRange(sq, [17, 15, -15, -16, -17])),
-  gote: tabulate(sq => computeRange(sq, [17, 16, 15, -15, -17])),
-};
-const GOLD_ATTACKS = {
-  sente: tabulate(sq => computeRange(sq, [16, 1, -1, -15, -16, -17])),
-  gote: tabulate(sq => computeRange(sq, [17, 16, 15, 1, -1, -16])),
-};
-
-export function kingAttacks(square: Square): SquareSet {
-  return KING_ATTACKS[square];
+function tabulateRanks(f: (rank: number) => SquareSet): SquareSet[] {
+  const table = [];
+  for (let rank = 0; rank < 16; rank++) table[rank] = f(rank);
+  return table;
 }
 
-export function knightAttacks(color: Color, square: Square): SquareSet {
-  return KNIGHT_ATTACKS[color][square];
-}
+const FORW_RANKS = tabulateRanks(rank => SquareSet.ranksAbove(rank));
+const BACK_RANKS = tabulateRanks(rank => SquareSet.ranksBelow(rank));
 
-export function silverAttacks(color: Color, square: Square): SquareSet {
-  return SILVER_ATTACKS[color][square];
-}
+const NEIGHBORS = tabulateSquares(sq => computeRange(sq, [-17, -16, -15, -1, 1, 15, 16, 17]));
 
-export function goldAttacks(color: Color, square: Square): SquareSet {
-  return GOLD_ATTACKS[color][square];
-}
+const FILE_RANGE = tabulateSquares(sq => SquareSet.fromFile(squareFile(sq)).without(sq));
+const RANK_RANGE = tabulateSquares(sq => SquareSet.fromRank(squareRank(sq)).without(sq));
 
-export function pawnAttacks(color: Color, square: Square): SquareSet {
-  return PAWN_ATTACKS[color][square];
-}
-
-const FILE_RANGE = tabulate(sq => SquareSet.fromFile(squareFile(sq)).without(sq));
-const RANK_RANGE = tabulate(sq => SquareSet.fromRank(squareRank(sq)).without(sq));
-
-const FORW_RANGE = tabulate(sq => SquareSet.ranksAbove(squareRank(sq)).without(sq));
-const BACK_RANGE = tabulate(sq => SquareSet.ranksBelow(squareRank(sq)).without(sq));
-
-const DIAG_RANGE = tabulate(sq => {
+const DIAG_RANGE = tabulateSquares(sq => {
   const diag = new SquareSet([0x20001, 0x80004, 0x200010, 0x800040, 0x2000100, 0x8000400, 0x20001000, 0x80004000]);
   const shift = 16 * (squareRank(sq) - squareFile(sq));
   return (shift >= 0 ? diag.shl256(shift) : diag.shr256(-shift)).without(sq);
 });
 
-const ANTI_DIAG_RANGE = tabulate(sq => {
+const ANTI_DIAG_RANGE = tabulateSquares(sq => {
   const diag = new SquareSet([0x40008000, 0x10002000, 0x4000800, 0x1000200, 0x400080, 0x100020, 0x40008, 0x10002]);
   const shift = 16 * (squareRank(sq) + squareFile(sq) - 15);
   return (shift >= 0 ? diag.shl256(shift) : diag.shr256(-shift)).without(sq);
 });
+
+export function kingAttacks(square: Square): SquareSet {
+  return NEIGHBORS[square];
+}
+
+export function knightAttacks(color: Color, square: Square): SquareSet {
+  if (color === 'sente') return computeRange(square, [-31, -33]);
+  else return computeRange(square, [31, 33]);
+}
+
+export function silverAttacks(color: Color, square: Square): SquareSet {
+  if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 16, square - 1, square + 1]);
+  else return NEIGHBORS[square].withoutMany([square - 16, square - 1, square + 1]);
+}
+
+export function goldAttacks(color: Color, square: Square): SquareSet {
+  if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 17, square + 15]);
+  else return NEIGHBORS[square].withoutMany([square - 17, square - 15]);
+}
+
+export function pawnAttacks(color: Color, square: Square): SquareSet {
+  if (color === 'sente') return SquareSet.fromSquare(square - 16);
+  else return SquareSet.fromSquare(square + 16);
+}
 
 function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
   let forward = occupied.intersect(range);
@@ -108,9 +97,8 @@ export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
 }
 
 export function lanceAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
-  return color === 'sente'
-    ? fileAttacks(square, occupied).intersect(FORW_RANGE[square])
-    : fileAttacks(square, occupied).intersect(BACK_RANGE[square]);
+  if (color === 'sente') return fileAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]);
+  else return fileAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]);
 }
 
 export function horseAttacks(square: Square, occupied: SquareSet): SquareSet {

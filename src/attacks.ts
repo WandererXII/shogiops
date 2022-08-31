@@ -1,4 +1,4 @@
-import { squareFile, squareRank } from './util.js';
+import { opposite, squareFile, squareRank } from './util.js';
 import { Square, Piece, Color } from './types.js';
 import { SquareSet } from './squareSet.js';
 
@@ -40,6 +40,29 @@ const ANTI_DIAG_RANGE = tabulateSquares(sq => {
   return (shift >= 0 ? diag.shl256(shift) : diag.shr256(-shift)).without(sq);
 });
 
+function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
+  let forward = occupied.intersect(range);
+  let reverse = forward.rowSwap256(); // Assumes no more than 1 bit per rank
+
+  forward = forward.minus256(bit);
+  reverse = reverse.minus256(bit.rowSwap256());
+  return forward.xor(reverse.rowSwap256()).intersect(range);
+}
+
+function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return hyperbola(SquareSet.fromSquare(square), FILE_RANGE[square], occupied);
+}
+
+function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
+  const range = RANK_RANGE[square];
+  let forward = occupied.intersect(range);
+  let reverse = forward.rbit256();
+  forward = forward.minus256(SquareSet.fromSquare(square));
+  reverse = reverse.minus256(SquareSet.fromSquare(255 - square));
+
+  return forward.xor(reverse.rbit256()).intersect(range);
+}
+
 export function kingAttacks(square: Square): SquareSet {
   return NEIGHBORS[square];
 }
@@ -64,29 +87,6 @@ export function pawnAttacks(color: Color, square: Square): SquareSet {
   else return SquareSet.fromSquare(square + 16);
 }
 
-function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
-  let forward = occupied.intersect(range);
-  let reverse = forward.rowSwap256(); // Assumes no more than 1 bit per rank
-
-  forward = forward.minus256(bit);
-  reverse = reverse.minus256(bit.rowSwap256());
-  return forward.xor(reverse.rowSwap256()).intersect(range);
-}
-
-function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
-  return hyperbola(SquareSet.fromSquare(square), FILE_RANGE[square], occupied);
-}
-
-function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
-  const range = RANK_RANGE[square];
-  let forward = occupied.intersect(range);
-  let reverse = forward.rbit256();
-  forward = forward.minus256(SquareSet.fromSquare(square));
-  reverse = reverse.minus256(SquareSet.fromSquare(255 - square));
-
-  return forward.xor(reverse.rbit256()).intersect(range);
-}
-
 export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
   const bit = SquareSet.fromSquare(square);
   return hyperbola(bit, DIAG_RANGE[square], occupied).xor(hyperbola(bit, ANTI_DIAG_RANGE[square], occupied));
@@ -107,6 +107,113 @@ export function horseAttacks(square: Square, occupied: SquareSet): SquareSet {
 
 export function dragonAttacks(square: Square, occupied: SquareSet): SquareSet {
   return rookAttacks(square, occupied).union(kingAttacks(square));
+}
+
+// Chushogi pieces
+
+export function goBetweenAttacks(square: Square): SquareSet {
+  return SquareSet.fromSquares([square - 16, square + 16]);
+}
+
+export function reverseChariotAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return fileAttacks(square, occupied);
+}
+
+export function sideMoverAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return rankAttacks(square, occupied).union(SquareSet.fromSquares([square - 16, square + 16]));
+}
+
+export function verticalMoverAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return fileAttacks(square, occupied).union(computeRange(square, [-1, 1]));
+}
+
+export function copperAttacks(color: Color, square: Square): SquareSet {
+  if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 17, square + 15, square + 1, square - 1]);
+  else return NEIGHBORS[square].withoutMany([square - 17, square - 15, square - 1, square + 1]);
+}
+
+export function ferociousLeopardAttacks(square: Square): SquareSet {
+  return NEIGHBORS[square].withoutMany([square + 1, square - 1]);
+}
+
+export function blindTigerAttacks(color: Color, square: Square): SquareSet {
+  if (color === 'sente') return NEIGHBORS[square].without(square - 16);
+  else return NEIGHBORS[square].without(square + 16);
+}
+
+export function drunkElephantAttacks(color: Color, square: Square): SquareSet {
+  return blindTigerAttacks(opposite(color), square);
+}
+
+export function kirinAttacks(square: Square): SquareSet {
+  return NEIGHBORS[square]
+    .withoutMany([square + 1, square - 1, square + 16, square - 16])
+    .union(computeRange(square, [32, -32, -2, 2]));
+}
+
+export function phoenixAttacks(square: Square): SquareSet {
+  return NEIGHBORS[square]
+    .withoutMany([square - 15, square - 17, square + 15, square + 17])
+    .union(computeRange(square, [30, 34, -30, -34]));
+}
+
+export function freeKingAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return rookAttacks(square, occupied).union(bishopAttacks(square, occupied));
+}
+
+export function flyingStagAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return fileAttacks(square, occupied).union(NEIGHBORS[square]);
+}
+
+export function flyingOxAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return fileAttacks(square, occupied).union(bishopAttacks(square, occupied));
+}
+
+export function freeBoarAttacks(square: Square, occupied: SquareSet): SquareSet {
+  return rankAttacks(square, occupied).union(bishopAttacks(square, occupied));
+}
+
+export function whaleAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+  if (color === 'sente')
+    return fileAttacks(square, occupied).union(
+      bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)])
+    );
+  else
+    return fileAttacks(square, occupied).union(
+      bishopAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)])
+    );
+}
+
+export function whiteHorseAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+  return whaleAttacks(opposite(color), square, occupied);
+}
+
+export function hornedFalconAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+  if (color === 'sente')
+    return bishopAttacks(square, occupied)
+      .union(rookAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
+      .withMany([square, square - 16, square - 32]);
+  else
+    return bishopAttacks(square, occupied)
+      .union(rookAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]))
+      .withMany([square, square + 16, square + 32]);
+}
+
+export function soaringEagleAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+  if (color === 'sente')
+    return rookAttacks(square, occupied)
+      .union(bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
+      .union(computeRange(square, [-15, -17, 0, -30, -34]));
+  else
+    return rookAttacks(square, occupied)
+      .union(bishopAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]))
+      .union(computeRange(square, [15, 17, 0, 30, 34]));
+}
+
+export function lionAttacks(square: Square): SquareSet {
+  return NEIGHBORS[square].union(
+    computeRange(square, [-34, -33, -32, -31, -30, -18, -14, -2, 0, 2, 14, 18, 30, 31, 32, 33, 34])
+  );
 }
 
 export function attacks(piece: Piece, square: Square, occupied: SquareSet): SquareSet {

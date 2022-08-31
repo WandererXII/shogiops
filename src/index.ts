@@ -55,7 +55,9 @@ export {
 
 export { Board } from './board.js';
 
-export { IllegalSetup, Shogi, Position, PositionError, Context } from './shogi.js';
+export { IllegalSetup, Position, PositionError, Context } from './position.js';
+
+export { Shogi } from './shogi.js';
 
 export * as compat from './compat.js';
 

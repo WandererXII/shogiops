@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
 import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
 import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps.js';
-import { Position } from '../../shogi.js';
+import { Position } from '../../position.js';
 import { Color, isDrop, Move, ROLES, Rules, Square } from '../../types.js';
 import { defined, kanjiToRole, parseCoordinates, roleTo1Kanji, roleTo2Kanji } from '../../util.js';
 import { Hand, Hands } from '../../hand.js';

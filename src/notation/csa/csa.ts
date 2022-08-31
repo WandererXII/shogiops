@@ -1,6 +1,6 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
-import { Position } from '../../shogi.js';
+import { Position } from '../../position.js';
 import { Color, isDrop, Move } from '../../types.js';
 import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util.js';
 import { Hand, Hands } from '../../hand.js';

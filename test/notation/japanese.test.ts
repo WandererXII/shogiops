@@ -1,5 +1,4 @@
 import { parseSfen } from '../../src/sfen';
-import { initializePosition } from '../../src/variant';
 import { makeJapaneseMove } from '../../src/notation/japanese';
 import { Shogi } from '../../src/shogi';
 import { parseUsi } from '../../src/util';

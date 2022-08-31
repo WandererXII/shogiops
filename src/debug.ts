@@ -1,8 +1,8 @@
 import { Square, Piece } from './types.js';
 import { makeSquare, makeUsi } from './util.js';
+import { Position } from './position.js';
 import { makePiece } from './sfen.js';
 import { SquareSet } from './squareSet.js';
-import { Position } from './shogi.js';
 import { pieceCanPromote, pieceInDeadZone } from './variantUtil.js';
 
 export function piece(piece: Piece): string {

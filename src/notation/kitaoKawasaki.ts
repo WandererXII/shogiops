@@ -1,5 +1,5 @@
 import { roleTo2Kanji } from '../util.js';
-import { Position } from '../shogi.js';
+import { Position } from '../position.js';
 import { Move, isDrop, Square } from '../types.js';
 import { pieceCanPromote } from '../variantUtil.js';
 import { makeNumberSquare, piecesAiming } from './notationUtil.js';

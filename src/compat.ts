@@ -1,6 +1,6 @@
 import { SquareName, Move, isDrop, Role } from './types.js';
 import { defined, makeSquare, parseUsi } from './util.js';
-import { Position } from './shogi.js';
+import { Position } from './position.js';
 
 export function shogigroundDests(pos: Position): Map<SquareName, SquareName[]> {
   const result = new Map();

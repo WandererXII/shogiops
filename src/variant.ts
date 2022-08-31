@@ -1,6 +1,7 @@
 import { Result } from '@badrap/result';
 import { Color, Role, Rules, Square } from './types.js';
-import { PositionError, Position, IllegalSetup, Context, Shogi } from './shogi.js';
+import { PositionError, Position, IllegalSetup, Context } from './position.js';
+import { Shogi } from './shogi.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { Hands } from './hand.js';

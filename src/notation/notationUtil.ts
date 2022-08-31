@@ -1,4 +1,4 @@
-import { Position } from '../shogi.js';
+import { Position } from '../position.js';
 import { Piece, Square } from '../types.js';
 import { squareFile, squareRank } from '../util.js';
 import { SquareSet } from '../squareSet.js';

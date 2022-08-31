@@ -1,5 +1,5 @@
 import { makeSquare, roleToString } from '../util.js';
-import { Position } from '../shogi.js';
+import { Position } from '../position.js';
 import { Move, isDrop } from '../types.js';
 import { pieceCanPromote } from '../variantUtil.js';
 import { piecesAiming } from './notationUtil.js';

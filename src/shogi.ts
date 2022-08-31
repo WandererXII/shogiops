@@ -13,8 +13,7 @@ import {
   lanceAttacks,
   silverAttacks,
   goldAttacks,
-  horseAttacks,
-  dragonAttacks,
+  attacks,
 } from './attacks.js';
 import { opposite, defined } from './util.js';
 import { Hands } from './hand.js';
@@ -43,22 +42,25 @@ export enum IllegalSetup {
 export class PositionError extends Error {}
 
 function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
+  const defender = opposite(attacker);
   return board[attacker].intersect(
     rookAttacks(square, occupied)
-      .intersect(board.rook)
-      .union(bishopAttacks(square, occupied).intersect(board.bishop))
-      .union(lanceAttacks(opposite(attacker), square, occupied).intersect(board.lance))
-      .union(knightAttacks(opposite(attacker), square).intersect(board.knight))
-      .union(silverAttacks(opposite(attacker), square).intersect(board.silver))
-      .union(goldAttacks(opposite(attacker), square).intersect(board.gold))
-      .union(goldAttacks(opposite(attacker), square).intersect(board.tokin))
-      .union(goldAttacks(opposite(attacker), square).intersect(board.promotedlance))
-      .union(goldAttacks(opposite(attacker), square).intersect(board.promotedknight))
-      .union(goldAttacks(opposite(attacker), square).intersect(board.promotedsilver))
-      .union(horseAttacks(square, occupied).intersect(board.horse))
-      .union(dragonAttacks(square, occupied).intersect(board.dragon))
-      .union(kingAttacks(square).intersect(board.king))
-      .union(pawnAttacks(opposite(attacker), square).intersect(board.pawn))
+      .intersect(board.rook.union(board.dragon))
+      .union(bishopAttacks(square, occupied).intersect(board.bishop.union(board.horse)))
+      .union(lanceAttacks(defender, square, occupied).intersect(board.lance))
+      .union(knightAttacks(defender, square).intersect(board.knight))
+      .union(silverAttacks(defender, square).intersect(board.silver))
+      .union(
+        goldAttacks(defender, square).intersect(
+          board.gold
+            .union(board.tokin)
+            .union(board.promotedlance)
+            .union(board.promotedknight)
+            .union(board.promotedsilver)
+        )
+      )
+      .union(kingAttacks(square).intersect(board.king.union(board.horse).union(board.dragon)))
+      .union(pawnAttacks(defender, square).intersect(board.pawn))
   );
 }
 
@@ -371,25 +373,7 @@ export class Shogi extends Position {
     const piece = this.board.get(square);
     if (!piece || piece.color !== this.turn) return SquareSet.empty();
 
-    let pseudo;
-    if (piece.role === 'pawn') pseudo = pawnAttacks(this.turn, square);
-    else if (piece.role === 'lance') pseudo = lanceAttacks(this.turn, square, this.board.occupied);
-    else if (piece.role === 'knight') pseudo = knightAttacks(this.turn, square);
-    else if (piece.role === 'silver') pseudo = silverAttacks(this.turn, square);
-    else if (
-      piece.role === 'gold' ||
-      piece.role === 'tokin' ||
-      piece.role === 'promotedlance' ||
-      piece.role === 'promotedknight' ||
-      piece.role === 'promotedsilver'
-    )
-      pseudo = goldAttacks(this.turn, square);
-    else if (piece.role === 'bishop') pseudo = bishopAttacks(square, this.board.occupied);
-    else if (piece.role === 'rook') pseudo = rookAttacks(square, this.board.occupied);
-    else if (piece.role === 'horse') pseudo = horseAttacks(square, this.board.occupied);
-    else if (piece.role === 'dragon') pseudo = dragonAttacks(square, this.board.occupied);
-    else pseudo = kingAttacks(square);
-
+    let pseudo = attacks(piece, square, this.board.occupied);
     pseudo = pseudo.diff(this.board[this.turn]);
 
     if (defined(ctx.king)) {

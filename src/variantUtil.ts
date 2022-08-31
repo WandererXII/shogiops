@@ -49,6 +49,7 @@ export function allRoles(rules: Rules): Role[] {
   }
 }
 
+// correct order for sfen export
 export function handRoles(rules: Rules): Role[] {
   switch (rules) {
     case 'minishogi':

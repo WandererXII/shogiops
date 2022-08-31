@@ -3,10 +3,9 @@ import { Piece, Color, Rules } from './types.js';
 import { Board } from './board.js';
 import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
 import { Hand, Hands } from './hand.js';
-import { ROLES } from './types.js';
 import { Position } from './shogi.js';
 import { initializePosition } from './variant.js';
-import { dimensions } from './variantUtil.js';
+import { dimensions, handRoles } from './variantUtil.js';
 
 export enum InvalidSfen {
   Sfen = 'ERR_SFEN',
@@ -173,16 +172,18 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
   return sfen;
 }
 
-export function makeHand(hand: Hand): string {
-  return ROLES.map(role => {
-    const r = roleToString(role);
-    const n = hand[role];
-    return n > 1 ? n + r : n === 1 ? r : '';
-  }).join('');
+export function makeHand(rules: Rules, hand: Hand): string {
+  return handRoles(rules)
+    .map(role => {
+      const r = roleToString(role);
+      const n = hand[role];
+      return n > 1 ? n + r : n === 1 ? r : '';
+    })
+    .join('');
 }
 
-export function makeHands(hands: Hands): string {
-  const handsStr = makeHand(hands.sente).toUpperCase() + makeHand(hands.gote);
+export function makeHands(rules: Rules, hands: Hands): string {
+  const handsStr = makeHand(rules, hands.sente).toUpperCase() + makeHand(rules, hands.gote);
   return handsStr === '' ? '-' : handsStr;
 }
 
@@ -190,7 +191,7 @@ export function makeSfen(pos: Position): string {
   return [
     makeBoardSfen(pos.rules, pos.board),
     toBW(pos.turn),
-    makeHands(pos.hands),
+    makeHands(pos.rules, pos.hands),
     Math.max(1, Math.min(pos.fullmoves, 9999)),
   ].join(' ');
 }

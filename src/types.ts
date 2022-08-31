@@ -38,7 +38,6 @@ export type ByColor<T> = {
   [color in Color]: T;
 };
 
-// correct order for sfen hand exporting
 export const ROLES = [
   'rook',
   'bishop',

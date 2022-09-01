@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Color, Role, Rules, Square } from './types.js';
+import { Color, Role, RulesTypeMap, Square } from './types.js';
 import { PositionError, Position, IllegalSetup, Context } from './position.js';
 import { Shogi } from './shogi.js';
 import { SquareSet } from './squareSet.js';
@@ -8,7 +8,7 @@ import { Hands } from './hand.js';
 
 export { Position, PositionError, IllegalSetup, Context, Shogi };
 
-export function defaultPosition(rules: Rules): Position {
+export function defaultPosition<R extends keyof RulesTypeMap>(rules: R): RulesTypeMap[R] {
   switch (rules) {
     case 'minishogi':
       return Minishogi.default();
@@ -17,14 +17,14 @@ export function defaultPosition(rules: Rules): Position {
   }
 }
 
-export function initializePosition(
-  rules: Rules,
+export function initializePosition<R extends keyof RulesTypeMap>(
+  rules: R,
   board: Board,
   hands: Hands,
   turn: Color,
   moveNumber: number,
   strict = true
-): Result<Position, PositionError> {
+): Result<RulesTypeMap[R], PositionError> {
   switch (rules) {
     case 'minishogi':
       return Minishogi.initialize(board, hands, turn, moveNumber, strict);

@@ -1,3 +1,6 @@
+import { Shogi } from './shogi';
+import { Minishogi } from './variant';
+
 export const FILE_NAMES = [
   '1',
   '2',
@@ -88,6 +91,10 @@ export function isNormal(v: Move): v is NormalMove {
 
 export const RULES = ['standard', 'minishogi'] as const;
 export type Rules = typeof RULES[number];
+export interface RulesTypeMap {
+  standard: Shogi;
+  minishogi: Minishogi;
+}
 
 export interface Outcome {
   winner: Color | undefined;

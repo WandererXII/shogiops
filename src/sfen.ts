@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Piece, Color, Rules } from './types.js';
+import { Piece, Color, Rules, RulesTypeMap } from './types.js';
 import { Board } from './board.js';
 import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
 import { Hand, Hands } from './hand.js';
@@ -95,7 +95,11 @@ export function parseHands(handsPart: string): Result<Hands, SfenError> {
   return Result.ok(hands);
 }
 
-export function parseSfen(rules: Rules, sfen: string, strict?: boolean): Result<Position, SfenError> {
+export function parseSfen<R extends keyof RulesTypeMap>(
+  rules: R,
+  sfen: string,
+  strict?: boolean
+): Result<RulesTypeMap[R], SfenError> {
   const parts = sfen.split(' ');
 
   // Board

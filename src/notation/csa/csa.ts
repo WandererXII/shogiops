@@ -1,10 +1,10 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
-import { Position } from '../../position.js';
+import { Shogi } from '../../shogi.js';
 import { Color, isDrop, Move } from '../../types.js';
 import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util.js';
 import { Hand, Hands } from '../../hand.js';
-import { allRoles, dimensions, handRoles, promote } from '../../variantUtil.js';
+import { allRoles, handRoles, promote } from '../../variantUtil.js';
 import { makeNumberSquare, parseNumberSquare } from '../notationUtil.js';
 import { initializePosition } from '../../variant.js';
 
@@ -25,7 +25,7 @@ export enum InvalidCsa {
 export class CsaError extends Error {}
 
 // exporting handicaps differently is prob not worth it, so let's always go with the whole board
-export function makeCsaHeader(pos: Position): string {
+export function makeCsaHeader(pos: Shogi): string {
   return [
     makeCsaBoard(pos.board),
     makeCsaHand(pos.hands.sente, 'P+'),
@@ -70,7 +70,7 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
 }
 
 // Import
-export function parseCsaHeader(csa: string): Result<Position, CsaError> {
+export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
   const lines = normalizedCsaLines(csa);
   const handicap = lines.find(l => l.startsWith('PI'));
   const isWholeBoard = lines.some(l => l.startsWith('P1'));
@@ -127,7 +127,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   return Result.ok(board);
 }
 
-function parseAdditions(initialPos: Position, additions: string[]): Result<Position, CsaError> {
+function parseAdditions(initialPos: Shogi, additions: string[]): Result<Shogi, CsaError> {
   for (const line of additions) {
     const color: Color = line[1] === '+' ? 'sente' : 'gote';
     for (const sp of line.substring(2).match(/.{4}/g) || []) {
@@ -166,7 +166,7 @@ export function normalizedCsaLines(csa: string): string[] {
 //
 
 // Parsing CSA moves
-export function parseCsaMove(pos: Position, csaMove: string): Move | undefined {
+export function parseCsaMove(pos: Shogi, csaMove: string): Move | undefined {
   // Normal move
   const match = csaMove.match(/(?:[\+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/);
   if (!match) {
@@ -188,7 +188,7 @@ export function parseCsaMove(pos: Position, csaMove: string): Move | undefined {
   };
 }
 
-export function parseCsaMoves(pos: Position, csaMoves: string[]): Move[] {
+export function parseCsaMoves(pos: Shogi, csaMoves: string[]): Move[] {
   pos = pos.clone();
   const moves: Move[] = [];
   for (const m of csaMoves) {
@@ -201,7 +201,7 @@ export function parseCsaMoves(pos: Position, csaMoves: string[]): Move[] {
 }
 
 // Making CSA formatted moves
-export function makeCsaMove(pos: Position, move: Move): string | undefined {
+export function makeCsaMove(pos: Shogi, move: Move): string | undefined {
   if (isDrop(move)) {
     return '00' + makeNumberSquare(move.to) + roleToCsa(move.role);
   } else {

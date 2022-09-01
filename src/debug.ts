@@ -1,22 +1,21 @@
-import { Square, Piece } from './types.js';
+import { Square, Role } from './types.js';
 import { makeSquare, makeUsi } from './util.js';
 import { Position } from './position.js';
-import { makePiece } from './sfen.js';
 import { SquareSet } from './squareSet.js';
 import { pieceCanPromote, pieceInDeadZone } from './variantUtil.js';
 
-export function piece(piece: Piece): string {
-  return makePiece(piece);
-}
-
-export function square(sq: Square): string {
-  return makeSquare(sq);
-}
-
-export function dests(dests: Map<Square, SquareSet>): string {
+export function moveDests(moveDests: Map<Square, SquareSet>): string {
   const lines = [];
-  for (const [from, to] of dests) {
-    lines.push(`${makeSquare(from)}: ${Array.from(to, square).join(' ')}`);
+  for (const [from, to] of moveDests) {
+    lines.push(`${makeSquare(from)}: ${Array.from(to, makeSquare).join(' ')}`);
+  }
+  return lines.join('\n');
+}
+
+export function dropDests(dropDests: Map<Role, SquareSet>): string {
+  const lines = [];
+  for (const [role, to] of dropDests) {
+    lines.push(`${role}: ${Array.from(to, makeSquare).join(' ')}`);
   }
   return lines.join('\n');
 }
@@ -24,12 +23,9 @@ export function dests(dests: Map<Square, SquareSet>): string {
 export function perft(pos: Position, depth: number, log = false): number {
   if (depth < 1) return 1;
 
-  const ctx = pos.ctx();
-  const dropDests = pos.allDropDests(ctx);
-
   let nodes = 0;
-  for (const [from, dests] of pos.allDests(ctx)) {
-    for (const to of dests) {
+  for (const [from, moveDests] of pos.allMoveDests()) {
+    for (const to of moveDests) {
       const promotions: Array<boolean> = [];
       const piece = pos.board.get(from)!;
       if (pieceCanPromote(pos.rules)(piece, from, to)) {
@@ -47,7 +43,7 @@ export function perft(pos: Position, depth: number, log = false): number {
       }
     }
   }
-  for (const [role, dropDestsOfRole] of dropDests) {
+  for (const [role, dropDestsOfRole] of pos.allDropDests()) {
     for (const to of dropDestsOfRole) {
       const child = pos.clone();
       const move = { role, to };

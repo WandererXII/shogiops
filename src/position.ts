@@ -24,7 +24,6 @@ export enum IllegalSetup {
   InvalidPiecesHand = 'ERR_INVALID_PIECE_IN_HAND',
   InvalidPiecesPromotionZone = 'ERR_PIECES_MUST_PROMOTE',
   Kings = 'ERR_KINGS',
-  Variant = 'ERR_VARIANT',
 }
 
 export class PositionError extends Error {}
@@ -56,7 +55,6 @@ export interface Context {
   king: Square | undefined;
   blockers: SquareSet;
   checkers: SquareSet;
-  variantEnd: boolean;
   mustCapture: boolean;
 }
 
@@ -77,8 +75,6 @@ export abstract class Position {
 
   abstract dropDests(role: Role, ctx?: Context): SquareSet;
   abstract dests(square: Square, ctx?: Context): SquareSet;
-  abstract isVariantEnd(): boolean;
-  abstract variantOutcome(ctx?: Context): Outcome | undefined;
   abstract hasInsufficientMaterial(color: Color): boolean;
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
@@ -91,14 +87,12 @@ export abstract class Position {
   }
 
   ctx(): Context {
-    const variantEnd = this.isVariantEnd();
     const king = this.board.kingOf(this.turn);
     if (!defined(king))
       return {
         king,
         blockers: SquareSet.empty(),
         checkers: SquareSet.empty(),
-        variantEnd,
         mustCapture: false,
       };
     const snipers = rookAttacks(king, SquareSet.empty())
@@ -116,7 +110,6 @@ export abstract class Position {
       king,
       blockers,
       checkers,
-      variantEnd,
       mustCapture: false,
     };
   }
@@ -181,23 +174,20 @@ export abstract class Position {
   }
 
   isEnd(ctx?: Context): boolean {
-    if (ctx ? ctx.variantEnd : this.isVariantEnd()) return true;
     return this.isInsufficientMaterial() || !this.hasDests(ctx);
   }
 
   isCheckmate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
-    return !ctx.variantEnd && ctx.checkers.nonEmpty() && !this.hasDests(ctx);
+    return ctx.checkers.nonEmpty() && !this.hasDests(ctx);
   }
 
   isStalemate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
-    return !ctx.variantEnd && ctx.checkers.isEmpty() && !this.hasDests(ctx);
+    return ctx.checkers.isEmpty() && !this.hasDests(ctx);
   }
 
   outcome(ctx?: Context): Outcome | undefined {
-    const variantOutcome = this.variantOutcome(ctx);
-    if (defined(variantOutcome)) return variantOutcome;
     ctx = ctx || this.ctx();
     const checkmateStalemate = this.isCheckmate(ctx) || this.isStalemate(ctx);
     if (checkmateStalemate && !(this.lastMove && isDrop(this.lastMove) && this.lastMove.role === 'pawn'))
@@ -210,7 +200,6 @@ export abstract class Position {
   allDests(ctx?: Context): Map<Square, SquareSet> {
     ctx = ctx || this.ctx();
     const d = new Map();
-    if (ctx.variantEnd) return d;
     for (const square of this.board[this.turn]) {
       d.set(square, this.dests(square, ctx));
     }
@@ -220,7 +209,6 @@ export abstract class Position {
   allDropDests(ctx?: Context): Map<Role, SquareSet> {
     ctx = ctx || this.ctx();
     const d = new Map();
-    if (ctx.variantEnd) return d;
     for (const prole of handRoles(this.rules)) {
       if (this.hands[this.turn][prole] > 0) d.set(prole, this.dropDests(prole, ctx));
       else d.set(prole, SquareSet.empty());

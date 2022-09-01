@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Rules, Color, Square, Outcome, Role } from './types.js';
+import { Rules, Color, Square, Role } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { between, ray, attacks } from './attacks.js';
@@ -113,7 +113,6 @@ export class Shogi extends Position {
 
   dests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
-    if (ctx.variantEnd) return SquareSet.empty();
     const piece = this.board.get(square);
     if (!piece || piece.color !== this.turn) return SquareSet.empty();
 
@@ -138,14 +137,6 @@ export class Shogi extends Position {
       if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     }
     return pseudo.intersect(new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]));
-  }
-
-  isVariantEnd(): boolean {
-    return false;
-  }
-
-  variantOutcome(_ctx?: Context): Outcome | undefined {
-    return;
   }
 
   hasInsufficientMaterial(color: Color): boolean {

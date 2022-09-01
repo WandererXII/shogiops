@@ -111,7 +111,7 @@ export class Shogi extends Position {
     } else return mask;
   }
 
-  dests(square: Square, ctx?: Context): SquareSet {
+  moveDests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
     const piece = this.board.get(square);
     if (!piece || piece.color !== this.turn) return SquareSet.empty();

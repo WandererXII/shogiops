@@ -1,10 +1,10 @@
 import { Shogi } from '../src/shogi';
-import { shogigroundDests, shogigroundDropDests } from '../src/compat';
+import { shogigroundMoveDests, shogigroundDropDests } from '../src/compat';
 import { parseSfen } from '../src/sfen';
 
 test('shogiground dests', () => {
   const pos = Shogi.default();
-  const dests = shogigroundDests(pos);
+  const dests = shogigroundMoveDests(pos);
   expect(dests.get('7g')).toContain('7f');
   expect(dests.get('5i')).toContain('6h');
   expect(dests.get('5i')).not.toContain('6i');

@@ -2,10 +2,10 @@ import { SquareName, Move, isDrop, Role } from './types.js';
 import { defined, makeSquare, parseUsi } from './util.js';
 import { Position } from './position.js';
 
-export function shogigroundDests(pos: Position): Map<SquareName, SquareName[]> {
+export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[]> {
   const result = new Map();
   const ctx = pos.ctx();
-  for (const [from, squares] of pos.allDests(ctx)) {
+  for (const [from, squares] of pos.allMoveDests(ctx)) {
     if (squares.nonEmpty()) {
       const d = Array.from(squares, s => makeSquare(s));
       result.set(makeSquare(from), d);

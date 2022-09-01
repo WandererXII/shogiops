@@ -7,7 +7,7 @@ export function piecesAiming(pos: Position, piece: Piece, to: Square): SquareSet
   // Disambiguation
   let pieces = SquareSet.empty();
   for (const s of pos.board.pieces(pos.turn, piece.role))
-    if (pos.dests(s).has(to)) pieces = pieces.union(SquareSet.fromSquare(s));
+    if (pos.moveDests(s).has(to)) pieces = pieces.union(SquareSet.fromSquare(s));
   return pieces;
 }
 

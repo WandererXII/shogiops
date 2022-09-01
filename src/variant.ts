@@ -61,8 +61,8 @@ export class Minishogi extends Shogi {
     return super.clone() as Minishogi;
   }
 
-  dests(square: Square, ctx?: Context): SquareSet {
-    return super.dests(square, ctx).intersect(new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]));
+  moveDests(square: Square, ctx?: Context): SquareSet {
+    return super.moveDests(square, ctx).intersect(new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]));
   }
 
   dropDests(role: Role, ctx?: Context): SquareSet {

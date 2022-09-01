@@ -73,8 +73,8 @@ export abstract class Position {
   // - static initialize()
   // - Proper signature for clone()
 
+  abstract moveDests(square: Square, ctx?: Context): SquareSet;
   abstract dropDests(role: Role, ctx?: Context): SquareSet;
-  abstract dests(square: Square, ctx?: Context): SquareSet;
   abstract hasInsufficientMaterial(color: Color): boolean;
 
   protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
@@ -142,7 +142,7 @@ export abstract class Position {
   hasDests(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     for (const square of this.board[this.turn]) {
-      if (this.dests(square, ctx).nonEmpty()) return true;
+      if (this.moveDests(square, ctx).nonEmpty()) return true;
     }
     for (const prole of handRoles(this.rules)) {
       if (this.hands[this.turn][prole] > 0 && this.dropDests(prole, ctx).nonEmpty()) return true;
@@ -163,8 +163,8 @@ export abstract class Position {
       if (move.promotion && !pieceCanPromote(this.rules)(piece, move.from, move.to)) return false;
       if (!move.promotion && pieceInDeadZone(this.rules)(piece, move.to)) return false;
 
-      const dests = this.dests(move.from, ctx);
-      return dests.has(move.to);
+      const moveDests = this.moveDests(move.from, ctx);
+      return moveDests.has(move.to);
     }
   }
 
@@ -197,11 +197,11 @@ export abstract class Position {
     else return;
   }
 
-  allDests(ctx?: Context): Map<Square, SquareSet> {
+  allMoveDests(ctx?: Context): Map<Square, SquareSet> {
     ctx = ctx || this.ctx();
     const d = new Map();
     for (const square of this.board[this.turn]) {
-      d.set(square, this.dests(square, ctx));
+      d.set(square, this.moveDests(square, ctx));
     }
     return d;
   }

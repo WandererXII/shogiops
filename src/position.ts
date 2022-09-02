@@ -4,7 +4,7 @@ import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { between, ray } from './attacks.js';
 import { opposite, defined } from './util.js';
-import { Hands } from './hand.js';
+import { Hands } from './hands.js';
 import { allRoles, handRoles, pieceCanPromote, pieceInDeadZone, promote, unpromote } from './variantUtil.js';
 
 export enum IllegalSetup {

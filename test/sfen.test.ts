@@ -1,7 +1,7 @@
 import { parseSfen, makeSfen, makeBoardSfen, initialSfen } from '../src/sfen';
 import { Board } from '../src/board';
 import { defaultPosition } from '../src/variant';
-import { Hands } from '../src/hand';
+import { Hands } from '../src/hands';
 
 test('make board sfen', () => {
   expect(makeBoardSfen('standard', Board.default())).toEqual(initialSfen('standard').split(' ')[0]);

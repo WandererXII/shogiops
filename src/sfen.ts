@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Piece, Color, Rules, RulesTypeMap } from './types.js';
 import { Board } from './board.js';
 import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
-import { Hand, Hands } from './hand.js';
+import { Hand, Hands } from './hands.js';
 import { Position } from './position.js';
 import { initializePosition } from './variant.js';
 import { dimensions, handRoles } from './variantUtil.js';

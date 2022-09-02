@@ -67,7 +67,7 @@ export * as sfen from './sfen.js';
 
 export * as handicaps from './notation/kif/kifHandicaps.js';
 
-export * as hand from './hand.js';
+export * as hands from './hands.js';
 
 export * as japanese from './notation/japanese.js';
 

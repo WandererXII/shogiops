@@ -4,7 +4,7 @@ import { PositionError, Position, Context } from './position.js';
 import { pseudoDropDests, pseudoMoveDests, Shogi } from './shogi.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
-import { Hands } from './hand.js';
+import { Hands } from './hands.js';
 import { opposite } from './util.js';
 import { bishopAttacks, goldAttacks, kingAttacks, pawnAttacks, rookAttacks, silverAttacks } from './attacks.js';
 

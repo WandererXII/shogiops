@@ -3,7 +3,7 @@ import { Board } from '../../board.js';
 import { Shogi } from '../../shogi.js';
 import { Color, isDrop, Move } from '../../types.js';
 import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util.js';
-import { Hand, Hands } from '../../hand.js';
+import { Hand, Hands } from '../../hands.js';
 import { allRoles, handRoles, promote } from '../../variantUtil.js';
 import { makeNumberSquare, parseNumberSquare } from '../notationUtil.js';
 import { initializePosition } from '../../variant.js';

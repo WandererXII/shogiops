@@ -5,7 +5,7 @@ import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps.js';
 import { Position } from '../../position.js';
 import { Color, isDrop, Move, ROLES, Rules, Square } from '../../types.js';
 import { defined, kanjiToRole, parseCoordinates, roleTo1Kanji, roleTo2Kanji } from '../../util.js';
-import { Hand, Hands } from '../../hand.js';
+import { Hand, Hands } from '../../hands.js';
 import { allRoles, dimensions, handRoles, promote } from '../../variantUtil.js';
 import {
   kanjiToNumber,

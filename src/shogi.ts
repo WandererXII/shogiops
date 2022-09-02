@@ -16,7 +16,7 @@ import {
   pawnAttacks,
 } from './attacks.js';
 import { opposite, defined, squareFile } from './util.js';
-import { Hands } from './hand.js';
+import { Hands } from './hands.js';
 import { backrank, secondBackrank } from './variantUtil.js';
 import { Context, Position, PositionError } from './position.js';
 

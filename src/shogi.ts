@@ -57,11 +57,11 @@ export class Shogi extends Position {
       rookAttacks(square, occupied)
         .intersect(board.rook.union(board.dragon))
         .union(bishopAttacks(square, occupied).intersect(board.bishop.union(board.horse)))
-        .union(lanceAttacks(defender, square, occupied).intersect(board.lance))
-        .union(knightAttacks(defender, square).intersect(board.knight))
-        .union(silverAttacks(defender, square).intersect(board.silver))
+        .union(lanceAttacks(square, defender, occupied).intersect(board.lance))
+        .union(knightAttacks(square, defender).intersect(board.knight))
+        .union(silverAttacks(square, defender).intersect(board.silver))
         .union(
-          goldAttacks(defender, square).intersect(
+          goldAttacks(square, defender).intersect(
             board.gold
               .union(board.tokin)
               .union(board.promotedlance)
@@ -70,7 +70,7 @@ export class Shogi extends Position {
           )
         )
         .union(kingAttacks(square).intersect(board.king.union(board.dragon).union(board.horse)))
-        .union(pawnAttacks(defender, square).intersect(board.pawn))
+        .union(pawnAttacks(square, defender).intersect(board.pawn))
     );
   }
 
@@ -79,7 +79,7 @@ export class Shogi extends Position {
     return rookAttacks(square, empty)
       .intersect(this.board.rook.union(this.board.dragon))
       .union(bishopAttacks(square, empty).intersect(this.board.bishop.union(this.board.horse)))
-      .union(lanceAttacks(opposite(attacker), square, empty).intersect(this.board.lance))
+      .union(lanceAttacks(square, opposite(attacker), empty).intersect(this.board.lance))
       .intersect(this.board[attacker]);
   }
 

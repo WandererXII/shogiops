@@ -1,5 +1,5 @@
-import { Shogi } from './shogi';
-import { Minishogi } from './variant';
+import { Shogi } from './shogi.js';
+import { Minishogi } from './variant.js';
 
 export const FILE_NAMES = [
   '1',

@@ -78,9 +78,9 @@ export class Minishogi extends Position {
       rookAttacks(square, occupied)
         .intersect(board.rook.union(board.dragon))
         .union(bishopAttacks(square, occupied).intersect(board.bishop.union(board.horse)))
-        .union(goldAttacks(defender, square).intersect(board.gold.union(board.tokin).union(board.promotedsilver)))
-        .union(silverAttacks(defender, square).intersect(board.silver))
-        .union(pawnAttacks(defender, square).intersect(board.pawn))
+        .union(goldAttacks(square, defender).intersect(board.gold.union(board.tokin).union(board.promotedsilver)))
+        .union(silverAttacks(square, defender).intersect(board.silver))
+        .union(pawnAttacks(square, defender).intersect(board.pawn))
         .union(kingAttacks(square).intersect(board.king.union(board.dragon).union(board.horse)))
     );
   }

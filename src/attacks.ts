@@ -67,22 +67,22 @@ export function kingAttacks(square: Square): SquareSet {
   return NEIGHBORS[square];
 }
 
-export function knightAttacks(color: Color, square: Square): SquareSet {
+export function knightAttacks(square: Square, color: Color): SquareSet {
   if (color === 'sente') return computeRange(square, [-31, -33]);
   else return computeRange(square, [31, 33]);
 }
 
-export function silverAttacks(color: Color, square: Square): SquareSet {
+export function silverAttacks(square: Square, color: Color): SquareSet {
   if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 16, square - 1, square + 1]);
   else return NEIGHBORS[square].withoutMany([square - 16, square - 1, square + 1]);
 }
 
-export function goldAttacks(color: Color, square: Square): SquareSet {
+export function goldAttacks(square: Square, color: Color): SquareSet {
   if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 17, square + 15]);
   else return NEIGHBORS[square].withoutMany([square - 17, square - 15]);
 }
 
-export function pawnAttacks(color: Color, square: Square): SquareSet {
+export function pawnAttacks(square: Square, color: Color): SquareSet {
   if (color === 'sente') return SquareSet.fromSquare(square - 16);
   else return SquareSet.fromSquare(square + 16);
 }
@@ -96,7 +96,7 @@ export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
   return fileAttacks(square, occupied).xor(rankAttacks(square, occupied));
 }
 
-export function lanceAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+export function lanceAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente') return fileAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]);
   else return fileAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]);
 }
@@ -127,7 +127,7 @@ export function verticalMoverAttacks(square: Square, occupied: SquareSet): Squar
   return fileAttacks(square, occupied).union(computeRange(square, [-1, 1]));
 }
 
-export function copperAttacks(color: Color, square: Square): SquareSet {
+export function copperAttacks(square: Square, color: Color): SquareSet {
   if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 17, square + 15, square + 1, square - 1]);
   else return NEIGHBORS[square].withoutMany([square - 17, square - 15, square - 1, square + 1]);
 }
@@ -136,13 +136,13 @@ export function ferociousLeopardAttacks(square: Square): SquareSet {
   return NEIGHBORS[square].withoutMany([square + 1, square - 1]);
 }
 
-export function blindTigerAttacks(color: Color, square: Square): SquareSet {
+export function blindTigerAttacks(square: Square, color: Color): SquareSet {
   if (color === 'sente') return NEIGHBORS[square].without(square - 16);
   else return NEIGHBORS[square].without(square + 16);
 }
 
-export function drunkElephantAttacks(color: Color, square: Square): SquareSet {
-  return blindTigerAttacks(opposite(color), square);
+export function drunkElephantAttacks(square: Square, color: Color): SquareSet {
+  return blindTigerAttacks(square, opposite(color));
 }
 
 export function kirinAttacks(square: Square): SquareSet {
@@ -173,7 +173,7 @@ export function freeBoarAttacks(square: Square, occupied: SquareSet): SquareSet 
   return rankAttacks(square, occupied).union(bishopAttacks(square, occupied));
 }
 
-export function whaleAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+export function whaleAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return fileAttacks(square, occupied).union(
       bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)])
@@ -184,11 +184,11 @@ export function whaleAttacks(color: Color, square: Square, occupied: SquareSet):
     );
 }
 
-export function whiteHorseAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
-  return whaleAttacks(opposite(color), square, occupied);
+export function whiteHorseAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
+  return whaleAttacks(square, opposite(color), occupied);
 }
 
-export function hornedFalconAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+export function hornedFalconAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return bishopAttacks(square, occupied)
       .union(rookAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
@@ -199,7 +199,7 @@ export function hornedFalconAttacks(color: Color, square: Square, occupied: Squa
       .withMany([square, square + 16, square + 32]);
 }
 
-export function soaringEagleAttacks(color: Color, square: Square, occupied: SquareSet): SquareSet {
+export function soaringEagleAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return rookAttacks(square, occupied)
       .union(bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
@@ -219,19 +219,19 @@ export function lionAttacks(square: Square): SquareSet {
 export function attacks(piece: Piece, square: Square, occupied: SquareSet): SquareSet {
   switch (piece.role) {
     case 'pawn':
-      return pawnAttacks(piece.color, square);
+      return pawnAttacks(square, piece.color);
     case 'lance':
-      return lanceAttacks(piece.color, square, occupied);
+      return lanceAttacks(square, piece.color, occupied);
     case 'knight':
-      return knightAttacks(piece.color, square);
+      return knightAttacks(square, piece.color);
     case 'silver':
-      return silverAttacks(piece.color, square);
+      return silverAttacks(square, piece.color);
     case 'promotedknight':
     case 'promotedlance':
     case 'promotedsilver':
     case 'tokin':
     case 'gold':
-      return goldAttacks(piece.color, square);
+      return goldAttacks(square, piece.color);
     case 'bishop':
       return bishopAttacks(square, occupied);
     case 'rook':

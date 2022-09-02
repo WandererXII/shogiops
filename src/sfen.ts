@@ -12,7 +12,7 @@ export enum InvalidSfen {
   Board = 'ERR_BOARD',
   Hands = 'ERR_HANDS',
   Turn = 'ERR_TURN',
-  Fullmoves = 'ERR_FULLMOVES',
+  MoveNumber = 'ERR_MOVENUMBER',
 }
 
 export function initialSfen(rules: Rules): string {
@@ -120,15 +120,15 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   else hands = parseHands(handsPart);
 
   // Turn
-  const fullmovesPart = parts.shift();
-  const fullmoves = defined(fullmovesPart) ? parseSmallUint(fullmovesPart) : 1;
-  if (!defined(fullmoves)) return Result.err(new SfenError(InvalidSfen.Fullmoves));
+  const moveNumberPart = parts.shift();
+  const moveNumber = defined(moveNumberPart) ? parseSmallUint(moveNumberPart) : 1;
+  if (!defined(moveNumber)) return Result.err(new SfenError(InvalidSfen.MoveNumber));
 
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
 
   return board.chain(board =>
     hands.chain(hands => {
-      return initializePosition(rules, board, hands, turn, Math.max(1, fullmoves), strict);
+      return initializePosition(rules, board, hands, turn, Math.max(1, moveNumber), strict);
     })
   );
 }
@@ -196,6 +196,6 @@ export function makeSfen(pos: Position): string {
     makeBoardSfen(pos.rules, pos.board),
     toBW(pos.turn),
     makeHands(pos.rules, pos.hands),
-    Math.max(1, Math.min(pos.fullmoves, 9999)),
+    Math.max(1, Math.min(pos.moveNumber, 9999)),
   ].join(' ');
 }

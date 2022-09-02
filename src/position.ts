@@ -29,7 +29,7 @@ export abstract class Position {
   board: Board;
   hands: Hands;
   turn: Color;
-  fullmoves: number;
+  moveNumber: number;
   lastMove: Move | undefined;
 
   protected fullSquareSet: SquareSet;
@@ -118,7 +118,7 @@ export abstract class Position {
     pos.board = this.board.clone();
     pos.hands = this.hands.clone();
     pos.turn = this.turn;
-    pos.fullmoves = this.fullmoves;
+    pos.moveNumber = this.moveNumber;
     pos.lastMove = this.lastMove;
     return pos;
   }
@@ -209,7 +209,7 @@ export abstract class Position {
   play(move: Move): void {
     const turn = this.turn;
 
-    this.fullmoves += 1;
+    this.moveNumber += 1;
     this.turn = opposite(turn);
     this.lastMove = move;
 

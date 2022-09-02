@@ -17,7 +17,7 @@ test('parse initial sfen', () => {
   expect(pos.board).toEqual(Board.default());
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
-  expect(pos.fullmoves).toEqual(1);
+  expect(pos.moveNumber).toEqual(1);
 });
 
 test('partial sfen', () => {
@@ -25,7 +25,7 @@ test('partial sfen', () => {
   expect(pos.board).toEqual(Board.default());
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
-  expect(pos.fullmoves).toEqual(1);
+  expect(pos.moveNumber).toEqual(1);
 });
 
 test.each([

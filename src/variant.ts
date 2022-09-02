@@ -44,7 +44,7 @@ export class Minishogi extends Position {
     pos.board = Board.minishogi();
     pos.hands = Hands.empty();
     pos.turn = 'sente';
-    pos.fullmoves = 1;
+    pos.moveNumber = 1;
     return pos;
   }
 
@@ -59,7 +59,7 @@ export class Minishogi extends Position {
     pos.board = board.clone();
     pos.hands = hands.clone();
     pos.turn = turn;
-    pos.fullmoves = moveNumber;
+    pos.moveNumber = moveNumber;
     return pos.validate(strict).map(_ => pos);
   }
 

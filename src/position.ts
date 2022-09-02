@@ -1,17 +1,8 @@
-import { Rules, Color, COLORS, Square, Move, isDrop, Piece, Outcome, Role } from './types.js';
+import { Result } from '@badrap/result';
+import { Rules, Color, COLORS, Square, Move, isDrop, Outcome, Role } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
-import {
-  bishopAttacks,
-  rookAttacks,
-  knightAttacks,
-  kingAttacks,
-  pawnAttacks,
-  between,
-  lanceAttacks,
-  silverAttacks,
-  goldAttacks,
-} from './attacks.js';
+import { between, ray } from './attacks.js';
 import { opposite, defined } from './util.js';
 import { Hands } from './hand.js';
 import { allRoles, handRoles, pieceCanPromote, pieceInDeadZone, promote, unpromote } from './variantUtil.js';
@@ -28,34 +19,10 @@ export enum IllegalSetup {
 
 export class PositionError extends Error {}
 
-function attacksTo(square: Square, attacker: Color, board: Board, occupied: SquareSet): SquareSet {
-  const defender = opposite(attacker);
-  return board[attacker].intersect(
-    rookAttacks(square, occupied)
-      .intersect(board.rook.union(board.dragon))
-      .union(bishopAttacks(square, occupied).intersect(board.bishop.union(board.horse)))
-      .union(lanceAttacks(defender, square, occupied).intersect(board.lance))
-      .union(knightAttacks(defender, square).intersect(board.knight))
-      .union(silverAttacks(defender, square).intersect(board.silver))
-      .union(
-        goldAttacks(defender, square).intersect(
-          board.gold
-            .union(board.tokin)
-            .union(board.promotedlance)
-            .union(board.promotedknight)
-            .union(board.promotedsilver)
-        )
-      )
-      .union(kingAttacks(square).intersect(board.king.union(board.horse).union(board.dragon)))
-      .union(pawnAttacks(defender, square).intersect(board.pawn))
-  );
-}
-
 export interface Context {
   king: Square | undefined;
   blockers: SquareSet;
   checkers: SquareSet;
-  mustCapture: boolean;
 }
 
 export abstract class Position {
@@ -65,25 +32,63 @@ export abstract class Position {
   fullmoves: number;
   lastMove: Move | undefined;
 
+  protected fullSquareSet: SquareSet;
+
   protected constructor(readonly rules: Rules) {}
 
   // When subclassing:
-
+  // - private constructor()
   // - static default()
-  // - static initialize()
-  // - Proper signature for clone()
+  // - static initialize(
+  //     board: Board,
+  //     hands: Hands,
+  //     turn: Color,
+  //     moveNumber: number,
+  //     strict?: boolean
+  //   )
 
   abstract moveDests(square: Square, ctx?: Context): SquareSet;
   abstract dropDests(role: Role, ctx?: Context): SquareSet;
-  abstract hasInsufficientMaterial(color: Color): boolean;
 
-  protected kingAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
-    return attacksTo(square, attacker, this.board, occupied);
+  abstract hasInsufficientMaterial(color: Color): boolean;
+  // Attackers' pieces attacking square - useful for checks for example
+  abstract squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet;
+
+  // Attackers' long-range pieces at least x-raying square - for finding blockers
+  protected abstract squareSnipers(square: Square, attacker: Color): SquareSet;
+
+  protected validate(strict?: boolean): Result<undefined, PositionError> {
+    if (!strict) return Result.ok(undefined);
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+    if (this.board.king.size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
+
+    const otherKing = this.board.kingOf(opposite(this.turn));
+    if (defined(otherKing) && this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
+      return Result.err(new PositionError(IllegalSetup.OppositeCheck));
+
+    for (const rn of this.hands.sente)
+      if (!handRoles(this.rules).includes(rn[0])) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+    for (const rn of this.hands.gote)
+      if (!handRoles(this.rules).includes(rn[0])) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+
+    for (const sp of this.board) {
+      if (!allRoles(this.rules).includes(sp[1].role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
+      if (pieceInDeadZone(this.rules)(sp[1], sp[0]))
+        return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
+    }
+
+    return this.validateCheckers();
   }
 
-  protected playCaptureAt(captured: Piece): void {
-    const unpromotedRole = unpromote(this.rules)(captured.role) || captured.role;
-    this.hands[opposite(captured.color)][unpromotedRole]++;
+  protected validateCheckers(): Result<undefined, PositionError> {
+    const ourKing = this.board.kingOf(this.turn);
+    if (defined(ourKing)) {
+      // Multiple sliding checkers aligned with king.
+      const checkers = this.squareAttackers(ourKing, opposite(this.turn), this.board.occupied);
+      if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
+        return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
+    }
+    return Result.ok(undefined);
   }
 
   ctx(): Context {
@@ -93,30 +98,22 @@ export abstract class Position {
         king,
         blockers: SquareSet.empty(),
         checkers: SquareSet.empty(),
-        mustCapture: false,
       };
-    const snipers = rookAttacks(king, SquareSet.empty())
-      .intersect(this.board.rook.union(this.board.dragon))
-      .union(bishopAttacks(king, SquareSet.empty()).intersect(this.board.bishop.union(this.board.horse)))
-      .union(lanceAttacks(this.turn, king, SquareSet.empty()).intersect(this.board.lance))
-      .intersect(this.board[opposite(this.turn)]);
+    const snipers = this.squareSnipers(king, opposite(this.turn));
     let blockers = SquareSet.empty();
     for (const sniper of snipers) {
       const b = between(king, sniper).intersect(this.board.occupied);
       if (!b.moreThanOne()) blockers = blockers.union(b);
     }
-    const checkers = this.kingAttackers(king, opposite(this.turn), this.board.occupied);
+    const checkers = this.squareAttackers(king, opposite(this.turn), this.board.occupied);
     return {
       king,
       blockers,
       checkers,
-      mustCapture: false,
     };
   }
 
-  // The following should be identical in all subclasses
-
-  clone(): Position {
+  clone(): this {
     const pos = new (this as any).constructor();
     pos.board = this.board.clone();
     pos.hands = this.hands.clone();
@@ -124,15 +121,6 @@ export abstract class Position {
     pos.fullmoves = this.fullmoves;
     pos.lastMove = this.lastMove;
     return pos;
-  }
-
-  equalsIgnoreMoves(other: Position): boolean {
-    return (
-      this.rules === other.rules &&
-      this.board.equals(other.board) &&
-      this.hands.equals(other.hands) &&
-      this.turn === other.turn
-    );
   }
 
   isInsufficientMaterial(): boolean {
@@ -153,7 +141,7 @@ export abstract class Position {
   isLegal(move: Move, ctx?: Context): boolean {
     if (isDrop(move)) {
       const role = move.role;
-      if (!defined(role) || !handRoles(this.rules).includes(role) || this.hands[this.turn][role] <= 0) return false;
+      if (!handRoles(this.rules).includes(role) || this.hands[this.turn][role] <= 0) return false;
       return this.dropDests(role, ctx).has(move.to);
     } else {
       const piece = this.board.get(move.from);
@@ -168,9 +156,10 @@ export abstract class Position {
     }
   }
 
-  isCheck(): boolean {
+  isCheck(ctx?: Context): boolean {
+    if (ctx) return ctx.checkers.nonEmpty();
     const king = this.board.kingOf(this.turn);
-    return defined(king) && this.kingAttackers(king, opposite(this.turn), this.board.occupied).nonEmpty();
+    return defined(king) && this.squareAttackers(king, opposite(this.turn), this.board.occupied).nonEmpty();
   }
 
   isEnd(ctx?: Context): boolean {
@@ -209,13 +198,14 @@ export abstract class Position {
   allDropDests(ctx?: Context): Map<Role, SquareSet> {
     ctx = ctx || this.ctx();
     const d = new Map();
-    for (const prole of handRoles(this.rules)) {
-      if (this.hands[this.turn][prole] > 0) d.set(prole, this.dropDests(prole, ctx));
-      else d.set(prole, SquareSet.empty());
+    for (const role of handRoles(this.rules)) {
+      if (this.hands[this.turn][role] > 0) d.set(role, this.dropDests(role, ctx));
+      else d.set(role, SquareSet.empty());
     }
     return d;
   }
 
+  // doesn't care about validity, just tries to play the move
   play(move: Move): void {
     const turn = this.turn;
 
@@ -236,7 +226,10 @@ export abstract class Position {
         piece.role = promote(this.rules)(piece.role) || piece.role;
 
       const capture = this.board.set(move.to, piece);
-      if (capture) this.playCaptureAt(capture);
+      if (capture) {
+        const unpromotedRole = unpromote(this.rules)(capture.role) || capture.role;
+        this.hands[opposite(capture.color)][unpromotedRole]++;
+      }
     }
   }
 }

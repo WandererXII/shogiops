@@ -1,16 +1,29 @@
 import { Result } from '@badrap/result';
-import { Rules, Color, Square, Role } from './types.js';
+import { Color, Square, Role } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
-import { between, ray, attacks } from './attacks.js';
-import { opposite, defined } from './util.js';
+import {
+  between,
+  ray,
+  attacks,
+  rookAttacks,
+  bishopAttacks,
+  lanceAttacks,
+  silverAttacks,
+  knightAttacks,
+  goldAttacks,
+  kingAttacks,
+  pawnAttacks,
+} from './attacks.js';
+import { opposite, defined, squareFile } from './util.js';
 import { Hands } from './hand.js';
-import { allRoles, backrank, handRoles, pieceInDeadZone, secondBackrank } from './variantUtil.js';
-import { Context, IllegalSetup, Position, PositionError } from './position.js';
+import { backrank, secondBackrank } from './variantUtil.js';
+import { Context, Position, PositionError } from './position.js';
 
 export class Shogi extends Position {
-  protected constructor(rules?: Rules) {
-    super(rules || 'standard');
+  private constructor() {
+    super('standard');
+    this.fullSquareSet = new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]);
   }
 
   static default(): Shogi {
@@ -27,7 +40,7 @@ export class Shogi extends Position {
     hands: Hands,
     turn: Color,
     moveNumber: number,
-    strict = true
+    strict?: boolean
   ): Result<Shogi, PositionError> {
     const pos = new this();
     pos.board = board.clone();
@@ -37,97 +50,67 @@ export class Shogi extends Position {
     return pos.validate(strict).map(_ => pos);
   }
 
-  clone(): Shogi {
-    return super.clone() as Shogi;
+  squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
+    const defender = opposite(attacker),
+      board = this.board;
+    return board[attacker].intersect(
+      rookAttacks(square, occupied)
+        .intersect(board.rook.union(board.dragon))
+        .union(bishopAttacks(square, occupied).intersect(board.bishop.union(board.horse)))
+        .union(lanceAttacks(defender, square, occupied).intersect(board.lance))
+        .union(knightAttacks(defender, square).intersect(board.knight))
+        .union(silverAttacks(defender, square).intersect(board.silver))
+        .union(
+          goldAttacks(defender, square).intersect(
+            board.gold
+              .union(board.tokin)
+              .union(board.promotedlance)
+              .union(board.promotedknight)
+              .union(board.promotedsilver)
+          )
+        )
+        .union(kingAttacks(square).intersect(board.king.union(board.dragon).union(board.horse)))
+        .union(pawnAttacks(defender, square).intersect(board.pawn))
+    );
   }
 
-  protected validate(strict: boolean): Result<undefined, PositionError> {
-    if (!strict) return Result.ok(undefined);
-    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.king.size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
-
-    const otherKing = this.board.kingOf(opposite(this.turn));
-    if (defined(otherKing) && this.kingAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
-      return Result.err(new PositionError(IllegalSetup.OppositeCheck));
-
-    for (const rn of this.hands.sente)
-      if (!handRoles(this.rules).includes(rn[0])) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
-    for (const rn of this.hands.gote)
-      if (!handRoles(this.rules).includes(rn[0])) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
-
-    for (const sp of this.board) {
-      if (!allRoles(this.rules).includes(sp[1].role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
-      if (pieceInDeadZone(this.rules)(sp[1], sp[0]))
-        return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
-    }
-
-    return this.validateCheckers();
-  }
-
-  protected validateCheckers(): Result<undefined, PositionError> {
-    const ourKing = this.board.kingOf(this.turn);
-    if (defined(ourKing)) {
-      // Multiple sliding checkers aligned with king.
-      const checkers = this.kingAttackers(ourKing, opposite(this.turn), this.board.occupied);
-      if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
-        return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-    }
-    return Result.ok(undefined);
+  squareSnipers(square: number, attacker: Color): SquareSet {
+    const empty = SquareSet.empty();
+    return rookAttacks(square, empty)
+      .intersect(this.board.rook.union(this.board.dragon))
+      .union(bishopAttacks(square, empty).intersect(this.board.bishop.union(this.board.horse)))
+      .union(lanceAttacks(opposite(attacker), square, empty).intersect(this.board.lance))
+      .intersect(this.board[attacker]);
   }
 
   dropDests(role: Role, ctx?: Context): SquareSet {
-    let mask = this.board.occupied
-      .complement()
-      .intersect(new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]));
-    ctx = ctx || this.ctx();
-    // Removing backranks, where no legal drop would be possible
-    if (role === 'pawn' || role === 'lance' || role === 'knight') mask = mask.diff(backrank(this.rules)(this.turn));
-    if (role === 'knight') mask = mask.diff(secondBackrank(this.rules)(this.turn));
-
-    // Checking for double pawns
-    if (role === 'pawn') {
-      const pawns = this.board.pawn.intersect(this.board[this.turn]);
-      for (let i = 0; i < 9; i++) {
-        const file = SquareSet.fromFile(i);
-        if (pawns.intersect(file).nonEmpty()) mask = mask.diff(file);
-      }
-    }
-
-    // Checking for a pawn checkmate
-    if (role === 'pawn') {
-      const king = this.board.pieces(opposite(this.turn), 'king');
-      const kingFront = (this.turn === 'sente' ? king.shl256(16) : king.shr256(16)).singleSquare();
-      if (kingFront && mask.has(kingFront)) {
-        const child = this.clone();
-        child.play({ role: 'pawn', to: kingFront });
-        if (defined(child.outcome())) mask = mask.diff(SquareSet.fromSquare(kingFront));
-      }
-    }
-
-    if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
-      const checker = ctx.checkers.singleSquare();
-      if (!defined(checker)) return SquareSet.empty();
-      return mask.intersect(between(checker, ctx.king));
-    } else return mask;
+    return pseudoDropDests(this, role, ctx).intersect(this.fullSquareSet);
   }
 
   moveDests(square: Square, ctx?: Context): SquareSet {
-    ctx = ctx || this.ctx();
-    const piece = this.board.get(square);
-    if (!piece || piece.color !== this.turn) return SquareSet.empty();
+    return pseudoMoveDests(this, square, ctx).intersect(this.fullSquareSet);
+  }
 
-    let pseudo = attacks(piece, square, this.board.occupied);
-    pseudo = pseudo.diff(this.board[this.turn]);
+  hasInsufficientMaterial(color: Color): boolean {
+    return this.board[color].size() + this.hands[color].count() < 2;
+  }
+}
 
-    if (defined(ctx.king)) {
-      if (piece.role === 'king') {
-        const occ = this.board.occupied.without(square);
-        for (const to of pseudo) {
-          if (this.kingAttackers(to, opposite(this.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
-        }
-        return pseudo.intersect(new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]));
+export const pseudoMoveDests = (pos: Position, square: Square, ctx?: Context) => {
+  ctx = ctx || pos.ctx();
+  const piece = pos.board.get(square);
+  if (!piece || piece.color !== pos.turn) return SquareSet.empty();
+
+  let pseudo = attacks(piece, square, pos.board.occupied);
+  pseudo = pseudo.diff(pos.board[pos.turn]);
+
+  if (defined(ctx.king)) {
+    if (piece.role === 'king') {
+      const occ = pos.board.occupied.without(square);
+      for (const to of pseudo) {
+        if (pos.squareAttackers(to, opposite(pos.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
       }
-
+    } else {
       if (ctx.checkers.nonEmpty()) {
         const checker = ctx.checkers.singleSquare();
         if (!defined(checker)) return SquareSet.empty();
@@ -136,10 +119,39 @@ export class Shogi extends Position {
 
       if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     }
-    return pseudo.intersect(new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]));
+  }
+  return pseudo;
+};
+
+export const pseudoDropDests = (pos: Position, role: Role, ctx?: Context) => {
+  ctx = ctx || pos.ctx();
+  let mask = pos.board.occupied.complement();
+  // Removing backranks, where no legal drop would be possible
+  if (role === 'pawn' || role === 'lance' || role === 'knight') mask = mask.diff(backrank(pos.rules)(pos.turn));
+  if (role === 'knight') mask = mask.diff(secondBackrank(pos.rules)(pos.turn));
+
+  if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
+    const checker = ctx.checkers.singleSquare();
+    if (!defined(checker)) return SquareSet.empty();
+    mask = mask.intersect(between(checker, ctx.king));
   }
 
-  hasInsufficientMaterial(color: Color): boolean {
-    return this.board.occupied.intersect(this.board[color]).size() + this.hands[color].count() < 2; // sente king, gote king and one other piece
+  if (role === 'pawn') {
+    // Checking for double pawns
+    const pawns = pos.board.pawn.intersect(pos.board[pos.turn]);
+    for (const pawn of pawns) {
+      const file = SquareSet.fromFile(squareFile(pawn));
+      mask = mask.diff(file);
+    }
+    // Checking for a pawn checkmate
+    const king = pos.board.pieces(opposite(pos.turn), 'king');
+    const kingFront = (pos.turn === 'sente' ? king.shl256(16) : king.shr256(16)).singleSquare();
+    if (kingFront && mask.has(kingFront)) {
+      const child = pos.clone();
+      child.play({ role: 'pawn', to: kingFront });
+      if (defined(child.outcome())) mask = mask.without(kingFront);
+    }
   }
-}
+
+  return mask;
+};

@@ -1,5 +1,6 @@
 import { SquareSet } from './squareSet.js';
 import { Color, Role, Rules, Piece, Square, Dimensions } from './types.js';
+import { squareRank } from './util.js';
 
 export function pieceCanPromote(rules: Rules): (piece: Piece, from: Square, to: Square) => boolean {
   switch (rules) {
@@ -13,14 +14,16 @@ export function pieceForcePromote(rules: Rules): (piece: Piece, sq: Square) => b
   switch (rules) {
     default:
       return (piece: Piece, sq: Square) => {
+        const dims = dimensions(rules),
+          rank = squareRank(sq);
         if (piece.role === 'lance' || piece.role === 'pawn')
-          return backrank(rules)(piece.color).intersect(SquareSet.fromSquare(sq)).nonEmpty();
-        if (piece.role === 'knight')
-          return secondBackrank(rules)(piece.color)
-            .union(backrank(rules)(piece.color))
-            .intersect(SquareSet.fromSquare(sq))
-            .nonEmpty();
-        return false;
+          return rank === (piece.color === 'sente' ? 0 : dims.ranks - 1);
+        else if (piece.role === 'knight')
+          return (
+            rank === (piece.color === 'sente' ? 0 : dims.ranks - 1) ||
+            rank === (piece.color === 'sente' ? 1 : dims.ranks - 2)
+          );
+        else return false;
       };
   }
 }
@@ -104,24 +107,6 @@ export function dimensions(rules: Rules): Dimensions {
       return { files: 5, ranks: 5 };
     default:
       return { files: 9, ranks: 9 };
-  }
-}
-
-export function backrank(rules: Rules): (color: Color) => SquareSet {
-  switch (rules) {
-    case 'minishogi':
-      return promotionZone(rules);
-    default:
-      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(0) : SquareSet.fromRank(8));
-  }
-}
-
-export function secondBackrank(rules: Rules): (color: Color) => SquareSet {
-  switch (rules) {
-    case 'minishogi':
-      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(1) : SquareSet.fromRank(3));
-    default:
-      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(1) : SquareSet.fromRank(7));
   }
 }
 

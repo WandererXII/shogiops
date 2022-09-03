@@ -17,7 +17,7 @@ import {
 } from './attacks.js';
 import { opposite, defined, squareFile } from './util.js';
 import { Hands } from './hands.js';
-import { backrank, secondBackrank } from './variantUtil.js';
+import { dimensions } from './variantUtil.js';
 import { Context, Position, PositionError } from './position.js';
 
 export class Shogi extends Position {
@@ -129,8 +129,11 @@ export const pseudoDropDests = (pos: Position, piece: Piece, ctx?: Context): Squ
   const role = piece.role;
   let mask = pos.board.occupied.complement();
   // Removing backranks, where no legal drop would be possible
-  if (role === 'pawn' || role === 'lance' || role === 'knight') mask = mask.diff(backrank(pos.rules)(pos.turn));
-  if (role === 'knight') mask = mask.diff(secondBackrank(pos.rules)(pos.turn));
+  const dims = dimensions(pos.rules);
+  if (role === 'pawn' || role === 'lance')
+    mask = mask.diff(SquareSet.fromRank(pos.turn === 'sente' ? 0 : dims.ranks - 1));
+  else if (role === 'knight')
+    mask = mask.diff(pos.turn === 'sente' ? SquareSet.ranksAbove(2) : SquareSet.ranksBelow(dims.ranks - 3));
 
   if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
     const checker = ctx.checkers.singleSquare();

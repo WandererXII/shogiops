@@ -5,7 +5,7 @@ import { Board } from './board.js';
 import { between, ray } from './attacks.js';
 import { opposite, defined, makePieceName } from './util.js';
 import { Hands } from './hands.js';
-import { allRoles, handRoles, pieceCanPromote, pieceInDeadZone, promote, unpromote } from './variantUtil.js';
+import { allRoles, handRoles, pieceCanPromote, pieceForcePromote, promote, unpromote } from './variantUtil.js';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
@@ -73,7 +73,7 @@ export abstract class Position {
 
     for (const sp of this.board) {
       if (!allRoles(this.rules).includes(sp[1].role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
-      if (pieceInDeadZone(this.rules)(sp[1], sp[0]))
+      if (pieceForcePromote(this.rules)(sp[1], sp[0]))
         return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
     }
 
@@ -149,7 +149,7 @@ export abstract class Position {
 
       // Checking whether we can promote
       if (move.promotion && !pieceCanPromote(this.rules)(piece, move.from, move.to)) return false;
-      if (!move.promotion && pieceInDeadZone(this.rules)(piece, move.to)) return false;
+      if (!move.promotion && pieceForcePromote(this.rules)(piece, move.to)) return false;
 
       const moveDests = this.moveDests(move.from, ctx);
       return moveDests.has(move.to);
@@ -223,7 +223,7 @@ export abstract class Position {
       if (!piece) return;
       if (
         (move.promotion && pieceCanPromote(this.rules)(piece, move.from, move.to)) ||
-        pieceInDeadZone(this.rules)(piece, move.to)
+        pieceForcePromote(this.rules)(piece, move.to)
       )
         piece.role = promote(this.rules)(piece.role) || piece.role;
 

@@ -9,7 +9,7 @@ export function pieceCanPromote(rules: Rules): (piece: Piece, from: Square, to: 
         (promotionZone(rules)(piece.color).has(from) || promotionZone(rules)(piece.color).has(to));
   }
 }
-export function pieceInDeadZone(rules: Rules): (piece: Piece, sq: Square) => boolean {
+export function pieceForcePromote(rules: Rules): (piece: Piece, sq: Square) => boolean {
   switch (rules) {
     default:
       return (piece: Piece, sq: Square) => {

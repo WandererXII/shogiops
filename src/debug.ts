@@ -2,7 +2,7 @@ import { Square, Role } from './types.js';
 import { parsePieceName, makeSquare, makeUsi } from './util.js';
 import { Position } from './position.js';
 import { SquareSet } from './squareSet.js';
-import { pieceCanPromote, pieceInDeadZone } from './variantUtil.js';
+import { pieceCanPromote, pieceForcePromote } from './variantUtil.js';
 
 export function moveDests(moveDests: Map<Square, SquareSet>): string {
   const lines = [];
@@ -30,7 +30,7 @@ export function perft(pos: Position, depth: number, log = false): number {
       const piece = pos.board.get(from)!;
       if (pieceCanPromote(pos.rules)(piece, from, to)) {
         promotions.push(true);
-        if (!pieceInDeadZone(pos.rules)(piece, to)) promotions.push(false);
+        if (!pieceForcePromote(pos.rules)(piece, to)) promotions.push(false);
       } else promotions.push(false);
 
       for (const promotion of promotions) {

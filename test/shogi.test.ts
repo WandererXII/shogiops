@@ -131,7 +131,7 @@ test.each(insufficientMaterial)('insufficient material: %s', (sfen, sente, gote)
 
 test('impossible checker alignment', () => {
   // Multiple checkers aligned with king.
-  const r1 = parseSfen('standard', 'r8/4s4/7k1/b8/9/2K6/3b5/9/9 b - 1');
+  const r1 = parseSfen('standard', 'r8/4s4/7k1/b8/9/2K6/3b5/9/9 b - 1', true);
   expect(
     r1.unwrap(
       _ => undefined,

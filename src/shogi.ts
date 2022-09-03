@@ -40,7 +40,7 @@ export class Shogi extends Position {
     hands: Hands,
     turn: Color,
     moveNumber: number,
-    strict?: boolean
+    strict: boolean
   ): Result<Shogi, PositionError> {
     const pos = new this();
     pos.board = board.clone();

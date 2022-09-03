@@ -44,7 +44,7 @@ export abstract class Position {
   //     hands: Hands,
   //     turn: Color,
   //     moveNumber: number,
-  //     strict?: boolean
+  //     strict: boolean
   //   )
 
   abstract moveDests(square: Square, ctx?: Context): SquareSet;
@@ -57,7 +57,7 @@ export abstract class Position {
   // Attackers' long-range pieces at least x-raying square - for finding blockers
   protected abstract squareSnipers(square: Square, attacker: Color): SquareSet;
 
-  protected validate(strict?: boolean): Result<undefined, PositionError> {
+  protected validate(strict: boolean): Result<undefined, PositionError> {
     if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.king.size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));

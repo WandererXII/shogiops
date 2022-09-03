@@ -128,7 +128,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
 
   return board.chain(board =>
     hands.chain(hands => {
-      return initializePosition(rules, board, hands, turn, Math.max(1, moveNumber), strict);
+      return initializePosition(rules, board, hands, turn, Math.max(1, moveNumber), !!strict);
     })
   );
 }

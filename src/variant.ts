@@ -23,7 +23,7 @@ export function initializePosition<R extends keyof RulesTypeMap>(
   hands: Hands,
   turn: Color,
   moveNumber: number,
-  strict = true
+  strict: boolean
 ): Result<RulesTypeMap[R], PositionError> {
   switch (rules) {
     case 'minishogi':
@@ -53,7 +53,7 @@ export class Minishogi extends Position {
     hands: Hands,
     turn: Color,
     moveNumber: number,
-    strict?: boolean
+    strict: boolean
   ): Result<Minishogi, PositionError> {
     const pos = new this();
     pos.board = board.clone();

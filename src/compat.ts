@@ -1,9 +1,9 @@
-import { SquareName, Move, isDrop, Role } from './types.js';
-import { defined, makeSquare, parseUsi } from './util.js';
+import { SquareName, Move, isDrop, PieceName, Piece } from './types.js';
+import { defined, makePieceName, makeSquare, parseUsi } from './util.js';
 import { Position } from './position.js';
 
 export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[]> {
-  const result = new Map();
+  const result: Map<SquareName, SquareName[]> = new Map();
   const ctx = pos.ctx();
   for (const [from, squares] of pos.allMoveDests(ctx)) {
     if (squares.nonEmpty()) {
@@ -14,20 +14,20 @@ export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[
   return result;
 }
 
-export function shogigroundDropDests(pos: Position, role?: Role): Map<Role, SquareName[]> {
-  const result = new Map();
-  if (role) {
-    const squares = pos.dropDests(role);
+export function shogigroundDropDests(pos: Position, piece?: Piece): Map<PieceName, SquareName[]> {
+  const result: Map<PieceName, SquareName[]> = new Map();
+  if (piece) {
+    const squares = pos.dropDests(piece);
     if (squares.nonEmpty()) {
       const d = Array.from(squares, s => makeSquare(s));
-      result.set(role, d);
+      result.set(makePieceName(piece), d);
     }
   } else {
     const ctx = pos.ctx();
-    for (const [r, squares] of pos.allDropDests(ctx)) {
+    for (const [p, squares] of pos.allDropDests(ctx)) {
       if (squares.nonEmpty()) {
         const d = Array.from(squares, s => makeSquare(s));
-        result.set(r, d);
+        result.set(p, d);
       }
     }
   }

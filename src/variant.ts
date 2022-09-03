@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Color, Role, RulesTypeMap, Square } from './types.js';
+import { Color, Piece, RulesTypeMap, Square } from './types.js';
 import { PositionError, Position, Context } from './position.js';
 import { pseudoDropDests, pseudoMoveDests, Shogi } from './shogi.js';
 import { SquareSet } from './squareSet.js';
@@ -89,8 +89,8 @@ export class Minishogi extends Position {
     return pseudoMoveDests(this, square, ctx).intersect(this.fullSquareSet);
   }
 
-  dropDests(role: Role, ctx?: Context): SquareSet {
-    return pseudoDropDests(this, role, ctx).intersect(this.fullSquareSet);
+  dropDests(piece: Piece, ctx?: Context): SquareSet {
+    return pseudoDropDests(this, piece, ctx).intersect(this.fullSquareSet);
   }
 
   hasInsufficientMaterial(color: Color): boolean {

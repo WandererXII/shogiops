@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { Color, Square, Role } from './types.js';
+import { Color, Square, Piece } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import {
@@ -83,8 +83,8 @@ export class Shogi extends Position {
       .intersect(this.board[attacker]);
   }
 
-  dropDests(role: Role, ctx?: Context): SquareSet {
-    return pseudoDropDests(this, role, ctx).intersect(this.fullSquareSet);
+  dropDests(piece: Piece, ctx?: Context): SquareSet {
+    return pseudoDropDests(this, piece, ctx).intersect(this.fullSquareSet);
   }
 
   moveDests(square: Square, ctx?: Context): SquareSet {
@@ -96,7 +96,7 @@ export class Shogi extends Position {
   }
 }
 
-export const pseudoMoveDests = (pos: Position, square: Square, ctx?: Context) => {
+export const pseudoMoveDests = (pos: Position, square: Square, ctx?: Context): SquareSet => {
   ctx = ctx || pos.ctx();
   const piece = pos.board.get(square);
   if (!piece || piece.color !== pos.turn) return SquareSet.empty();
@@ -123,8 +123,10 @@ export const pseudoMoveDests = (pos: Position, square: Square, ctx?: Context) =>
   return pseudo;
 };
 
-export const pseudoDropDests = (pos: Position, role: Role, ctx?: Context) => {
+export const pseudoDropDests = (pos: Position, piece: Piece, ctx?: Context): SquareSet => {
   ctx = ctx || pos.ctx();
+  if (piece.color !== pos.turn) return SquareSet.empty();
+  const role = piece.role;
   let mask = pos.board.occupied.complement();
   // Removing backranks, where no legal drop would be possible
   if (role === 'pawn' || role === 'lance' || role === 'knight') mask = mask.diff(backrank(pos.rules)(pos.turn));

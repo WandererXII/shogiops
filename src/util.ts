@@ -1,4 +1,4 @@
-import { FILE_NAMES, RANK_NAMES, Color, Square, Role, Move, isDrop, SquareName } from './types.js';
+import { FILE_NAMES, RANK_NAMES, Color, Square, Role, Move, isDrop, SquareName, Piece, PieceName } from './types.js';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
@@ -279,6 +279,17 @@ export function stringToRole(ch: string): Role | undefined {
     default:
       return;
   }
+}
+
+export function makePieceName(piece: Piece): PieceName {
+  return `${piece.color} ${piece.role}`;
+}
+
+export function parsePieceName(pieceName: PieceName): Piece {
+  const splitted = pieceName.split(' '),
+    color = splitted[0] as Color,
+    role = splitted[1] as Role;
+  return { color, role };
 }
 
 export function parseCoordinates(file: number, rank: number): Square | undefined {

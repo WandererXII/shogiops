@@ -68,6 +68,8 @@ export interface Piece {
   color: Color;
 }
 
+export type PieceName = `${Color} ${Role}`;
+
 export interface NormalMove {
   from: Square;
   to: Square;

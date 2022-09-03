@@ -1,4 +1,4 @@
-import { parseUsi, makeUsi, squareFile, squareRank, parseSquare } from '../src/util';
+import { parseUsi, makeUsi, squareFile, squareRank, parseSquare, makePieceName, parsePieceName } from '../src/util';
 
 test('square coordinates', () => {
   expect(squareFile(0)).toBe(0);
@@ -59,4 +59,10 @@ test('make usi', () => {
   expect(makeUsi({ from: 0, to: 0, promotion: true })).toBe('1a1a+');
   expect(makeUsi({ from: 0, to: 0, promotion: false })).toBe('1a1a');
   expect(makeUsi({ from: 0, to: 0, promotion: undefined })).toBe('1a1a');
+});
+
+test('piece name', () => {
+  expect(makePieceName({ role: 'rook', color: 'sente' })).toEqual('sente rook');
+  expect(parsePieceName('sente rook')).toEqual({ color: 'sente', role: 'rook' });
+  expect(parsePieceName('gote bishop')).toEqual({ color: 'gote', role: 'bishop' });
 });

@@ -1,9 +1,9 @@
 import { Result } from '@badrap/result';
-import { Rules, Color, COLORS, Square, Move, isDrop, Outcome, Role } from './types.js';
+import { Rules, Color, COLORS, Square, Move, isDrop, Outcome, Piece, PieceName } from './types.js';
 import { SquareSet } from './squareSet.js';
 import { Board } from './board.js';
 import { between, ray } from './attacks.js';
-import { opposite, defined } from './util.js';
+import { opposite, defined, makePieceName } from './util.js';
 import { Hands } from './hands.js';
 import { allRoles, handRoles, pieceCanPromote, pieceInDeadZone, promote, unpromote } from './variantUtil.js';
 
@@ -48,7 +48,7 @@ export abstract class Position {
   //   )
 
   abstract moveDests(square: Square, ctx?: Context): SquareSet;
-  abstract dropDests(role: Role, ctx?: Context): SquareSet;
+  abstract dropDests(piece: Piece, ctx?: Context): SquareSet;
 
   abstract hasInsufficientMaterial(color: Color): boolean;
   // Attackers' pieces attacking square - useful for checks for example
@@ -132,8 +132,8 @@ export abstract class Position {
     for (const square of this.board[this.turn]) {
       if (this.moveDests(square, ctx).nonEmpty()) return true;
     }
-    for (const prole of handRoles(this.rules)) {
-      if (this.hands[this.turn][prole] > 0 && this.dropDests(prole, ctx).nonEmpty()) return true;
+    for (const role of handRoles(this.rules)) {
+      if (this.hands[this.turn][role] > 0 && this.dropDests({ color: this.turn, role }, ctx).nonEmpty()) return true;
     }
     return false;
   }
@@ -142,7 +142,7 @@ export abstract class Position {
     if (isDrop(move)) {
       const role = move.role;
       if (!handRoles(this.rules).includes(role) || this.hands[this.turn][role] <= 0) return false;
-      return this.dropDests(role, ctx).has(move.to);
+      return this.dropDests({ color: this.turn, role }, ctx).has(move.to);
     } else {
       const piece = this.board.get(move.from);
       if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
@@ -188,19 +188,21 @@ export abstract class Position {
 
   allMoveDests(ctx?: Context): Map<Square, SquareSet> {
     ctx = ctx || this.ctx();
-    const d = new Map();
+    const d: Map<Square, SquareSet> = new Map();
     for (const square of this.board[this.turn]) {
       d.set(square, this.moveDests(square, ctx));
     }
     return d;
   }
 
-  allDropDests(ctx?: Context): Map<Role, SquareSet> {
+  allDropDests(ctx?: Context): Map<PieceName, SquareSet> {
     ctx = ctx || this.ctx();
-    const d = new Map();
+    const d: Map<PieceName, SquareSet> = new Map();
     for (const role of handRoles(this.rules)) {
-      if (this.hands[this.turn][role] > 0) d.set(role, this.dropDests(role, ctx));
-      else d.set(role, SquareSet.empty());
+      const piece = { color: this.turn, role };
+      if (this.hands[this.turn][role] > 0) {
+        d.set(makePieceName(piece), this.dropDests(piece, ctx));
+      } else d.set(makePieceName(piece), SquareSet.empty());
     }
     return d;
   }

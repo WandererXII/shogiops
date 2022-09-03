@@ -1,5 +1,5 @@
 import { Square, Role } from './types.js';
-import { makeSquare, makeUsi } from './util.js';
+import { parsePieceName, makeSquare, makeUsi } from './util.js';
 import { Position } from './position.js';
 import { SquareSet } from './squareSet.js';
 import { pieceCanPromote, pieceInDeadZone } from './variantUtil.js';
@@ -43,10 +43,11 @@ export function perft(pos: Position, depth: number, log = false): number {
       }
     }
   }
-  for (const [role, dropDestsOfRole] of pos.allDropDests()) {
+  for (const [pieceName, dropDestsOfRole] of pos.allDropDests()) {
     for (const to of dropDestsOfRole) {
       const child = pos.clone();
-      const move = { role, to };
+      const piece = parsePieceName(pieceName);
+      const move = { role: piece.role, to };
       child.play(move);
       const children = perft(child, depth - 1, false);
       if (log) console.log(makeUsi(move), children, '(', depth, ')');

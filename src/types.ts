@@ -1,5 +1,6 @@
-import { Shogi } from './shogi.js';
-import { Minishogi } from './variant.js';
+import type { Shogi } from './shogi.js';
+import type { SquareSet } from './squareSet.js';
+import type { Minishogi } from './variant.js';
 
 export const FILE_NAMES = [
   '1',
@@ -56,12 +57,48 @@ export const ROLES = [
   'promotedlance',
   'tokin',
   'king',
+  'tiger',
+  'copper',
+  'elephant',
+  'leopard',
+  'ox',
+  'stag',
+  'boar',
+  'gobetween',
+  'falcon',
+  'kirin',
+  'lion',
+  'phoenix',
+  'prince',
+  'queen',
+  'chariot',
+  'sidemover',
+  'eagle',
+  'verticalmover',
+  'whale',
+  'whitehorse',
+  'tiger',
+  'copper',
+  'elephant',
+  'leopard',
+  'ox',
+  'stag',
+  'boar',
+  'gobetween',
+  'falcon',
+  'kirin',
+  'lion',
+  'phoenix',
+  'prince',
+  'queen',
+  'chariot',
+  'sidemover',
+  'eagle',
+  'verticalmover',
+  'whale',
+  'whitehorse',
 ] as const;
 export type Role = typeof ROLES[number];
-
-export type ByRole<T> = {
-  [role in Role]: T;
-};
 
 export interface Piece {
   role: Role;

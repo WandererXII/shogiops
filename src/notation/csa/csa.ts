@@ -28,8 +28,8 @@ export class CsaError extends Error {}
 export function makeCsaHeader(pos: Shogi): string {
   return [
     makeCsaBoard(pos.board),
-    makeCsaHand(pos.hands.sente, 'P+'),
-    makeCsaHand(pos.hands.gote, 'P-'),
+    makeCsaHand(pos.hands.color('sente'), 'P+'),
+    makeCsaHand(pos.hands.color('gote'), 'P-'),
     pos.turn === 'gote' ? '-' : '+',
   ]
     .filter(p => p.length > 0)

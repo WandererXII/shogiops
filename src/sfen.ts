@@ -188,7 +188,7 @@ export function makeHand(rules: Rules, hand: Hand): string {
 }
 
 export function makeHands(rules: Rules, hands: Hands): string {
-  const handsStr = makeHand(rules, hands.sente).toUpperCase() + makeHand(rules, hands.gote);
+  const handsStr = makeHand(rules, hands.color('sente')).toUpperCase() + makeHand(rules, hands.color('gote'));
   return handsStr === '' ? '-' : handsStr;
 }
 

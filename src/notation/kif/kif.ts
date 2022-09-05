@@ -39,9 +39,9 @@ export function makeKifHeader(pos: Position): string {
 
 export function makeKifPositionHeader(pos: Position): string {
   return [
-    '後手の持駒：' + makeKifHand(pos.hands.gote),
+    '後手の持駒：' + makeKifHand(pos.hands.color('gote')),
     makeKifBoard(pos.board, pos.rules),
-    '先手の持駒：' + makeKifHand(pos.hands.sente),
+    '先手の持駒：' + makeKifHand(pos.hands.color('sente')),
     ...(pos.turn === 'gote' ? ['後手番'] : []),
   ].join('\n');
 }

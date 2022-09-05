@@ -1,4 +1,4 @@
-import { HandMap, Role, ROLES } from './types.js';
+import { Color, HandMap, Role, ROLES } from './types.js';
 
 // Hand alone can store any role
 export class Hand {
@@ -56,13 +56,13 @@ export class Hand {
 
   *[Symbol.iterator](): Iterator<[Role, number]> {
     for (const [role, num] of this.handMap) {
-      if (num) yield [role, num];
+      if (num > 0) yield [role, num];
     }
   }
 }
 
 export class Hands {
-  constructor(public gote: Hand, public sente: Hand) {}
+  constructor(private gote: Hand, private sente: Hand) {}
 
   static empty(): Hands {
     return new Hands(Hand.empty(), Hand.empty());
@@ -72,12 +72,17 @@ export class Hands {
     return new Hands(this.gote.clone(), this.sente.clone());
   }
 
-  equals(other: Hands): boolean {
-    return this.gote.equals(other.gote) && this.sente.equals(other.sente);
-  }
-
   combine(other: Hands): Hands {
     return new Hands(this.gote.combine(other.gote), this.sente.combine(other.sente));
+  }
+
+  color(color: Color): Hand {
+    if (color === 'sente') return this.sente;
+    else return this.gote;
+  }
+
+  equals(other: Hands): boolean {
+    return this.gote.equals(other.gote) && this.sente.equals(other.sente);
   }
 
   count(): number {

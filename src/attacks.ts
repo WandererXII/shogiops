@@ -115,7 +115,7 @@ export function goBetweenAttacks(square: Square): SquareSet {
   return SquareSet.fromSquares([square - 16, square + 16]);
 }
 
-export function reverseChariotAttacks(square: Square, occupied: SquareSet): SquareSet {
+export function chariotAttacks(square: Square, occupied: SquareSet): SquareSet {
   return fileAttacks(square, occupied);
 }
 
@@ -132,17 +132,17 @@ export function copperAttacks(square: Square, color: Color): SquareSet {
   else return NEIGHBORS[square].withoutMany([square - 17, square - 15, square - 1, square + 1]);
 }
 
-export function ferociousLeopardAttacks(square: Square): SquareSet {
+export function leopardAttacks(square: Square): SquareSet {
   return NEIGHBORS[square].withoutMany([square + 1, square - 1]);
 }
 
-export function blindTigerAttacks(square: Square, color: Color): SquareSet {
+export function tigerAttacks(square: Square, color: Color): SquareSet {
   if (color === 'sente') return NEIGHBORS[square].without(square - 16);
   else return NEIGHBORS[square].without(square + 16);
 }
 
-export function drunkElephantAttacks(square: Square, color: Color): SquareSet {
-  return blindTigerAttacks(square, opposite(color));
+export function elephantAttacks(square: Square, color: Color): SquareSet {
+  return tigerAttacks(square, opposite(color));
 }
 
 export function kirinAttacks(square: Square): SquareSet {
@@ -157,19 +157,19 @@ export function phoenixAttacks(square: Square): SquareSet {
     .union(computeRange(square, [30, 34, -30, -34]));
 }
 
-export function freeKingAttacks(square: Square, occupied: SquareSet): SquareSet {
+export function queenAttacks(square: Square, occupied: SquareSet): SquareSet {
   return rookAttacks(square, occupied).union(bishopAttacks(square, occupied));
 }
 
-export function flyingStagAttacks(square: Square, occupied: SquareSet): SquareSet {
+export function stagAttacks(square: Square, occupied: SquareSet): SquareSet {
   return fileAttacks(square, occupied).union(NEIGHBORS[square]);
 }
 
-export function flyingOxAttacks(square: Square, occupied: SquareSet): SquareSet {
+export function oxAttacks(square: Square, occupied: SquareSet): SquareSet {
   return fileAttacks(square, occupied).union(bishopAttacks(square, occupied));
 }
 
-export function freeBoarAttacks(square: Square, occupied: SquareSet): SquareSet {
+export function boarAttacks(square: Square, occupied: SquareSet): SquareSet {
   return rankAttacks(square, occupied).union(bishopAttacks(square, occupied));
 }
 
@@ -188,7 +188,7 @@ export function whiteHorseAttacks(square: Square, color: Color, occupied: Square
   return whaleAttacks(square, opposite(color), occupied);
 }
 
-export function hornedFalconAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
+export function falconAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return bishopAttacks(square, occupied)
       .union(rookAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
@@ -199,7 +199,7 @@ export function hornedFalconAttacks(square: Square, color: Color, occupied: Squa
       .withMany([square, square + 16, square + 32]);
 }
 
-export function soaringEagleAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
+export function eagleAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return rookAttacks(square, occupied)
       .union(bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
@@ -240,6 +240,45 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
       return horseAttacks(square, occupied);
     case 'dragon':
       return dragonAttacks(square, occupied);
+    case 'tiger':
+      return tigerAttacks(square, piece.color);
+    case 'copper':
+      return copperAttacks(square, piece.color);
+    case 'elephant':
+      return elephantAttacks(square, piece.color);
+    case 'leopard':
+      return leopardAttacks(square);
+    case 'ox':
+      return oxAttacks(square, occupied);
+    case 'stag':
+      return stagAttacks(square, occupied);
+    case 'boar':
+      return boarAttacks(square, occupied);
+    case 'gobetween':
+      return goBetweenAttacks(square);
+    case 'falcon':
+      return falconAttacks(square, piece.color, occupied);
+    case 'kirin':
+      return kirinAttacks(square);
+    case 'lion':
+      return lionAttacks(square);
+    case 'phoenix':
+      return phoenixAttacks(square);
+    case 'queen':
+      return queenAttacks(square, occupied);
+    case 'chariot':
+      return chariotAttacks(square, occupied);
+    case 'sidemover':
+      return sideMoverAttacks(square, occupied);
+    case 'eagle':
+      return eagleAttacks(square, piece.color, occupied);
+    case 'verticalmover':
+      return verticalMoverAttacks(square, occupied);
+    case 'whale':
+      return whaleAttacks(square, piece.color, occupied);
+    case 'whitehorse':
+      return whiteHorseAttacks(square, piece.color, occupied);
+    case 'prince':
     case 'king':
       return kingAttacks(square);
   }

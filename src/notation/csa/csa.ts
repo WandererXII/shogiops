@@ -61,7 +61,7 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
     handRoles('standard')
       .map(role => {
         const r = roleToCsa(role);
-        const n = hand[role];
+        const n = hand.get(role);
         return ('00' + r).repeat(Math.min(n, 18));
       })
       .filter(p => p.length > 0)
@@ -89,7 +89,7 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
 
 export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
   const splitted = handicap.substring(2).match(/.{4}/g) || [];
-  const intitalBoard = Board.default();
+  const intitalBoard = Board.standard();
   for (const s of splitted) {
     const sq = parseNumberSquare(s.substring(0, 2));
     if (defined(sq)) {
@@ -137,7 +137,7 @@ function parseAdditions(initialPos: Shogi, additions: string[]): Result<Shogi, C
       if ((defined(sq) || sqString === '00') && defined(role)) {
         if (!defined(sq)) {
           if (!handRoles('standard').includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
-          initialPos.hands[color][role]++;
+          initialPos.hands[color].capture(role);
         } else {
           initialPos.board.set(sq, { role: role, color: color });
         }

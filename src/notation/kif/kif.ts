@@ -77,7 +77,7 @@ export function makeKifHand(hand: Hand): string {
   if (hand.isEmpty()) return 'なし';
   return ROLES.map(role => {
     const r = roleTo1Kanji(role);
-    const n = hand[role];
+    const n = hand.get(role);
     return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
   })
     .filter(p => p.length > 0)
@@ -175,8 +175,8 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
       let countStr = '';
       while (i < piece.length && ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'].includes(piece[i]))
         countStr += piece[i++];
-      const count = kanjiToNumber(countStr) || 1;
-      hand[role] += count;
+      const count = (kanjiToNumber(countStr) || 1) + hand.get(role);
+      hand.set(role, count);
     }
   }
   return Result.ok(hand);

@@ -60,16 +60,16 @@ export abstract class Position {
   protected validate(strict: boolean): Result<undefined, PositionError> {
     if (!strict) return Result.ok(undefined);
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.king.size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.role('king').size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
 
     const otherKing = this.board.kingOf(opposite(this.turn));
     if (defined(otherKing) && this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
-    for (const rn of this.hands.sente)
-      if (!handRoles(this.rules).includes(rn[0])) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
-    for (const rn of this.hands.gote)
-      if (!handRoles(this.rules).includes(rn[0])) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+    for (const [r, _] of this.hands.sente)
+      if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+    for (const [r, _] of this.hands.gote)
+      if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
 
     for (const sp of this.board) {
       if (!allRoles(this.rules).includes(sp[1].role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
@@ -129,11 +129,12 @@ export abstract class Position {
 
   hasDests(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
-    for (const square of this.board[this.turn]) {
+    for (const square of this.board.color(this.turn)) {
       if (this.moveDests(square, ctx).nonEmpty()) return true;
     }
     for (const role of handRoles(this.rules)) {
-      if (this.hands[this.turn][role] > 0 && this.dropDests({ color: this.turn, role }, ctx).nonEmpty()) return true;
+      if (this.hands[this.turn].get(role) > 0 && this.dropDests({ color: this.turn, role }, ctx).nonEmpty())
+        return true;
     }
     return false;
   }
@@ -141,7 +142,7 @@ export abstract class Position {
   isLegal(move: Move, ctx?: Context): boolean {
     if (isDrop(move)) {
       const role = move.role;
-      if (!handRoles(this.rules).includes(role) || this.hands[this.turn][role] <= 0) return false;
+      if (!handRoles(this.rules).includes(role) || this.hands[this.turn].get(role) <= 0) return false;
       return this.dropDests({ color: this.turn, role }, ctx).has(move.to);
     } else {
       const piece = this.board.get(move.from);
@@ -189,7 +190,7 @@ export abstract class Position {
   allMoveDests(ctx?: Context): Map<Square, SquareSet> {
     ctx = ctx || this.ctx();
     const d: Map<Square, SquareSet> = new Map();
-    for (const square of this.board[this.turn]) {
+    for (const square of this.board.color(this.turn)) {
       d.set(square, this.moveDests(square, ctx));
     }
     return d;
@@ -200,7 +201,7 @@ export abstract class Position {
     const d: Map<PieceName, SquareSet> = new Map();
     for (const role of handRoles(this.rules)) {
       const piece = { color: this.turn, role };
-      if (this.hands[this.turn][role] > 0) {
+      if (this.hands[this.turn].get(role) > 0) {
         d.set(makePieceName(piece), this.dropDests(piece, ctx));
       } else d.set(makePieceName(piece), SquareSet.empty());
     }
@@ -217,7 +218,7 @@ export abstract class Position {
 
     if (isDrop(move)) {
       this.board.set(move.to, { role: move.role, color: turn });
-      this.hands[turn][move.role]--;
+      this.hands[turn].drop(move.role);
     } else {
       const piece = this.board.take(move.from);
       if (!piece) return;
@@ -230,7 +231,7 @@ export abstract class Position {
       const capture = this.board.set(move.to, piece);
       if (capture) {
         const unpromotedRole = unpromote(this.rules)(capture.role) || capture.role;
-        this.hands[opposite(capture.color)][unpromotedRole]++;
+        this.hands[opposite(capture.color)].capture(unpromotedRole);
       }
     }
   }

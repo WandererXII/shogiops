@@ -28,7 +28,7 @@ export class Shogi extends Position {
 
   static default(): Shogi {
     const pos = new this();
-    pos.board = Board.default();
+    pos.board = Board.standard();
     pos.hands = Hands.empty();
     pos.turn = 'sente';
     pos.moveNumber = 1;
@@ -53,34 +53,35 @@ export class Shogi extends Position {
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     const defender = opposite(attacker),
       board = this.board;
-    return board[attacker].intersect(
+    return board.color(attacker).intersect(
       rookAttacks(square, occupied)
-        .intersect(board.rook.union(board.dragon))
-        .union(bishopAttacks(square, occupied).intersect(board.bishop.union(board.horse)))
-        .union(lanceAttacks(square, defender, occupied).intersect(board.lance))
-        .union(knightAttacks(square, defender).intersect(board.knight))
-        .union(silverAttacks(square, defender).intersect(board.silver))
+        .intersect(board.role('rook').union(board.role('dragon')))
+        .union(bishopAttacks(square, occupied).intersect(board.role('bishop').union(board.role('horse'))))
+        .union(lanceAttacks(square, defender, occupied).intersect(board.role('lance')))
+        .union(knightAttacks(square, defender).intersect(board.role('knight')))
+        .union(silverAttacks(square, defender).intersect(board.role('silver')))
         .union(
           goldAttacks(square, defender).intersect(
-            board.gold
-              .union(board.tokin)
-              .union(board.promotedlance)
-              .union(board.promotedknight)
-              .union(board.promotedsilver)
+            board
+              .role('gold')
+              .union(board.role('tokin'))
+              .union(board.role('promotedlance'))
+              .union(board.role('promotedknight'))
+              .union(board.role('promotedsilver'))
           )
         )
-        .union(kingAttacks(square).intersect(board.king.union(board.dragon).union(board.horse)))
-        .union(pawnAttacks(square, defender).intersect(board.pawn))
+        .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
+        .union(kingAttacks(square).intersect(board.role('king').union(board.role('dragon')).union(board.role('horse'))))
     );
   }
 
   squareSnipers(square: number, attacker: Color): SquareSet {
     const empty = SquareSet.empty();
     return rookAttacks(square, empty)
-      .intersect(this.board.rook.union(this.board.dragon))
-      .union(bishopAttacks(square, empty).intersect(this.board.bishop.union(this.board.horse)))
-      .union(lanceAttacks(square, opposite(attacker), empty).intersect(this.board.lance))
-      .intersect(this.board[attacker]);
+      .intersect(this.board.role('rook').union(this.board.role('dragon')))
+      .union(bishopAttacks(square, empty).intersect(this.board.role('bishop').union(this.board.role('horse'))))
+      .union(lanceAttacks(square, opposite(attacker), empty).intersect(this.board.role('lance')))
+      .intersect(this.board.color(attacker));
   }
 
   dropDests(piece: Piece, ctx?: Context): SquareSet {
@@ -92,7 +93,7 @@ export class Shogi extends Position {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
-    return this.board[color].size() + this.hands[color].count() < 2;
+    return this.board.color(color).size() + this.hands[color].count() < 2;
   }
 }
 
@@ -102,7 +103,7 @@ export const pseudoMoveDests = (pos: Position, square: Square, ctx?: Context): S
   if (!piece || piece.color !== pos.turn) return SquareSet.empty();
 
   let pseudo = attacks(piece, square, pos.board.occupied);
-  pseudo = pseudo.diff(pos.board[pos.turn]);
+  pseudo = pseudo.diff(pos.board.color(pos.turn));
 
   if (defined(ctx.king)) {
     if (piece.role === 'king') {
@@ -143,7 +144,7 @@ export const pseudoDropDests = (pos: Position, piece: Piece, ctx?: Context): Squ
 
   if (role === 'pawn') {
     // Checking for double pawns
-    const pawns = pos.board.pawn.intersect(pos.board[pos.turn]);
+    const pawns = pos.board.role('pawn').intersect(pos.board.color(pos.turn));
     for (const pawn of pawns) {
       const file = SquareSet.fromFile(squareFile(pawn));
       mask = mask.diff(file);

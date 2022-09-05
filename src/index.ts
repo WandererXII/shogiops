@@ -10,7 +10,6 @@ export {
   ByColor,
   Role,
   ROLES,
-  ByRole,
   Piece,
   NormalMove,
   DropMove,

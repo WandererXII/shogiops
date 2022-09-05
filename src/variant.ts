@@ -66,22 +66,26 @@ export class Minishogi extends Position {
   squareSnipers(square: number, attacker: Color): SquareSet {
     const empty = SquareSet.empty();
     return rookAttacks(square, empty)
-      .intersect(this.board.rook.union(this.board.dragon))
-      .union(bishopAttacks(square, empty).intersect(this.board.bishop.union(this.board.horse)))
-      .intersect(this.board[attacker]);
+      .intersect(this.board.role('rook').union(this.board.role('dragon')))
+      .union(bishopAttacks(square, empty).intersect(this.board.role('bishop').union(this.board.role('horse'))))
+      .intersect(this.board.color(attacker));
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     const defender = opposite(attacker),
       board = this.board;
-    return board[attacker].intersect(
+    return board.color(attacker).intersect(
       rookAttacks(square, occupied)
-        .intersect(board.rook.union(board.dragon))
-        .union(bishopAttacks(square, occupied).intersect(board.bishop.union(board.horse)))
-        .union(goldAttacks(square, defender).intersect(board.gold.union(board.tokin).union(board.promotedsilver)))
-        .union(silverAttacks(square, defender).intersect(board.silver))
-        .union(pawnAttacks(square, defender).intersect(board.pawn))
-        .union(kingAttacks(square).intersect(board.king.union(board.dragon).union(board.horse)))
+        .intersect(board.role('rook').union(board.role('dragon')))
+        .union(bishopAttacks(square, occupied).intersect(board.role('bishop').union(board.role('horse'))))
+        .union(
+          goldAttacks(square, defender).intersect(
+            board.role('gold').union(board.role('tokin')).union(board.role('promotedsilver'))
+          )
+        )
+        .union(silverAttacks(square, defender).intersect(board.role('silver')))
+        .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
+        .union(kingAttacks(square).intersect(board.role('king').union(board.role('dragon')).union(board.role('horse'))))
     );
   }
 
@@ -94,6 +98,6 @@ export class Minishogi extends Position {
   }
 
   hasInsufficientMaterial(color: Color): boolean {
-    return this.board[color].size() + this.hands[color].count() < 2;
+    return this.board.color(color).size() + this.hands[color].count() < 2;
   }
 }

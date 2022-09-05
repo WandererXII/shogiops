@@ -100,6 +100,10 @@ export const ROLES = [
 ] as const;
 export type Role = typeof ROLES[number];
 
+export type RoleMap = Map<Role, SquareSet>;
+export type ColorMap = Map<Color, SquareSet>;
+export type HandMap = Map<Role, number>;
+
 export interface Piece {
   role: Role;
   color: Color;

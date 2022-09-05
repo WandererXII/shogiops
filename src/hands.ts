@@ -1,49 +1,49 @@
-import { Role, ROLES } from './types.js';
+import { HandMap, Role, ROLES } from './types.js';
 
-// Hand alone can store anything
-// let the variants decide what to store and what not
+// Hand alone can store any role
 export class Hand {
-  pawn: number;
-  lance: number;
-  knight: number;
-  silver: number;
-  gold: number;
-  bishop: number;
-  rook: number;
-  tokin: number;
-  promotedlance: number;
-  promotedknight: number;
-  promotedsilver: number;
-  horse: number;
-  dragon: number;
-  king: number;
+  private handMap: HandMap;
 
-  private constructor() {}
+  private constructor(h: HandMap) {
+    this.handMap = h;
+  }
 
   static empty(): Hand {
-    const m = new Hand();
-    for (const role of ROLES) m[role] = 0;
-    return m;
+    return new Hand(new Map());
   }
 
   clone(): Hand {
-    const m = new Hand();
-    for (const role of ROLES) m[role] = this[role];
-    return m;
+    return new Hand(new Map(this.handMap));
+  }
+
+  combine(other: Hand): Hand {
+    const h = Hand.empty();
+    for (const role of ROLES) h.set(role, this.get(role) + other.get(role));
+    return h;
+  }
+
+  get(role: Role): number {
+    return this.handMap.get(role) || 0;
+  }
+
+  set(role: Role, cnt: number): void {
+    this.handMap.set(role, cnt);
+  }
+
+  drop(role: Role): void {
+    this.set(role, this.get(role) - 1);
+  }
+
+  capture(role: Role): void {
+    this.set(role, this.get(role) + 1);
   }
 
   equals(other: Hand): boolean {
-    return ROLES.every(role => this[role] === other[role]);
-  }
-
-  add(other: Hand): Hand {
-    const m = new Hand();
-    for (const role of ROLES) m[role] = this[role] + other[role];
-    return m;
+    return ROLES.every(role => this.get(role) === other.get(role));
   }
 
   nonEmpty(): boolean {
-    return ROLES.some(role => this[role] > 0);
+    return ROLES.some(role => this.get(role) > 0);
   }
 
   isEmpty(): boolean {
@@ -51,12 +51,12 @@ export class Hand {
   }
 
   count(): number {
-    return ROLES.map(role => this[role]).reduce((acc, cur) => acc + cur);
+    return ROLES.map(role => this.get(role)).reduce((acc, cur) => acc + cur);
   }
 
   *[Symbol.iterator](): Iterator<[Role, number]> {
-    for (const role of ROLES.filter(r => this[r] > 0)) {
-      yield [role, this[role]];
+    for (const [role, num] of this.handMap) {
+      if (num) yield [role, num];
     }
   }
 }
@@ -76,8 +76,8 @@ export class Hands {
     return this.gote.equals(other.gote) && this.sente.equals(other.sente);
   }
 
-  add(other: Hands): Hands {
-    return new Hands(this.gote.add(other.gote), this.sente.add(other.sente));
+  combine(other: Hands): Hands {
+    return new Hands(this.gote.combine(other.gote), this.sente.combine(other.sente));
   }
 
   count(): number {

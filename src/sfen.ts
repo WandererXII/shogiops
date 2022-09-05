@@ -90,7 +90,8 @@ export function parseHands(handsPart: string): Result<Hands, SfenError> {
     } else count = 1;
     const piece = stringToPiece(handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
-    hands[piece.color][piece.role] += count;
+    count += hands[piece.color].get(piece.role);
+    hands[piece.color].set(piece.role, count);
   }
   return Result.ok(hands);
 }
@@ -180,7 +181,7 @@ export function makeHand(rules: Rules, hand: Hand): string {
   return handRoles(rules)
     .map(role => {
       const r = roleToString(role);
-      const n = hand[role];
+      const n = hand.get(role);
       return n > 1 ? n + r : n === 1 ? r : '';
     })
     .join('');

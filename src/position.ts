@@ -66,9 +66,9 @@ export abstract class Position {
     if (defined(otherKing) && this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
-    for (const [r, _] of this.hands.color('sente'))
+    for (const [r] of this.hands.color('sente'))
       if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
-    for (const [r, _] of this.hands.color('gote'))
+    for (const [r] of this.hands.color('gote'))
       if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
 
     for (const sp of this.board) {
@@ -132,7 +132,7 @@ export abstract class Position {
     for (const square of this.board.color(this.turn)) {
       if (this.moveDests(square, ctx).nonEmpty()) return true;
     }
-    for (const [role, _] of this.hands[this.turn]) {
+    for (const [role] of this.hands[this.turn]) {
       if (this.dropDests({ color: this.turn, role }, ctx).nonEmpty()) return true;
     }
     return false;

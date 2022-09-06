@@ -23,7 +23,7 @@ export class Hand {
   }
 
   get(role: Role): number {
-    return this.handMap.get(role) || 0;
+    return this.handMap.get(role) ?? 0;
   }
 
   set(role: Role, cnt: number): void {

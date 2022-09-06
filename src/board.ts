@@ -118,6 +118,12 @@ export class Board implements Iterable<[Square, Piece]> {
     }
   }
 
+  roles(): Role[] {
+    return Array.from(this.roleMap)
+      .filter(([_, sqs]) => sqs.nonEmpty())
+      .map(([r]) => r);
+  }
+
   pieces(color: Color, role: Role): SquareSet {
     return this.color(color).intersect(this.role(role));
   }

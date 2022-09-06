@@ -58,7 +58,15 @@ export abstract class Position {
   protected abstract squareSnipers(square: Square, attacker: Color): SquareSet;
 
   protected validate(strict: boolean): Result<undefined, PositionError> {
+    for (const [r] of this.hands.color('sente'))
+      if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+    for (const [r] of this.hands.color('gote'))
+      if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+    for (const role of this.board.roles())
+      if (!allRoles(this.rules).includes(role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
+
     if (!strict) return Result.ok(undefined);
+
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.role('king').size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
 
@@ -66,16 +74,9 @@ export abstract class Position {
     if (defined(otherKing) && this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
-    for (const [r] of this.hands.color('sente'))
-      if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
-    for (const [r] of this.hands.color('gote'))
-      if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
-
-    for (const sp of this.board) {
-      if (!allRoles(this.rules).includes(sp[1].role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
-      if (pieceForcePromote(this.rules)(sp[1], sp[0]))
+    for (const [sq, piece] of this.board)
+      if (pieceForcePromote(this.rules)(piece, sq))
         return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
-    }
 
     return this.validateCheckers();
   }

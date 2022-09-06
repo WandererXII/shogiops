@@ -38,14 +38,6 @@ export class Minishogi extends Position {
     return pos.validate(strict).map(_ => pos);
   }
 
-  squareSnipers(square: number, attacker: Color): SquareSet {
-    const empty = SquareSet.empty();
-    return rookAttacks(square, empty)
-      .intersect(this.board.role('rook').union(this.board.role('dragon')))
-      .union(bishopAttacks(square, empty).intersect(this.board.role('bishop').union(this.board.role('horse'))))
-      .intersect(this.board.color(attacker));
-  }
-
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     const defender = opposite(attacker),
       board = this.board;
@@ -62,6 +54,14 @@ export class Minishogi extends Position {
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
         .union(kingAttacks(square).intersect(board.role('king').union(board.role('dragon')).union(board.role('horse'))))
     );
+  }
+
+  squareSnipers(square: number, attacker: Color): SquareSet {
+    const empty = SquareSet.empty();
+    return rookAttacks(square, empty)
+      .intersect(this.board.role('rook').union(this.board.role('dragon')))
+      .union(bishopAttacks(square, empty).intersect(this.board.role('bishop').union(this.board.role('horse'))))
+      .intersect(this.board.color(attacker));
   }
 
   moveDests(square: Square, ctx?: Context): SquareSet {

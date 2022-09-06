@@ -35,7 +35,7 @@ export class Shogi extends Position {
     return pos;
   }
 
-  static initialize(
+  static from(
     board: Board,
     hands: Hands,
     turn: Color,

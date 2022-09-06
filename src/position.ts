@@ -39,7 +39,7 @@ export abstract class Position {
   // When subclassing:
   // - private constructor()
   // - static default()
-  // - static initialize(
+  // - static from(
   //     board: Board,
   //     hands: Hands,
   //     turn: Color,

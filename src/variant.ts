@@ -27,9 +27,9 @@ export function initializePosition<R extends keyof RulesTypeMap>(
 ): Result<RulesTypeMap[R], PositionError> {
   switch (rules) {
     case 'minishogi':
-      return Minishogi.initialize(board, hands, turn, moveNumber, strict);
+      return Minishogi.from(board, hands, turn, moveNumber, strict);
     default:
-      return Shogi.initialize(board, hands, turn, moveNumber, strict);
+      return Shogi.from(board, hands, turn, moveNumber, strict);
   }
 }
 
@@ -48,7 +48,7 @@ export class Minishogi extends Position {
     return pos;
   }
 
-  static initialize(
+  static from(
     board: Board,
     hands: Hands,
     turn: Color,

@@ -2,7 +2,7 @@ import { Move, isDrop } from '../types.js';
 import { makeSquare, roleToString } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
-import { piecesAiming } from './notationUtil.js';
+import { piecesAiming } from './util.js';
 
 // P-7f
 export function makeWesternEngineMove(pos: Position, move: Move): string | undefined {

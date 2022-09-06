@@ -14,7 +14,7 @@ import {
   numberToKanji,
   parseJapaneseSquare,
   parseNumberSquare,
-} from '../notationUtil.js';
+} from '../util.js';
 import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps.js';
 
 //

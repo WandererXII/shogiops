@@ -3,7 +3,7 @@ import { Move, Piece, Square, isDrop } from '../types.js';
 import { roleTo2Kanji, squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
-import { makeJapaneseSquare, piecesAiming } from './notationUtil.js';
+import { makeJapaneseSquare, piecesAiming } from './util.js';
 
 // ７六歩
 export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): string | undefined {

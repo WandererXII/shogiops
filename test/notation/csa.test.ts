@@ -6,7 +6,7 @@ import {
   parseCsaMoves,
   parseTags,
 } from '../../src/notation/csa/csa';
-import { parseNumberSquare } from '../../src/notation/notationUtil';
+import { parseNumberSquare } from '../../src/notation/util';
 import { initialSfen, parseSfen } from '../../src/sfen';
 import { parseSquare, parseUsi } from '../../src/util';
 import { Shogi } from '../../src/variant/shogi';

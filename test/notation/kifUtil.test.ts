@@ -4,7 +4,7 @@ import {
   makeNumberSquare,
   numberToKanji,
   parseJapaneseSquare,
-} from '../../src/notation/notationUtil';
+} from '../../src/notation/util';
 import { parseSquare } from '../../src/util';
 
 test('parse kif square', () => {

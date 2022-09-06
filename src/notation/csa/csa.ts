@@ -5,7 +5,7 @@ import { Color, Move, isDrop } from '../../types.js';
 import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util.js';
 import { Shogi } from '../../variant/shogi.js';
 import { allRoles, handRoles, promote } from '../../variant/util.js';
-import { makeNumberSquare, parseNumberSquare } from '../notationUtil.js';
+import { makeNumberSquare, parseNumberSquare } from '../util.js';
 
 // Olny supports standard shogi no variants
 

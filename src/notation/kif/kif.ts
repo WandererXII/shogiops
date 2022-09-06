@@ -3,17 +3,20 @@ import { Board } from '../../board.js';
 import { Hand, Hands } from '../../hands.js';
 import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
 import { Color, Move, ROLES, Rules, Square, isDrop } from '../../types.js';
-import { defined, kanjiToRole, parseCoordinates, roleTo1Kanji, roleTo2Kanji } from '../../util.js';
+import { defined, parseCoordinates } from '../../util.js';
 import { Position } from '../../variant/position.js';
 import { allRoles, dimensions, handRoles, promote } from '../../variant/util.js';
 import { initializePosition } from '../../variant/variant.js';
 import {
   kanjiToNumber,
+  kanjiToRole,
   makeJapaneseSquare,
   makeNumberSquare,
   numberToKanji,
   parseJapaneseSquare,
   parseNumberSquare,
+  roleTo1Kanji,
+  roleTo2Kanji,
 } from '../util.js';
 import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps.js';
 

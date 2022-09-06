@@ -1,8 +1,7 @@
 import { Move, Square, isDrop } from '../types.js';
-import { roleTo2Kanji } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
-import { makeNumberSquare, piecesAiming } from './util.js';
+import { makeNumberSquare, piecesAiming, roleTo2Kanji } from './util.js';
 
 // 歩-76
 export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Square): string | undefined {

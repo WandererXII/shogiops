@@ -1,4 +1,4 @@
-import { FILE_NAMES, RANK_NAMES, Color, Square, Role, Move, isDrop, SquareName, Piece, PieceName } from './types.js';
+import { Color, FILE_NAMES, Move, Piece, PieceName, RANK_NAMES, Role, Square, SquareName, isDrop } from './types.js';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
@@ -16,6 +16,7 @@ export function squareFile(square: Square): number {
   return square & 15;
 }
 
+// move to variant...
 export function roleToString(role: Role): string {
   switch (role) {
     case 'pawn':
@@ -44,7 +45,7 @@ export function roleToString(role: Role): string {
       return '+b';
     case 'dragon':
       return '+r';
-    case 'king':
+    default:
       return 'k';
   }
 }
@@ -77,7 +78,7 @@ export function roleToCsa(role: Role): string {
       return 'UM';
     case 'dragon':
       return 'RY';
-    case 'king':
+    default:
       return 'OU';
   }
 }
@@ -145,7 +146,7 @@ export function roleTo1Kanji(role: Role): string {
       return '馬';
     case 'dragon':
       return '龍';
-    case 'king':
+    default:
       return '玉';
   }
 }

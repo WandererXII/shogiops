@@ -1,4 +1,4 @@
-import { SquareName, Move, isDrop, PieceName, Piece } from './types.js';
+import { Move, Piece, PieceName, SquareName, isDrop } from './types.js';
 import { defined, makePieceName, makeSquare, parseUsi } from './util.js';
 import { Position } from './variant/position.js';
 

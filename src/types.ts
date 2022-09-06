@@ -1,6 +1,6 @@
-import type { Shogi } from './variant/shogi.js';
-import type { Minishogi } from './variant/minishogi.js';
 import type { SquareSet } from './squareSet.js';
+import type { Minishogi } from './variant/minishogi.js';
+import type { Shogi } from './variant/shogi.js';
 
 export const FILE_NAMES = [
   '1',

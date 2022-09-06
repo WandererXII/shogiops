@@ -1,5 +1,5 @@
-import { Square, Color, Role, Piece, ROLES, ColorMap, RoleMap } from './types.js';
 import { SquareSet } from './squareSet.js';
+import { Color, ColorMap, Piece, ROLES, Role, RoleMap, Square } from './types.js';
 
 export class Board implements Iterable<[Square, Piece]> {
   private constructor(public occupied: SquareSet, private colorMap: ColorMap, private roleMap: RoleMap) {}

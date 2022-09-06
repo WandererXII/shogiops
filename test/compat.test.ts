@@ -1,6 +1,6 @@
-import { Shogi } from '../src/variant/shogi';
-import { shogigroundMoveDests, shogigroundDropDests } from '../src/compat';
+import { shogigroundDropDests, shogigroundMoveDests } from '../src/compat';
 import { parseSfen } from '../src/sfen';
+import { Shogi } from '../src/variant/shogi';
 
 test('shogiground dests', () => {
   const pos = Shogi.default();

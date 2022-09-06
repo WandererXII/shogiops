@@ -1,4 +1,4 @@
-import { parseUsi, makeUsi, squareFile, squareRank, parseSquare, makePieceName, parsePieceName } from '../src/util';
+import { makePieceName, makeUsi, parsePieceName, parseSquare, parseUsi, squareFile, squareRank } from '../src/util';
 
 test('square coordinates', () => {
   expect(squareFile(0)).toBe(0);

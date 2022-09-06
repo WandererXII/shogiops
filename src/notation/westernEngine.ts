@@ -1,6 +1,6 @@
+import { Move, isDrop } from '../types.js';
 import { makeSquare, roleToString } from '../util.js';
 import { Position } from '../variant/position.js';
-import { Move, isDrop } from '../types.js';
 import { pieceCanPromote } from '../variant/util.js';
 import { piecesAiming } from './notationUtil.js';
 

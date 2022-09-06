@@ -1,11 +1,11 @@
 import { Result } from '@badrap/result';
-import { Piece, Color, Rules, RulesTypeMap } from './types.js';
 import { Board } from './board.js';
-import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
 import { Hand, Hands } from './hands.js';
+import { Color, Piece, Rules, RulesTypeMap } from './types.js';
+import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
 import { Position } from './variant/position.js';
-import { initializePosition } from './variant/variant.js';
 import { dimensions, handRoles } from './variant/util.js';
+import { initializePosition } from './variant/variant.js';
 
 export enum InvalidSfen {
   Sfen = 'ERR_SFEN',

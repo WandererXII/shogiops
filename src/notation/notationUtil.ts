@@ -1,7 +1,7 @@
-import { Position } from '../variant/position.js';
+import { SquareSet } from '../squareSet.js';
 import { Piece, Square } from '../types.js';
 import { squareFile, squareRank } from '../util.js';
-import { SquareSet } from '../squareSet.js';
+import { Position } from '../variant/position.js';
 
 export function piecesAiming(pos: Position, piece: Piece, to: Square): SquareSet {
   // Disambiguation

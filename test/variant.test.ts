@@ -1,6 +1,6 @@
-import { Rules } from '../src/types';
 import { perft } from '../src/debug';
 import { parseSfen } from '../src/sfen';
+import { Rules } from '../src/types';
 
 const variantPerfts: [Rules, string, number, number][] = [
   ['minishogi', 'rbsgk/4p/5/P4/KGSBR b - 1', 1, 14],

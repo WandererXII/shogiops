@@ -1,8 +1,8 @@
-import { makeSfen, parseSfen } from '../src/sfen';
-import { Shogi } from '../src/variant/shogi';
 import { perft } from '../src/debug';
+import { makeSfen, parseSfen } from '../src/sfen';
 import { parseUsi } from '../src/util';
 import { IllegalSetup } from '../src/variant/position';
+import { Shogi } from '../src/variant/shogi';
 
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550&start=16
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550

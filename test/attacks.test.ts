@@ -1,15 +1,15 @@
 import {
-  rookAttacks,
-  bishopAttacks,
-  knightAttacks,
-  kingAttacks,
-  silverAttacks,
-  goldAttacks,
-  lanceAttacks,
-  horseAttacks,
-  dragonAttacks,
-  ray,
   between,
+  bishopAttacks,
+  dragonAttacks,
+  goldAttacks,
+  horseAttacks,
+  kingAttacks,
+  knightAttacks,
+  lanceAttacks,
+  ray,
+  rookAttacks,
+  silverAttacks,
 } from '../src/attacks';
 import { SquareSet } from '../src/squareSet';
 

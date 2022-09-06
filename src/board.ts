@@ -75,11 +75,7 @@ export class Board implements Iterable<[Square, Piece]> {
   }
 
   getRole(square: Square): Role | undefined {
-    if (this.has(square)) {
-      for (const role of ROLES) {
-        if (this.role(role).has(square)) return role;
-      }
-    }
+    for (const [role, sqs] of this.roleMap) if (sqs.has(square)) return role;
     return;
   }
 

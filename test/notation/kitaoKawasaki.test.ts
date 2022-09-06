@@ -1,5 +1,5 @@
 import { makeKitaoKawasakiMove } from '../../src/notation/kitaoKawasaki';
-import { Shogi } from '../../src/shogi';
+import { Shogi } from '../../src/variant/shogi';
 import { parseUsi } from '../../src/util';
 
 test('basic moves', () => {

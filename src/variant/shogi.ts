@@ -1,7 +1,7 @@
 import { Result } from '@badrap/result';
-import { Color, Square, Piece } from './types.js';
-import { SquareSet } from './squareSet.js';
-import { Board } from './board.js';
+import { Color, Square, Piece } from '../types.js';
+import { SquareSet } from '../squareSet.js';
+import { Board } from '../board.js';
 import {
   between,
   ray,
@@ -14,10 +14,10 @@ import {
   goldAttacks,
   kingAttacks,
   pawnAttacks,
-} from './attacks.js';
-import { opposite, defined, squareFile } from './util.js';
-import { Hands } from './hands.js';
-import { dimensions } from './variantUtil.js';
+} from '../attacks.js';
+import { opposite, defined, squareFile } from '../util.js';
+import { Hands } from '../hands.js';
+import { dimensions } from './util.js';
 import { Context, Position, PositionError } from './position.js';
 
 export class Shogi extends Position {

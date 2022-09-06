@@ -54,9 +54,15 @@ export {
 
 export { Board } from './board.js';
 
-export { IllegalSetup, Position, PositionError, Context } from './position.js';
+export { IllegalSetup, Position, PositionError, Context } from './variant/position.js';
 
-export { Shogi } from './shogi.js';
+export { Shogi } from './variant/shogi.js';
+
+export { Minishogi } from './variant/minishogi.js';
+
+export * as variant from './variant/variant.js';
+
+export * as variantUtil from './variant/util.js';
 
 export * as compat from './compat.js';
 
@@ -79,7 +85,3 @@ export * as westernEngine from './notation/westernEngine.js';
 export * as kif from './notation/kif/kif.js';
 
 export * as csa from './notation/csa/csa.js';
-
-export * as variant from './variant.js';
-
-export * as variantUtil from './variantUtil.js';

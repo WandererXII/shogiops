@@ -1,4 +1,4 @@
-import { Shogi } from '../../src/shogi';
+import { Shogi } from '../../src/variant/shogi';
 import { makeWesternEngineMove } from '../../src/notation/westernEngine';
 import { parseUsi } from '../../src/util';
 

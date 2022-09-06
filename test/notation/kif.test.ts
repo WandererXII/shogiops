@@ -7,7 +7,7 @@ import {
   parseKifMoves,
   parseTags,
 } from '../../src/notation/kif/kif';
-import { Shogi } from '../../src/shogi';
+import { Shogi } from '../../src/variant/shogi';
 import { parseUsi } from '../../src/util';
 
 test('make kif header from some random position', () => {

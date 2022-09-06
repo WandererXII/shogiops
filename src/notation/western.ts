@@ -1,7 +1,7 @@
 import { roleToString } from '../util.js';
-import { Position } from '../position.js';
+import { Position } from '../variant/position.js';
 import { Move, isDrop } from '../types.js';
-import { pieceCanPromote } from '../variantUtil.js';
+import { pieceCanPromote } from '../variant/util.js';
 import { makeNumberSquare, piecesAiming } from './notationUtil.js';
 
 // P-76

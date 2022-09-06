@@ -1,37 +1,12 @@
 import { Result } from '@badrap/result';
-import { Color, Piece, RulesTypeMap, Square } from './types.js';
-import { PositionError, Position, Context } from './position.js';
-import { pseudoDropDests, pseudoMoveDests, Shogi } from './shogi.js';
-import { SquareSet } from './squareSet.js';
-import { Board } from './board.js';
-import { Hands } from './hands.js';
-import { opposite } from './util.js';
-import { bishopAttacks, goldAttacks, kingAttacks, pawnAttacks, rookAttacks, silverAttacks } from './attacks.js';
-
-export function defaultPosition<R extends keyof RulesTypeMap>(rules: R): RulesTypeMap[R] {
-  switch (rules) {
-    case 'minishogi':
-      return Minishogi.default();
-    default:
-      return Shogi.default();
-  }
-}
-
-export function initializePosition<R extends keyof RulesTypeMap>(
-  rules: R,
-  board: Board,
-  hands: Hands,
-  turn: Color,
-  moveNumber: number,
-  strict: boolean
-): Result<RulesTypeMap[R], PositionError> {
-  switch (rules) {
-    case 'minishogi':
-      return Minishogi.from(board, hands, turn, moveNumber, strict);
-    default:
-      return Shogi.from(board, hands, turn, moveNumber, strict);
-  }
-}
+import { bishopAttacks, goldAttacks, kingAttacks, pawnAttacks, rookAttacks, silverAttacks } from '../attacks.js';
+import { Board } from '../board.js';
+import { Hands } from '../hands.js';
+import { SquareSet } from '../squareSet.js';
+import { Color, Piece, Square } from '../types.js';
+import { opposite } from '../util.js';
+import { Context, Position, PositionError } from './position.js';
+import { pseudoDropDests, pseudoMoveDests } from './shogi.js';
 
 export class Minishogi extends Position {
   private constructor() {

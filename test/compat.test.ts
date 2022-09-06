@@ -1,4 +1,4 @@
-import { Shogi } from '../src/shogi';
+import { Shogi } from '../src/variant/shogi';
 import { shogigroundMoveDests, shogigroundDropDests } from '../src/compat';
 import { parseSfen } from '../src/sfen';
 

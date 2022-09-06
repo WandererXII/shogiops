@@ -1,7 +1,7 @@
 import { roleTo2Kanji, squareFile, squareRank } from '../util.js';
-import { Position } from '../position.js';
 import { Move, isDrop, Square, Piece } from '../types.js';
-import { pieceCanPromote } from '../variantUtil.js';
+import { Position } from '../variant/position.js';
+import { pieceCanPromote } from '../variant/util.js';
 import { makeJapaneseSquare, piecesAiming } from './notationUtil.js';
 import { SquareSet } from '../squareSet.js';
 

@@ -1,6 +1,6 @@
 import { parseSfen } from '../../src/sfen';
 import { makeJapaneseMove } from '../../src/notation/japanese';
-import { Shogi } from '../../src/shogi';
+import { Shogi } from '../../src/variant/shogi';
 import { parseUsi } from '../../src/util';
 
 test('basic moves', () => {

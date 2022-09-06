@@ -1,12 +1,11 @@
-import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
-import { Shogi } from '../../shogi.js';
+import { Hand, Hands } from '../../hands.js';
 import { Color, isDrop, Move } from '../../types.js';
 import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util.js';
-import { Hand, Hands } from '../../hands.js';
-import { allRoles, handRoles, promote } from '../../variantUtil.js';
+import { Shogi } from '../../variant/shogi.js';
+import { allRoles, handRoles, promote } from '../../variant/util.js';
 import { makeNumberSquare, parseNumberSquare } from '../notationUtil.js';
-import { initializePosition } from '../../variant.js';
+import { Result } from '@badrap/result';
 
 // Olny supports standard shogi no variants
 
@@ -78,7 +77,7 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
     defined(handicap) && !isWholeBoard ? parseCsaHandicap(handicap) : parseCsaBoard(lines.filter(l => /^P\d/.test(l)));
   const turn: Color = lines.some(l => l === '-') ? 'gote' : 'sente';
   return baseBoard.chain(board => {
-    return initializePosition('standard', board, Hands.empty(), turn, 1, true).chain(pos =>
+    return Shogi.from(board, Hands.empty(), turn, 1, true).chain(pos =>
       parseAdditions(
         pos,
         lines.filter(l => /P[\+|-]/.test(l))

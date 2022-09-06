@@ -1,6 +1,6 @@
-import { Shogi } from '../../src/shogi';
+import { Shogi } from '../../src/variant/shogi';
 import { makeWesternMove } from '../../src/notation/western';
-import { Minishogi } from '../../src/variant';
+import { Minishogi } from '../../src/variant/minishogi';
 import { parseUsi } from '../../src/util';
 
 test('basic moves', () => {

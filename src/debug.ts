@@ -1,8 +1,8 @@
 import { Square, Role } from './types.js';
 import { parsePieceName, makeSquare, makeUsi } from './util.js';
-import { Position } from './position.js';
+import { Position } from './variant/position.js';
+import { pieceCanPromote, pieceForcePromote } from './variant/util.js';
 import { SquareSet } from './squareSet.js';
-import { pieceCanPromote, pieceForcePromote } from './variantUtil.js';
 
 export function moveDests(moveDests: Map<Square, SquareSet>): string {
   const lines = [];

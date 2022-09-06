@@ -1,6 +1,6 @@
 import { parseSfen, makeSfen, makeBoardSfen, initialSfen } from '../src/sfen';
 import { Board } from '../src/board';
-import { defaultPosition } from '../src/variant';
+import { defaultPosition } from '../src/variant/variant';
 import { Hands } from '../src/hands';
 
 test('make board sfen', () => {

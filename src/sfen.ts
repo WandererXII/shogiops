@@ -30,6 +30,12 @@ function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
 }
 
+function parseColorLetter(str: string): Color | undefined {
+  if (str === 'b') return 'sente';
+  else if (str === 'w') return 'gote';
+  return;
+}
+
 function stringToPiece(s: string): Piece | undefined {
   const role = stringToRole(s);
   return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
@@ -43,9 +49,9 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
   if (dims.files !== ruleDims.files || dims.ranks !== ruleDims.ranks)
     return Result.err(new SfenError(InvalidSfen.Board));
   const board = Board.empty();
-  let empty = 0;
-  let rank = 0;
-  let file = dims.files - 1;
+  let empty = 0,
+    rank = 0,
+    file = dims.files - 1;
   for (let i = 0; i < boardPart.length; i++) {
     let c = boardPart[i];
     if (c === '/' && file < 0) {
@@ -61,8 +67,8 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
         if (file < 0 || file >= dims.files || rank < 0 || rank >= dims.ranks)
           return Result.err(new SfenError(InvalidSfen.Board));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
-        const square = parseCoordinates(file, rank)!;
-        const piece = stringToPiece(c);
+        const square = parseCoordinates(file, rank)!,
+          piece = stringToPiece(c);
         if (!piece) return Result.err(new SfenError(InvalidSfen.Board));
         board.set(square, piece);
         empty = 0;
@@ -104,42 +110,28 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   const parts = sfen.split(' ');
 
   // Board
-  const boardPart = parts.shift()!;
-  const board: Result<Board, SfenError> = parseBoardSfen(rules, boardPart);
+  const boardPart = parts.shift()!,
+    board: Result<Board, SfenError> = parseBoardSfen(rules, boardPart);
 
   // Turn
-  const turnPart = parts.shift();
-  let turn: Color;
-  if (!defined(turnPart) || turnPart === 'b') turn = 'sente';
-  else if (turnPart === 'w') turn = 'gote';
-  else return Result.err(new SfenError(InvalidSfen.Turn));
+  const turnPart = parts.shift(),
+    turn = defined(turnPart) ? parseColorLetter(turnPart) : 'sente';
+  if (!defined(turn)) return Result.err(new SfenError(InvalidSfen.Turn));
 
   // Hands
-  const handsPart = parts.shift();
-  let hands: Result<Hands, SfenError>;
-  if (!defined(handsPart)) hands = Result.ok(Hands.empty());
-  else hands = parseHands(handsPart);
+  const handsPart = parts.shift(),
+    hands = defined(handsPart) ? parseHands(handsPart) : Result.ok(Hands.empty());
 
-  // Turn
-  const moveNumberPart = parts.shift();
-  const moveNumber = defined(moveNumberPart) ? parseSmallUint(moveNumberPart) : 1;
+  // Move number
+  const moveNumberPart = parts.shift(),
+    moveNumber = defined(moveNumberPart) ? parseSmallUint(moveNumberPart) : 1;
   if (!defined(moveNumber)) return Result.err(new SfenError(InvalidSfen.MoveNumber));
 
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
 
   return board.chain(board =>
-    hands.chain(hands => {
-      return initializePosition(rules, board, hands, turn, Math.max(1, moveNumber), !!strict);
-    })
+    hands.chain(hands => initializePosition(rules, board, hands, turn, Math.max(1, moveNumber), !!strict))
   );
-}
-
-export function parsePiece(str: string): Piece | undefined {
-  if (!str) return;
-  const piece = stringToPiece(str[0]);
-  if (!piece) return;
-  else if (str.length > 1 && str[1] !== '+') return;
-  return piece;
 }
 
 export function makePiece(piece: Piece): string {

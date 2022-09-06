@@ -2,21 +2,27 @@ import { Square, Color, Role, Piece, ROLES, ColorMap, RoleMap } from './types.js
 import { SquareSet } from './squareSet.js';
 
 export class Board implements Iterable<[Square, Piece]> {
-  occupied: SquareSet;
+  private constructor(public occupied: SquareSet, private colorMap: ColorMap, private roleMap: RoleMap) {}
 
-  private colorMap: ColorMap;
-  private roleMap: RoleMap;
+  static empty(): Board {
+    return new Board(SquareSet.empty(), new Map(), new Map());
+  }
 
-  private constructor() {}
+  static from(
+    occupied: SquareSet,
+    colorsIter: Iterable<[Color, SquareSet]>,
+    rolesIter: Iterable<[Role, SquareSet]>
+  ): Board {
+    return new Board(occupied, new Map(colorsIter), new Map(rolesIter));
+  }
 
   static standard(): Board {
-    const board = new Board();
-    board.occupied = new SquareSet([0x8201ff, 0x1ff, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0]);
-    board.colorMap = new Map([
+    const occupied = new SquareSet([0x8201ff, 0x1ff, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0]);
+    const colorIter: [Color, SquareSet][] = [
       ['sente', new SquareSet([0x0, 0x0, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0])],
       ['gote', new SquareSet([0x8201ff, 0x1ff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])],
-    ]);
-    board.roleMap = new Map([
+    ];
+    const roleIter: [Role, SquareSet][] = [
       ['rook', new SquareSet([0x800000, 0x0, 0x0, 0x20000, 0x0, 0x0, 0x0, 0x0])],
       ['bishop', new SquareSet([0x20000, 0x0, 0x0, 0x800000, 0x0, 0x0, 0x0, 0x0])],
       ['gold', new SquareSet([0x28, 0x0, 0x0, 0x0, 0x28, 0x0, 0x0, 0x0])],
@@ -25,42 +31,29 @@ export class Board implements Iterable<[Square, Piece]> {
       ['lance', new SquareSet([0x101, 0x0, 0x0, 0x0, 0x101, 0x0, 0x0, 0x0])],
       ['pawn', new SquareSet([0x0, 0x1ff, 0x0, 0x1ff, 0x0, 0x0, 0x0, 0x0])],
       ['king', new SquareSet([0x10, 0x0, 0x0, 0x0, 0x10, 0x0, 0x0, 0x0])],
-    ]);
-    return board;
+    ];
+    return Board.from(occupied, colorIter, roleIter);
   }
 
   static minishogi(): Board {
-    const board = new Board();
-    board.occupied = new SquareSet([0x1001f, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
-    board.colorMap = new Map([
+    const occupied = new SquareSet([0x1001f, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    const colorMap: [Color, SquareSet][] = [
       ['sente', new SquareSet([0x0, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0])],
       ['gote', new SquareSet([0x1001f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])],
-    ]);
-    board.roleMap = new Map([
+    ];
+    const roleMap: [Role, SquareSet][] = [
       ['rook', new SquareSet([0x10, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0])],
       ['bishop', new SquareSet([0x8, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0])],
       ['gold', new SquareSet([0x2, 0x0, 0x8, 0x0, 0x0, 0x0, 0x0, 0x0])],
       ['silver', new SquareSet([0x4, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0])],
       ['pawn', new SquareSet([0x10000, 0x100000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])],
       ['king', new SquareSet([0x1, 0x0, 0x10, 0x0, 0x0, 0x0, 0x0, 0x0])],
-    ]);
-    return board;
-  }
-
-  static empty(): Board {
-    const board = new Board();
-    board.occupied = SquareSet.empty();
-    board.colorMap = new Map();
-    board.roleMap = new Map();
-    return board;
+    ];
+    return Board.from(occupied, colorMap, roleMap);
   }
 
   clone(): Board {
-    const board = new Board();
-    board.occupied = this.occupied;
-    board.colorMap = new Map(this.colorMap);
-    board.roleMap = new Map(this.roleMap);
-    return board;
+    return Board.from(this.occupied, this.colorMap, this.roleMap);
   }
 
   role(role: Role): SquareSet {

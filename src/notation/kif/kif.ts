@@ -115,7 +115,7 @@ export function parseKifPositionHeader(kif: string): Result<Position, KifError> 
   return board.chain(board =>
     goteHand.chain(gHand =>
       senteHand.chain(sHand => {
-        return initializePosition(rules, board, new Hands(gHand, sHand), turn, 1, true);
+        return initializePosition(rules, board, Hands.from(sHand, gHand), turn, 1, true);
       })
     )
   );

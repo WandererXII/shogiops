@@ -2,18 +2,18 @@ import { Color, HandMap, Role, ROLES } from './types.js';
 
 // Hand alone can store any role
 export class Hand {
-  private handMap: HandMap;
-
-  private constructor(h: HandMap) {
-    this.handMap = h;
-  }
+  private constructor(private handMap: HandMap) {}
 
   static empty(): Hand {
     return new Hand(new Map());
   }
 
+  static from(iter: Iterable<[Role, number]>): Hand {
+    return new Hand(new Map(iter));
+  }
+
   clone(): Hand {
-    return new Hand(new Map(this.handMap));
+    return Hand.from(this.handMap);
   }
 
   combine(other: Hand): Hand {
@@ -62,18 +62,22 @@ export class Hand {
 }
 
 export class Hands {
-  constructor(private gote: Hand, private sente: Hand) {}
+  private constructor(private sente: Hand, private gote: Hand) {}
 
   static empty(): Hands {
     return new Hands(Hand.empty(), Hand.empty());
   }
 
+  static from(sente: Hand, gote: Hand): Hands {
+    return new Hands(sente, gote);
+  }
+
   clone(): Hands {
-    return new Hands(this.gote.clone(), this.sente.clone());
+    return new Hands(this.sente.clone(), this.gote.clone());
   }
 
   combine(other: Hands): Hands {
-    return new Hands(this.gote.combine(other.gote), this.sente.combine(other.sente));
+    return new Hands(this.sente.combine(other.sente), this.gote.combine(other.gote));
   }
 
   color(color: Color): Hand {
@@ -82,15 +86,15 @@ export class Hands {
   }
 
   equals(other: Hands): boolean {
-    return this.gote.equals(other.gote) && this.sente.equals(other.sente);
+    return this.sente.equals(other.sente) && this.gote.equals(other.gote);
   }
 
   count(): number {
-    return this.gote.count() + this.sente.count();
+    return this.sente.count() + this.gote.count();
   }
 
   isEmpty(): boolean {
-    return this.gote.isEmpty() && this.sente.isEmpty();
+    return this.sente.isEmpty() && this.gote.isEmpty();
   }
 
   nonEmpty(): boolean {

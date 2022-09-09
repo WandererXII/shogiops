@@ -1,8 +1,8 @@
 import { Result } from '@badrap/result';
 import { Board } from './board.js';
 import { Hand, Hands } from './hands.js';
-import { Color, Piece, Rules, RulesTypeMap } from './types.js';
-import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
+import { Color, Piece, Role, Rules, RulesTypeMap } from './types.js';
+import { defined, parseCoordinates, toBW } from './util.js';
 import { Position } from './variant/position.js';
 import { dimensions, handRoles } from './variant/util.js';
 import { initializePosition } from './variant/variant.js';
@@ -14,6 +14,7 @@ export enum InvalidSfen {
   Turn = 'ERR_TURN',
   MoveNumber = 'ERR_MOVENUMBER',
 }
+export class SfenError extends Error {}
 
 export function initialSfen(rules: Rules): string {
   switch (rules) {
@@ -24,7 +25,87 @@ export function initialSfen(rules: Rules): string {
   }
 }
 
-export class SfenError extends Error {}
+export function roleToForsyth(rules: Rules): (role: Role) => string {
+  switch (rules) {
+    default:
+      return standardRoleToForsyth;
+  }
+}
+
+export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
+  switch (rules) {
+    default:
+      return standardForsythToRole;
+  }
+}
+
+function standardRoleToForsyth(role: Role): string {
+  switch (role) {
+    case 'pawn':
+      return 'p';
+    case 'lance':
+      return 'l';
+    case 'knight':
+      return 'n';
+    case 'silver':
+      return 's';
+    case 'gold':
+      return 'g';
+    case 'bishop':
+      return 'b';
+    case 'rook':
+      return 'r';
+    case 'tokin':
+      return '+p';
+    case 'promotedlance':
+      return '+l';
+    case 'promotedknight':
+      return '+n';
+    case 'promotedsilver':
+      return '+s';
+    case 'horse':
+      return '+b';
+    case 'dragon':
+      return '+r';
+    default:
+      return 'k';
+  }
+}
+
+function standardForsythToRole(ch: string): Role | undefined {
+  switch (ch.toLowerCase()) {
+    case 'p':
+      return 'pawn';
+    case 'l':
+      return 'lance';
+    case 'n':
+      return 'knight';
+    case 's':
+      return 'silver';
+    case 'g':
+      return 'gold';
+    case 'b':
+      return 'bishop';
+    case 'r':
+      return 'rook';
+    case '+p':
+      return 'tokin';
+    case '+l':
+      return 'promotedlance';
+    case '+n':
+      return 'promotedknight';
+    case '+s':
+      return 'promotedsilver';
+    case '+b':
+      return 'horse';
+    case '+r':
+      return 'dragon';
+    case 'k':
+      return 'king';
+    default:
+      return;
+  }
+}
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
@@ -36,8 +117,8 @@ function parseColorLetter(str: string): Color | undefined {
   return;
 }
 
-function stringToPiece(s: string): Piece | undefined {
-  const role = stringToRole(s);
+function stringToPiece(rules: Rules, s: string): Piece | undefined {
+  const role = forsythToRole(rules)(s);
   return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
 }
 
@@ -68,7 +149,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
           return Result.err(new SfenError(InvalidSfen.Board));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
         const square = parseCoordinates(file, rank)!,
-          piece = stringToPiece(c);
+          piece = stringToPiece(rules, c);
         if (!piece) return Result.err(new SfenError(InvalidSfen.Board));
         board.set(square, piece);
         empty = 0;
@@ -81,7 +162,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
   return Result.ok(board);
 }
 
-export function parseHands(handsPart: string): Result<Hands, SfenError> {
+export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenError> {
   const hands = Hands.empty();
   for (let i = 0; i < handsPart.length; i++) {
     if (handsPart[i] === '-') break;
@@ -94,7 +175,7 @@ export function parseHands(handsPart: string): Result<Hands, SfenError> {
         i++;
       }
     } else count = 1;
-    const piece = stringToPiece(handsPart[i]);
+    const piece = stringToPiece(rules, handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
     count += hands[piece.color].get(piece.role);
     hands[piece.color].set(piece.role, count);
@@ -120,7 +201,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
 
   // Hands
   const handsPart = parts.shift(),
-    hands = defined(handsPart) ? parseHands(handsPart) : Result.ok(Hands.empty());
+    hands = defined(handsPart) ? parseHands(rules, handsPart) : Result.ok(Hands.empty());
 
   // Move number
   const moveNumberPart = parts.shift(),
@@ -134,8 +215,8 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   );
 }
 
-export function makePiece(piece: Piece): string {
-  let r = roleToString(piece.role);
+export function makePiece(rules: Rules, piece: Piece): string {
+  let r = roleToForsyth(rules)(piece.role);
   if (piece.color === 'sente') r = r.toUpperCase();
   return r;
 }
@@ -154,7 +235,7 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
           sfen += empty;
           empty = 0;
         }
-        sfen += makePiece(piece);
+        sfen += makePiece(rules, piece);
       }
 
       if (file === 0) {
@@ -172,7 +253,7 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
 export function makeHand(rules: Rules, hand: Hand): string {
   return handRoles(rules)
     .map(role => {
-      const r = roleToString(role);
+      const r = roleToForsyth(rules)(role);
       const n = hand.get(role);
       return n > 1 ? n + r : n === 1 ? r : '';
     })

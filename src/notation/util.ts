@@ -11,6 +11,39 @@ export function piecesAiming(pos: Position, piece: Piece, to: Square): SquareSet
   return pieces;
 }
 
+export function roleToWestern(role: Role): string {
+  switch (role) {
+    case 'pawn':
+      return 'p';
+    case 'lance':
+      return 'l';
+    case 'knight':
+      return 'n';
+    case 'silver':
+      return 's';
+    case 'gold':
+      return 'g';
+    case 'bishop':
+      return 'b';
+    case 'rook':
+      return 'r';
+    case 'tokin':
+      return '+p';
+    case 'promotedlance':
+      return '+l';
+    case 'promotedknight':
+      return '+n';
+    case 'promotedsilver':
+      return '+s';
+    case 'horse':
+      return '+b';
+    case 'dragon':
+      return '+r';
+    default:
+      return 'k';
+  }
+}
+
 export function roleTo1Kanji(role: Role): string {
   switch (role) {
     case 'pawn':

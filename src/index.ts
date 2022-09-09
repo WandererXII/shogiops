@@ -21,18 +21,7 @@ export {
   Outcome,
 } from './types.js';
 
-export {
-  stringToRole,
-  defined,
-  makeSquare,
-  makeUsi,
-  opposite,
-  parseSquare,
-  parseUsi,
-  roleToString,
-  squareFile,
-  squareRank,
-} from './util.js';
+export { defined, makeSquare, makeUsi, opposite, parseSquare, parseUsi, squareFile, squareRank } from './util.js';
 
 export { SquareSet } from './squareSet.js';
 

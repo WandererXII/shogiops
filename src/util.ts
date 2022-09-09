@@ -16,119 +16,6 @@ export function squareFile(square: Square): number {
   return square & 15;
 }
 
-// move to variant...
-export function roleToString(role: Role): string {
-  switch (role) {
-    case 'pawn':
-      return 'p';
-    case 'lance':
-      return 'l';
-    case 'knight':
-      return 'n';
-    case 'silver':
-      return 's';
-    case 'gold':
-      return 'g';
-    case 'bishop':
-      return 'b';
-    case 'rook':
-      return 'r';
-    case 'tokin':
-      return '+p';
-    case 'promotedlance':
-      return '+l';
-    case 'promotedknight':
-      return '+n';
-    case 'promotedsilver':
-      return '+s';
-    case 'horse':
-      return '+b';
-    case 'dragon':
-      return '+r';
-    default:
-      return 'k';
-  }
-}
-
-export function stringToRole(
-  ch:
-    | 'p'
-    | 'l'
-    | 'n'
-    | 's'
-    | 'g'
-    | 'b'
-    | 'r'
-    | '+p'
-    | '+l'
-    | '+n'
-    | '+s'
-    | '+b'
-    | '+r'
-    | 'P'
-    | 'L'
-    | 'N'
-    | 'S'
-    | 'G'
-    | 'B'
-    | 'R'
-    | '+P'
-    | '+L'
-    | '+N'
-    | '+S'
-    | '+B'
-    | '+R'
-): Role;
-export function stringToRole(ch: string): Role | undefined;
-export function stringToRole(ch: string): Role | undefined {
-  switch (ch) {
-    case 'P':
-    case 'p':
-      return 'pawn';
-    case 'L':
-    case 'l':
-      return 'lance';
-    case 'N':
-    case 'n':
-      return 'knight';
-    case 'S':
-    case 's':
-      return 'silver';
-    case 'G':
-    case 'g':
-      return 'gold';
-    case 'B':
-    case 'b':
-      return 'bishop';
-    case 'R':
-    case 'r':
-      return 'rook';
-    case '+P':
-    case '+p':
-      return 'tokin';
-    case '+L':
-    case '+l':
-      return 'promotedlance';
-    case '+N':
-    case '+n':
-      return 'promotedknight';
-    case '+S':
-    case '+s':
-      return 'promotedsilver';
-    case '+B':
-    case '+b':
-      return 'horse';
-    case '+R':
-    case '+r':
-      return 'dragon';
-    case 'K':
-    case 'k':
-      return 'king';
-    default:
-      return;
-  }
-}
-
 export function makePieceName(piece: Piece): PieceName {
   return `${piece.color} ${piece.role}`;
 }
@@ -159,9 +46,31 @@ export function makeSquare(square: Square): SquareName {
   return (FILE_NAMES[squareFile(square)] + RANK_NAMES[squareRank(square)]) as SquareName;
 }
 
+// other roles can't be dropped with any current variant
+function parseUsiDropRole(ch: string): Role | undefined {
+  switch (ch.toUpperCase()) {
+    case 'P':
+      return 'pawn';
+    case 'L':
+      return 'lance';
+    case 'N':
+      return 'knight';
+    case 'S':
+      return 'silver';
+    case 'G':
+      return 'gold';
+    case 'B':
+      return 'bishop';
+    case 'R':
+      return 'rook';
+    default:
+      return;
+  }
+}
+
 export function parseUsi(str: string): Move | undefined {
   if (str[1] === '*') {
-    const role = stringToRole(str[0]);
+    const role = parseUsiDropRole(str[0]);
     const to = parseSquare(str.slice(2));
     if (defined(role) && defined(to)) return { role, to };
   } else if (str.length >= 4 && str.length <= 7) {
@@ -175,8 +84,12 @@ export function parseUsi(str: string): Move | undefined {
   return;
 }
 
+function makeUsiDropRole(role: Role): string {
+  return role === 'knight' ? 'N' : role[0].toUpperCase();
+}
+
 export function makeUsi(move: Move): string {
-  if (isDrop(move)) return `${roleToString(move.role).toUpperCase()}*${makeSquare(move.to)}`;
+  if (isDrop(move)) return `${makeUsiDropRole(move.role).toUpperCase()}*${makeSquare(move.to)}`;
   return makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? '+' : '');
 }
 

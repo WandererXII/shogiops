@@ -8,6 +8,7 @@ import {
   eagleAttacks,
   elephantAttacks,
   falconAttacks,
+  goBetweenAttacks,
   goldAttacks,
   kingAttacks,
   kirinAttacks,
@@ -68,53 +69,12 @@ export class Chushogi extends Position {
     const defender = opposite(attacker),
       board = this.board;
     return board.color(attacker).intersect(
-      rookAttacks(square, occupied)
-        .intersect(
-          board
-            .role('rook')
-            .union(board.role('promotedrook'))
-            .union(board.role('dragon'))
-            .union(board.role('promoteddragon'))
-        )
-        .union(
-          bishopAttacks(square, occupied).intersect(
-            board
-              .role('bishop')
-              .union(board.role('promotedbishop'))
-              .union(board.role('horse'))
-              .union(board.role('promotedhorse'))
-          )
-        )
-        .union(
-          elephantAttacks(square, defender).intersect(board.role('elephant').union(board.role('promotedelephant')))
-        )
-        .union(
-          sideMoverAttacks(square, occupied).intersect(board.role('sidemover').union(board.role('promotedsidemover')))
-        )
-        .union(falconAttacks(square, defender, occupied).intersect(board.role('falcon')))
-        .union(eagleAttacks(square, defender, occupied).intersect(board.role('eagle')))
-        .union(boarAttacks(square, occupied).intersect(board.role('boar')))
-        .union(
-          verticalMoverAttacks(square, occupied).intersect(
-            board.role('verticalmover').union(board.role('promotedverticalmover'))
-          )
-        )
-        .union(oxAttacks(square, occupied).intersect(board.role('ox')))
-        .union(goldAttacks(square, defender).intersect(board.role('gold').union(board.role('tokin'))))
-        .union(silverAttacks(square, defender).intersect(board.role('silver')))
-        .union(lionAttacks(square).intersect(board.role('lion').union(board.role('promotedlion'))))
-        .union(queenAttacks(square, occupied).intersect(board.role('queen').union(board.role('promotedqueen'))))
-        .union(chariotAttacks(square, occupied).intersect(board.role('chariot')))
-        .union(whaleAttacks(square, defender, occupied).intersect(board.role('whale')))
-        .union(tigerAttacks(square, defender).intersect(board.role('tiger')))
-        .union(kirinAttacks(square).intersect(board.role('kirin')))
-        .union(phoenixAttacks(square).intersect(board.role('phoenix')))
-        .union(lanceAttacks(square, defender, occupied).intersect(board.role('lance')))
-        .union(whiteHorseAttacks(square, defender, occupied).intersect(board.role('whitehorse')))
+      lanceAttacks(square, defender, occupied)
+        .intersect(board.role('lance'))
         .union(leopardAttacks(square).intersect(board.role('leopard')))
-        .union(stagAttacks(square, occupied).intersect(board.role('stag')))
         .union(copperAttacks(square, defender).intersect(board.role('copper')))
-        .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
+        .union(silverAttacks(square, defender).intersect(board.role('silver')))
+        .union(goldAttacks(square, defender).intersect(board.role('gold').union(board.role('tokin'))))
         .union(
           kingAttacks(square).intersect(
             board
@@ -126,6 +86,50 @@ export class Chushogi extends Position {
               .union(board.role('promotedhorse'))
           )
         )
+        .union(
+          elephantAttacks(square, defender).intersect(board.role('elephant').union(board.role('promotedelephant')))
+        )
+        .union(chariotAttacks(square, occupied).intersect(board.role('chariot')))
+        .union(
+          bishopAttacks(square, occupied).intersect(
+            board
+              .role('bishop')
+              .union(board.role('promotedbishop'))
+              .union(board.role('horse'))
+              .union(board.role('promotedhorse'))
+          )
+        )
+        .union(tigerAttacks(square, defender).intersect(board.role('tiger')))
+        .union(kirinAttacks(square).intersect(board.role('kirin')))
+        .union(phoenixAttacks(square).intersect(board.role('phoenix')))
+        .union(
+          sideMoverAttacks(square, occupied).intersect(board.role('sidemover').union(board.role('promotedsidemover')))
+        )
+        .union(
+          verticalMoverAttacks(square, occupied).intersect(
+            board.role('verticalmover').union(board.role('promotedverticalmover'))
+          )
+        )
+        .union(
+          rookAttacks(square, occupied).intersect(
+            board
+              .role('rook')
+              .union(board.role('promotedrook'))
+              .union(board.role('dragon'))
+              .union(board.role('promoteddragon'))
+          )
+        )
+        .union(lionAttacks(square).intersect(board.role('lion').union(board.role('promotedlion'))))
+        .union(queenAttacks(square, occupied).intersect(board.role('queen').union(board.role('promotedqueen'))))
+        .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
+        .union(goBetweenAttacks(square).intersect(board.role('gobetween')))
+        .union(whiteHorseAttacks(square, defender, occupied).intersect(board.role('whitehorse')))
+        .union(whaleAttacks(square, defender, occupied).intersect(board.role('whale')))
+        .union(stagAttacks(square, occupied).intersect(board.role('stag')))
+        .union(boarAttacks(square, occupied).intersect(board.role('boar')))
+        .union(oxAttacks(square, occupied).intersect(board.role('ox')))
+        .union(falconAttacks(square, defender, occupied).intersect(board.role('falcon')))
+        .union(eagleAttacks(square, defender, occupied).intersect(board.role('eagle')))
     );
   }
 

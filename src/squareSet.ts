@@ -364,6 +364,15 @@ export class SquareSet implements Iterable<Square> {
     return this.nonEmpty() && !this.moreThanOne();
   }
 
+  hex(): string {
+    let s = '';
+    for (let i = 0; i < 8; i++) {
+      if (i > 0) s += ', ';
+      s += `0x${this.dRows[i].toString(16)}`;
+    }
+    return s;
+  }
+
   visual(): string {
     let str = '';
     for (let y = 0; y < 8; y++) {

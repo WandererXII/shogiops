@@ -233,18 +233,23 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
     case 'gold':
       return goldAttacks(square, piece.color);
     case 'bishop':
+    case 'promotedbishop':
       return bishopAttacks(square, occupied);
     case 'rook':
+    case 'promotedrook':
       return rookAttacks(square, occupied);
     case 'horse':
+    case 'promotedhorse':
       return horseAttacks(square, occupied);
     case 'dragon':
+    case 'promoteddragon':
       return dragonAttacks(square, occupied);
     case 'tiger':
       return tigerAttacks(square, piece.color);
     case 'copper':
       return copperAttacks(square, piece.color);
     case 'elephant':
+    case 'promotedelephant':
       return elephantAttacks(square, piece.color);
     case 'leopard':
       return leopardAttacks(square);
@@ -261,18 +266,22 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
     case 'kirin':
       return kirinAttacks(square);
     case 'lion':
+    case 'promotedlion':
       return lionAttacks(square);
     case 'phoenix':
       return phoenixAttacks(square);
     case 'queen':
+    case 'promotedqueen':
       return queenAttacks(square, occupied);
     case 'chariot':
       return chariotAttacks(square, occupied);
     case 'sidemover':
+    case 'promotedsidemover':
       return sideMoverAttacks(square, occupied);
     case 'eagle':
       return eagleAttacks(square, piece.color, occupied);
     case 'verticalmover':
+    case 'promotedverticalmover':
       return verticalMoverAttacks(square, occupied);
     case 'whale':
       return whaleAttacks(square, piece.color, occupied);

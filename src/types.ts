@@ -1,4 +1,5 @@
 import type { SquareSet } from './squareSet.js';
+import type { Chushogi } from './variant/chushogi.js';
 import type { Minishogi } from './variant/minishogi.js';
 import type { Shogi } from './variant/shogi.js';
 
@@ -43,60 +44,50 @@ export type ByColor<T> = {
 };
 
 export const ROLES = [
-  'rook',
-  'bishop',
-  'gold',
-  'silver',
-  'knight',
   'lance',
+  'knight',
+  'silver',
+  'gold',
+  'king',
+  'bishop',
+  'rook',
   'pawn',
-  'dragon',
-  'horse',
+  'promotedlance',
   'promotedsilver',
   'promotedknight',
-  'promotedlance',
+  'horse',
+  'dragon',
   'tokin',
-  'king',
-  'tiger',
+  // chushogi
+  'leopard',
   'copper',
   'elephant',
-  'leopard',
-  'ox',
-  'stag',
-  'boar',
-  'gobetween',
-  'falcon',
-  'kirin',
-  'lion',
-  'phoenix',
-  'prince',
-  'queen',
   'chariot',
-  'sidemover',
-  'eagle',
-  'verticalmover',
-  'whale',
-  'whitehorse',
   'tiger',
-  'copper',
-  'elephant',
-  'leopard',
-  'ox',
-  'stag',
-  'boar',
-  'gobetween',
-  'falcon',
   'kirin',
-  'lion',
   'phoenix',
-  'prince',
-  'queen',
-  'chariot',
   'sidemover',
-  'eagle',
   'verticalmover',
-  'whale',
+  'lion',
+  'queen',
+  'gobetween',
   'whitehorse',
+  'promotedbishop',
+  'promotedsidemover',
+  'promotedverticalmover',
+  'promotedrook',
+  'prince',
+  'whale',
+  'promotedhorse',
+  'stag',
+  'promotedlion',
+  'promotedqueen',
+  'boar',
+  'ox',
+  'falcon',
+  'eagle',
+  'promoteddragon',
+  'promotedelephant',
 ] as const;
 export type Role = typeof ROLES[number];
 
@@ -132,11 +123,12 @@ export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 
-export const RULES = ['standard', 'minishogi'] as const;
+export const RULES = ['standard', 'minishogi', 'chushogi'] as const;
 export type Rules = typeof RULES[number];
 export interface RulesTypeMap {
   standard: Shogi;
   minishogi: Minishogi;
+  chushogi: Chushogi;
 }
 
 export interface Outcome {

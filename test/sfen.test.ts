@@ -48,4 +48,14 @@ test('minishogi sfen', () => {
   expect(pos).toEqual(defaultPosition('minishogi'));
   expect(makeBoardSfen('minishogi', pos.board)).toEqual('rbsgk/4p/5/P4/KGSBR');
   expect(makeBoardSfen('minishogi', defaultPosition('minishogi').board)).toEqual('rbsgk/4p/5/P4/KGSBR');
+  expect(makeSfen(pos)).toEqual(initialSfen('minishogi'));
+});
+
+test('chushogi sfen', () => {
+  const pos = parseSfen(
+    'chushogi',
+    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1'
+  ).unwrap();
+  expect(pos).toEqual(defaultPosition('chushogi'));
+  expect(makeSfen(pos)).toEqual(initialSfen('chushogi'));
 });

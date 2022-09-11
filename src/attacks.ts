@@ -192,27 +192,27 @@ export function falconAttacks(square: Square, color: Color, occupied: SquareSet)
   if (color === 'sente')
     return bishopAttacks(square, occupied)
       .union(rookAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
-      .withMany([square, square - 16, square - 32]);
+      .withMany([square - 16, square - 32]);
   else
     return bishopAttacks(square, occupied)
       .union(rookAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]))
-      .withMany([square, square + 16, square + 32]);
+      .withMany([square + 16, square + 32]);
 }
 
 export function eagleAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return rookAttacks(square, occupied)
       .union(bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
-      .union(computeRange(square, [-15, -17, 0, -30, -34]));
+      .union(computeRange(square, [-15, -17, -30, -34]));
   else
     return rookAttacks(square, occupied)
       .union(bishopAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]))
-      .union(computeRange(square, [15, 17, 0, 30, 34]));
+      .union(computeRange(square, [15, 17, 30, 34]));
 }
 
 export function lionAttacks(square: Square): SquareSet {
   return NEIGHBORS[square].union(
-    computeRange(square, [-34, -33, -32, -31, -30, -18, -14, -2, 0, 2, 14, 18, 30, 31, 32, 33, 34])
+    computeRange(square, [-34, -33, -32, -31, -30, -18, -14, -2, 2, 14, 18, 30, 31, 32, 33, 34])
   );
 }
 

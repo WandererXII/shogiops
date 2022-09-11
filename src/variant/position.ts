@@ -31,6 +31,7 @@ export abstract class Position {
   turn: Color;
   moveNumber: number;
   lastMove: Move | undefined;
+  lastCapture: Piece | undefined;
 
   protected fullSquareSet: SquareSet;
 
@@ -229,6 +230,7 @@ export abstract class Position {
         piece.role = promote(this.rules)(piece.role) || piece.role;
 
       const capture = this.board.set(move.to, piece);
+      this.lastCapture = capture;
       if (capture) {
         const unpromotedRole = unpromote(this.rules)(capture.role) || capture.role;
         if (handRoles(this.rules).includes(unpromotedRole)) this.hands[opposite(capture.color)].capture(unpromotedRole);

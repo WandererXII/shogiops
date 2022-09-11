@@ -231,7 +231,7 @@ export abstract class Position {
       const capture = this.board.set(move.to, piece);
       if (capture) {
         const unpromotedRole = unpromote(this.rules)(capture.role) || capture.role;
-        this.hands[opposite(capture.color)].capture(unpromotedRole);
+        if (handRoles(this.rules).includes(unpromotedRole)) this.hands[opposite(capture.color)].capture(unpromotedRole);
       }
     }
   }

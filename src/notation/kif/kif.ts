@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
 import { Hand, Hands } from '../../hands.js';
 import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
-import { Color, Move, ROLES, Rules, Square, isDrop } from '../../types.js';
+import { Color, Move, Rules, Square, isDrop } from '../../types.js';
 import { defined, parseCoordinates } from '../../util.js';
 import { Position } from '../../variant/position.js';
 import { allRoles, dimensions, handRoles, promote } from '../../variant/util.js';
@@ -42,9 +42,9 @@ export function makeKifHeader(pos: Position): string {
 
 export function makeKifPositionHeader(pos: Position): string {
   return [
-    '後手の持駒：' + makeKifHand(pos.hands.color('gote')),
+    '後手の持駒：' + makeKifHand(pos.rules, pos.hands.color('gote')),
     makeKifBoard(pos.board, pos.rules),
-    '先手の持駒：' + makeKifHand(pos.hands.color('sente')),
+    '先手の持駒：' + makeKifHand(pos.rules, pos.hands.color('sente')),
     ...(pos.turn === 'gote' ? ['後手番'] : []),
   ].join('\n');
 }
@@ -76,13 +76,14 @@ export function makeKifBoard(board: Board, rules: Rules): string {
   return kifBoard;
 }
 
-export function makeKifHand(hand: Hand): string {
+export function makeKifHand(rules: Rules, hand: Hand): string {
   if (hand.isEmpty()) return 'なし';
-  return ROLES.map(role => {
-    const r = roleTo1Kanji(role);
-    const n = hand.get(role);
-    return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
-  })
+  return handRoles(rules)
+    .map(role => {
+      const r = roleTo1Kanji(role);
+      const n = hand.get(role);
+      return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
+    })
     .filter(p => p.length > 0)
     .join(' ');
 }

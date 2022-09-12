@@ -1,11 +1,17 @@
 import { Result } from '@badrap/result';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
-import { Color, RulesTypeMap } from '../types.js';
+import { Color } from '../types.js';
 import { Chushogi } from './chushogi.js';
 import { Minishogi } from './minishogi.js';
 import { PositionError } from './position.js';
 import { Shogi } from './shogi.js';
+
+export interface RulesTypeMap {
+  standard: Shogi;
+  minishogi: Minishogi;
+  chushogi: Chushogi;
+}
 
 export function defaultPosition<R extends keyof RulesTypeMap>(rules: R): RulesTypeMap[R] {
   switch (rules) {

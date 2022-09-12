@@ -1,7 +1,4 @@
 import type { SquareSet } from './squareSet.js';
-import type { Chushogi } from './variant/chushogi.js';
-import type { Minishogi } from './variant/minishogi.js';
-import type { Shogi } from './variant/shogi.js';
 
 export const FILE_NAMES = [
   '1',
@@ -125,11 +122,6 @@ export function isNormal(v: Move): v is NormalMove {
 
 export const RULES = ['standard', 'minishogi', 'chushogi'] as const;
 export type Rules = typeof RULES[number];
-export interface RulesTypeMap {
-  standard: Shogi;
-  minishogi: Minishogi;
-  chushogi: Chushogi;
-}
 
 export interface Outcome {
   winner: Color | undefined;

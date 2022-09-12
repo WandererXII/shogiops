@@ -17,7 +17,11 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
       const roleStr = roleTo2Kanji(piece.role);
       const ambPieces = piecesAiming(pos, piece, move.to).without(move.from);
       const ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces);
-      const promStr = move.promotion ? '成' : pieceCanPromote(pos.rules)(piece, move.from, move.to) ? '不成' : '';
+      const promStr = move.promotion
+        ? '成'
+        : pieceCanPromote(pos.rules)(piece, move.from, move.to, pos.board.get(move.to))
+        ? '不成'
+        : '';
       return `${destStr}${roleStr}${ambStr}${promStr}`;
     } else return undefined;
   }

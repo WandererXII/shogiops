@@ -28,7 +28,7 @@ export function perft(pos: Position, depth: number, log = false): number {
     for (const to of moveDests) {
       const promotions: Array<boolean> = [];
       const piece = pos.board.get(from)!;
-      if (pieceCanPromote(pos.rules)(piece, from, to)) {
+      if (pieceCanPromote(pos.rules)(piece, from, to, pos.board.get(to))) {
         promotions.push(true);
         if (!pieceForcePromote(pos.rules)(piece, to)) promotions.push(false);
       } else promotions.push(false);

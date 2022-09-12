@@ -14,9 +14,10 @@ export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Squa
       const ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty()
         ? ''
         : `(${makeNumberSquare(move.from)})`;
-      const actionStr = pos.board.has(move.to) ? 'x' : '-';
+      const capture = pos.board.get(move.to);
+      const actionStr = !!capture ? 'x' : '-';
       const destStr = lastDest === move.to ? '' : makeNumberSquare(move.to);
-      const promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to) ? '=' : '';
+      const promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture) ? '=' : '';
       return `${roleStr}${ambStr}${actionStr}${destStr}${promStr}`;
     } else return undefined;
   }

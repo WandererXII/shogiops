@@ -33,7 +33,7 @@ export abstract class Position {
   lastMove: Move | undefined;
   lastCapture: Piece | undefined;
 
-  protected fullSquareSet: SquareSet;
+  fullSquareSet: SquareSet;
 
   protected constructor(readonly rules: Rules) {}
 
@@ -150,7 +150,8 @@ export abstract class Position {
       if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
 
       // Checking whether we can promote
-      if (move.promotion && !pieceCanPromote(this.rules)(piece, move.from, move.to)) return false;
+      if (move.promotion && !pieceCanPromote(this.rules)(piece, move.from, move.to, this.board.get(move.to)))
+        return false;
       if (!move.promotion && pieceForcePromote(this.rules)(piece, move.to)) return false;
 
       const moveDests = this.moveDests(move.from, ctx);
@@ -224,7 +225,7 @@ export abstract class Position {
       const piece = this.board.take(move.from);
       if (!piece) return;
       if (
-        (move.promotion && pieceCanPromote(this.rules)(piece, move.from, move.to)) ||
+        (move.promotion && pieceCanPromote(this.rules)(piece, move.from, move.to, this.board.get(move.to))) ||
         pieceForcePromote(this.rules)(piece, move.to)
       )
         piece.role = promote(this.rules)(piece.role) || piece.role;

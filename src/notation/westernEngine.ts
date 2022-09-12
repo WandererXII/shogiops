@@ -13,8 +13,9 @@ export function makeWesternEngineMove(pos: Position, move: Move): string | undef
     if (piece) {
       const roleStr = roleToWestern(piece.role).toUpperCase();
       const ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty() ? '' : makeSquare(move.from);
-      const actionStr = pos.board.has(move.to) ? 'x' : '-';
-      const promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to) ? '=' : '';
+      const capture = pos.board.get(move.to);
+      const actionStr = !!capture ? 'x' : '-';
+      const promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture) ? '=' : '';
       return `${roleStr}${ambStr}${actionStr}${makeSquare(move.to)}${promStr}`;
     } else return undefined;
   }

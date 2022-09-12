@@ -2,10 +2,12 @@ import { SquareSet } from '../squareSet.js';
 import { Color, Dimensions, Piece, Role, Rules, Square } from '../types.js';
 import { squareRank } from '../util.js';
 
-export function pieceCanPromote(rules: Rules): (piece: Piece, from: Square, to: Square) => boolean {
+export function pieceCanPromote(
+  rules: Rules
+): (piece: Piece, from: Square, to: Square, capture: Piece | undefined) => boolean {
   switch (rules) {
     case 'chushogi':
-      return (piece: Piece, from: Square, to: Square, capture?: boolean) =>
+      return (piece: Piece, from: Square, to: Square, capture: Piece | undefined) =>
         promotableRoles(rules).includes(piece.role) &&
         ((!promotionZone(rules)(piece.color).has(from) && promotionZone(rules)(piece.color).has(to)) ||
           (!!capture && (promotionZone(rules)(piece.color).has(from) || promotionZone(rules)(piece.color).has(to))));

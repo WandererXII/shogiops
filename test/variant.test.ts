@@ -20,6 +20,7 @@ test.each(variantPerfts)('variant perft: %s (%s): %s', (rules, sfen, depth, res)
 test('minishogi checkmate', () => {
   const pos = parseSfen('minishogi', 'r1s1k/2b1g/5/r1G1B/KPS2 b p').unwrap();
   expect(pos.isCheckmate()).toBe(true);
+  expect(pos.outcome()).toEqual({ winner: 'gote' });
 });
 
 test('roles outside variant', () => {

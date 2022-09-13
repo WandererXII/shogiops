@@ -181,10 +181,7 @@ export abstract class Position {
 
   outcome(ctx?: Context): Outcome | undefined {
     ctx = ctx || this.ctx();
-    const checkmateStalemate = this.isCheckmate(ctx) || this.isStalemate(ctx);
-    if (checkmateStalemate && !(this.lastMove && isDrop(this.lastMove) && this.lastMove.role === 'pawn'))
-      return { winner: opposite(this.turn) };
-    else if (checkmateStalemate) return { winner: this.turn };
+    if (this.isCheckmate(ctx) || this.isStalemate(ctx)) return { winner: opposite(this.turn) };
     else if (this.isInsufficientMaterial()) return { winner: undefined };
     else return;
   }

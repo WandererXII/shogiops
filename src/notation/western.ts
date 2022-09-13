@@ -10,11 +10,11 @@ export function makeWesternMove(pos: Position, move: Move): string | undefined {
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleToWestern(piece.role).toUpperCase();
-      const ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty() ? '' : makeNumberSquare(move.from);
-      const capture = pos.board.get(move.to);
-      const actionStr = !!capture ? 'x' : '-';
-      const promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture) ? '=' : '';
+      const roleStr = roleToWestern(piece.role).toUpperCase(),
+        ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty() ? '' : makeNumberSquare(move.from),
+        capture = pos.board.get(move.to),
+        actionStr = !!capture ? 'x' : '-',
+        promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture) ? '=' : '';
       return `${roleStr}${ambStr}${actionStr}${makeNumberSquare(move.to)}${promStr}`;
     } else return undefined;
   }

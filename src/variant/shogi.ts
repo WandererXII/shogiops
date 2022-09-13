@@ -150,8 +150,8 @@ export const pseudoDropDests = (pos: Position, piece: Piece, ctx?: Context): Squ
       mask = mask.diff(file);
     }
     // Checking for a pawn checkmate
-    const kingSquare = pos.board.kingOf(opposite(pos.turn));
-    const kingFront = defined(kingSquare) ? (pos.turn === 'sente' ? kingSquare + 16 : kingSquare - 16) : undefined;
+    const kingSquare = pos.board.kingOf(opposite(pos.turn)),
+      kingFront = defined(kingSquare) ? (pos.turn === 'sente' ? kingSquare + 16 : kingSquare - 16) : undefined;
     if (defined(kingFront) && mask.has(kingFront)) {
       const child = pos.clone();
       child.play({ role: 'pawn', to: kingFront });

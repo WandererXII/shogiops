@@ -204,8 +204,8 @@ export function makeNumberSquare(sq: Square): string {
 // only for single digit boards - something like 111 would be amiguous
 export function parseNumberSquare(str: string): Square | undefined {
   if (str.length !== 2) return;
-  const file = str.charCodeAt(0) - '1'.charCodeAt(0);
-  const rank = str.charCodeAt(1) - '1'.charCodeAt(0);
+  const file = str.charCodeAt(0) - '1'.charCodeAt(0),
+    rank = str.charCodeAt(1) - '1'.charCodeAt(0);
   if (file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
   return file + 16 * rank;
 }
@@ -222,16 +222,16 @@ export function makeJapaneseSquare(sq: Square): string {
 
 export function parseJapaneseSquare(str: string): Square | undefined {
   if (str.length < 2 || str.length > 4) return;
-  const fileOffset = str.length === 2 || (str.length === 3 && str[1] === '十') ? 1 : 2;
-  const file =
-    parseInt(
-      str
-        .slice(0, fileOffset)
-        .split('')
-        .map(c => (c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c))
-        .join('')
-    ) - 1;
-  const rank = kanjiToNumber(str.slice(fileOffset)) - 1;
+  const fileOffset = str.length === 2 || (str.length === 3 && str[1] === '十') ? 1 : 2,
+    file =
+      parseInt(
+        str
+          .slice(0, fileOffset)
+          .split('')
+          .map(c => (c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c))
+          .join('')
+      ) - 1,
+    rank = kanjiToNumber(str.slice(fileOffset)) - 1;
   if (isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
   return file + 16 * rank;
 }

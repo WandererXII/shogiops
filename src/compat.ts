@@ -1,5 +1,5 @@
-import { Move, Piece, PieceName, SquareName, isDrop } from './types.js';
-import { defined, makePieceName, makeSquare, parseSquare, parseUsi } from './util.js';
+import { Move, PieceName, SquareName, isDrop } from './types.js';
+import { defined, makeSquare, parseSquare, parseUsi } from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
 

@@ -26,16 +26,16 @@ export function perft(pos: Position, depth: number, log = false): number {
   let nodes = 0;
   for (const [from, moveDests] of pos.allMoveDests()) {
     for (const to of moveDests) {
-      const promotions: Array<boolean> = [];
-      const piece = pos.board.get(from)!;
+      const promotions: Array<boolean> = [],
+        piece = pos.board.get(from)!;
       if (pieceCanPromote(pos.rules)(piece, from, to, pos.board.get(to))) {
         promotions.push(true);
         if (!pieceForcePromote(pos.rules)(piece, to)) promotions.push(false);
       } else promotions.push(false);
 
       for (const promotion of promotions) {
-        const child = pos.clone();
-        const move = { from, to, promotion };
+        const child = pos.clone(),
+          move = { from, to, promotion };
         child.play(move);
         const children = perft(child, depth - 1, false);
         if (log) console.log(makeUsi(move), children, '(', depth, ')');
@@ -45,9 +45,9 @@ export function perft(pos: Position, depth: number, log = false): number {
   }
   for (const [pieceName, dropDestsOfRole] of pos.allDropDests()) {
     for (const to of dropDestsOfRole) {
-      const child = pos.clone();
-      const piece = parsePieceName(pieceName);
-      const move = { role: piece.role, to };
+      const child = pos.clone(),
+        piece = parsePieceName(pieceName),
+        move = { role: piece.role, to };
       child.play(move);
       const children = perft(child, depth - 1, false);
       if (log) console.log(makeUsi(move), children, '(', depth, ')');

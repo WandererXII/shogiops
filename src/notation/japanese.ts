@@ -13,29 +13,29 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const destStr = lastDest === move.to ? '同　' : makeJapaneseSquare(move.to);
-      const roleStr = roleTo2Kanji(piece.role);
-      const ambPieces = piecesAiming(pos, piece, move.to).without(move.from);
-      const ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces);
-      const promStr = move.promotion
-        ? '成'
-        : pieceCanPromote(pos.rules)(piece, move.from, move.to, pos.board.get(move.to))
-        ? '不成'
-        : '';
+      const destStr = lastDest === move.to ? '同　' : makeJapaneseSquare(move.to),
+        roleStr = roleTo2Kanji(piece.role),
+        ambPieces = piecesAiming(pos, piece, move.to).without(move.from),
+        ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces),
+        promStr = move.promotion
+          ? '成'
+          : pieceCanPromote(pos.rules)(piece, move.from, move.to, pos.board.get(move.to))
+          ? '不成'
+          : '';
       return `${destStr}${roleStr}${ambStr}${promStr}`;
     } else return undefined;
   }
 }
 
 function disambiguate(piece: Piece, orig: Square, dest: Square, others: SquareSet): string {
-  const myRank = squareRank(orig);
-  const myFile = squareFile(orig);
+  const myRank = squareRank(orig),
+    myFile = squareFile(orig);
 
-  const destRank = squareRank(dest);
-  const destFile = squareFile(dest);
+  const destRank = squareRank(dest),
+    destFile = squareFile(dest);
 
-  const movingUp = myRank > destRank;
-  const movingDown = myRank < destRank;
+  const movingUp = myRank > destRank,
+    movingDown = myRank < destRank;
 
   // special case if gold/silver like piece is moving directly forward
   if (
@@ -49,9 +49,9 @@ function disambiguate(piece: Piece, orig: Square, dest: Square, others: SquareSe
   if (![...others].map(squareRank).some(r => r < destRank === movingDown && r > destRank === movingUp))
     return verticalDisambiguation(piece, movingUp, movingDown);
 
-  const othersFiles = [...others].map(squareFile);
-  const rightest = othersFiles.reduce((prev, cur) => (prev < cur ? prev : cur));
-  const leftest = othersFiles.reduce((prev, cur) => (prev > cur ? prev : cur));
+  const othersFiles = [...others].map(squareFile),
+    rightest = othersFiles.reduce((prev, cur) => (prev < cur ? prev : cur)),
+    leftest = othersFiles.reduce((prev, cur) => (prev > cur ? prev : cur));
 
   // is this piece positioned most on one side, not in the middle
   if (rightest > myFile || leftest < myFile || (others.size() === 2 && rightest < myFile && leftest > myFile))

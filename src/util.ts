@@ -36,8 +36,8 @@ export function parseSquare(str: SquareName): Square;
 export function parseSquare(str: string): Square | undefined;
 export function parseSquare(str: string): Square | undefined {
   if (str.length !== 2 && str.length !== 3) return;
-  const file = parseInt(str.slice(0, -1)) - 1;
-  const rank = str.slice(-1).charCodeAt(0) - 'a'.charCodeAt(0);
+  const file = parseInt(str.slice(0, -1)) - 1,
+    rank = str.slice(-1).charCodeAt(0) - 'a'.charCodeAt(0);
   if (isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
   return file + 16 * rank;
 }
@@ -70,15 +70,15 @@ function parseUsiDropRole(ch: string): Role | undefined {
 
 export function parseUsi(str: string): Move | undefined {
   if (str[1] === '*') {
-    const role = parseUsiDropRole(str[0]);
-    const to = parseSquare(str.slice(2));
+    const role = parseUsiDropRole(str[0]),
+      to = parseSquare(str.slice(2));
     if (defined(role) && defined(to)) return { role, to };
   } else if (str.length >= 4 && str.length <= 7) {
-    const fromOffset = parseInt(str[2]) ? 2 : 3;
-    const toOffset = parseInt(str[fromOffset + 1]) ? 3 : 2;
-    const from = parseSquare(str.slice(0, fromOffset));
-    const to = parseSquare(str.slice(fromOffset, fromOffset + toOffset));
-    const promotion = str[fromOffset + toOffset] === '+' ? true : false;
+    const fromOffset = parseInt(str[2]) ? 2 : 3,
+      toOffset = parseInt(str[fromOffset + 1]) ? 3 : 2,
+      from = parseSquare(str.slice(0, fromOffset)),
+      to = parseSquare(str.slice(fromOffset, fromOffset + toOffset)),
+      promotion = str[fromOffset + toOffset] === '+' ? true : false;
     if (defined(from) && defined(to)) return { from, to, promotion };
   }
   return;

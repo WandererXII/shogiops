@@ -10,14 +10,14 @@ export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Squa
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleTo2Kanji(piece.role).replace('成', '+');
-      const ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty()
-        ? ''
-        : `(${makeNumberSquare(move.from)})`;
-      const capture = pos.board.get(move.to);
-      const actionStr = !!capture ? 'x' : '-';
-      const destStr = lastDest === move.to ? '' : makeNumberSquare(move.to);
-      const promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture) ? '=' : '';
+      const roleStr = roleTo2Kanji(piece.role).replace('成', '+'),
+        ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty()
+          ? ''
+          : `(${makeNumberSquare(move.from)})`,
+        capture = pos.board.get(move.to),
+        actionStr = !!capture ? 'x' : '-',
+        destStr = lastDest === move.to ? '' : makeNumberSquare(move.to),
+        promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture) ? '=' : '';
       return `${roleStr}${ambStr}${actionStr}${destStr}${promStr}`;
     } else return undefined;
   }

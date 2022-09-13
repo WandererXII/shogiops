@@ -165,12 +165,12 @@ export function parseSfen<R extends keyof RulesTypeMap>(
 
 export function makeBoardSfen(rules: Rules, board: Board): string {
   const dims = dimensions(rules);
-  let sfen = '';
-  let empty = 0;
+  let sfen = '',
+    empty = 0;
   for (let rank = 0; rank < dims.ranks; rank++) {
     for (let file = dims.files - 1; file >= 0; file--) {
-      const square = parseCoordinates(file, rank)!;
-      const piece = board.get(square);
+      const square = parseCoordinates(file, rank)!,
+        piece = board.get(square);
       if (!piece) empty++;
       else {
         if (empty > 0) {
@@ -195,8 +195,8 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
 export function makeHand(rules: Rules, hand: Hand): string {
   return handRoles(rules)
     .map(role => {
-      const r = roleToForsyth(rules)(role)!;
-      const n = hand.get(role);
+      const r = roleToForsyth(rules)(role)!,
+        n = hand.get(role);
       return n > 1 ? n + r : n === 1 ? r : '';
     })
     .join('');

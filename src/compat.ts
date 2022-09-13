@@ -15,23 +15,16 @@ export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[
   return result;
 }
 
-export function shogigroundDropDests(pos: Position, piece?: Piece): Map<PieceName, SquareName[]> {
-  const result: Map<PieceName, SquareName[]> = new Map();
-  if (piece) {
-    const squares = pos.dropDests(piece);
+export function shogigroundDropDests(pos: Position): Map<PieceName, SquareName[]> {
+  const result: Map<PieceName, SquareName[]> = new Map(),
+    ctx = pos.ctx();
+  for (const [pieceName, squares] of pos.allDropDests(ctx)) {
     if (squares.nonEmpty()) {
       const d = Array.from(squares, s => makeSquare(s));
-      result.set(makePieceName(piece), d);
-    }
-  } else {
-    const ctx = pos.ctx();
-    for (const [p, squares] of pos.allDropDests(ctx)) {
-      if (squares.nonEmpty()) {
-        const d = Array.from(squares, s => makeSquare(s));
-        result.set(p, d);
-      }
+      result.set(pieceName, d);
     }
   }
+
   return result;
 }
 

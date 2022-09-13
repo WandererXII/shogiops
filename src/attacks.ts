@@ -199,15 +199,20 @@ export function falconAttacks(square: Square, color: Color, occupied: SquareSet)
       .withMany([square + 16, square + 32]);
 }
 
+export function eagleLionAttacks(square: Square, color: Color): SquareSet {
+  if (color === 'sente') return computeRange(square, [-15, -17, -30, -34]);
+  else return computeRange(square, [15, 17, 30, 34]);
+}
+
 export function eagleAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return rookAttacks(square, occupied)
       .union(bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
-      .union(computeRange(square, [-15, -17, -30, -34]));
+      .union(eagleLionAttacks(square, color));
   else
     return rookAttacks(square, occupied)
       .union(bishopAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]))
-      .union(computeRange(square, [15, 17, 30, 34]));
+      .union(eagleLionAttacks(square, color));
 }
 
 export function lionAttacks(square: Square): SquareSet {

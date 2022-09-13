@@ -6,6 +6,7 @@ import {
   chariotAttacks,
   copperAttacks,
   eagleAttacks,
+  eagleLionAttacks,
   elephantAttacks,
   falconAttacks,
   goBetweenAttacks,
@@ -143,7 +144,30 @@ export class Chushogi extends Position {
     const piece = this.board.get(square);
     if (!piece || piece.color !== this.turn) return SquareSet.empty();
 
-    return attacks(piece, square, this.board.occupied).diff(this.board.color(this.turn)).intersect(this.fullSquareSet);
+    let pseudoDests = attacks(piece, square, this.board.occupied)
+      .diff(this.board.color(this.turn))
+      .intersect(this.fullSquareSet);
+
+    const oppColor = opposite(this.turn),
+      oppLions = this.board.color(oppColor).intersect(this.board.role('lion').union(this.board.role('promotedlion')));
+
+    // considers only the first step destinations, for second step - secondLionStepDests
+    if (piece.role === 'lion' || piece.role === 'promotedlion') {
+      const neighbors = kingAttacks(square);
+      // don't allow capture of a non-adjacent lion protected by an enemy piece
+      for (const lion of pseudoDests.diff(neighbors).intersect(oppLions)) {
+        if (this.squareAttackers(lion, oppColor, this.board.occupied.without(square)).nonEmpty())
+          pseudoDests = pseudoDests.without(lion);
+      }
+    } else if (this.lastCapture && (this.lastCapture.role === 'lion' || this.lastCapture.role === 'promotedlion')) {
+      const lastDest = this.lastMove?.to;
+      // can't recapture lion on another square
+      for (const lion of oppLions.intersect(pseudoDests)) {
+        if (lion !== lastDest) pseudoDests = pseudoDests.without(lion);
+      }
+    }
+
+    return pseudoDests;
   }
 
   dropDests(_piece: Piece, _ctx?: Context): SquareSet {
@@ -153,4 +177,44 @@ export class Chushogi extends Position {
   hasInsufficientMaterial(_color: Color): boolean {
     return false;
   }
+}
+
+// expects position before piece moves to it's first destination
+export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: Square): SquareSet {
+  const piece = before.board.get(initialSq);
+  if (!piece || piece.color !== before.turn) return SquareSet.empty();
+
+  if (piece.role === 'lion' || piece.role === 'promotedlion') {
+    if (!kingAttacks(initialSq).has(midSq)) return SquareSet.empty();
+    let pseudoDests = kingAttacks(midSq)
+      .diff(before.board.color(before.turn).without(initialSq))
+      .intersect(before.fullSquareSet);
+    const oppColor = opposite(before.turn),
+      oppLions = before.board
+        .color(oppColor)
+        .intersect(before.board.role('lion').union(before.board.role('promotedlion'))),
+      capture = before.board.get(midSq),
+      clearOccupied = before.board.occupied.withoutMany([initialSq, midSq]);
+
+    // can't capture lion protected by an enemy piece, unless we captured something valuable first (not a pawn or go-between)
+    for (const lion of oppLions.intersect(pseudoDests)) {
+      const lionProtected = before.squareAttackers(lion, oppColor, clearOccupied).nonEmpty();
+      if (lionProtected && (!capture || capture.role === 'pawn' || capture.role === 'gobetween'))
+        pseudoDests = pseudoDests.without(lion);
+    }
+    return pseudoDests;
+  } else if (piece.role === 'falcon') {
+    if (!pawnAttacks(initialSq, piece.color).has(midSq)) return SquareSet.empty();
+
+    return goBetweenAttacks(midSq)
+      .diff(before.board.color(before.turn).without(initialSq))
+      .intersect(before.fullSquareSet);
+  } else if (piece.role === 'eagle') {
+    const pseudoDests = eagleLionAttacks(initialSq, piece.color)
+      .diff(before.board.color(before.turn))
+      .intersect(before.fullSquareSet);
+    if (!pseudoDests.has(midSq)) return SquareSet.empty();
+
+    return pseudoDests.intersect(kingAttacks(midSq)).with(initialSq);
+  } else return SquareSet.empty();
 }

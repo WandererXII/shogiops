@@ -1,10 +1,11 @@
 import { Move, Piece, PieceName, SquareName, isDrop } from './types.js';
-import { defined, makePieceName, makeSquare, parseUsi } from './util.js';
+import { defined, makePieceName, makeSquare, parseSquare, parseUsi } from './util.js';
+import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
 
 export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[]> {
-  const result: Map<SquareName, SquareName[]> = new Map();
-  const ctx = pos.ctx();
+  const result: Map<SquareName, SquareName[]> = new Map(),
+    ctx = pos.ctx();
   for (const [from, squares] of pos.allMoveDests(ctx)) {
     if (squares.nonEmpty()) {
       const d = Array.from(squares, s => makeSquare(s));
@@ -30,6 +31,20 @@ export function shogigroundDropDests(pos: Position, piece?: Piece): Map<PieceNam
         result.set(p, d);
       }
     }
+  }
+  return result;
+}
+
+export function shogigroundSecondLionStep(
+  before: Chushogi,
+  initialSq: SquareName,
+  midSq: SquareName
+): Map<SquareName, SquareName[]> {
+  const result: Map<SquareName, SquareName[]> = new Map(),
+    squares = secondLionStepDests(before, parseSquare(initialSq), parseSquare(midSq));
+  if (squares.nonEmpty()) {
+    const d = Array.from(squares, s => makeSquare(s));
+    result.set(makeSquare(parseSquare(midSq)), d);
   }
   return result;
 }

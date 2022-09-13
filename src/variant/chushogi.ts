@@ -1,6 +1,7 @@
 import { Result } from '@badrap/result';
 import {
   attacks,
+  between,
   bishopAttacks,
   boarAttacks,
   chariotAttacks,
@@ -33,7 +34,7 @@ import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
 import { Color, Piece, Square } from '../types.js';
-import { opposite } from '../util.js';
+import { defined, opposite } from '../util.js';
 import { Context, Position, PositionError } from './position.js';
 
 export class Chushogi extends Position {
@@ -172,6 +173,40 @@ export class Chushogi extends Position {
 
   dropDests(_piece: Piece, _ctx?: Context): SquareSet {
     return SquareSet.empty();
+  }
+
+  isCheckmate(ctx?: Context): boolean {
+    ctx = ctx || this.ctx();
+    const royal = this.board
+        .role('king')
+        .union(this.board.role('prince'))
+        .intersect(this.board.color(this.turn))
+        .singleSquare(), // undefined if more royal pieces are present
+      checkers = ctx.checkers;
+    if (!defined(royal)) return false;
+
+    const canRoyalEscape = () => {
+      // can royal escape
+      let royalDests = kingAttacks(royal);
+      const occ = this.board.occupied.without(royal);
+      for (const to of royalDests) {
+        if (this.squareAttackers(to, opposite(this.turn), occ).nonEmpty()) royalDests = royalDests.without(to);
+      }
+      if (royalDests.nonEmpty()) return true;
+
+      // can another piece block the check
+      const checker = checkers.singleSquare();
+      if (defined(checker)) {
+        for (const square of this.board.color(this.turn).without(royal)) {
+          if (this.moveDests(square, ctx).intersect(between(checker, royal).with(checker)).nonEmpty()) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    return ctx.checkers.nonEmpty() && canRoyalEscape();
   }
 
   hasInsufficientMaterial(_color: Color): boolean {

@@ -145,6 +145,17 @@ export function promotableRoles(rules: Rules): Role[] {
   }
 }
 
+export function fullSquareSet(rules: Rules): SquareSet {
+  switch (rules) {
+    case 'chushogi':
+      return new SquareSet([0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0x0, 0x0]);
+    case 'minishogi':
+      return new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    default:
+      return new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]);
+  }
+}
+
 export function promote(rules: Rules): (role: Role) => Role | undefined {
   switch (rules) {
     case 'chushogi':

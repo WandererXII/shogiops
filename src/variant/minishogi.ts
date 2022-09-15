@@ -3,7 +3,7 @@ import { bishopAttacks, goldAttacks, kingAttacks, pawnAttacks, rookAttacks, silv
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { Color, Piece, Role, Square } from '../types.js';
+import { Color, Piece, Role, Setup, Square } from '../types.js';
 import { opposite } from '../util.js';
 import { Context, Position, PositionError } from './position.js';
 import { standardDropDests, standardMoveDests } from './shogi.js';
@@ -22,18 +22,9 @@ export class Minishogi extends Position {
     return pos;
   }
 
-  static from(
-    board: Board,
-    hands: Hands,
-    turn: Color,
-    moveNumber: number,
-    strict: boolean
-  ): Result<Minishogi, PositionError> {
+  static from(setup: Setup, strict: boolean): Result<Minishogi, PositionError> {
     const pos = new this();
-    pos.board = board.clone();
-    pos.hands = hands.clone();
-    pos.turn = turn;
-    pos.moveNumber = moveNumber;
+    pos.fromSetup(setup);
     return pos.validate(strict).map(_ => pos);
   }
 

@@ -3,14 +3,15 @@ import { between, ray } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { COLORS, Color, Move, Outcome, Piece, PieceName, Rules, Square, isDrop } from '../types.js';
+import { COLORS, Color, Move, Outcome, Piece, PieceName, Rules, Setup, Square, isDrop } from '../types.js';
 import { defined, makePieceName, opposite } from '../util.js';
-import { allRoles, handRoles, pieceCanPromote, pieceForcePromote, promote, unpromote } from './util.js';
+import { allRoles, fullSquareSet, handRoles, pieceCanPromote, pieceForcePromote, promote, unpromote } from './util.js';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
   ImpossibleCheck = 'ERR_IMPOSSIBLE_CHECK',
+  PiecesOutsideBoard = 'ERR_PIECES_OUTSIDE_BOARD',
   InvalidPieces = 'ERR_INVALID_PIECE',
   InvalidPiecesHand = 'ERR_INVALID_PIECE_IN_HAND',
   InvalidPiecesPromotionZone = 'ERR_PIECES_MUST_PROMOTE',
@@ -40,10 +41,7 @@ export abstract class Position {
   // - private constructor()
   // - static default()
   // - static from(
-  //     board: Board,
-  //     hands: Hands,
-  //     turn: Color,
-  //     moveNumber: number,
+  //     setup: Setup,
   //     strict: boolean
   //   )
 
@@ -55,6 +53,15 @@ export abstract class Position {
 
   // Attackers' long-range pieces at least x-raying square - for finding blockers
   protected abstract squareSnipers(square: Square, attacker: Color): SquareSet;
+
+  protected fromSetup(setup: Setup) {
+    this.board = setup.board.clone();
+    this.hands = setup.hands.clone();
+    this.turn = setup.turn;
+    this.moveNumber = setup.moveNumber;
+    this.lastMove = setup.lastMove;
+    this.lastCapture = setup.lastCapture;
+  }
 
   clone(): this {
     const pos = new (this as any).constructor();

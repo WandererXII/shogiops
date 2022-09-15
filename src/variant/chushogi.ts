@@ -33,7 +33,7 @@ import {
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { Color, Piece, Role, Square } from '../types.js';
+import { Color, Piece, Role, Setup, Square } from '../types.js';
 import { defined, opposite } from '../util.js';
 import { Context, Position, PositionError } from './position.js';
 import { fullSquareSet } from './util.js';
@@ -52,18 +52,9 @@ export class Chushogi extends Position {
     return pos;
   }
 
-  static from(
-    board: Board,
-    hands: Hands,
-    turn: Color,
-    moveNumber: number,
-    strict: boolean
-  ): Result<Chushogi, PositionError> {
+  static from(setup: Setup, strict: boolean): Result<Chushogi, PositionError> {
     const pos = new this();
-    pos.board = board.clone();
-    pos.hands = hands.clone();
-    pos.turn = turn;
-    pos.moveNumber = moveNumber;
+    pos.fromSetup(setup);
     return pos.validate(strict).map(_ => pos);
   }
 

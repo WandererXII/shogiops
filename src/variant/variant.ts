@@ -1,7 +1,5 @@
 import { Result } from '@badrap/result';
-import { Board } from '../board.js';
-import { Hands } from '../hands.js';
-import { Color } from '../types.js';
+import { Setup } from '../types.js';
 import { Chushogi } from './chushogi.js';
 import { Minishogi } from './minishogi.js';
 import { PositionError } from './position.js';
@@ -26,18 +24,15 @@ export function defaultPosition<R extends keyof RulesTypeMap>(rules: R): RulesTy
 
 export function initializePosition<R extends keyof RulesTypeMap>(
   rules: R,
-  board: Board,
-  hands: Hands,
-  turn: Color,
-  moveNumber: number,
+  setup: Setup,
   strict: boolean
 ): Result<RulesTypeMap[R], PositionError> {
   switch (rules) {
     case 'chushogi':
-      return Chushogi.from(board, hands, turn, moveNumber, strict);
+      return Chushogi.from(setup, strict);
     case 'minishogi':
-      return Minishogi.from(board, hands, turn, moveNumber, strict);
+      return Minishogi.from(setup, strict);
     default:
-      return Shogi.from(board, hands, turn, moveNumber, strict);
+      return Shogi.from(setup, strict);
   }
 }

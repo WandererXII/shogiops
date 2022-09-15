@@ -1,3 +1,5 @@
+import type { Board } from './board.js';
+import type { Hands } from './hands.js';
 import type { SquareSet } from './squareSet.js';
 
 export const FILE_NAMES = [
@@ -35,10 +37,6 @@ export interface Dimensions {
   ranks: number;
   files: number;
 }
-
-export type ByColor<T> = {
-  [color in Color]: T;
-};
 
 export const ROLES = [
   'lance',
@@ -118,6 +116,20 @@ export function isDrop(v: Move): v is DropMove {
 
 export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
+}
+
+export interface Setup {
+  board: Board;
+  hands: Hands;
+  turn: Color;
+  moveNumber: number;
+  lastMove:
+    | Move
+    | {
+        to: Square;
+      }
+    | undefined;
+  lastCapture: Piece | undefined;
 }
 
 export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kinglost'] as const;

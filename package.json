@@ -36,7 +36,7 @@
     "compile": "tsc",
     "prepare": "tsc",
     "doc": "typedoc src/index.ts",
-    "lint": "eslint src/*.ts",
+    "lint": "eslint 'src/**/*.ts'",
     "format": "prettier --write ."
   },
   "files": [

@@ -63,7 +63,7 @@ function disambiguate(piece: Piece, orig: Square, dest: Square, others: SquareSe
   );
 }
 
-function verticalDisambiguation(piece: Piece, up: Boolean, down: Boolean): string {
+function verticalDisambiguation(piece: Piece, up: boolean, down: boolean): string {
   return up === down
     ? '寄'
     : (piece.color === 'sente') === up
@@ -73,6 +73,6 @@ function verticalDisambiguation(piece: Piece, up: Boolean, down: Boolean): strin
     : '引';
 }
 
-function sideDisambiguation(piece: Piece, right: Boolean, left: Boolean): string {
+function sideDisambiguation(piece: Piece, right: boolean, left: boolean): string {
   return !left && !right ? '中' : (piece.color === 'sente') === right ? '右' : '左';
 }

@@ -51,7 +51,7 @@ export class Hand {
   }
 
   count(): number {
-    return ROLES.map(role => this.get(role)).reduce((acc, cur) => acc + cur);
+    return ROLES.reduce((acc, role) => acc + this.get(role), 0);
   }
 
   *[Symbol.iterator](): Iterator<[Role, number]> {

@@ -75,6 +75,9 @@ export abstract class Position {
   }
 
   protected validate(strict: boolean): Result<undefined, PositionError> {
+    if (!this.board.occupied.intersect(fullSquareSet(this.rules)).equals(this.board.occupied))
+      return Result.err(new PositionError(IllegalSetup.PiecesOutsideBoard));
+
     for (const [r] of this.hands.color('sente'))
       if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
     for (const [r] of this.hands.color('gote'))

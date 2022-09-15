@@ -1,8 +1,8 @@
 import { Result } from '@badrap/result';
 import { Board } from './board.js';
 import { Hand, Hands } from './hands.js';
-import { Color, Piece, Role, Rules } from './types.js';
-import { defined, parseCoordinates, toBW } from './util.js';
+import { Color, Move, Piece, Role, Rules, Square } from './types.js';
+import { defined, makeSquare, parseCoordinates, parseSquare, toBW } from './util.js';
 import { Position, PositionError } from './variant/position.js';
 import { dimensions, handRoles } from './variant/util.js';
 import { RulesTypeMap, initializePosition } from './variant/variant.js';
@@ -148,8 +148,17 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   if (!defined(turn)) return Result.err(new SfenError(InvalidSfen.Turn));
 
   // Hands
-  const handsPart = parts.shift(),
-    hands = defined(handsPart) ? parseHands(rules, handsPart) : Result.ok(Hands.empty());
+  const handsPart = parts.shift();
+  let hands = Result.ok(Hands.empty()),
+    lastMove: Move | { to: Square } | undefined,
+    lastCapture: Piece | undefined;
+  if (rules === 'chushogi') {
+    const destSquare = defined(handsPart) ? parseSquare(handsPart) : undefined;
+    if (defined(destSquare)) {
+      lastMove = { to: destSquare };
+      lastCapture = { role: 'lion', color: turn };
+    }
+  } else if (defined(handsPart)) hands = parseHands(rules, handsPart);
 
   // Move number
   const moveNumberPart = parts.shift(),
@@ -159,7 +168,13 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
 
   return board.chain(board =>
-    hands.chain(hands => initializePosition(rules, board, hands, turn, Math.max(1, moveNumber), !!strict))
+    hands.chain(hands =>
+      initializePosition(
+        rules,
+        { board, hands, turn, moveNumber: Math.max(1, moveNumber), lastMove, lastCapture },
+        !!strict
+      )
+    )
   );
 }
 
@@ -207,11 +222,17 @@ export function makeHands(rules: Rules, hands: Hands): string {
   return handsStr === '' ? '-' : handsStr;
 }
 
+function lastLionCapture(pos: Position): string {
+  if (pos.lastMove && (pos.lastCapture?.role === 'lion' || pos.lastCapture?.role === 'promotedlion'))
+    return makeSquare(pos.lastMove.to);
+  else return '-';
+}
+
 export function makeSfen(pos: Position): string {
   return [
     makeBoardSfen(pos.rules, pos.board),
     toBW(pos.turn),
-    makeHands(pos.rules, pos.hands),
+    pos.rules === 'chushogi' ? lastLionCapture(pos) : makeHands(pos.rules, pos.hands),
     Math.max(1, Math.min(pos.moveNumber, 9999)),
   ].join(' ');
 }

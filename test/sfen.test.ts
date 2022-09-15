@@ -1,6 +1,7 @@
 import { Board } from '../src/board';
 import { Hands } from '../src/hands';
 import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '../src/sfen';
+import { parseSquare } from '../src/util';
 import { defaultPosition } from '../src/variant/variant';
 
 test('make board sfen', () => {
@@ -58,4 +59,11 @@ test('chushogi sfen', () => {
   ).unwrap();
   expect(pos).toEqual(defaultPosition('chushogi'));
   expect(makeSfen(pos)).toEqual(initialSfen('chushogi'));
+
+  const pos2 = parseSfen(
+    'chushogi',
+    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b 5e 1'
+  ).unwrap();
+  expect(pos2.lastMove).toEqual({ to: parseSquare('5e') });
+  expect(pos2.lastCapture).toEqual({ role: 'lion', color: 'sente' });
 });

@@ -7,39 +7,45 @@ export {
   SquareName,
   Color,
   COLORS,
-  ByColor,
+  Dimensions,
   Role,
   ROLES,
   Piece,
+  PieceName,
+  RoleMap,
+  ColorMap,
+  HandMap,
   NormalMove,
   DropMove,
   Move,
   isDrop,
   isNormal,
+  Setup,
+  Result,
+  RESULTS,
   Rules,
   RULES,
   Outcome,
 } from './types.js';
 
-export { defined, makeSquare, makeUsi, opposite, parseSquare, parseUsi, squareFile, squareRank } from './util.js';
+export {
+  defined,
+  makeSquare,
+  makeUsi,
+  makePieceName,
+  opposite,
+  parseCoordinates,
+  parseSquare,
+  parseUsi,
+  parsePieceName,
+  squareFile,
+  squareRank,
+  toBW,
+  toBlackWhite,
+  toColor,
+} from './util.js';
 
 export { SquareSet } from './squareSet.js';
-
-export {
-  attacks,
-  between,
-  bishopAttacks,
-  kingAttacks,
-  knightAttacks,
-  pawnAttacks,
-  lanceAttacks,
-  silverAttacks,
-  goldAttacks,
-  horseAttacks,
-  dragonAttacks,
-  ray,
-  rookAttacks,
-} from './attacks';
 
 export { Board } from './board.js';
 
@@ -54,6 +60,8 @@ export { Chushogi } from './variant/chushogi.js';
 export * as variant from './variant/variant.js';
 
 export * as variantUtil from './variant/util.js';
+
+export * as attacks from './attacks';
 
 export * as compat from './compat.js';
 

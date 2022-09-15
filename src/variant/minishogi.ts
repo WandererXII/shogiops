@@ -42,24 +42,20 @@ export class Minishogi extends Position {
       board = this.board;
     return board.color(attacker).intersect(
       rookAttacks(square, occupied)
-        .intersect(board.role('rook').union(board.role('dragon')))
-        .union(bishopAttacks(square, occupied).intersect(board.role('bishop').union(board.role('horse'))))
-        .union(
-          goldAttacks(square, defender).intersect(
-            board.role('gold').union(board.role('tokin')).union(board.role('promotedsilver'))
-          )
-        )
+        .intersect(board.roles('rook', 'dragon'))
+        .union(bishopAttacks(square, occupied).intersect(board.roles('bishop', 'horse')))
+        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'tokin', 'promotedsilver')))
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-        .union(kingAttacks(square).intersect(board.role('king').union(board.role('dragon')).union(board.role('horse'))))
+        .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse')))
     );
   }
 
   squareSnipers(square: number, attacker: Color): SquareSet {
     const empty = SquareSet.empty();
     return rookAttacks(square, empty)
-      .intersect(this.board.role('rook').union(this.board.role('dragon')))
-      .union(bishopAttacks(square, empty).intersect(this.board.role('bishop').union(this.board.role('horse'))))
+      .intersect(this.board.roles('rook', 'dragon'))
+      .union(bishopAttacks(square, empty).intersect(this.board.roles('bishop', 'horse')))
       .intersect(this.board.color(attacker));
   }
 

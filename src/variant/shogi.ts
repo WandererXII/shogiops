@@ -54,31 +54,26 @@ export class Shogi extends Position {
       board = this.board;
     return board.color(attacker).intersect(
       rookAttacks(square, occupied)
-        .intersect(board.role('rook').union(board.role('dragon')))
-        .union(bishopAttacks(square, occupied).intersect(board.role('bishop').union(board.role('horse'))))
+        .intersect(board.roles('rook', 'dragon'))
+        .union(bishopAttacks(square, occupied).intersect(board.roles('bishop', 'horse')))
         .union(lanceAttacks(square, defender, occupied).intersect(board.role('lance')))
         .union(knightAttacks(square, defender).intersect(board.role('knight')))
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
         .union(
           goldAttacks(square, defender).intersect(
-            board
-              .role('gold')
-              .union(board.role('tokin'))
-              .union(board.role('promotedlance'))
-              .union(board.role('promotedknight'))
-              .union(board.role('promotedsilver'))
+            board.roles('gold', 'tokin', 'promotedlance', 'promotedknight', 'promotedsilver')
           )
         )
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-        .union(kingAttacks(square).intersect(board.role('king').union(board.role('dragon')).union(board.role('horse'))))
+        .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse')))
     );
   }
 
   squareSnipers(square: number, attacker: Color): SquareSet {
     const empty = SquareSet.empty();
     return rookAttacks(square, empty)
-      .intersect(this.board.role('rook').union(this.board.role('dragon')))
-      .union(bishopAttacks(square, empty).intersect(this.board.role('bishop').union(this.board.role('horse'))))
+      .intersect(this.board.roles('rook', 'dragon'))
+      .union(bishopAttacks(square, empty).intersect(this.board.roles('bishop', 'horse')))
       .union(lanceAttacks(square, opposite(attacker), empty).intersect(this.board.role('lance')))
       .intersect(this.board.color(attacker));
   }

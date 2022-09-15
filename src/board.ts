@@ -91,6 +91,9 @@ export class Board implements Iterable<[Square, Piece]> {
   role(role: Role): SquareSet {
     return this.roleMap.get(role) || SquareSet.empty();
   }
+  roles(role: Role, ...roles: Role[]): SquareSet {
+    return roles.reduce((acc, r) => acc.union(this.role(r)), this.role(role));
+  }
   color(color: Color): SquareSet {
     return this.colorMap.get(color) || SquareSet.empty();
   }

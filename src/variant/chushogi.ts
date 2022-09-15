@@ -76,53 +76,25 @@ export class Chushogi extends Position {
         .union(leopardAttacks(square).intersect(board.role('leopard')))
         .union(copperAttacks(square, defender).intersect(board.role('copper')))
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
-        .union(goldAttacks(square, defender).intersect(board.role('gold').union(board.role('tokin'))))
+        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'tokin')))
         .union(
           kingAttacks(square).intersect(
-            board
-              .role('king')
-              .union(board.role('prince'))
-              .union(board.role('dragon'))
-              .union(board.role('promoteddragon'))
-              .union(board.role('horse'))
-              .union(board.role('promotedhorse'))
+            board.roles('king', 'prince', 'dragon', 'promoteddragon', 'horse', 'promotedhorse')
           )
         )
-        .union(
-          elephantAttacks(square, defender).intersect(board.role('elephant').union(board.role('promotedelephant')))
-        )
+        .union(elephantAttacks(square, defender).intersect(board.roles('elephant', 'promotedelephant')))
         .union(chariotAttacks(square, occupied).intersect(board.role('chariot')))
         .union(
-          bishopAttacks(square, occupied).intersect(
-            board
-              .role('bishop')
-              .union(board.role('promotedbishop'))
-              .union(board.role('horse'))
-              .union(board.role('promotedhorse'))
-          )
+          bishopAttacks(square, occupied).intersect(board.roles('bishop', 'promotedbishop', 'horse', 'promotedhorse'))
         )
         .union(tigerAttacks(square, defender).intersect(board.role('tiger')))
         .union(kirinAttacks(square).intersect(board.role('kirin')))
         .union(phoenixAttacks(square).intersect(board.role('phoenix')))
-        .union(
-          sideMoverAttacks(square, occupied).intersect(board.role('sidemover').union(board.role('promotedsidemover')))
-        )
-        .union(
-          verticalMoverAttacks(square, occupied).intersect(
-            board.role('verticalmover').union(board.role('promotedverticalmover'))
-          )
-        )
-        .union(
-          rookAttacks(square, occupied).intersect(
-            board
-              .role('rook')
-              .union(board.role('promotedrook'))
-              .union(board.role('dragon'))
-              .union(board.role('promoteddragon'))
-          )
-        )
-        .union(lionAttacks(square).intersect(board.role('lion').union(board.role('promotedlion'))))
-        .union(queenAttacks(square, occupied).intersect(board.role('queen').union(board.role('promotedqueen'))))
+        .union(sideMoverAttacks(square, occupied).intersect(board.roles('sidemover', 'promotedsidemover')))
+        .union(verticalMoverAttacks(square, occupied).intersect(board.roles('verticalmover', 'promotedverticalmover')))
+        .union(rookAttacks(square, occupied).intersect(board.roles('rook', 'promotedrook', 'dragon', 'promoteddragon')))
+        .union(lionAttacks(square).intersect(board.roles('lion', 'promotedlion')))
+        .union(queenAttacks(square, occupied).intersect(board.roles('queen', 'promotedqueen')))
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
         .union(goBetweenAttacks(square).intersect(board.role('gobetween')))
         .union(whiteHorseAttacks(square, defender, occupied).intersect(board.role('whitehorse')))
@@ -141,7 +113,7 @@ export class Chushogi extends Position {
   }
 
   kingsOf(color: Color): SquareSet {
-    return this.board.role('king').union(this.board.role('prince')).intersect(this.board.color(color));
+    return this.board.roles('king', 'prince').intersect(this.board.color(color));
   }
 
   moveDests(square: Square, ctx?: Context): SquareSet {
@@ -154,7 +126,7 @@ export class Chushogi extends Position {
       .intersect(fullSquareSet(this.rules));
 
     const oppColor = opposite(ctx.color),
-      oppLions = this.board.color(oppColor).intersect(this.board.role('lion').union(this.board.role('promotedlion')));
+      oppLions = this.board.color(oppColor).intersect(this.board.roles('lion', 'promotedlion'));
 
     // considers only the first step destinations, for second step - secondLionStepDests
     if (piece.role === 'lion' || piece.role === 'promotedlion') {
@@ -181,11 +153,7 @@ export class Chushogi extends Position {
 
   isCheckmate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
-    const royal = this.board
-        .role('king')
-        .union(this.board.role('prince'))
-        .intersect(this.board.color(ctx.color))
-        .singleSquare(), // undefined if more royal pieces are present
+    const royal = this.kingsOf(ctx.color).singleSquare(), // undefined if more royal pieces are present
       color = ctx.color,
       checkers = ctx.checkers;
     if (!defined(royal)) return false;
@@ -226,9 +194,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
     const oppColor = opposite(before.turn),
-      oppLions = before.board
-        .color(oppColor)
-        .intersect(before.board.role('lion').union(before.board.role('promotedlion'))),
+      oppLions = before.board.color(oppColor).intersect(before.board.roles('lion', 'promotedlion')),
       capture = before.board.get(midSq),
       clearOccupied = before.board.occupied.withoutMany([initialSq, midSq]);
 

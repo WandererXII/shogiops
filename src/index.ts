@@ -49,6 +49,8 @@ export { Shogi } from './variant/shogi.js';
 
 export { Minishogi } from './variant/minishogi.js';
 
+export { Chushogi } from './variant/chushogi.js';
+
 export * as variant from './variant/variant.js';
 
 export * as variantUtil from './variant/util.js';

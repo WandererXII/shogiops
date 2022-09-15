@@ -120,9 +120,13 @@ export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 
+export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kinglost'] as const;
+export type Result = typeof RESULTS[number];
+
 export const RULES = ['standard', 'minishogi', 'chushogi'] as const;
 export type Rules = typeof RULES[number];
 
 export interface Outcome {
+  result: Result;
   winner: Color | undefined;
 }

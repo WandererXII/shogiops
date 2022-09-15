@@ -36,11 +36,11 @@ import { SquareSet } from '../squareSet.js';
 import { Color, Piece, Square } from '../types.js';
 import { defined, opposite } from '../util.js';
 import { Context, Position, PositionError } from './position.js';
+import { fullSquareSet } from './util.js';
 
 export class Chushogi extends Position {
   private constructor() {
     super('chushogi');
-    this.fullSquareSet = new SquareSet([0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0x0, 0x0]);
   }
 
   static default(): Chushogi {
@@ -140,16 +140,20 @@ export class Chushogi extends Position {
     return SquareSet.empty();
   }
 
+  kingsOf(color: Color): SquareSet {
+    return this.board.role('king').union(this.board.role('prince')).intersect(this.board.color(color));
+  }
+
   moveDests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
     const piece = this.board.get(square);
-    if (!piece || piece.color !== this.turn) return SquareSet.empty();
+    if (!piece || piece.color !== ctx.color) return SquareSet.empty();
 
     let pseudoDests = attacks(piece, square, this.board.occupied)
-      .diff(this.board.color(this.turn))
-      .intersect(this.fullSquareSet);
+      .diff(this.board.color(ctx.color))
+      .intersect(fullSquareSet(this.rules));
 
-    const oppColor = opposite(this.turn),
+    const oppColor = opposite(ctx.color),
       oppLions = this.board.color(oppColor).intersect(this.board.role('lion').union(this.board.role('promotedlion')));
 
     // considers only the first step destinations, for second step - secondLionStepDests
@@ -180,8 +184,9 @@ export class Chushogi extends Position {
     const royal = this.board
         .role('king')
         .union(this.board.role('prince'))
-        .intersect(this.board.color(this.turn))
+        .intersect(this.board.color(ctx.color))
         .singleSquare(), // undefined if more royal pieces are present
+      color = ctx.color,
       checkers = ctx.checkers;
     if (!defined(royal)) return false;
 
@@ -190,14 +195,14 @@ export class Chushogi extends Position {
       let royalDests = kingAttacks(royal);
       const occ = this.board.occupied.without(royal);
       for (const to of royalDests) {
-        if (this.squareAttackers(to, opposite(this.turn), occ).nonEmpty()) royalDests = royalDests.without(to);
+        if (this.squareAttackers(to, opposite(color), occ).nonEmpty()) royalDests = royalDests.without(to);
       }
       if (royalDests.nonEmpty()) return true;
 
       // can another piece block the check
       const checker = checkers.singleSquare();
       if (defined(checker)) {
-        for (const square of this.board.color(this.turn).without(royal)) {
+        for (const square of this.board.color(color).without(royal)) {
           if (this.moveDests(square, ctx).intersect(between(checker, royal).with(checker)).nonEmpty()) {
             return true;
           }
@@ -207,10 +212,6 @@ export class Chushogi extends Position {
     };
 
     return ctx.checkers.nonEmpty() && canRoyalEscape();
-  }
-
-  hasInsufficientMaterial(_color: Color): boolean {
-    return false;
   }
 }
 
@@ -223,7 +224,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
     if (!kingAttacks(initialSq).has(midSq)) return SquareSet.empty();
     let pseudoDests = kingAttacks(midSq)
       .diff(before.board.color(before.turn).without(initialSq))
-      .intersect(before.fullSquareSet);
+      .intersect(fullSquareSet(before.rules));
     const oppColor = opposite(before.turn),
       oppLions = before.board
         .color(oppColor)
@@ -243,11 +244,11 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
 
     return goBetweenAttacks(midSq)
       .diff(before.board.color(before.turn).without(initialSq))
-      .intersect(before.fullSquareSet);
+      .intersect(fullSquareSet(before.rules));
   } else if (piece.role === 'eagle') {
     const pseudoDests = eagleLionAttacks(initialSq, piece.color)
       .diff(before.board.color(before.turn))
-      .intersect(before.fullSquareSet);
+      .intersect(fullSquareSet(before.rules));
     if (!pseudoDests.has(midSq)) return SquareSet.empty();
 
     return pseudoDests.intersect(kingAttacks(midSq)).with(initialSq);

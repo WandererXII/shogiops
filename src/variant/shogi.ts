@@ -18,12 +18,11 @@ import { SquareSet } from '../squareSet.js';
 import { Color, Piece, Square } from '../types.js';
 import { defined, opposite, squareFile } from '../util.js';
 import { Context, Position, PositionError } from './position.js';
-import { dimensions } from './util.js';
+import { dimensions, fullSquareSet } from './util.js';
 
 export class Shogi extends Position {
   private constructor() {
     super('standard');
-    this.fullSquareSet = new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]);
   }
 
   static default(): Shogi {
@@ -85,31 +84,27 @@ export class Shogi extends Position {
   }
 
   dropDests(piece: Piece, ctx?: Context): SquareSet {
-    return pseudoDropDests(this, piece, ctx).intersect(this.fullSquareSet);
+    return standardDropDests(this, piece, ctx);
   }
 
   moveDests(square: Square, ctx?: Context): SquareSet {
-    return pseudoMoveDests(this, square, ctx).intersect(this.fullSquareSet);
-  }
-
-  hasInsufficientMaterial(color: Color): boolean {
-    return this.board.color(color).size() + this.hands[color].count() < 2;
+    return standardMoveDests(this, square, ctx);
   }
 }
 
-export const pseudoMoveDests = (pos: Position, square: Square, ctx?: Context): SquareSet => {
+export const standardMoveDests = (pos: Position, square: Square, ctx?: Context): SquareSet => {
   ctx = ctx || pos.ctx();
   const piece = pos.board.get(square);
-  if (!piece || piece.color !== pos.turn) return SquareSet.empty();
+  if (!piece || piece.color !== ctx.color) return SquareSet.empty();
 
   let pseudo = attacks(piece, square, pos.board.occupied);
-  pseudo = pseudo.diff(pos.board.color(pos.turn));
+  pseudo = pseudo.diff(pos.board.color(ctx.color));
 
   if (defined(ctx.king)) {
     if (piece.role === 'king') {
       const occ = pos.board.occupied.without(square);
       for (const to of pseudo) {
-        if (pos.squareAttackers(to, opposite(pos.turn), occ).nonEmpty()) pseudo = pseudo.without(to);
+        if (pos.squareAttackers(to, opposite(ctx.color), occ).nonEmpty()) pseudo = pseudo.without(to);
       }
     } else {
       if (ctx.checkers.nonEmpty()) {
@@ -121,20 +116,20 @@ export const pseudoMoveDests = (pos: Position, square: Square, ctx?: Context): S
       if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     }
   }
-  return pseudo;
+  return pseudo.intersect(fullSquareSet(pos.rules));
 };
 
-export const pseudoDropDests = (pos: Position, piece: Piece, ctx?: Context): SquareSet => {
+export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): SquareSet => {
   ctx = ctx || pos.ctx();
-  if (piece.color !== pos.turn) return SquareSet.empty();
+  if (piece.color !== ctx.color) return SquareSet.empty();
   const role = piece.role;
   let mask = pos.board.occupied.complement();
   // Removing backranks, where no legal drop would be possible
   const dims = dimensions(pos.rules);
   if (role === 'pawn' || role === 'lance')
-    mask = mask.diff(SquareSet.fromRank(pos.turn === 'sente' ? 0 : dims.ranks - 1));
+    mask = mask.diff(SquareSet.fromRank(ctx.color === 'sente' ? 0 : dims.ranks - 1));
   else if (role === 'knight')
-    mask = mask.diff(pos.turn === 'sente' ? SquareSet.ranksAbove(2) : SquareSet.ranksBelow(dims.ranks - 3));
+    mask = mask.diff(ctx.color === 'sente' ? SquareSet.ranksAbove(2) : SquareSet.ranksBelow(dims.ranks - 3));
 
   if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
     const checker = ctx.checkers.singleSquare();
@@ -144,14 +139,14 @@ export const pseudoDropDests = (pos: Position, piece: Piece, ctx?: Context): Squ
 
   if (role === 'pawn') {
     // Checking for double pawns
-    const pawns = pos.board.role('pawn').intersect(pos.board.color(pos.turn));
+    const pawns = pos.board.role('pawn').intersect(pos.board.color(ctx.color));
     for (const pawn of pawns) {
       const file = SquareSet.fromFile(squareFile(pawn));
       mask = mask.diff(file);
     }
     // Checking for a pawn checkmate
-    const kingSquare = pos.board.kingOf(opposite(pos.turn)),
-      kingFront = defined(kingSquare) ? (pos.turn === 'sente' ? kingSquare + 16 : kingSquare - 16) : undefined;
+    const kingSquare = pos.kingsOf(opposite(ctx.color)).singleSquare(),
+      kingFront = defined(kingSquare) ? (ctx.color === 'sente' ? kingSquare + 16 : kingSquare - 16) : undefined;
     if (defined(kingFront) && mask.has(kingFront)) {
       const child = pos.clone();
       child.play({ role: 'pawn', to: kingFront });
@@ -159,5 +154,5 @@ export const pseudoDropDests = (pos: Position, piece: Piece, ctx?: Context): Squ
     }
   }
 
-  return mask;
+  return mask.intersect(fullSquareSet(pos.rules));
 };

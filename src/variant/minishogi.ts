@@ -6,12 +6,11 @@ import { SquareSet } from '../squareSet.js';
 import { Color, Piece, Square } from '../types.js';
 import { opposite } from '../util.js';
 import { Context, Position, PositionError } from './position.js';
-import { pseudoDropDests, pseudoMoveDests } from './shogi.js';
+import { standardDropDests, standardMoveDests } from './shogi.js';
 
 export class Minishogi extends Position {
   private constructor() {
     super('minishogi');
-    this.fullSquareSet = new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
   }
 
   static default(): Minishogi {
@@ -65,14 +64,10 @@ export class Minishogi extends Position {
   }
 
   moveDests(square: Square, ctx?: Context): SquareSet {
-    return pseudoMoveDests(this, square, ctx).intersect(this.fullSquareSet);
+    return standardMoveDests(this, square, ctx);
   }
 
   dropDests(piece: Piece, ctx?: Context): SquareSet {
-    return pseudoDropDests(this, piece, ctx).intersect(this.fullSquareSet);
-  }
-
-  hasInsufficientMaterial(color: Color): boolean {
-    return this.board.color(color).size() + this.hands[color].count() < 2;
+    return standardDropDests(this, piece, ctx);
   }
 }

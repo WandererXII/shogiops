@@ -176,8 +176,16 @@ export function unpromote(rules: Rules): (role: Role) => Role | undefined {
 
 export function promotionZone(rules: Rules): (color: Color) => SquareSet {
   switch (rules) {
+    case 'chushogi':
+      return (color: Color) =>
+        color === 'sente'
+          ? new SquareSet([0xfff0fff, 0xfff0fff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])
+          : new SquareSet([0x0, 0x0, 0x0, 0x0, 0xfff0fff, 0xfff0fff, 0x0, 0x0]);
     case 'minishogi':
-      return (color: Color) => (color === 'sente' ? SquareSet.fromRank(0) : SquareSet.fromRank(4));
+      return (color: Color) =>
+        color === 'sente'
+          ? new SquareSet([0x1f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])
+          : new SquareSet([0x0, 0x0, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
     default:
       return (color: Color) =>
         color === 'sente'

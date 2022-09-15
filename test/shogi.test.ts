@@ -104,7 +104,7 @@ test('pawn checkmate legality', () => {
 const insufficientMaterial: [string, boolean][] = [
   ['lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1', false],
   ['9/4k4/9/9/9/9/9/4K4/9 b - 1', true],
-  ['9/4k4/9/9/9/9/2G6/4K4/9 b - 1', true],
+  ['9/4k4/9/9/9/9/2G6/4K4/9 b - 1', false],
 ];
 
 test.each(insufficientMaterial)('insufficient material: %s', (sfen, insufficient) => {

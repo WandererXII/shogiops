@@ -31,7 +31,7 @@ export abstract class Position {
   hands: Hands;
   turn: Color;
   moveNumber: number;
-  lastMove: Move | undefined;
+  lastMove: Move | { to: Square } | undefined;
   lastCapture: Piece | undefined;
 
   protected constructor(readonly rules: Rules) {}

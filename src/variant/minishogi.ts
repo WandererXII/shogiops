@@ -3,7 +3,7 @@ import { bishopAttacks, goldAttacks, kingAttacks, pawnAttacks, rookAttacks, silv
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { Color, Piece, Square } from '../types.js';
+import { Color, Piece, Role, Square } from '../types.js';
 import { opposite } from '../util.js';
 import { Context, Position, PositionError } from './position.js';
 import { standardDropDests, standardMoveDests } from './shogi.js';
@@ -15,7 +15,7 @@ export class Minishogi extends Position {
 
   static default(): Minishogi {
     const pos = new this();
-    pos.board = Board.minishogi();
+    pos.board = minishogiBoard();
     pos.hands = Hands.empty();
     pos.turn = 'sente';
     pos.moveNumber = 1;
@@ -67,3 +67,20 @@ export class Minishogi extends Position {
     return standardDropDests(this, piece, ctx);
   }
 }
+
+const minishogiBoard = (): Board => {
+  const occupied = new SquareSet([0x1001f, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+  const colorMap: [Color, SquareSet][] = [
+    ['sente', new SquareSet([0x0, 0x100000, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0])],
+    ['gote', new SquareSet([0x1001f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])],
+  ];
+  const roleMap: [Role, SquareSet][] = [
+    ['rook', new SquareSet([0x10, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0])],
+    ['bishop', new SquareSet([0x8, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0])],
+    ['gold', new SquareSet([0x2, 0x0, 0x8, 0x0, 0x0, 0x0, 0x0, 0x0])],
+    ['silver', new SquareSet([0x4, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0])],
+    ['pawn', new SquareSet([0x10000, 0x100000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])],
+    ['king', new SquareSet([0x1, 0x0, 0x10, 0x0, 0x0, 0x0, 0x0, 0x0])],
+  ];
+  return Board.from(occupied, colorMap, roleMap);
+};

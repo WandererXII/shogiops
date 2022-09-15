@@ -3,7 +3,7 @@ import { Board } from '../../board.js';
 import { Hand, Hands } from '../../hands.js';
 import { Color, Move, isDrop } from '../../types.js';
 import { defined, parseCoordinates } from '../../util.js';
-import { Shogi } from '../../variant/shogi.js';
+import { Shogi, standardBoard } from '../../variant/shogi.js';
 import { allRoles, handRoles, promote } from '../../variant/util.js';
 import { csaToRole, makeNumberSquare, parseNumberSquare, roleToCsa } from '../util.js';
 
@@ -88,7 +88,7 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
 
 export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
   const splitted = handicap.substring(2).match(/.{4}/g) || [];
-  const intitalBoard = Board.standard();
+  const intitalBoard = standardBoard();
   for (const s of splitted) {
     const sq = parseNumberSquare(s.substring(0, 2));
     if (defined(sq)) {

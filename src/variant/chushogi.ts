@@ -10,6 +10,7 @@ import {
   eagleLionAttacks,
   elephantAttacks,
   falconAttacks,
+  falconLionAttacks,
   goBetweenAttacks,
   goldAttacks,
   kingAttacks,
@@ -20,7 +21,6 @@ import {
   oxAttacks,
   pawnAttacks,
   phoenixAttacks,
-  queenAttacks,
   rookAttacks,
   sideMoverAttacks,
   silverAttacks,
@@ -33,8 +33,8 @@ import {
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { Color, Piece, Role, Setup, Square } from '../types.js';
-import { defined, opposite } from '../util.js';
+import { Color, Outcome, Piece, Role, Setup, Square } from '../types.js';
+import { defined, opposite, squareDist } from '../util.js';
 import { Context, Position, PositionError } from './position.js';
 import { fullSquareSet } from './util.js';
 
@@ -76,16 +76,21 @@ export class Chushogi extends Position {
         .union(elephantAttacks(square, defender).intersect(board.roles('elephant', 'promotedelephant')))
         .union(chariotAttacks(square, occupied).intersect(board.role('chariot')))
         .union(
-          bishopAttacks(square, occupied).intersect(board.roles('bishop', 'promotedbishop', 'horse', 'promotedhorse'))
+          bishopAttacks(square, occupied).intersect(
+            board.roles('bishop', 'promotedbishop', 'horse', 'promotedhorse', 'queen', 'promotedqueen')
+          )
         )
         .union(tigerAttacks(square, defender).intersect(board.role('tiger')))
         .union(kirinAttacks(square).intersect(board.role('kirin')))
         .union(phoenixAttacks(square).intersect(board.role('phoenix')))
         .union(sideMoverAttacks(square, occupied).intersect(board.roles('sidemover', 'promotedsidemover')))
         .union(verticalMoverAttacks(square, occupied).intersect(board.roles('verticalmover', 'promotedverticalmover')))
-        .union(rookAttacks(square, occupied).intersect(board.roles('rook', 'promotedrook', 'dragon', 'promoteddragon')))
+        .union(
+          rookAttacks(square, occupied).intersect(
+            board.roles('rook', 'promotedrook', 'dragon', 'promoteddragon', 'queen', 'promotedqueen')
+          )
+        )
         .union(lionAttacks(square).intersect(board.roles('lion', 'promotedlion')))
-        .union(queenAttacks(square, occupied).intersect(board.roles('queen', 'promotedqueen')))
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
         .union(goBetweenAttacks(square).intersect(board.role('gobetween')))
         .union(whiteHorseAttacks(square, defender, occupied).intersect(board.role('whitehorse')))
@@ -112,9 +117,7 @@ export class Chushogi extends Position {
     const piece = this.board.get(square);
     if (!piece || piece.color !== ctx.color) return SquareSet.empty();
 
-    let pseudoDests = attacks(piece, square, this.board.occupied)
-      .diff(this.board.color(ctx.color))
-      .intersect(fullSquareSet(this.rules));
+    let pseudo = attacks(piece, square, this.board.occupied).diff(this.board.color(ctx.color));
 
     const oppColor = opposite(ctx.color),
       oppLions = this.board.color(oppColor).intersect(this.board.roles('lion', 'promotedlion'));
@@ -123,54 +126,153 @@ export class Chushogi extends Position {
     if (piece.role === 'lion' || piece.role === 'promotedlion') {
       const neighbors = kingAttacks(square);
       // don't allow capture of a non-adjacent lion protected by an enemy piece
-      for (const lion of pseudoDests.diff(neighbors).intersect(oppLions)) {
+      for (const lion of pseudo.diff(neighbors).intersect(oppLions)) {
         if (this.squareAttackers(lion, oppColor, this.board.occupied.without(square)).nonEmpty())
-          pseudoDests = pseudoDests.without(lion);
+          pseudo = pseudo.without(lion);
       }
-    } else if (this.lastCapture && (this.lastCapture.role === 'lion' || this.lastCapture.role === 'promotedlion')) {
-      const lastDest = this.lastMove?.to;
+    } else if (
+      this.lastMove &&
+      this.lastCapture &&
+      (this.lastCapture.role === 'lion' || this.lastCapture.role === 'promotedlion')
+    ) {
+      const lastDest = this.lastMove.to;
       // can't recapture lion on another square
-      for (const lion of oppLions.intersect(pseudoDests)) {
-        if (lion !== lastDest) pseudoDests = pseudoDests.without(lion);
+      for (const lion of oppLions.intersect(pseudo)) {
+        if (lion !== lastDest) pseudo = pseudo.without(lion);
       }
     }
 
-    return pseudoDests;
+    return pseudo.intersect(fullSquareSet(this.rules));
   }
 
   dropDests(_piece: Piece, _ctx?: Context): SquareSet {
     return SquareSet.empty();
   }
 
+  // checkmate can happen both after our move or after opponent's move
+  // so we need to check both unless specific ctx is provided
   isCheckmate(ctx?: Context): boolean {
-    ctx = ctx || this.ctx();
-    const royal = this.kingsOf(ctx.color).singleSquare(), // undefined if more royal pieces are present
-      color = ctx.color,
-      checkers = ctx.checkers;
-    if (!defined(royal)) return false;
+    if (ctx) {
+      // king or prince
+      const king = this.kingsOf(ctx.color).singleSquare(), // undefined if more royal pieces are present
+        color = ctx.color,
+        checkers = ctx.checkers;
+      if (!defined(king) || checkers.isEmpty()) return false;
 
-    const canRoyalEscape = () => {
-      // can royal escape
-      let royalDests = kingAttacks(royal);
-      const occ = this.board.occupied.without(royal);
-      for (const to of royalDests) {
-        if (this.squareAttackers(to, opposite(color), occ).nonEmpty()) royalDests = royalDests.without(to);
+      // can king escape
+      let kingDests = kingAttacks(king).diff(this.board.color(color)).intersect(fullSquareSet(this.rules));
+      const occ = this.board.occupied.without(king);
+      for (const to of kingDests) {
+        if (this.squareAttackers(to, opposite(color), occ).nonEmpty()) kingDests = kingDests.without(to);
       }
-      if (royalDests.nonEmpty()) return true;
+      if (kingDests.nonEmpty()) return false;
 
       // can another piece block the check
       const checker = checkers.singleSquare();
       if (defined(checker)) {
-        for (const square of this.board.color(color).without(royal)) {
-          if (this.moveDests(square, ctx).intersect(between(checker, royal).with(checker)).nonEmpty()) {
-            return true;
+        const checkerPiece = this.board.get(checker)!;
+
+        for (const square of this.board.color(color).without(king)) {
+          const dests = this.moveDests(square, ctx),
+            piece = this.board.get(square)!;
+
+          // possibly special capture rules
+          if (['lion', 'promotedlion'].includes(checkerPiece.role) && ['lion', 'promotedlion'].includes(piece.role)) {
+            if (dests.has(checker)) return false;
+            else if (squareDist(checker, square) === 2) {
+              const neighbors = kingAttacks(square).diff(this.board.color(color));
+              for (const neighbor of neighbors) {
+                if (secondLionStepDests(this, square, neighbor).has(checker)) return false;
+              }
+            }
+          }
+          // these can jump, so only way to stop them is to capture them
+          else if (['lion', 'promotedlion', 'kirin', 'phoenix'].includes(checkerPiece.role)) {
+            if (dests.has(checker)) return false;
+          }
+          // these can also jump, but also have long range attacks
+          else if (['eagle', 'falcon'].includes(checkerPiece.role)) {
+            if (checkerPiece.role === 'eagle') {
+              if (eagleLionAttacks(checker, checkerPiece.color).has(king) && dests.has(checker)) return false;
+              else if (dests.intersect(between(checker, king).with(checker)).nonEmpty()) return false;
+            } else {
+              if (falconLionAttacks(checker, checkerPiece.color).has(king) && dests.has(checker)) return false;
+              else if (dests.intersect(between(checker, king).with(checker)).nonEmpty()) return false;
+            }
+          }
+          // these can't jump - long or short range attacks
+          else if (dests.intersect(between(checker, king).with(checker)).nonEmpty()) {
+            return false;
           }
         }
       }
-      return false;
-    };
+      // lion could capture two checkers
+      else if (checkers.size() === 2) {
+        const first = checkers.first()!,
+          last = checkers.last()!;
+        if (squareDist(first, last) === 1) {
+          for (const lion of this.board.roles('lion', 'promotedlion').intersect(this.board.color(color))) {
+            const existsPath =
+              checkers.subsetOf(lionAttacks(lion)) &&
+              (secondLionStepDests(this, lion, first).has(last) || secondLionStepDests(this, lion, last).has(first));
+            if (existsPath) return true;
+          }
+        }
+      }
 
-    return ctx.checkers.nonEmpty() && canRoyalEscape();
+      // it's checkmate
+      return true;
+    } else return this.isCheckmate(this.ctx(this.turn)) || this.isCheckmate(this.ctx(opposite(this.turn)));
+  }
+
+  isStalemate(ctx?: Context): boolean {
+    ctx = ctx || this.ctx();
+
+    return ctx.checkers.isEmpty() && !this.hasDests(ctx);
+  }
+
+  isDraw(_ctx?: Context): boolean {
+    return false;
+  }
+
+  isBareKing(_ctx?: Context): boolean {
+    return false;
+  }
+
+  kingsLost(ctx?: Context): boolean {
+    const color = ctx?.color || this.turn;
+    return this.kingsOf(color).isEmpty();
+  }
+
+  outcome(ctx?: Context | undefined): Outcome | undefined {
+    ctx = ctx || this.ctx();
+    const oppCtx = this.ctx(opposite(ctx.color));
+    if (this.kingsLost(ctx))
+      return {
+        result: 'kinglost',
+        winner: oppCtx.color,
+      };
+    else if (this.isCheckmate(oppCtx))
+      return {
+        result: 'checkmate',
+        winner: ctx.color,
+      };
+    else if (this.isCheckmate(ctx))
+      return {
+        result: 'checkmate',
+        winner: oppCtx.color,
+      };
+    else if (this.isStalemate(ctx)) {
+      return {
+        result: 'stalemate',
+        winner: opposite(ctx.color),
+      };
+    } else if (this.isDraw(ctx)) {
+      return {
+        result: 'draw',
+        winner: undefined,
+      };
+    } else return;
   }
 }
 
@@ -219,7 +321,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
     const oppColor = opposite(before.turn),
       oppLions = before.board.color(oppColor).intersect(before.board.roles('lion', 'promotedlion')),
       capture = before.board.get(midSq),
-      clearOccupied = before.board.occupied.withoutMany([initialSq, midSq]);
+      clearOccupied = before.board.occupied.withoutMany(initialSq, midSq);
 
     // can't capture lion protected by an enemy piece, unless we captured something valuable first (not a pawn or go-between)
     for (const lion of oppLions.intersect(pseudoDests)) {

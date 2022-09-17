@@ -16,6 +16,14 @@ export function squareFile(square: Square): number {
   return square & 15;
 }
 
+export function squareDist(a: Square, b: Square): number {
+  const x1 = squareFile(a),
+    x2 = squareFile(b);
+  const y1 = squareRank(a),
+    y2 = squareRank(b);
+  return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+}
+
 export function makePieceName(piece: Piece): PieceName {
   return `${piece.color} ${piece.role}`;
 }

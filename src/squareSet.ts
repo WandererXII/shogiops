@@ -60,7 +60,7 @@ export class SquareSet implements Iterable<Square> {
     return new SquareSet(newRows);
   }
 
-  static fromSquares(squares: Square[]): SquareSet {
+  static fromSquares(...squares: Square[]): SquareSet {
     const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
     for (const square of squares) {
       if (square < 256 && square >= 0) {
@@ -288,7 +288,7 @@ export class SquareSet implements Iterable<Square> {
     return new SquareSet(newDRows);
   }
 
-  withMany(squares: Square[]): SquareSet {
+  withMany(...squares: Square[]): SquareSet {
     const newDRows: BitRows = [...this.dRows];
     for (const square of squares) {
       if (square < 256 && square >= 0) {
@@ -307,7 +307,7 @@ export class SquareSet implements Iterable<Square> {
     return new SquareSet(newDRows);
   }
 
-  withoutMany(squares: Square[]): SquareSet {
+  withoutMany(...squares: Square[]): SquareSet {
     const newDRows: BitRows = [...this.dRows];
     for (const square of squares) {
       if (square < 256 && square >= 0) {

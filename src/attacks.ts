@@ -5,7 +5,7 @@ import { opposite, squareFile, squareRank } from './util.js';
 function computeRange(square: Square, deltas: number[]): SquareSet {
   const file = squareFile(square),
     dests: Square[] = deltas.map(delta => square + delta).filter(sq => Math.abs(file - squareFile(sq)) <= 2);
-  return SquareSet.fromSquares(dests);
+  return SquareSet.fromSquares(...dests);
 }
 
 function tabulateSquares(f: (square: Square) => SquareSet): SquareSet[] {
@@ -73,13 +73,13 @@ export function knightAttacks(square: Square, color: Color): SquareSet {
 }
 
 export function silverAttacks(square: Square, color: Color): SquareSet {
-  if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 16, square - 1, square + 1]);
-  else return NEIGHBORS[square].withoutMany([square - 16, square - 1, square + 1]);
+  if (color === 'sente') return NEIGHBORS[square].withoutMany(square + 16, square - 1, square + 1);
+  else return NEIGHBORS[square].withoutMany(square - 16, square - 1, square + 1);
 }
 
 export function goldAttacks(square: Square, color: Color): SquareSet {
-  if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 17, square + 15]);
-  else return NEIGHBORS[square].withoutMany([square - 17, square - 15]);
+  if (color === 'sente') return NEIGHBORS[square].withoutMany(square + 17, square + 15);
+  else return NEIGHBORS[square].withoutMany(square - 17, square - 15);
 }
 
 export function pawnAttacks(square: Square, color: Color): SquareSet {
@@ -112,7 +112,7 @@ export function dragonAttacks(square: Square, occupied: SquareSet): SquareSet {
 // Chushogi pieces
 
 export function goBetweenAttacks(square: Square): SquareSet {
-  return SquareSet.fromSquares([square - 16, square + 16]);
+  return SquareSet.fromSquares(square - 16, square + 16);
 }
 
 export function chariotAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -120,7 +120,7 @@ export function chariotAttacks(square: Square, occupied: SquareSet): SquareSet {
 }
 
 export function sideMoverAttacks(square: Square, occupied: SquareSet): SquareSet {
-  return rankAttacks(square, occupied).union(SquareSet.fromSquares([square - 16, square + 16]));
+  return rankAttacks(square, occupied).union(SquareSet.fromSquares(square - 16, square + 16));
 }
 
 export function verticalMoverAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -128,12 +128,12 @@ export function verticalMoverAttacks(square: Square, occupied: SquareSet): Squar
 }
 
 export function copperAttacks(square: Square, color: Color): SquareSet {
-  if (color === 'sente') return NEIGHBORS[square].withoutMany([square + 17, square + 15, square + 1, square - 1]);
-  else return NEIGHBORS[square].withoutMany([square - 17, square - 15, square - 1, square + 1]);
+  if (color === 'sente') return NEIGHBORS[square].withoutMany(square + 17, square + 15, square + 1, square - 1);
+  else return NEIGHBORS[square].withoutMany(square - 17, square - 15, square - 1, square + 1);
 }
 
 export function leopardAttacks(square: Square): SquareSet {
-  return NEIGHBORS[square].withoutMany([square + 1, square - 1]);
+  return NEIGHBORS[square].withoutMany(square + 1, square - 1);
 }
 
 export function tigerAttacks(square: Square, color: Color): SquareSet {
@@ -147,13 +147,13 @@ export function elephantAttacks(square: Square, color: Color): SquareSet {
 
 export function kirinAttacks(square: Square): SquareSet {
   return NEIGHBORS[square]
-    .withoutMany([square + 1, square - 1, square + 16, square - 16])
+    .withoutMany(square + 1, square - 1, square + 16, square - 16)
     .union(computeRange(square, [32, -32, -2, 2]));
 }
 
 export function phoenixAttacks(square: Square): SquareSet {
   return NEIGHBORS[square]
-    .withoutMany([square - 15, square - 17, square + 15, square + 17])
+    .withoutMany(square - 15, square - 17, square + 15, square + 17)
     .union(computeRange(square, [30, 34, -30, -34]));
 }
 
@@ -188,15 +188,20 @@ export function whiteHorseAttacks(square: Square, color: Color, occupied: Square
   return whaleAttacks(square, opposite(color), occupied);
 }
 
+export function falconLionAttacks(square: Square, color: Color): SquareSet {
+  if (color === 'sente') return SquareSet.fromSquares(square - 16, square - 32);
+  else return SquareSet.fromSquares(square + 16, square + 32);
+}
+
 export function falconAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return bishopAttacks(square, occupied)
       .union(rookAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
-      .withMany([square - 16, square - 32]);
+      .union(falconLionAttacks(square, color));
   else
     return bishopAttacks(square, occupied)
       .union(rookAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]))
-      .withMany([square + 16, square + 32]);
+      .union(falconLionAttacks(square, color));
 }
 
 export function eagleLionAttacks(square: Square, color: Color): SquareSet {

@@ -167,59 +167,39 @@ export class Chushogi extends Position {
       }
       if (kingDests.nonEmpty()) return false;
 
-      // can another piece block the check
       const checker = checkers.singleSquare();
-      if (defined(checker)) {
-        const checkerPiece = this.board.get(checker)!;
-
+      // we can capture two checker with lion
+      if (checkers.size() === 2) {
+        const first = checkers.first()!,
+          last = checkers.last()!;
+        if (squareDist(first, last) === 1) {
+          const ourLions = this.board.roles('lion', 'promotedlion').intersect(this.board.color(color));
+          for (const lion of ourLions) {
+            const existsPath =
+              checkers.subsetOf(lionAttacks(lion)) &&
+              (secondLionStepDests(this, lion, first).has(last) || secondLionStepDests(this, lion, last).has(first));
+            if (existsPath) return false;
+          }
+        }
+      } else if (defined(checker)) {
         for (const square of this.board.color(color).without(king)) {
           const dests = this.moveDests(square, ctx),
-            piece = this.board.get(square)!;
+            occ = this.board.occupied.union(dests).without(square);
+          if (this.squareAttackers(king, opposite(color), occ).isEmpty()) return false;
 
-          // possibly special capture rules
+          // for lion we might have to consider second step separately
+          const piece = this.board.get(square)!,
+            checkerPiece = this.board.get(checker)!;
           if (['lion', 'promotedlion'].includes(checkerPiece.role) && ['lion', 'promotedlion'].includes(piece.role)) {
-            if (dests.has(checker)) return false;
-            else if (squareDist(checker, square) === 2) {
-              const neighbors = kingAttacks(square).diff(this.board.color(color));
+            if (squareDist(checker, square) === 2) {
+              const neighbors = kingAttacks(square).diff(this.board.color(color)).intersect(fullSquareSet(this.rules));
               for (const neighbor of neighbors) {
                 if (secondLionStepDests(this, square, neighbor).has(checker)) return false;
               }
             }
           }
-          // these can jump, so only way to stop them is to capture them
-          else if (['lion', 'promotedlion', 'kirin', 'phoenix'].includes(checkerPiece.role)) {
-            if (dests.has(checker)) return false;
-          }
-          // these can also jump, but also have long range attacks
-          else if (['eagle', 'falcon'].includes(checkerPiece.role)) {
-            if (checkerPiece.role === 'eagle') {
-              if (eagleLionAttacks(checker, checkerPiece.color).has(king) && dests.has(checker)) return false;
-              else if (dests.intersect(between(checker, king).with(checker)).nonEmpty()) return false;
-            } else {
-              if (falconLionAttacks(checker, checkerPiece.color).has(king) && dests.has(checker)) return false;
-              else if (dests.intersect(between(checker, king).with(checker)).nonEmpty()) return false;
-            }
-          }
-          // these can't jump - long or short range attacks
-          else if (dests.intersect(between(checker, king).with(checker)).nonEmpty()) {
-            return false;
-          }
         }
       }
-      // lion could capture two checkers
-      else if (checkers.size() === 2) {
-        const first = checkers.first()!,
-          last = checkers.last()!;
-        if (squareDist(first, last) === 1) {
-          for (const lion of this.board.roles('lion', 'promotedlion').intersect(this.board.color(color))) {
-            const existsPath =
-              checkers.subsetOf(lionAttacks(lion)) &&
-              (secondLionStepDests(this, lion, first).has(last) || secondLionStepDests(this, lion, last).has(first));
-            if (existsPath) return true;
-          }
-        }
-      }
-
       // it's checkmate
       return true;
     } else return this.isCheckmate(this.ctx(this.turn)) || this.isCheckmate(this.ctx(opposite(this.turn)));
@@ -342,6 +322,6 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
       .intersect(fullSquareSet(before.rules));
     if (!pseudoDests.has(midSq)) return SquareSet.empty();
 
-    return pseudoDests.intersect(kingAttacks(midSq)).with(initialSq);
+    return pseudoDests.intersect(kingAttacks(midSq)).with(initialSq).intersect(fullSquareSet(before.rules));
   } else return SquareSet.empty();
 }

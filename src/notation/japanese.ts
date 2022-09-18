@@ -3,18 +3,18 @@ import { Move, Piece, Square, isDrop } from '../types.js';
 import { squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
-import { makeJapaneseSquare, piecesAiming, roleTo2Kanji } from './util.js';
+import { makeJapaneseSquare, piecesAiming, roleToKanji } from './util.js';
 
 // ７六歩
 export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
   if (isDrop(move)) {
     const ambStr = piecesAiming(pos, { role: move.role, color: pos.turn }, move.to).isEmpty() ? '' : '打';
-    return `${makeJapaneseSquare(move.to)}${roleTo2Kanji(move.role)}${ambStr}`;
+    return `${makeJapaneseSquare(move.to)}${roleToKanji(move.role)}${ambStr}`;
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
       const destStr = lastDest === move.to ? '同　' : makeJapaneseSquare(move.to),
-        roleStr = roleTo2Kanji(piece.role),
+        roleStr = roleToKanji(piece.role),
         ambPieces = piecesAiming(pos, piece, move.to).without(move.from),
         ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces),
         promStr = move.promotion

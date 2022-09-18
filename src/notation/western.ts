@@ -6,11 +6,11 @@ import { makeNumberSquare, piecesAiming, roleToWestern } from './util.js';
 // P-76
 export function makeWesternMove(pos: Position, move: Move): string | undefined {
   if (isDrop(move)) {
-    return roleToWestern(move.role).toUpperCase() + '*' + makeNumberSquare(move.to);
+    return roleToWestern(pos.rules)(move.role) + '*' + makeNumberSquare(move.to);
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleToWestern(piece.role).toUpperCase(),
+      const roleStr = roleToWestern(pos.rules)(piece.role),
         ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty() ? '' : makeNumberSquare(move.from),
         capture = pos.board.get(move.to),
         actionStr = !!capture ? 'x' : '-',

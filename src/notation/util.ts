@@ -1,5 +1,5 @@
 import { SquareSet } from '../squareSet.js';
-import { Piece, Role, Square } from '../types.js';
+import { Piece, Role, Rules, Square } from '../types.js';
 import { squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 
@@ -11,40 +11,100 @@ export function piecesAiming(pos: Position, piece: Piece, to: Square): SquareSet
   return pieces;
 }
 
-export function roleToWestern(role: Role): string {
-  switch (role) {
-    case 'pawn':
-      return 'p';
-    case 'lance':
-      return 'l';
-    case 'knight':
-      return 'n';
-    case 'silver':
-      return 's';
-    case 'gold':
-      return 'g';
-    case 'bishop':
-      return 'b';
-    case 'rook':
-      return 'r';
-    case 'tokin':
-      return '+p';
-    case 'promotedlance':
-      return '+l';
-    case 'promotedknight':
-      return '+n';
-    case 'promotedsilver':
-      return '+s';
-    case 'horse':
-      return '+b';
-    case 'dragon':
-      return '+r';
-    default:
-      return 'k';
-  }
+export function roleToWestern(rules: Rules): (role: Role) => string {
+  return role => {
+    switch (role) {
+      case 'pawn':
+        return 'P';
+      case 'lance':
+        return 'L';
+      case 'knight':
+        return 'N';
+      case 'silver':
+        return 'S';
+      case 'gold':
+        return 'G';
+      case 'bishop':
+        return 'B';
+      case 'rook':
+        return 'R';
+      case 'tokin':
+        return '+P';
+      case 'promotedlance':
+        return '+L';
+      case 'promotedknight':
+        return '+N';
+      case 'promotedsilver':
+        return '+S';
+      case 'horse':
+        return rules === 'chushogi' ? 'H' : '+B';
+      case 'dragon':
+        return rules === 'chushogi' ? 'D' : '+R';
+      case 'king':
+        return 'K';
+      case 'leopard':
+        return 'FL';
+      case 'copper':
+        return 'C';
+      case 'elephant':
+        return 'DE';
+      case 'chariot':
+        return 'RC';
+      case 'tiger':
+        return 'BT';
+      case 'kirin':
+        return 'Kr';
+      case 'phoenix':
+        return 'Ph';
+      case 'sidemover':
+        return 'SM';
+      case 'verticalmover':
+        return 'VM';
+      case 'lion':
+        return 'Ln';
+      case 'queen':
+        return 'FK';
+      case 'gobetween':
+        return 'GB';
+      case 'whitehorse':
+        return '+L';
+      case 'promotedbishop':
+        return '+FL';
+      case 'promotedsidemover':
+        return '+C';
+      case 'promotedverticalmover':
+        return '+S';
+      case 'promotedrook':
+        return '+G';
+      case 'prince':
+        return '+DE';
+      case 'whale':
+        return '+RC';
+      case 'promotedhorse':
+        return '+B';
+      case 'stag':
+        return '+BT';
+      case 'promotedlion':
+        return '+Kr';
+      case 'promotedqueen':
+        return '+Ph';
+      case 'boar':
+        return '+SM';
+      case 'ox':
+        return '+VM';
+      case 'falcon':
+        return '+H';
+      case 'eagle':
+        return '+D';
+      case 'promoteddragon':
+        return '+R';
+      case 'promotedelephant':
+        return '+GB';
+    }
+  };
 }
 
-export function roleTo1Kanji(role: Role): string {
+export function roleToKanji(role: Role): string {
   switch (role) {
     case 'pawn':
       return '歩';
@@ -63,33 +123,92 @@ export function roleTo1Kanji(role: Role): string {
     case 'tokin':
       return 'と';
     case 'promotedlance':
-      return '杏';
-    case 'promotedknight':
-      return '圭';
-    case 'promotedsilver':
-      return '全';
-    case 'horse':
-      return '馬';
-    case 'dragon':
-      return '龍';
-    default:
-      return '玉';
-  }
-}
-
-export function roleTo2Kanji(role: Role): string {
-  switch (role) {
-    case 'promotedlance':
       return '成香';
     case 'promotedknight':
       return '成桂';
     case 'promotedsilver':
       return '成銀';
-    default:
-      return roleTo1Kanji(role);
+    case 'horse':
+      return '馬';
+    case 'dragon':
+      return '龍';
+    case 'king':
+      return '玉';
+    case 'leopard':
+      return '豹';
+    case 'copper':
+      return '銅';
+    case 'elephant':
+      return '象';
+    case 'chariot':
+      return '反';
+    case 'tiger':
+      return '虎';
+    case 'kirin':
+      return '麒';
+    case 'phoenix':
+      return '鳳';
+    case 'sidemover':
+      return '横';
+    case 'verticalmover':
+      return '竪';
+    case 'lion':
+      return '獅';
+    case 'queen':
+      return '奔';
+    case 'gobetween':
+      return '仲';
+    case 'whitehorse':
+      return '駒';
+    case 'promotedbishop':
+      return '小角';
+    case 'promotedsidemover':
+      return '横';
+    case 'promotedverticalmover':
+      return '竪';
+    case 'promotedrook':
+      return '金飛車';
+    case 'prince':
+      return '太';
+    case 'whale':
+      return '鯨';
+    case 'promotedhorse':
+      return '馬';
+    case 'stag':
+      return '鹿';
+    case 'promotedlion':
+      return '獅';
+    case 'promotedqueen':
+      return '奔';
+    case 'boar':
+      return '猪';
+    case 'ox':
+      return '牛';
+    case 'falcon':
+      return '鷹';
+    case 'eagle':
+      return '鷲';
+    case 'promoteddragon':
+      return '龍';
+    case 'promotedelephant':
+      return '象';
   }
 }
 
+export function roleToSingleKanji(role: Role): string {
+  switch (role) {
+    case 'promotedlance':
+      return '杏';
+    case 'promotedknight':
+      return '圭';
+    case 'promotedsilver':
+      return '全';
+    default:
+      return roleToKanji(role);
+  }
+}
+
+// todo - chushogi pieces?
 export function kanjiToRole(str: string): Role | undefined {
   switch (str) {
     case '歩':
@@ -124,6 +243,65 @@ export function kanjiToRole(str: string): Role | undefined {
     case '玉':
     case '王':
       return 'king';
+    case '豹':
+      return 'leopard';
+    case '銅':
+      return 'copper';
+    case '象':
+      return 'elephant';
+    case '反':
+      return 'chariot';
+    case '虎':
+      return 'tiger';
+    case '麒':
+      return 'kirin';
+    case '鳳':
+      return 'phoenix';
+    case '横':
+      return 'sidemover';
+    case '竪':
+      return 'verticalmover';
+    case '獅':
+      return 'lion';
+    case '奔':
+      return 'queen';
+    case '仲':
+      return 'gobetween';
+    case '駒':
+      return 'whitehorse';
+    case '小角':
+      return 'promotedbishop';
+    case '横':
+      return 'promotedsidemover';
+    case '竪':
+      return 'promotedverticalmover';
+    case '金飛車':
+    case '金飛':
+      return 'promotedrook';
+    case '太':
+      return 'prince';
+    case '鯨':
+      return 'whale';
+    case '馬':
+      return 'promotedhorse';
+    case '鹿':
+      return 'stag';
+    case '獅':
+      return 'promotedlion';
+    case '奔':
+      return 'promotedqueen';
+    case '猪':
+      return 'boar';
+    case '牛':
+      return 'ox';
+    case '鷹':
+      return 'falcon';
+    case '鷲':
+      return 'eagle';
+    case '龍':
+      return 'promoteddragon';
+    case '象':
+      return 'promotedelephant';
     default:
       return undefined;
   }

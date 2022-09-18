@@ -76,18 +76,23 @@ function parseUsiDropRole(ch: string): Role | undefined {
   }
 }
 
+export const usiDropRegex = /^([PLNSGBR])\*(\d\d?[a-p])$/;
+export const usiMoveRegex = /^(\d\d?[a-p])(\d\d?[a-p])(\d\d?[a-p])?(\+|=|\?)?$/;
+
 export function parseUsi(str: string): Move | undefined {
-  if (str[1] === '*') {
-    const role = parseUsiDropRole(str[0]),
-      to = parseSquare(str.slice(2));
+  const dropMatch = str.match(usiDropRegex);
+  if (dropMatch) {
+    const role = parseUsiDropRole(dropMatch[1]),
+      to = parseSquare(dropMatch[2]);
     if (defined(role) && defined(to)) return { role, to };
-  } else if (str.length >= 4 && str.length <= 7) {
-    const fromOffset = parseInt(str[2]) ? 2 : 3,
-      toOffset = parseInt(str[fromOffset + 1]) ? 3 : 2,
-      from = parseSquare(str.slice(0, fromOffset)),
-      to = parseSquare(str.slice(fromOffset, fromOffset + toOffset)),
-      promotion = str[fromOffset + toOffset] === '+' ? true : false;
-    if (defined(from) && defined(to)) return { from, to, promotion };
+  }
+  const moveMatch = str.match(usiMoveRegex);
+  if (moveMatch) {
+    const from = parseSquare(moveMatch[1]),
+      to = parseSquare(moveMatch[2]),
+      midStep = moveMatch[3] ? parseSquare(moveMatch[3]) : undefined,
+      promotion = moveMatch[4] === '+' ? true : false;
+    if (defined(from) && defined(to)) return { from, to, promotion, midStep };
   }
   return;
 }
@@ -98,7 +103,12 @@ function makeUsiDropRole(role: Role): string {
 
 export function makeUsi(move: Move): string {
   if (isDrop(move)) return `${makeUsiDropRole(move.role).toUpperCase()}*${makeSquare(move.to)}`;
-  return makeSquare(move.from) + makeSquare(move.to) + (move.promotion ? '+' : '');
+  return (
+    makeSquare(move.from) +
+    makeSquare(move.to) +
+    (defined(move.midStep) ? makeSquare(move.midStep) : '') +
+    (move.promotion ? '+' : '')
+  );
 }
 
 export function toBW(color: string): 'b' | 'w' {

@@ -47,6 +47,13 @@ test('parse usi', () => {
   expect(parseUsi('16o16p+')).toEqual({ from: 239, to: 255, promotion: true });
   expect(parseUsi('16p1a')).toEqual({ from: 255, to: 0, promotion: false });
   expect(parseUsi('16p1a+')).toEqual({ from: 255, to: 0, promotion: true });
+  // with midstep
+  expect(parseUsi('1a1a1a')).toEqual({ from: 0, to: 0, midStep: 0, promotion: false });
+  expect(parseUsi('1a1a1a=')).toEqual({ from: 0, to: 0, midStep: 0, promotion: false });
+  expect(parseUsi('1a1a1a+')).toEqual({ from: 0, to: 0, midStep: 0, promotion: true });
+  expect(parseUsi('16p16p16p')).toEqual({ from: 255, to: 255, midStep: 255, promotion: false });
+  expect(parseUsi('16p16p16p=')).toEqual({ from: 255, to: 255, midStep: 255, promotion: false });
+  expect(parseUsi('16p16p16p+')).toEqual({ from: 255, to: 255, midStep: 255, promotion: true });
 });
 
 test('make usi', () => {
@@ -60,6 +67,9 @@ test('make usi', () => {
   expect(makeUsi({ from: 0, to: 0, promotion: true })).toBe('1a1a+');
   expect(makeUsi({ from: 0, to: 0, promotion: false })).toBe('1a1a');
   expect(makeUsi({ from: 0, to: 0, promotion: undefined })).toBe('1a1a');
+  // with midstep
+  expect(makeUsi({ from: 0, to: 0, midStep: 255 })).toBe('1a1a16p');
+  expect(makeUsi({ from: 0, to: 0, midStep: 255, promotion: true })).toBe('1a1a16p+');
 });
 
 test('piece name', () => {

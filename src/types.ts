@@ -101,6 +101,7 @@ export interface NormalMove {
   from: Square;
   to: Square;
   promotion?: boolean;
+  midStep?: Square;
 }
 
 export interface DropMove {

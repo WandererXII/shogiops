@@ -296,6 +296,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
   if (piece.role === 'lion' || piece.role === 'promotedlion') {
     if (!kingAttacks(initialSq).has(midSq)) return SquareSet.empty();
     let pseudoDests = kingAttacks(midSq)
+      .with(midSq)
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
     const oppColor = opposite(before.turn),
@@ -314,6 +315,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
     if (!pawnAttacks(initialSq, piece.color).has(midSq)) return SquareSet.empty();
 
     return goBetweenAttacks(midSq)
+      .with(midSq)
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
   } else if (piece.role === 'eagle') {

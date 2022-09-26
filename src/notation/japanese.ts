@@ -13,7 +13,7 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const destStr = lastDest === move.to ? '同　' : makeJapaneseSquare(move.to),
+      const destStr = (lastDest || pos.lastMove?.to) === move.to ? '同　' : makeJapaneseSquare(move.to),
         roleStr = roleToKanji(piece.role),
         ambPieces = piecesAiming(pos, piece, move.to).without(move.from),
         ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces),

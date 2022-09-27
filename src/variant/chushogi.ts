@@ -274,11 +274,9 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
   } else if (piece.role === 'eagle') {
-    const pseudoDests = eagleLionAttacks(initialSq, piece.color)
-      .diff(before.board.color(before.turn))
-      .intersect(fullSquareSet(before.rules));
+    const pseudoDests = eagleLionAttacks(initialSq, piece.color).diff(before.board.color(before.turn));
     if (!pseudoDests.has(midSq)) return SquareSet.empty();
 
-    return pseudoDests.intersect(kingAttacks(midSq)).with(initialSq).intersect(fullSquareSet(before.rules));
+    return pseudoDests.intersect(kingAttacks(midSq)).withMany(initialSq, midSq).intersect(fullSquareSet(before.rules));
   } else return SquareSet.empty();
 }

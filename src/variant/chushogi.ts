@@ -149,66 +149,17 @@ export class Chushogi extends Position {
     return SquareSet.empty();
   }
 
-  // checkmate can happen both after our move or after opponent's move
-  // so we need to check both unless specific ctx is provided
-  isCheckmate(ctx?: Context): boolean {
-    if (ctx) {
-      // king or prince
-      const king = this.kingsOf(ctx.color).singleSquare(), // undefined if more royal pieces are present
-        color = ctx.color,
-        checkers = ctx.checkers;
-      if (!defined(king) || checkers.isEmpty()) return false;
-
-      // can king escape
-      let kingDests = kingAttacks(king).diff(this.board.color(color)).intersect(fullSquareSet(this.rules));
-      const occ = this.board.occupied.without(king);
-      for (const to of kingDests) {
-        if (this.squareAttackers(to, opposite(color), occ).nonEmpty()) kingDests = kingDests.without(to);
-      }
-      if (kingDests.nonEmpty()) return false;
-
-      const checker = checkers.singleSquare();
-      // we can capture two checker with lion
-      if (checkers.size() === 2) {
-        const first = checkers.first()!,
-          last = checkers.last()!;
-        if (squareDist(first, last) === 1) {
-          const ourLions = this.board.roles('lion', 'promotedlion').intersect(this.board.color(color));
-          for (const lion of ourLions) {
-            const existsPath =
-              checkers.subsetOf(lionAttacks(lion)) &&
-              (secondLionStepDests(this, lion, first).has(last) || secondLionStepDests(this, lion, last).has(first));
-            if (existsPath) return false;
-          }
-        }
-      } else if (defined(checker)) {
-        for (const square of this.board.color(color).without(king)) {
-          const dests = this.moveDests(square, ctx),
-            occ = this.board.occupied.union(dests).without(square);
-          if (this.squareAttackers(king, opposite(color), occ).isEmpty()) return false;
-
-          // for lion we might have to consider second step separately
-          const piece = this.board.get(square)!,
-            checkerPiece = this.board.get(checker)!;
-          if (['lion', 'promotedlion'].includes(checkerPiece.role) && ['lion', 'promotedlion'].includes(piece.role)) {
-            if (squareDist(checker, square) === 2) {
-              const neighbors = kingAttacks(square).diff(this.board.color(color)).intersect(fullSquareSet(this.rules));
-              for (const neighbor of neighbors) {
-                if (secondLionStepDests(this, square, neighbor).has(checker)) return false;
-              }
-            }
-          }
-        }
-      }
-      // it's checkmate
-      return true;
-    } else return this.isCheckmate(this.ctx(this.turn)) || this.isCheckmate(this.ctx(opposite(this.turn)));
+  // checkmate not supported, because of not well defined edge cases
+  // - Both sides checkmated at once
+  // - Both royal pieces checkmated
+  // - Checkmating opponent, but in doing so moving into check
+  isCheckmate(_ctx?: Context): boolean {
+    return false;
   }
 
   isStalemate(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
-
-    return ctx.checkers.isEmpty() && !this.hasDests(ctx);
+    return !this.hasDests(ctx);
   }
 
   isDraw(_ctx?: Context): boolean {
@@ -226,21 +177,10 @@ export class Chushogi extends Position {
 
   outcome(ctx?: Context | undefined): Outcome | undefined {
     ctx = ctx || this.ctx();
-    const oppCtx = this.ctx(opposite(ctx.color));
     if (this.kingsLost(ctx))
       return {
         result: 'kinglost',
-        winner: oppCtx.color,
-      };
-    else if (this.isCheckmate(oppCtx))
-      return {
-        result: 'checkmate',
-        winner: ctx.color,
-      };
-    else if (this.isCheckmate(ctx))
-      return {
-        result: 'checkmate',
-        winner: oppCtx.color,
+        winner: opposite(ctx.color),
       };
     else if (this.isStalemate(ctx)) {
       return {

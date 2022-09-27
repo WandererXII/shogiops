@@ -89,8 +89,9 @@ export function parseUsi(str: string): Move | undefined {
   const moveMatch = str.match(usiMoveRegex);
   if (moveMatch) {
     const from = parseSquare(moveMatch[1]),
-      to = parseSquare(moveMatch[2]),
-      midStep = moveMatch[3] ? parseSquare(moveMatch[3]) : undefined,
+      hasMidStep = !!moveMatch[3],
+      midStep = hasMidStep ? parseSquare(moveMatch[2]) : undefined,
+      to = hasMidStep ? parseSquare(moveMatch[3]) : parseSquare(moveMatch[2]),
       promotion = moveMatch[4] === '+' ? true : false;
     if (defined(from) && defined(to)) return { from, to, promotion, midStep };
   }
@@ -105,8 +106,8 @@ export function makeUsi(move: Move): string {
   if (isDrop(move)) return `${makeUsiDropRole(move.role).toUpperCase()}*${makeSquare(move.to)}`;
   return (
     makeSquare(move.from) +
-    makeSquare(move.to) +
     (defined(move.midStep) ? makeSquare(move.midStep) : '') +
+    makeSquare(move.to) +
     (move.promotion ? '+' : '')
   );
 }

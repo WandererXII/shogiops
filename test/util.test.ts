@@ -68,8 +68,8 @@ test('make usi', () => {
   expect(makeUsi({ from: 0, to: 0, promotion: false })).toBe('1a1a');
   expect(makeUsi({ from: 0, to: 0, promotion: undefined })).toBe('1a1a');
   // with midstep
-  expect(makeUsi({ from: 0, to: 0, midStep: 255 })).toBe('1a1a16p');
-  expect(makeUsi({ from: 0, to: 0, midStep: 255, promotion: true })).toBe('1a1a16p+');
+  expect(makeUsi({ from: 0, to: 0, midStep: 255 })).toBe('1a16p1a');
+  expect(makeUsi({ from: 0, to: 0, midStep: 255, promotion: true })).toBe('1a16p1a+');
 });
 
 test('piece name', () => {

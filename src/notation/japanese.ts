@@ -1,6 +1,6 @@
 import { SquareSet } from '../squareSet.js';
 import { Move, Piece, Square, isDrop } from '../types.js';
-import { squareFile, squareRank } from '../util.js';
+import { defined, squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
 import { makeJapaneseSquare, piecesAiming, roleToKanji } from './util.js';
@@ -13,16 +13,25 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const destStr = (lastDest ?? pos.lastMove?.to) === move.to ? '同　' : makeJapaneseSquare(move.to),
-        roleStr = roleToKanji(piece.role),
+      const roleStr = roleToKanji(piece.role),
         ambPieces = piecesAiming(pos, piece, move.to).without(move.from),
-        ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces),
-        promStr = move.promotion
-          ? '成'
-          : pieceCanPromote(pos.rules)(piece, move.from, move.to, pos.board.get(move.to))
-          ? '不成'
-          : '';
-      return `${destStr}${roleStr}${ambStr}${promStr}`;
+        ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces);
+
+      if (defined(move.midStep)) {
+        const midCapture = pos.board.get(move.midStep),
+          igui = !!midCapture && move.to === move.from;
+        if (igui) return `${makeJapaneseSquare(move.midStep)}居喰い`;
+        else if (move.to === move.from) return 'じっと';
+        else return `${makeJapaneseSquare(move.midStep)}・${makeJapaneseSquare(move.to)}${roleStr}${ambStr}`;
+      } else {
+        const destStr = (lastDest ?? pos.lastMove?.to) === move.to ? '同　' : makeJapaneseSquare(move.to),
+          promStr = move.promotion
+            ? '成'
+            : pieceCanPromote(pos.rules)(piece, move.from, move.to, pos.board.get(move.to))
+            ? '不成'
+            : '';
+        return `${destStr}${roleStr}${ambStr}${promStr}`;
+      }
     } else return undefined;
   }
 }

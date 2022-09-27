@@ -1,7 +1,6 @@
 import { Result } from '@badrap/result';
 import {
   attacks,
-  between,
   bishopAttacks,
   boarAttacks,
   chariotAttacks,
@@ -10,7 +9,6 @@ import {
   eagleLionAttacks,
   elephantAttacks,
   falconAttacks,
-  falconLionAttacks,
   goBetweenAttacks,
   goldAttacks,
   kingAttacks,
@@ -34,9 +32,9 @@ import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
 import { Color, Outcome, Piece, Role, Setup, Square } from '../types.js';
-import { defined, opposite, squareDist } from '../util.js';
-import { Context, Position, PositionError } from './position.js';
-import { fullSquareSet } from './util.js';
+import { opposite } from '../util.js';
+import { Context, IllegalSetup, Position, PositionError } from './position.js';
+import { allRoles, fullSquareSet } from './util.js';
 
 export class Chushogi extends Position {
   private constructor() {
@@ -56,6 +54,23 @@ export class Chushogi extends Position {
     const pos = new this();
     pos.fromSetup(setup);
     return pos.validate(strict).map(_ => pos);
+  }
+
+  validate(strict: boolean): Result<undefined, PositionError> {
+    if (!this.board.occupied.intersect(fullSquareSet(this.rules)).equals(this.board.occupied))
+      return Result.err(new PositionError(IllegalSetup.PiecesOutsideBoard));
+
+    if (this.hands.count()) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+
+    for (const role of this.board.presentRoles())
+      if (!allRoles(this.rules).includes(role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
+
+    if (!strict) return Result.ok(undefined);
+
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+    if (this.board.role('king').size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
+
+    return Result.ok(undefined);
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {

@@ -74,7 +74,7 @@ export abstract class Position {
     return pos;
   }
 
-  protected validate(strict: boolean): Result<undefined, PositionError> {
+  validate(strict: boolean): Result<undefined, PositionError> {
     if (!this.board.occupied.intersect(fullSquareSet(this.rules)).equals(this.board.occupied))
       return Result.err(new PositionError(IllegalSetup.PiecesOutsideBoard));
 

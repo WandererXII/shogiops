@@ -7,10 +7,16 @@ export function pieceCanPromote(
 ): (piece: Piece, from: Square, to: Square, capture: Piece | undefined) => boolean {
   switch (rules) {
     case 'chushogi':
-      return (piece: Piece, from: Square, to: Square, capture: Piece | undefined) =>
-        promotableRoles(rules).includes(piece.role) &&
-        ((!promotionZone(rules)(piece.color).has(from) && promotionZone(rules)(piece.color).has(to)) ||
-          (!!capture && (promotionZone(rules)(piece.color).has(from) || promotionZone(rules)(piece.color).has(to))));
+      return (piece: Piece, from: Square, to: Square, capture: Piece | undefined) => {
+        const pZone = promotionZone(rules)(piece.color);
+        return (
+          promotableRoles(rules).includes(piece.role) &&
+          ((!pZone.has(from) && pZone.has(to)) ||
+            (!!capture && (pZone.has(from) || pZone.has(to))) ||
+            (['pawn', 'lance'].includes(piece.role) &&
+              squareRank(to) === (piece.color === 'sente' ? 0 : dimensions(rules).ranks - 1)))
+        );
+      };
     default:
       return (piece: Piece, from: Square, to: Square) =>
         promotableRoles(rules).includes(piece.role) &&

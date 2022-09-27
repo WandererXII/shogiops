@@ -9,7 +9,8 @@ import { RulesTypeMap, initializePosition } from './variant/variant.js';
 
 export enum InvalidSfen {
   Sfen = 'ERR_SFEN',
-  Board = 'ERR_BOARD',
+  BoardDims = 'ERR_BOARD_DIMS',
+  BoardPiece = 'ERR_BOARD_PIECE',
   Hands = 'ERR_HANDS',
   Turn = 'ERR_TURN',
   MoveNumber = 'ERR_MOVENUMBER',
@@ -76,7 +77,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
   const dims = { files: ranks.length, ranks: ranks.length },
     ruleDims = dimensions(rules);
   if (dims.files !== ruleDims.files || dims.ranks !== ruleDims.ranks)
-    return Result.err(new SfenError(InvalidSfen.Board));
+    return Result.err(new SfenError(InvalidSfen.BoardDims));
   const board = Board.empty();
   let empty = 0,
     rank = 0,
@@ -89,16 +90,16 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
       rank++;
     } else {
       const step = parseInt(c, 10);
-      if (step) {
+      if (!isNaN(step)) {
         file = file + empty - (empty * 10 + step);
         empty = empty * 10 + step;
       } else {
         if (file < 0 || file >= dims.files || rank < 0 || rank >= dims.ranks)
-          return Result.err(new SfenError(InvalidSfen.Board));
+          return Result.err(new SfenError(InvalidSfen.BoardDims));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
         const square = parseCoordinates(file, rank)!,
           piece = forsythToPiece(rules, c);
-        if (!piece) return Result.err(new SfenError(InvalidSfen.Board));
+        if (!piece) return Result.err(new SfenError(InvalidSfen.BoardPiece));
         board.set(square, piece);
         empty = 0;
         file--;
@@ -106,7 +107,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
     }
   }
 
-  if (rank !== dims.ranks - 1 || file !== -1) return Result.err(new SfenError(InvalidSfen.Board));
+  if (rank !== dims.ranks - 1 || file !== -1) return Result.err(new SfenError(InvalidSfen.BoardDims));
   return Result.ok(board);
 }
 

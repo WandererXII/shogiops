@@ -16,7 +16,7 @@ export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Squa
           : `(${makeNumberSquare(move.from)})`,
         capture = pos.board.get(move.to),
         actionStr = !!capture ? 'x' : '-',
-        destStr = (lastDest || pos.lastMove?.to) === move.to ? '' : makeNumberSquare(move.to),
+        destStr = (lastDest ?? pos.lastMove?.to) === move.to ? '' : makeNumberSquare(move.to),
         promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture) ? '=' : '';
       return `${roleStr}${ambStr}${actionStr}${destStr}${promStr}`;
     } else return undefined;

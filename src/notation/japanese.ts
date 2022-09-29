@@ -3,18 +3,28 @@ import { Move, Piece, Square, isDrop } from '../types.js';
 import { defined, squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
-import { makeJapaneseSquare, piecesAiming, roleToKanji } from './util.js';
+import { aimingAt, makeJapaneseSquare, roleKanjiDuplicates, roleToKanji } from './util.js';
 
 // ７六歩
 export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
   if (isDrop(move)) {
-    const ambStr = piecesAiming(pos, { role: move.role, color: pos.turn }, move.to).isEmpty() ? '' : '打';
+    const ambStr = aimingAt(
+      pos,
+      pos.board.roles(move.role, ...roleKanjiDuplicates(move.role)).intersect(pos.board.color(pos.turn)),
+      move.to
+    ).isEmpty()
+      ? ''
+      : '打';
     return `${makeJapaneseSquare(move.to)}${roleToKanji(move.role)}${ambStr}`;
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
       const roleStr = roleToKanji(piece.role),
-        ambPieces = piecesAiming(pos, piece, move.to).without(move.from),
+        ambPieces = aimingAt(
+          pos,
+          pos.board.roles(piece.role, ...roleKanjiDuplicates(piece.role)).intersect(pos.board.color(piece.color)),
+          move.to
+        ).without(move.from),
         ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces);
 
       if (defined(move.midStep)) {

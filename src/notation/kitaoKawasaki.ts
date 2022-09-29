@@ -2,7 +2,7 @@ import { Move, Square, isDrop } from '../types.js';
 import { defined } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
-import { makeNumberSquare, piecesAiming, roleToKanji } from './util.js';
+import { aimingAt, makeNumberSquare, roleKanjiDuplicates, roleToKanji } from './util.js';
 
 // 歩-76
 export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
@@ -12,7 +12,13 @@ export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Squa
     const piece = pos.board.get(move.from);
     if (piece) {
       const roleStr = roleToKanji(piece.role).replace('成', '+'),
-        ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty()
+        ambStr = aimingAt(
+          pos,
+          pos.board.roles(piece.role, ...roleKanjiDuplicates(piece.role)).intersect(pos.board.color(piece.color)),
+          move.to
+        )
+          .without(move.from)
+          .isEmpty()
           ? ''
           : `(${makeNumberSquare(move.from)})`,
         capture = pos.board.get(move.to),
@@ -20,7 +26,7 @@ export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Squa
       if (defined(move.midStep)) {
         const midCapture = pos.board.get(move.midStep),
           igui = !!midCapture && move.to === move.from;
-        if (igui) return `${roleStr}${ambStr}!${makeNumberSquare(move.midStep)}`;
+        if (igui) return `${roleStr}${ambStr}x!${makeNumberSquare(move.midStep)}`;
         else if (move.to === move.from) return `--`;
         else
           return `${roleStr}${ambStr}${!!midCapture ? 'x' : '-'}${makeNumberSquare(

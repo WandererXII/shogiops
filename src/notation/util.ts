@@ -1,14 +1,12 @@
 import { SquareSet } from '../squareSet.js';
-import { Piece, Role, Rules, Square } from '../types.js';
+import { Role, Rules, Square } from '../types.js';
 import { squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 
-export function piecesAiming(pos: Position, piece: Piece, to: Square): SquareSet {
-  // Disambiguation
-  let pieces = SquareSet.empty();
-  for (const s of pos.board.pieces(pos.turn, piece.role))
-    if (pos.moveDests(s).has(to)) pieces = pieces.union(SquareSet.fromSquare(s));
-  return pieces;
+export function aimingAt(pos: Position, pieces: SquareSet, to: Square): SquareSet {
+  let ambs = SquareSet.empty();
+  for (const p of pieces) if (pos.moveDests(p).has(to)) ambs = ambs.with(p);
+  return ambs;
 }
 
 export function roleToWestern(rules: Rules): (role: Role) => string {
@@ -102,6 +100,23 @@ export function roleToWestern(rules: Rules): (role: Role) => string {
         return '+GB';
     }
   };
+}
+
+// for kanji disambiguation
+export function roleKanjiDuplicates(role: Role): Role[] {
+  const roles: Role[][] = [
+    ['elephant', 'promotedelephant'],
+    ['sidemover', 'promotedsidemover'],
+    ['verticalmover', 'promotedverticalmover'],
+    ['horse', 'promotedhorse'],
+    ['dragon', 'promoteddragon'],
+    ['lion', 'promotedlion'],
+    ['queen', 'promotedqueen'],
+  ];
+  for (const rs of roles) {
+    if (rs.includes(role)) return rs.filter(r => r !== role);
+  }
+  return [];
 }
 
 export function roleToKanji(role: Role): string {

@@ -288,9 +288,9 @@ export abstract class Position {
         piece.role = promote(this.rules)(piece.role) || piece.role;
 
       const capture = this.board.set(move.to, piece),
-        secondCapture = defined(move.midStep) && this.board.take(move.midStep);
+        secondCapture = defined(move.midStep) ? this.board.take(move.midStep) : undefined;
       if (capture) this.storeCapture(capture);
-      if (secondCapture) this.storeCapture(secondCapture);
+      if (defined(secondCapture)) this.storeCapture(secondCapture);
     }
   }
 }

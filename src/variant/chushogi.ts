@@ -68,7 +68,8 @@ export class Chushogi extends Position {
     if (!strict) return Result.ok(undefined);
 
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.role('king').size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.kingsOf('sente').isEmpty() || this.kingsOf('gote').isEmpty())
+      return Result.err(new PositionError(IllegalSetup.Kings));
 
     return Result.ok(undefined);
   }
@@ -165,10 +166,6 @@ export class Chushogi extends Position {
     return SquareSet.empty();
   }
 
-  // checkmate not supported, because of not well defined edge cases
-  // - Both sides checkmated at once
-  // - Both royal pieces checkmated
-  // - Checkmating opponent, but in doing so moving into check, or ignoring check
   isCheckmate(_ctx?: Context): boolean {
     return false;
   }

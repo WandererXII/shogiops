@@ -96,7 +96,7 @@ export abstract class Position {
     if (!strict) return Result.ok(undefined);
 
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.role('king').size() < 1) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.board.role('king').isEmpty()) return Result.err(new PositionError(IllegalSetup.Kings));
 
     for (const [sq, piece] of this.board)
       if (pieceForcePromote(this.rules)(piece, sq))

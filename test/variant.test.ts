@@ -29,5 +29,5 @@ test('roles outside variant', () => {
       _ => undefined,
       err => err.message
     )
-  ).toEqual(InvalidSfen.Board);
+  ).toEqual(InvalidSfen.BoardPiece);
 });

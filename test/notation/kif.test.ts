@@ -154,7 +154,7 @@ test('parse kif moves one by one', () => {
     m => parseUsi(m)!
   );
   for (const m of line) {
-    expect(parseKifMove(makeKifMove(pos, m)!)).toEqual(m);
+    expect(parseKifMove(makeKifMove(pos, m)!, pos.lastMove?.to)).toEqual(m);
     pos.play(m);
   }
   expect(pos.isCheckmate()).toBe(true);

@@ -32,9 +32,9 @@ import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
 import { Color, Outcome, Piece, Role, Setup, Square } from '../types.js';
-import { opposite } from '../util.js';
+import { defined, opposite } from '../util.js';
 import { Context, IllegalSetup, Position, PositionError } from './position.js';
-import { allRoles, fullSquareSet } from './util.js';
+import { allRoles, dimensions, fullSquareSet } from './util.js';
 
 export class Chushogi extends Position {
   private constructor() {
@@ -167,7 +167,7 @@ export class Chushogi extends Position {
   // checkmate not supported, because of not well defined edge cases
   // - Both sides checkmated at once
   // - Both royal pieces checkmated
-  // - Checkmating opponent, but in doing so moving into check
+  // - Checkmating opponent, but in doing so moving into check, or ignoring check
   isCheckmate(_ctx?: Context): boolean {
     return false;
   }
@@ -178,11 +178,58 @@ export class Chushogi extends Position {
   }
 
   isDraw(_ctx?: Context): boolean {
-    return false;
+    const oneWayRoles = this.board.roles('pawn', 'lance'),
+      occ = this.board.occupied.diff(
+        oneWayRoles
+          .intersect(this.board.color('sente').intersect(SquareSet.fromRank(0)))
+          .union(
+            oneWayRoles.intersect(
+              this.board.color('gote').intersect(SquareSet.fromRank(dimensions(this.rules).ranks - 1))
+            )
+          )
+      );
+    return (
+      occ.size() === 2 &&
+      this.kingsOf('sente').isSingleSquare() &&
+      !this.isCheck('sente') &&
+      this.kingsOf('gote').isSingleSquare() &&
+      !this.isCheck('gote')
+    );
   }
 
-  isBareKing(_ctx?: Context): boolean {
-    return false;
+  isBareKing(ctx?: Context): boolean {
+    if (ctx) {
+      // was our king bared
+      const color = ctx.color,
+        theirColor = opposite(color),
+        ourKing = this.kingsOf(color).singleSquare(),
+        ourPieces = this.board
+          .color(color)
+          .diff(
+            this.board
+              .roles('pawn', 'lance')
+              .intersect(SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1))
+          ),
+        theirPieces = this.board
+          .color(theirColor)
+          .diff(
+            this.board
+              .roles('pawn', 'gobetween')
+              .union(
+                this.board
+                  .role('lance')
+                  .intersect(SquareSet.fromRank(theirColor === 'sente' ? 0 : dimensions(this.rules).ranks - 1))
+              )
+          );
+
+      return (
+        ourPieces.size() === 1 &&
+        defined(ourKing) &&
+        theirPieces.size() > 1 &&
+        !this.isCheck(theirColor) &&
+        (theirPieces.size() > 2 || kingAttacks(ourKing).intersect(theirPieces).isEmpty())
+      );
+    } else return this.isBareKing(this.ctx(this.turn)) || this.isBareKing(this.ctx(opposite(this.turn)));
   }
 
   kingsLost(ctx?: Context): boolean {
@@ -201,6 +248,16 @@ export class Chushogi extends Position {
       return {
         result: 'stalemate',
         winner: opposite(ctx.color),
+      };
+    } else if (this.isBareKing(ctx)) {
+      return {
+        result: 'bareking',
+        winner: opposite(ctx.color),
+      };
+    } else if (this.isBareKing(this.ctx(opposite(ctx.color)))) {
+      return {
+        result: 'bareking',
+        winner: ctx.color,
       };
     } else if (this.isDraw(ctx)) {
       return {

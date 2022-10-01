@@ -261,6 +261,11 @@ export abstract class Position {
     }
   }
 
+  private storeCapture(capture: Piece): void {
+    const unpromotedRole = unpromote(this.rules)(capture.role) || capture.role;
+    if (handRoles(this.rules).includes(unpromotedRole)) this.hands[opposite(capture.color)].capture(unpromotedRole);
+  }
+
   // doesn't care about validity, just tries to play the move
   play(move: Move): void {
     const turn = this.turn;
@@ -282,11 +287,10 @@ export abstract class Position {
       )
         piece.role = promote(this.rules)(piece.role) || piece.role;
 
-      const capture = this.board.set(move.to, piece);
-      if (capture) {
-        const unpromotedRole = unpromote(this.rules)(capture.role) || capture.role;
-        if (handRoles(this.rules).includes(unpromotedRole)) this.hands[opposite(capture.color)].capture(unpromotedRole);
-      }
+      const capture = this.board.set(move.to, piece),
+        secondCapture = defined(move.midStep) && this.board.take(move.midStep);
+      if (capture) this.storeCapture(capture);
+      if (secondCapture) this.storeCapture(secondCapture);
     }
   }
 }

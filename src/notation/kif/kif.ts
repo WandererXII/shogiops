@@ -15,6 +15,7 @@ import {
   numberToKanji,
   parseJapaneseSquare,
   parseNumberSquare,
+  roleToFullKanji,
   roleToKanji,
   roleToSingleKanji,
 } from '../util.js';
@@ -246,12 +247,33 @@ export function parseKifMoves(kifMoves: string[], lastDest: Square | undefined =
 
 // Making kif formatted moves
 export function makeKifMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
-  const moveDest = lastDest === move.to ? '同　' : makeJapaneseSquare(move.to);
   if (isDrop(move)) {
-    return moveDest + roleToKanji(move.role) + '打';
+    return makeJapaneseSquare(move.to) + roleToKanji(move.role) + '打';
   } else {
-    const role = pos.board.getRole(move.from);
+    const sameSquareSymbol = pos.rules === 'chushogi' ? '仝' : '同　',
+      sameDest = (lastDest ?? pos.lastMove?.to) === move.to,
+      moveDestStr = sameDest ? sameSquareSymbol : makeJapaneseSquare(move.to),
+      promStr = move.promotion ? '成' : '',
+      role = pos.board.getRole(move.from);
     if (!role) return undefined;
-    return moveDest + roleToKanji(role) + (move.promotion ? '成' : '') + '(' + makeNumberSquare(move.from) + ')';
+    if (pos.rules === 'chushogi') {
+      if (defined(move.midStep)) {
+        const isIgui = move.to === move.from && pos.board.has(move.midStep),
+          isJitto = move.to === move.from && !isIgui,
+          midDestStr = sameDest ? sameSquareSymbol : makeJapaneseSquare(move.midStep),
+          move1 = '一歩目 ' + midDestStr + roleToFullKanji(role) + ' （←' + makeJapaneseSquare(move.from) + '）',
+          move2 =
+            '二歩目 ' +
+            moveDestStr +
+            roleToFullKanji(role) +
+            (isIgui ? '（居食い）' : isJitto ? 'じっと' : '') +
+            ' （←' +
+            makeJapaneseSquare(move.midStep) +
+            '）';
+
+        return `${move1},${move2}`;
+      }
+      return moveDestStr + roleToFullKanji(role) + promStr + ' （←' + makeJapaneseSquare(move.from) + '）';
+    } else return moveDestStr + roleToKanji(role) + promStr + '(' + makeNumberSquare(move.from) + ')';
   }
 }

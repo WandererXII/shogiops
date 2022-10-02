@@ -210,28 +210,33 @@ export function normalizedKifLines(kif: string): string[] {
 // KIF MOVES
 //
 
+export const kifMoveRegex =
+  /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(玉|飛|龍|角|馬|金|銀|成銀|桂|成桂|香|成香|歩|と)(不成|成)?\(([1-9][1-9])\)/;
+export const kifDropRegex = /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(飛|角|金|銀|桂|香|歩)打/;
+
 // Parsing kif moves
 export function parseKifMove(kifMove: string, lastDest: Square | undefined = undefined): Move | undefined {
   // Normal move
-  const match = kifMove.match(
-    /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(玉|飛|龍|角|馬|金|銀|成銀|桂|成桂|香|成香|歩|と)(成)?\(([1-9][1-9])\)/
-  );
-  if (!match) {
-    // Drop
-    const match = kifMove.match(/((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(飛|角|金|銀|桂|香|歩)打/);
-    if (!match) return;
-    const move = {
-      role: kanjiToRole(match[2])!,
-      to: parseJapaneseSquare(match[1]) ?? lastDest!,
-    };
-    return move;
-  }
+  const match = kifMove.match(kifMoveRegex);
+  if (match) {
+    const dest = parseJapaneseSquare(match[1]) ?? lastDest;
+    if (!defined(dest)) return;
 
-  return {
-    from: parseNumberSquare(match[4])!,
-    to: parseJapaneseSquare(match[1]) ?? lastDest!,
-    promotion: !!match[3],
-  };
+    return {
+      from: parseNumberSquare(match[4])!,
+      to: dest,
+      promotion: match[3] === '成',
+    };
+  } else {
+    // Drop
+    const match = kifMove.match(kifDropRegex);
+    if (!match || !match[1]) return;
+
+    return {
+      role: kanjiToRole(match[2])!,
+      to: parseJapaneseSquare(match[1])!,
+    };
+  }
 }
 
 export function parseKifMoves(kifMoves: string[], lastDest: Square | undefined = undefined): Move[] {

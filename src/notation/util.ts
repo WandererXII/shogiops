@@ -496,7 +496,10 @@ export function csaToRole(str: string): Role | undefined {
 }
 
 export function makeNumberSquare(sq: Square): string {
-  return (squareFile(sq) + 1).toString() + (squareRank(sq) + 1);
+  const file = squareFile(sq) + 1,
+    rank = squareRank(sq) + 1;
+  if (file >= 10) return String.fromCharCode(file + 87) + rank;
+  else return file.toString() + rank;
 }
 
 // only for single digit boards - something like 111 would be amiguous

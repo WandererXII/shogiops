@@ -196,11 +196,13 @@ export function falconLionAttacks(square: Square, color: Color): SquareSet {
 export function falconAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return bishopAttacks(square, occupied)
-      .union(rookAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
+      .union(rankAttacks(square, occupied))
+      .union(fileAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]))
       .union(falconLionAttacks(square, color));
   else
     return bishopAttacks(square, occupied)
-      .union(rookAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]))
+      .union(rankAttacks(square, occupied))
+      .union(fileAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]))
       .union(falconLionAttacks(square, color));
 }
 

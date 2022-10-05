@@ -271,7 +271,7 @@ export function makeKifMove(pos: Position, move: Move, lastDest?: Square): strin
             '二歩目 ' +
             moveDestStr +
             roleToFullKanji(role) +
-            (isIgui ? '（居食い）' : isJitto ? 'じっと' : '') +
+            (isIgui ? '（居食い）' : isJitto ? '(じっと)' : '') +
             ' （←' +
             makeJapaneseSquare(move.midStep) +
             '）';

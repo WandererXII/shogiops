@@ -1,6 +1,7 @@
+import { kingAttacks } from '../attacks.js';
 import { SquareSet } from '../squareSet.js';
-import { Move, Piece, Square, isDrop } from '../types.js';
-import { defined, squareFile, squareRank } from '../util.js';
+import { Move, Piece, Rules, Square, isDrop } from '../types.js';
+import { defined, squareDist, squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
 import { aimingAt, makeJapaneseSquare, roleKanjiDuplicates, roleToKanji } from './util.js';
@@ -25,7 +26,7 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
           pos.board.roles(piece.role, ...roleKanjiDuplicates(piece.role)).intersect(pos.board.color(piece.color)),
           move.to
         ).without(move.from),
-        ambStr = ambPieces.isEmpty() ? '' : disambiguate(piece, move.from, move.to, ambPieces);
+        ambStr = ambPieces.isEmpty() ? '' : disambiguate(pos.rules, piece, move.from, move.to, ambPieces);
 
       if (defined(move.midStep)) {
         const midCapture = pos.board.get(move.midStep),
@@ -46,7 +47,7 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
   }
 }
 
-function disambiguate(piece: Piece, orig: Square, dest: Square, others: SquareSet): string {
+function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, others: SquareSet): string {
   const myRank = squareRank(orig),
     myFile = squareFile(orig);
 
@@ -56,7 +57,7 @@ function disambiguate(piece: Piece, orig: Square, dest: Square, others: SquareSe
   const movingUp = myRank > destRank,
     movingDown = myRank < destRank;
 
-  // special case if gold/silver like piece is moving directly forward
+  // special case - gold-like piece is moving directly forward
   if (
     myFile === destFile &&
     (piece.color === 'sente') === movingUp &&
@@ -64,34 +65,42 @@ function disambiguate(piece: Piece, orig: Square, dest: Square, others: SquareSe
   )
     return '直';
 
-  // is this the only piece moving in certain vertical direction (up, down, horizontally)
+  // special case for lion moves on the same file
+  if (
+    ['lion', 'promotedlion', 'falcon'].includes(piece.role) &&
+    destFile === myFile &&
+    kingAttacks(orig).intersects(others)
+  ) {
+    return squareDist(orig, dest) === 2 ? '跳' : '直';
+  }
+
+  // is this the only piece moving in certain vertical direction (up, down, none - horizontally)
   if (![...others].map(squareRank).some(r => r < destRank === movingDown && r > destRank === movingUp))
-    return verticalDisambiguation(piece, movingUp, movingDown);
+    return verticalDisambiguation(rules, piece, movingUp, movingDown);
 
   const othersFiles = [...others].map(squareFile),
     rightest = othersFiles.reduce((prev, cur) => (prev < cur ? prev : cur)),
     leftest = othersFiles.reduce((prev, cur) => (prev > cur ? prev : cur));
 
-  // is this piece positioned most on one side, not in the middle
+  // is this piece positioned most on one side or in the middle
   if (rightest > myFile || leftest < myFile || (others.size() === 2 && rightest < myFile && leftest > myFile))
-    return sideDisambiguation(piece, rightest > squareFile(orig), leftest < squareFile(orig));
+    return sideDisambiguation(piece, rightest > myFile, leftest < myFile);
 
   return (
-    sideDisambiguation(piece, rightest >= squareFile(orig), leftest <= squareFile(orig)) +
-    verticalDisambiguation(piece, movingUp, movingDown)
+    sideDisambiguation(piece, rightest >= myFile, leftest <= myFile) +
+    verticalDisambiguation(rules, piece, movingUp, movingDown)
   );
 }
 
-function verticalDisambiguation(piece: Piece, up: boolean, down: boolean): string {
-  return up === down
-    ? '寄'
-    : (piece.color === 'sente') === up
-    ? ['horse', 'dragon'].includes(piece.role)
-      ? '行'
-      : '上'
-    : '引';
+function verticalDisambiguation(rules: Rules, piece: Piece, up: boolean, down: boolean): string {
+  if (up === down) return '寄';
+  else if ((piece.color === 'sente' && up) || (piece.color === 'gote' && down))
+    return rules !== 'chushogi' && ['horse', 'dragon'].includes(piece.role) ? '行' : '上';
+  else return '引';
 }
 
 function sideDisambiguation(piece: Piece, right: boolean, left: boolean): string {
-  return !left && !right ? '中' : (piece.color === 'sente') === right ? '右' : '左';
+  if (left === right) return '中';
+  else if ((piece.color === 'sente' && right) || (piece.color === 'gote' && left)) return '右';
+  else return '左';
 }

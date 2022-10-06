@@ -152,10 +152,9 @@ export class Chushogi extends Position {
       (this.lastCapture.role === 'lion' || this.lastCapture.role === 'promotedlion')
     ) {
       const lastDest = this.lastMove.to;
-      // can't recapture lion on another square, unless it's undefended
+      // can't recapture lion on another square (allow capturing lion form kirin promotion)
       for (const lion of oppLions.intersect(pseudo)) {
-        if (lion !== lastDest && this.squareAttackers(lion, oppColor, this.board.occupied.without(square)).nonEmpty())
-          pseudo = pseudo.without(lion);
+        if (lion !== lastDest) pseudo = pseudo.without(lion);
       }
     }
 

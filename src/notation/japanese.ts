@@ -61,7 +61,9 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
   if (
     myFile === destFile &&
     (piece.color === 'sente') === movingUp &&
-    ['gold', 'silver', 'promotedlance', 'promotedknight', 'promotedsilver', 'tokin'].includes(piece.role)
+    ['gold', 'silver', 'promotedlance', 'promotedknight', 'promotedsilver', 'promotedgold', 'tokin'].includes(
+      piece.role
+    )
   )
     return '直';
 

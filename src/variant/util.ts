@@ -68,7 +68,7 @@ export function allRoles(rules: Rules): Role[] {
         'pawn',
         'gobetween',
         'king',
-        'tokin',
+        'promotedgold',
         'ox',
         'stag',
         'boar',
@@ -233,7 +233,7 @@ function standardUnpromote(role: Role): Role | undefined {
 function chuushogiPromote(role: Role): Role | undefined {
   switch (role) {
     case 'pawn':
-      return 'tokin';
+      return 'promotedgold';
     case 'gobetween':
       return 'promotedelephant';
     case 'sidemover':
@@ -294,7 +294,7 @@ function standardPromote(role: Role): Role | undefined {
 
 function chuushogiUnpromote(role: Role): Role | undefined {
   switch (role) {
-    case 'tokin':
+    case 'promotedgold':
       return 'pawn';
     case 'promotedelephant':
       return 'gobetween';

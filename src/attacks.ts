@@ -243,6 +243,7 @@ export function attacks(piece: Piece, square: Square, occupied: SquareSet): Squa
     case 'promotedsilver':
     case 'tokin':
     case 'gold':
+    case 'promotedgold':
       return goldAttacks(square, piece.color);
     case 'bishop':
     case 'promotedbishop':

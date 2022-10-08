@@ -83,7 +83,7 @@ export class Chushogi extends Position {
         .union(leopardAttacks(square).intersect(board.role('leopard')))
         .union(copperAttacks(square, defender).intersect(board.role('copper')))
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
-        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'tokin')))
+        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'promotedgold')))
         .union(
           kingAttacks(square).intersect(
             board.roles('king', 'prince', 'dragon', 'promoteddragon', 'horse', 'promotedhorse')

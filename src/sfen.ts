@@ -312,7 +312,7 @@ function chushogiRoleToForsyth(role: Role): string | undefined {
       return 'q';
     case 'pawn':
       return 'p';
-    case 'tokin':
+    case 'promotedgold':
       return '+p';
     case 'gobetween':
       return 'i';
@@ -398,7 +398,7 @@ function chushogiForsythToRole(str: string): Role | undefined {
     case 'p':
       return 'pawn';
     case '+p':
-      return 'tokin';
+      return 'promotedgold';
     case 'i':
       return 'gobetween';
     case '+i':

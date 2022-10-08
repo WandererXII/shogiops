@@ -27,6 +27,7 @@ export function roleToWestern(rules: Rules): (role: Role) => string {
       case 'rook':
         return 'R';
       case 'tokin':
+      case 'promotedgold':
         return '+P';
       case 'promotedlance':
         return '+L';
@@ -105,6 +106,7 @@ export function roleToWestern(rules: Rules): (role: Role) => string {
 // for kanji disambiguation
 export function roleKanjiDuplicates(role: Role): Role[] {
   const roles: Role[][] = [
+    ['gold', 'promotedgold'],
     ['elephant', 'promotedelephant'],
     ['sidemover', 'promotedsidemover'],
     ['verticalmover', 'promotedverticalmover'],
@@ -130,6 +132,7 @@ export function roleToKanji(role: Role): string {
     case 'silver':
       return '銀';
     case 'gold':
+    case 'promotedgold':
       return '金';
     case 'bishop':
       return '角';
@@ -231,6 +234,7 @@ export function roleToFullKanji(role: Role): string {
     case 'silver':
       return '銀将';
     case 'gold':
+    case 'promotedgold':
       return '金将';
     case 'bishop':
       return '角行';

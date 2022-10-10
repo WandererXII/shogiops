@@ -1,6 +1,7 @@
 import { SquareSet } from './squareSet.js';
-import { Role, Square } from './types.js';
+import { NormalMove, PieceName, Square } from './types.js';
 import { makeSquare, makeUsi, parsePieceName } from './util.js';
+import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
 import { pieceCanPromote, pieceForcePromote } from './variant/util.js';
 
@@ -12,10 +13,10 @@ export function moveDests(moveDests: Map<Square, SquareSet>): string {
   return lines.join('\n');
 }
 
-export function dropDests(dropDests: Map<Role, SquareSet>): string {
+export function dropDests(dropDests: Map<PieceName, SquareSet>): string {
   const lines = [];
-  for (const [role, to] of dropDests) {
-    lines.push(`${role}: ${Array.from(to, makeSquare).join(' ')}`);
+  for (const [pn, to] of dropDests) {
+    lines.push(`${pn}: ${Array.from(to, makeSquare).join(' ')}`);
   }
   return lines.join('\n');
 }
@@ -40,6 +41,17 @@ export function perft(pos: Position, depth: number, log = false): number {
         const children = perft(child, depth - 1, false);
         if (log) console.log(makeUsi(move), children, '(', depth, ')');
         nodes += children;
+      }
+      if (['lion', 'promotedlion', 'eagle', 'falcon'].includes(piece.role)) {
+        const secondMoveDests = secondLionStepDests(pos as Chushogi, from, to);
+        for (const mid of secondMoveDests) {
+          const child = pos.clone(),
+            move: NormalMove = { from, to, midStep: mid };
+          child.play(move);
+          const children = perft(child, depth - 1, false);
+          if (log) console.log(makeUsi(move), children, '(', depth, ')');
+          nodes += children;
+        }
       }
     }
   }

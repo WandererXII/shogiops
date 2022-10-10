@@ -32,7 +32,7 @@ import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
 import { Color, Outcome, Piece, Role, Setup, Square } from '../types.js';
-import { defined, opposite } from '../util.js';
+import { defined, opposite, squareDist } from '../util.js';
 import { Context, IllegalSetup, Position, PositionError } from './position.js';
 import { allRoles, dimensions, fullSquareSet } from './util.js';
 
@@ -309,14 +309,21 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
     const oppColor = opposite(before.turn),
-      oppLions = before.board.color(oppColor).intersect(before.board.roles('lion', 'promotedlion')),
+      oppLions = before.board
+        .color(oppColor)
+        .intersect(before.board.roles('lion', 'promotedlion'))
+        .intersect(pseudoDests),
       capture = before.board.get(midSq),
       clearOccupied = before.board.occupied.withoutMany(initialSq, midSq);
 
-    // can't capture lion protected by an enemy piece, unless we captured something valuable first (not a pawn or go-between)
+    // can't capture a non-adjacent lion protected by an enemy piece,
+    // unless we captured something valuable first (not a pawn or go-between)
     for (const lion of oppLions.intersect(pseudoDests)) {
-      const lionProtected = before.squareAttackers(lion, oppColor, clearOccupied).nonEmpty();
-      if (lionProtected && (!capture || capture.role === 'pawn' || capture.role === 'gobetween'))
+      if (
+        squareDist(initialSq, lion) > 1 &&
+        before.squareAttackers(lion, oppColor, clearOccupied).nonEmpty() &&
+        (!capture || capture.role === 'pawn' || capture.role === 'gobetween')
+      )
         pseudoDests = pseudoDests.without(lion);
     }
     return pseudoDests;

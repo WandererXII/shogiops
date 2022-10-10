@@ -1,4 +1,5 @@
 import {
+  attacks,
   between,
   bishopAttacks,
   dragonAttacks,
@@ -300,5 +301,189 @@ test('horse attacks', () => {
   );
   expect(horseAttacks(255, SquareSet.empty())).toEqual(
     new SquareSet([0x20001, 0x80004, 0x200010, 0x800040, 0x2000100, 0x8000400, 0x20001000, 0x4000c000])
+  );
+});
+
+test('chushogi pieces', () => {
+  expect(attacks({ role: 'leopard', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x1c000000, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'copper', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x8000000, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'elephant', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x14001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'chariot', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x8000000, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'tiger', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x14000000, 0x1c001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'phoenix', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8002200, 0x8001400, 0x2200, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'kirin', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x14000800, 0x14002200, 0x800, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'sidemover', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8000000, 0x800f7ff, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'verticalmover', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x8001400, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'queen', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x1c00f7ff, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'lion', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x3e003e00, 0x3e003600, 0x3e00, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'gobetween', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8000000, 0x8000000, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'promotedgold', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x8001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'ox', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x1c000000, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'stag', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x1c000800, 0x1c001400, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'boar', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x41008080, 0x14002200, 0x1400f7ff, 0x41002200, 0x408080, 0x100020, 0x40008, 0x10002])
+  );
+  expect(attacks({ role: 'falcon', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x41008080, 0x1c002a00, 0x1c00f7ff, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'prince', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x1c001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'eagle', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x1c002a00, 0x1c00f7ff, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'whale', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x1c000000, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'whitehorse', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x8000000, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'promoteddragon', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x1c000800, 0x1c00f7ff, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'promotedhorse', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x41008080, 0x1c002200, 0x1c001400, 0x41002200, 0x408080, 0x100020, 0x40008, 0x10002])
+  );
+  expect(attacks({ role: 'promotedlion', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x3e003e00, 0x3e003600, 0x3e00, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'promotedqueen', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x1c00f7ff, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'promotedbishop', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x41008080, 0x14002200, 0x14000000, 0x41002200, 0x408080, 0x100020, 0x40008, 0x10002])
+  );
+  expect(attacks({ role: 'promotedelephant', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x14001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'promotedsidemover', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8000000, 0x800f7ff, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'promotedverticalmover', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x8001400, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'promotedrook', color: 'sente' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x800f7ff, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+
+  expect(attacks({ role: 'leopard', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x1c000000, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'copper', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8000000, 0x1c000000, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'elephant', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x14000000, 0x1c001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'chariot', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x8000000, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'tiger', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x14001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'phoenix', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8002200, 0x8001400, 0x2200, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'kirin', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x14000800, 0x14002200, 0x800, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'sidemover', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8000000, 0x800f7ff, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'verticalmover', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x8001400, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'queen', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x1c00f7ff, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'lion', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x3e003e00, 0x3e003600, 0x3e00, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'gobetween', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8000000, 0x8000000, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'promotedgold', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8000000, 0x1c001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'ox', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x1c000000, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'stag', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x1c000800, 0x1c001400, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'boar', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x41008080, 0x14002200, 0x1400f7ff, 0x41002200, 0x408080, 0x100020, 0x40008, 0x10002])
+  );
+  expect(attacks({ role: 'falcon', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x1c00f7ff, 0x41002a00, 0x408080, 0x100020, 0x40008, 0x10002])
+  );
+  expect(attacks({ role: 'prince', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x1c000000, 0x1c001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'eagle', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x1c00f7ff, 0x8002a00, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'whale', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x8000000, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'whitehorse', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x1c000000, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'promoteddragon', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x1c000800, 0x1c00f7ff, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'promotedhorse', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x41008080, 0x1c002200, 0x1c001400, 0x41002200, 0x408080, 0x100020, 0x40008, 0x10002])
+  );
+  expect(attacks({ role: 'promotedlion', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x3e003e00, 0x3e003600, 0x3e00, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'promotedqueen', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x49008880, 0x1c002a00, 0x1c00f7ff, 0x49002a00, 0x8408880, 0x8100820, 0x8040808, 0x8010802])
+  );
+  expect(attacks({ role: 'promotedbishop', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x41008080, 0x14002200, 0x14000000, 0x41002200, 0x408080, 0x100020, 0x40008, 0x10002])
+  );
+  expect(attacks({ role: 'promotedelephant', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x14000000, 0x1c001400, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'promotedsidemover', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x0, 0x8000000, 0x800f7ff, 0x0, 0x0, 0x0, 0x0, 0x0])
+  );
+  expect(attacks({ role: 'promotedverticalmover', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x8001400, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
+  );
+  expect(attacks({ role: 'promotedrook', color: 'gote' }, 75, SquareSet.empty())).toEqual(
+    new SquareSet([0x8000800, 0x8000800, 0x800f7ff, 0x8000800, 0x8000800, 0x8000800, 0x8000800, 0x8000800])
   );
 });

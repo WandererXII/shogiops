@@ -1,6 +1,6 @@
 import { kingAttacks } from '../attacks.js';
 import { SquareSet } from '../squareSet.js';
-import { Move, Piece, Rules, Square, isDrop } from '../types.js';
+import { Move, Piece, Role, Rules, Square, isDrop } from '../types.js';
 import { defined, squareDist, squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
@@ -11,19 +11,21 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
   if (isDrop(move)) {
     const ambStr = aimingAt(
       pos,
-      pos.board.roles(move.role, ...roleKanjiDuplicates(move.role)).intersect(pos.board.color(pos.turn)),
+      pos.board.roles(move.role, ...roleKanjiDuplicates(pos.rules)(move.role)).intersect(pos.board.color(pos.turn)),
       move.to
     ).isEmpty()
       ? ''
       : '打';
-    return `${makeJapaneseSquare(move.to)}${roleToKanji(move.role)}${ambStr}`;
+    return `${makeJapaneseSquare(move.to)}${roleToKanji(pos.rules)(move.role)}${ambStr}`;
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleToKanji(piece.role),
+      const roleStr = roleToKanji(pos.rules)(piece.role),
         ambPieces = aimingAt(
           pos,
-          pos.board.roles(piece.role, ...roleKanjiDuplicates(piece.role)).intersect(pos.board.color(piece.color)),
+          pos.board
+            .roles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
+            .intersect(pos.board.color(piece.color)),
           move.to
         ).without(move.from),
         ambStr = ambPieces.isEmpty() ? '' : disambiguate(pos.rules, piece, move.from, move.to, ambPieces);
@@ -57,19 +59,13 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
   const movingUp = myRank > destRank,
     movingDown = myRank < destRank;
 
-  // special case - gold-like piece is moving directly forward
-  if (
-    myFile === destFile &&
-    (piece.color === 'sente') === movingUp &&
-    ['gold', 'silver', 'promotedlance', 'promotedknight', 'promotedsilver', 'promotedgold', 'tokin'].includes(
-      piece.role
-    )
-  )
-    return '直';
+  // special case - gold-like/silver piece is moving directly forward
+  const sRoles: Role[] = ['gold', 'silver', 'promotedlance', 'promotedknight', 'promotedsilver', 'promotedpawn'];
+  if (myFile === destFile && (piece.color === 'sente') === movingUp && sRoles.includes(piece.role)) return '直';
 
   // special case for lion moves on the same file
   if (
-    ['lion', 'promotedlion', 'falcon'].includes(piece.role) &&
+    ['lion', 'lionpromoted', 'falcon'].includes(piece.role) &&
     destFile === myFile &&
     kingAttacks(orig).intersects(others)
   ) {

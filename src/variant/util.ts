@@ -68,7 +68,7 @@ export function allRoles(rules: Rules): Role[] {
         'pawn',
         'gobetween',
         'king',
-        'promotedgold',
+        'promotedpawn',
         'ox',
         'stag',
         'boar',
@@ -77,18 +77,18 @@ export function allRoles(rules: Rules): Role[] {
         'eagle',
         'whale',
         'whitehorse',
-        'promoteddragon',
-        'promotedhorse',
-        'promotedlion',
-        'promotedqueen',
-        'promotedbishop',
-        'promotedelephant',
-        'promotedsidemover',
-        'promotedverticalmover',
-        'promotedrook',
+        'dragonpromoted',
+        'horsepromoted',
+        'lionpromoted',
+        'queenpromoted',
+        'bishoppromoted',
+        'elephantpromoted',
+        'sidemoverpromoted',
+        'verticalmoverpromoted',
+        'rookpromoted',
       ];
     case 'minishogi':
-      return ['rook', 'bishop', 'gold', 'silver', 'pawn', 'king', 'dragon', 'horse', 'promotedsilver', 'tokin'];
+      return ['rook', 'bishop', 'gold', 'silver', 'pawn', 'dragon', 'horse', 'promotedsilver', 'promotedpawn', 'king'];
     default:
       return [
         'rook',
@@ -100,7 +100,7 @@ export function allRoles(rules: Rules): Role[] {
         'pawn',
         'dragon',
         'horse',
-        'tokin',
+        'promotedpawn',
         'promotedsilver',
         'promotedknight',
         'promotedlance',
@@ -213,7 +213,7 @@ export function dimensions(rules: Rules): Dimensions {
 
 function standardUnpromote(role: Role): Role | undefined {
   switch (role) {
-    case 'tokin':
+    case 'promotedpawn':
       return 'pawn';
     case 'promotedlance':
       return 'lance';
@@ -233,17 +233,17 @@ function standardUnpromote(role: Role): Role | undefined {
 function chuushogiPromote(role: Role): Role | undefined {
   switch (role) {
     case 'pawn':
-      return 'promotedgold';
+      return 'promotedpawn';
     case 'gobetween':
-      return 'promotedelephant';
+      return 'elephantpromoted';
     case 'sidemover':
       return 'boar';
     case 'verticalmover':
       return 'ox';
     case 'rook':
-      return 'promoteddragon';
+      return 'dragonpromoted';
     case 'bishop':
-      return 'promotedhorse';
+      return 'horsepromoted';
     case 'dragon':
       return 'eagle';
     case 'horse':
@@ -255,19 +255,19 @@ function chuushogiPromote(role: Role): Role | undefined {
     case 'tiger':
       return 'stag';
     case 'kirin':
-      return 'promotedlion';
+      return 'lionpromoted';
     case 'phoenix':
-      return 'promotedqueen';
+      return 'queenpromoted';
     case 'lance':
       return 'whitehorse';
     case 'leopard':
-      return 'promotedbishop';
+      return 'bishoppromoted';
     case 'copper':
-      return 'promotedsidemover';
+      return 'sidemoverpromoted';
     case 'silver':
-      return 'promotedverticalmover';
+      return 'verticalmoverpromoted';
     case 'gold':
-      return 'promotedrook';
+      return 'rookpromoted';
     default:
       return;
   }
@@ -276,7 +276,7 @@ function chuushogiPromote(role: Role): Role | undefined {
 function standardPromote(role: Role): Role | undefined {
   switch (role) {
     case 'pawn':
-      return 'tokin';
+      return 'promotedpawn';
     case 'lance':
       return 'promotedlance';
     case 'knight':
@@ -294,17 +294,17 @@ function standardPromote(role: Role): Role | undefined {
 
 function chuushogiUnpromote(role: Role): Role | undefined {
   switch (role) {
-    case 'promotedgold':
+    case 'promotedpawn':
       return 'pawn';
-    case 'promotedelephant':
+    case 'elephantpromoted':
       return 'gobetween';
     case 'boar':
       return 'sidemover';
     case 'ox':
       return 'verticalmover';
-    case 'promoteddragon':
+    case 'dragonpromoted':
       return 'rook';
-    case 'promotedhorse':
+    case 'horsepromoted':
       return 'bishop';
     case 'eagle':
       return 'dragon';
@@ -316,19 +316,19 @@ function chuushogiUnpromote(role: Role): Role | undefined {
       return 'chariot';
     case 'stag':
       return 'tiger';
-    case 'promotedlion':
+    case 'lionpromoted':
       return 'kirin';
-    case 'promotedqueen':
+    case 'queenpromoted':
       return 'phoenix';
     case 'whitehorse':
       return 'lance';
-    case 'promotedbishop':
+    case 'bishoppromoted':
       return 'leopard';
-    case 'promotedsidemover':
+    case 'sidemoverpromoted':
       return 'copper';
-    case 'promotedverticalmover':
+    case 'verticalmoverpromoted':
       return 'silver';
-    case 'promotedrook':
+    case 'rookpromoted':
       return 'gold';
     default:
       return;

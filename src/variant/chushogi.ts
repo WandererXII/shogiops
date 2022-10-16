@@ -83,30 +83,30 @@ export class Chushogi extends Position {
         .union(leopardAttacks(square).intersect(board.role('leopard')))
         .union(copperAttacks(square, defender).intersect(board.role('copper')))
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
-        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'promotedgold')))
+        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'promotedpawn')))
         .union(
           kingAttacks(square).intersect(
-            board.roles('king', 'prince', 'dragon', 'promoteddragon', 'horse', 'promotedhorse')
+            board.roles('king', 'prince', 'dragon', 'dragonpromoted', 'horse', 'horsepromoted')
           )
         )
-        .union(elephantAttacks(square, defender).intersect(board.roles('elephant', 'promotedelephant')))
+        .union(elephantAttacks(square, defender).intersect(board.roles('elephant', 'elephantpromoted')))
         .union(chariotAttacks(square, occupied).intersect(board.role('chariot')))
         .union(
           bishopAttacks(square, occupied).intersect(
-            board.roles('bishop', 'promotedbishop', 'horse', 'promotedhorse', 'queen', 'promotedqueen')
+            board.roles('bishop', 'bishoppromoted', 'horse', 'horsepromoted', 'queen', 'queenpromoted')
           )
         )
         .union(tigerAttacks(square, defender).intersect(board.role('tiger')))
         .union(kirinAttacks(square).intersect(board.role('kirin')))
         .union(phoenixAttacks(square).intersect(board.role('phoenix')))
-        .union(sideMoverAttacks(square, occupied).intersect(board.roles('sidemover', 'promotedsidemover')))
-        .union(verticalMoverAttacks(square, occupied).intersect(board.roles('verticalmover', 'promotedverticalmover')))
+        .union(sideMoverAttacks(square, occupied).intersect(board.roles('sidemover', 'sidemoverpromoted')))
+        .union(verticalMoverAttacks(square, occupied).intersect(board.roles('verticalmover', 'verticalmoverpromoted')))
         .union(
           rookAttacks(square, occupied).intersect(
-            board.roles('rook', 'promotedrook', 'dragon', 'promoteddragon', 'queen', 'promotedqueen')
+            board.roles('rook', 'rookpromoted', 'dragon', 'dragonpromoted', 'queen', 'queenpromoted')
           )
         )
-        .union(lionAttacks(square).intersect(board.roles('lion', 'promotedlion')))
+        .union(lionAttacks(square).intersect(board.roles('lion', 'lionpromoted')))
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
         .union(goBetweenAttacks(square).intersect(board.role('gobetween')))
         .union(whiteHorseAttacks(square, defender, occupied).intersect(board.role('whitehorse')))
@@ -136,10 +136,10 @@ export class Chushogi extends Position {
     let pseudo = attacks(piece, square, this.board.occupied).diff(this.board.color(ctx.color));
 
     const oppColor = opposite(ctx.color),
-      oppLions = this.board.color(oppColor).intersect(this.board.roles('lion', 'promotedlion'));
+      oppLions = this.board.color(oppColor).intersect(this.board.roles('lion', 'lionpromoted'));
 
     // considers only the first step destinations, for second step - secondLionStepDests
-    if (piece.role === 'lion' || piece.role === 'promotedlion') {
+    if (piece.role === 'lion' || piece.role === 'lionpromoted') {
       const neighbors = kingAttacks(square);
       // don't allow capture of a non-adjacent lion protected by an enemy piece
       for (const lion of pseudo.diff(neighbors).intersect(oppLions)) {
@@ -149,7 +149,7 @@ export class Chushogi extends Position {
     } else if (
       this.lastMove &&
       this.lastCapture &&
-      (this.lastCapture.role === 'lion' || this.lastCapture.role === 'promotedlion')
+      (this.lastCapture.role === 'lion' || this.lastCapture.role === 'lionpromoted')
     ) {
       const lastDest = this.lastMove.to;
       // can't recapture lion on another square (allow capturing lion form kirin promotion)
@@ -302,7 +302,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
   const piece = before.board.get(initialSq);
   if (!piece || piece.color !== before.turn) return SquareSet.empty();
 
-  if (piece.role === 'lion' || piece.role === 'promotedlion') {
+  if (piece.role === 'lion' || piece.role === 'lionpromoted') {
     if (!kingAttacks(initialSq).has(midSq)) return SquareSet.empty();
     let pseudoDests = kingAttacks(midSq)
       .with(midSq)
@@ -311,7 +311,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
     const oppColor = opposite(before.turn),
       oppLions = before.board
         .color(oppColor)
-        .intersect(before.board.roles('lion', 'promotedlion'))
+        .intersect(before.board.roles('lion', 'lionpromoted'))
         .intersect(pseudoDests),
       capture = before.board.get(midSq),
       clearOccupied = before.board.occupied.withoutMany(initialSq, midSq);

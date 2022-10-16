@@ -1,5 +1,5 @@
 import { SquareSet } from './squareSet.js';
-import { NormalMove, PieceName, Square } from './types.js';
+import { NormalMove, PieceName, Role, Square } from './types.js';
 import { makeSquare, makeUsi, parsePieceName } from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
@@ -42,7 +42,8 @@ export function perft(pos: Position, depth: number, log = false): number {
         if (log) console.log(makeUsi(move), children, '(', depth, ')');
         nodes += children;
       }
-      if (['lion', 'promotedlion', 'eagle', 'falcon'].includes(piece.role)) {
+      const roleWithLionPower: Role[] = ['lion', 'lionpromoted', 'eagle', 'falcon'];
+      if (roleWithLionPower.includes(piece.role)) {
         const secondMoveDests = secondLionStepDests(pos as Chushogi, from, to);
         for (const mid of secondMoveDests) {
           const child = pos.clone(),

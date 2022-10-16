@@ -224,7 +224,7 @@ export function makeHands(rules: Rules, hands: Hands): string {
 }
 
 function lastLionCapture(pos: Position): string {
-  if (pos.lastMove && (pos.lastCapture?.role === 'lion' || pos.lastCapture?.role === 'promotedlion'))
+  if (pos.lastMove && (pos.lastCapture?.role === 'lion' || pos.lastCapture?.role === 'lionpromoted'))
     return makeSquare(pos.lastMove.to);
   else return '-';
 }
@@ -246,19 +246,19 @@ function chushogiRoleToForsyth(role: Role): string | undefined {
       return '+l';
     case 'leopard':
       return 'f';
-    case 'promotedbishop':
+    case 'bishoppromoted':
       return '+f';
     case 'copper':
       return 'c';
-    case 'promotedsidemover':
+    case 'sidemoverpromoted':
       return '+c';
     case 'silver':
       return 's';
-    case 'promotedverticalmover':
+    case 'verticalmoverpromoted':
       return '+s';
     case 'gold':
       return 'g';
-    case 'promotedrook':
+    case 'rookpromoted':
       return '+g';
     case 'king':
       return 'k';
@@ -272,7 +272,7 @@ function chushogiRoleToForsyth(role: Role): string | undefined {
       return '+a';
     case 'bishop':
       return 'b';
-    case 'promotedhorse':
+    case 'horsepromoted':
       return '+b';
     case 'tiger':
       return 't';
@@ -280,11 +280,11 @@ function chushogiRoleToForsyth(role: Role): string | undefined {
       return '+t';
     case 'kirin':
       return 'o';
-    case 'promotedlion':
+    case 'lionpromoted':
       return '+o';
     case 'phoenix':
       return 'x';
-    case 'promotedqueen':
+    case 'queenpromoted':
       return '+x';
     case 'sidemover':
       return 'm';
@@ -296,7 +296,7 @@ function chushogiRoleToForsyth(role: Role): string | undefined {
       return '+v';
     case 'rook':
       return 'r';
-    case 'promoteddragon':
+    case 'dragonpromoted':
       return '+r';
     case 'horse':
       return 'h';
@@ -312,11 +312,11 @@ function chushogiRoleToForsyth(role: Role): string | undefined {
       return 'q';
     case 'pawn':
       return 'p';
-    case 'promotedgold':
+    case 'promotedpawn':
       return '+p';
     case 'gobetween':
       return 'i';
-    case 'promotedelephant':
+    case 'elephantpromoted':
       return '+i';
     default:
       return;
@@ -332,19 +332,19 @@ function chushogiForsythToRole(str: string): Role | undefined {
     case 'f':
       return 'leopard';
     case '+f':
-      return 'promotedbishop';
+      return 'bishoppromoted';
     case 'c':
       return 'copper';
     case '+c':
-      return 'promotedsidemover';
+      return 'sidemoverpromoted';
     case 's':
       return 'silver';
     case '+s':
-      return 'promotedverticalmover';
+      return 'verticalmoverpromoted';
     case 'g':
       return 'gold';
     case '+g':
-      return 'promotedrook';
+      return 'rookpromoted';
     case 'k':
       return 'king';
     case 'e':
@@ -358,7 +358,7 @@ function chushogiForsythToRole(str: string): Role | undefined {
     case 'b':
       return 'bishop';
     case '+b':
-      return 'promotedhorse';
+      return 'horsepromoted';
     case 't':
       return 'tiger';
     case '+t':
@@ -366,11 +366,11 @@ function chushogiForsythToRole(str: string): Role | undefined {
     case 'o':
       return 'kirin';
     case '+o':
-      return 'promotedlion';
+      return 'lionpromoted';
     case 'x':
       return 'phoenix';
     case '+x':
-      return 'promotedqueen';
+      return 'queenpromoted';
     case 'm':
       return 'sidemover';
     case '+m':
@@ -382,7 +382,7 @@ function chushogiForsythToRole(str: string): Role | undefined {
     case 'r':
       return 'rook';
     case '+r':
-      return 'promoteddragon';
+      return 'dragonpromoted';
     case 'h':
       return 'horse';
     case '+h':
@@ -398,11 +398,11 @@ function chushogiForsythToRole(str: string): Role | undefined {
     case 'p':
       return 'pawn';
     case '+p':
-      return 'promotedgold';
+      return 'promotedpawn';
     case 'i':
       return 'gobetween';
     case '+i':
-      return 'promotedelephant';
+      return 'elephantpromoted';
     default:
       return;
   }
@@ -428,7 +428,7 @@ function minishogiRoleToForsyth(role: Role): string | undefined {
       return '+r';
     case 'pawn':
       return 'p';
-    case 'tokin':
+    case 'promotedpawn':
       return '+p';
     default:
       return;
@@ -456,7 +456,7 @@ function minishogiForsythToRole(ch: string): Role | undefined {
     case 'p':
       return 'pawn';
     case '+p':
-      return 'tokin';
+      return 'promotedpawn';
     default:
       return;
   }
@@ -490,7 +490,7 @@ function standardRoleToForsyth(role: Role): string | undefined {
       return '+r';
     case 'pawn':
       return 'p';
-    case 'tokin':
+    case 'promotedpawn':
       return '+p';
     default:
       return;
@@ -526,7 +526,7 @@ function standardForsythToRole(ch: string): Role | undefined {
     case 'p':
       return 'pawn';
     case '+p':
-      return 'tokin';
+      return 'promotedpawn';
     default:
       return;
   }

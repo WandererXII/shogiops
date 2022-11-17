@@ -1,4 +1,5 @@
 import { makePieceName, makeUsi, parsePieceName, parseSquare, parseUsi, squareFile, squareRank } from '../src/util';
+import { usiFixture } from './fixtures/usi';
 
 test('square coordinates', () => {
   expect(squareFile(0)).toBe(0);
@@ -76,4 +77,12 @@ test('piece name', () => {
   expect(makePieceName({ role: 'rook', color: 'sente' })).toEqual('sente rook');
   expect(parsePieceName('sente rook')).toEqual({ color: 'sente', role: 'rook' });
   expect(parsePieceName('gote bishop')).toEqual({ color: 'gote', role: 'bishop' });
+});
+
+test('usi prod 500', () => {
+  for (const usis of usiFixture) {
+    for (const usi of usis.split(' ')) {
+      expect(parseUsi(usi)).toBeDefined();
+    }
+  }
 });

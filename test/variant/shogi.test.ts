@@ -3,6 +3,8 @@ import { makeSfen, parseSfen } from '../../src/sfen';
 import { parseUsi } from '../../src/util';
 import { IllegalSetup } from '../../src/variant/position';
 import { Shogi } from '../../src/variant/shogi';
+import { defaultPosition } from '../../src/variant/variant';
+import { usiFixture } from '../fixtures/usi';
 
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550&start=16
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550
@@ -124,4 +126,15 @@ test('impossible checker alignment', () => {
 
   // Checkers aligned with opponent king are fine.
   parseSfen('standard', '9/9/2s4k1/9/6N2/9/9/3K5/7L1 w - 2').unwrap();
+});
+
+test('prod 500 usi', () => {
+  for (const usis of usiFixture) {
+    const pos = defaultPosition('standard');
+    for (const usi of usis.split(' ')) {
+      const move = parseUsi(usi)!;
+      expect(pos.isLegal(move)).toBe(true);
+      pos.play(move);
+    }
+  }
 });

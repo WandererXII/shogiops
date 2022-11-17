@@ -7,11 +7,11 @@ import { aimingAt, makeNumberSquare, roleKanjiDuplicates, roleToKanji } from './
 // 歩-76
 export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
   if (isDrop(move)) {
-    return roleToKanji(pos.rules)(move.role) + '*' + makeNumberSquare(move.to);
+    return roleToKanji(move.role) + '*' + makeNumberSquare(move.to);
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleToKanji(pos.rules)(piece.role).replace('成', '+'),
+      const roleStr = roleToKanji(piece.role).replace('成', '+'),
         ambStr = aimingAt(
           pos,
           pos.board

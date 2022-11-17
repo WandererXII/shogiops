@@ -16,11 +16,11 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
     ).isEmpty()
       ? ''
       : '打';
-    return `${makeJapaneseSquare(move.to)}${roleToKanji(pos.rules)(move.role)}${ambStr}`;
+    return `${makeJapaneseSquare(move.to)}${roleToKanji(move.role)}${ambStr}`;
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleToKanji(pos.rules)(piece.role),
+      const roleStr = roleToKanji(piece.role),
         ambPieces = aimingAt(
           pos,
           pos.board
@@ -60,7 +60,15 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
     movingDown = myRank < destRank;
 
   // special case - gold-like/silver piece is moving directly forward
-  const sRoles: Role[] = ['gold', 'silver', 'promotedlance', 'promotedknight', 'promotedsilver', 'promotedpawn'];
+  const sRoles: Role[] = [
+    'gold',
+    'silver',
+    'promotedlance',
+    'promotedknight',
+    'promotedsilver',
+    'promotedpawn',
+    'tokin',
+  ];
   if (myFile === destFile && (piece.color === 'sente') === movingUp && sRoles.includes(piece.role)) return '直';
 
   // special case for lion moves on the same file

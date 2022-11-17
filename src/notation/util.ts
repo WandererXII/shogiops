@@ -26,6 +26,7 @@ export function roleToWestern(rules: Rules): (role: Role) => string {
         return 'B';
       case 'rook':
         return 'R';
+      case 'tokin':
       case 'promotedpawn':
         return '+P';
       case 'promotedlance':
@@ -124,195 +125,193 @@ export function roleKanjiDuplicates(rules: Rules): (role: Role) => Role[] {
   else return () => [];
 }
 
-export function roleToKanji(rules: Rules): (role: Role) => string {
-  return role => {
-    switch (role) {
-      case 'pawn':
-        return '歩';
-      case 'lance':
-        return '香';
-      case 'knight':
-        return '桂';
-      case 'silver':
-        return '銀';
-      case 'gold':
-        return '金';
-      case 'bishop':
-        return '角';
-      case 'rook':
-        return '飛';
-      case 'promotedpawn':
-        return rules === 'chushogi' ? '金' : 'と';
-      case 'promotedlance':
-        return '成香';
-      case 'promotedknight':
-        return '成桂';
-      case 'promotedsilver':
-        return '成銀';
-      case 'horse':
-      case 'horsepromoted':
-        return '馬';
-      case 'dragon':
-      case 'dragonpromoted':
-        return '龍';
-      case 'king':
-        return '玉';
-      case 'leopard':
-        return '豹';
-      case 'copper':
-        return '銅';
-      case 'elephant':
-      case 'elephantpromoted':
-        return '象';
-      case 'chariot':
-        return '反';
-      case 'tiger':
-        return '虎';
-      case 'kirin':
-        return '麒';
-      case 'phoenix':
-        return '鳳';
-      case 'sidemover':
-      case 'sidemoverpromoted':
-        return '横';
-      case 'verticalmover':
-      case 'verticalmoverpromoted':
-        return '竪';
-      case 'lion':
-      case 'lionpromoted':
-        return '獅';
-      case 'queen':
-      case 'queenpromoted':
-        return '奔';
-      case 'gobetween':
-        return '仲';
-      case 'whitehorse':
-        return '駒';
-      case 'bishoppromoted':
-        return '小角';
-      case 'rookpromoted':
-        return '金飛車';
-      case 'prince':
-        return '太';
-      case 'whale':
-        return '鯨';
-      case 'stag':
-        return '鹿';
-      case 'boar':
-        return '猪';
-      case 'ox':
-        return '牛';
-      case 'falcon':
-        return '鷹';
-      case 'eagle':
-        return '鷲';
-    }
-  };
+export function roleToKanji(role: Role): string {
+  switch (role) {
+    case 'pawn':
+      return '歩';
+    case 'lance':
+      return '香';
+    case 'knight':
+      return '桂';
+    case 'silver':
+      return '銀';
+    case 'gold':
+      return '金';
+    case 'bishop':
+      return '角';
+    case 'rook':
+      return '飛';
+    case 'tokin':
+      return 'と';
+    case 'promotedpawn':
+      return '金';
+    case 'promotedlance':
+      return '成香';
+    case 'promotedknight':
+      return '成桂';
+    case 'promotedsilver':
+      return '成銀';
+    case 'horse':
+    case 'horsepromoted':
+      return '馬';
+    case 'dragon':
+    case 'dragonpromoted':
+      return '龍';
+    case 'king':
+      return '玉';
+    case 'leopard':
+      return '豹';
+    case 'copper':
+      return '銅';
+    case 'elephant':
+    case 'elephantpromoted':
+      return '象';
+    case 'chariot':
+      return '反';
+    case 'tiger':
+      return '虎';
+    case 'kirin':
+      return '麒';
+    case 'phoenix':
+      return '鳳';
+    case 'sidemover':
+    case 'sidemoverpromoted':
+      return '横';
+    case 'verticalmover':
+    case 'verticalmoverpromoted':
+      return '竪';
+    case 'lion':
+    case 'lionpromoted':
+      return '獅';
+    case 'queen':
+    case 'queenpromoted':
+      return '奔';
+    case 'gobetween':
+      return '仲';
+    case 'whitehorse':
+      return '駒';
+    case 'bishoppromoted':
+      return '小角';
+    case 'rookpromoted':
+      return '金飛車';
+    case 'prince':
+      return '太';
+    case 'whale':
+      return '鯨';
+    case 'stag':
+      return '鹿';
+    case 'boar':
+      return '猪';
+    case 'ox':
+      return '牛';
+    case 'falcon':
+      return '鷹';
+    case 'eagle':
+      return '鷲';
+  }
 }
 
-export function roleToSingleKanji(rules: Rules): (role: Role) => string {
-  return role => {
-    switch (role) {
-      case 'promotedlance':
-        return '杏';
-      case 'promotedknight':
-        return '圭';
-      case 'promotedsilver':
-        return '全';
-      case 'bishoppromoted':
-        return '角';
-      case 'rookpromoted':
-        return '車';
-      default:
-        return roleToKanji(rules)(role);
-    }
-  };
+export function roleToSingleKanji(role: Role): string {
+  switch (role) {
+    case 'promotedlance':
+      return '杏';
+    case 'promotedknight':
+      return '圭';
+    case 'promotedsilver':
+      return '全';
+    case 'bishoppromoted':
+      return '角';
+    case 'rookpromoted':
+      return '車';
+    default:
+      return roleToKanji(role);
+  }
 }
 
-export function roleToFullKanji(rules: Rules): (role: Role) => string {
-  return role => {
-    switch (role) {
-      case 'pawn':
-        return '歩兵';
-      case 'lance':
-        return '香車';
-      case 'knight':
-        return '桂馬';
-      case 'silver':
-        return '銀将';
-      case 'gold':
-        return '金将';
-      case 'bishop':
-        return '角行';
-      case 'rook':
-        return '飛車';
-      case 'promotedpawn':
-        return rules === 'chushogi' ? '金将' : 'と金';
-      case 'promotedlance':
-        return '成香';
-      case 'promotedknight':
-        return '成桂';
-      case 'promotedsilver':
-        return '成銀';
-      case 'horse':
-      case 'horsepromoted':
-        return '龍馬';
-      case 'dragon':
-      case 'dragonpromoted':
-        return '龍王';
-      case 'king':
-        return '玉将';
-      case 'leopard':
-        return '猛豹';
-      case 'copper':
-        return '銅将';
-      case 'elephant':
-      case 'elephantpromoted':
-        return '醉象';
-      case 'chariot':
-        return '反車';
-      case 'tiger':
-        return '盲虎';
-      case 'kirin':
-        return '麒麟';
-      case 'phoenix':
-        return '鳳凰';
-      case 'sidemover':
-      case 'sidemoverpromoted':
-        return '横行';
-      case 'verticalmover':
-      case 'verticalmoverpromoted':
-        return '竪行';
-      case 'lion':
-      case 'lionpromoted':
-        return '獅子';
-      case 'queen':
-      case 'queenpromoted':
-        return '奔王';
-      case 'gobetween':
-        return '仲人';
-      case 'whitehorse':
-        return '白駒';
-      case 'bishoppromoted':
-        return '小角';
-      case 'rookpromoted':
-        return '金飛車';
-      case 'prince':
-        return '太子';
-      case 'whale':
-        return '鯨鯢';
-      case 'stag':
-        return '飛鹿';
-      case 'boar':
-        return '奔猪';
-      case 'ox':
-        return '飛牛';
-      case 'falcon':
-        return '角鷹';
-      case 'eagle':
-        return '飛鷲';
-    }
-  };
+export function roleToFullKanji(role: Role): string {
+  switch (role) {
+    case 'pawn':
+      return '歩兵';
+    case 'lance':
+      return '香車';
+    case 'knight':
+      return '桂馬';
+    case 'silver':
+      return '銀将';
+    case 'gold':
+      return '金将';
+    case 'bishop':
+      return '角行';
+    case 'rook':
+      return '飛車';
+    case 'tokin':
+      return 'と金';
+    case 'promotedpawn':
+      return '金将';
+    case 'promotedlance':
+      return '成香';
+    case 'promotedknight':
+      return '成桂';
+    case 'promotedsilver':
+      return '成銀';
+    case 'horse':
+    case 'horsepromoted':
+      return '龍馬';
+    case 'dragon':
+    case 'dragonpromoted':
+      return '龍王';
+    case 'king':
+      return '玉将';
+    case 'leopard':
+      return '猛豹';
+    case 'copper':
+      return '銅将';
+    case 'elephant':
+    case 'elephantpromoted':
+      return '醉象';
+    case 'chariot':
+      return '反車';
+    case 'tiger':
+      return '盲虎';
+    case 'kirin':
+      return '麒麟';
+    case 'phoenix':
+      return '鳳凰';
+    case 'sidemover':
+    case 'sidemoverpromoted':
+      return '横行';
+    case 'verticalmover':
+    case 'verticalmoverpromoted':
+      return '竪行';
+    case 'lion':
+    case 'lionpromoted':
+      return '獅子';
+    case 'queen':
+    case 'queenpromoted':
+      return '奔王';
+    case 'gobetween':
+      return '仲人';
+    case 'whitehorse':
+      return '白駒';
+    case 'bishoppromoted':
+      return '小角';
+    case 'rookpromoted':
+      return '金飛車';
+    case 'prince':
+      return '太子';
+    case 'whale':
+      return '鯨鯢';
+    case 'stag':
+      return '飛鹿';
+    case 'boar':
+      return '奔猪';
+    case 'ox':
+      return '飛牛';
+    case 'falcon':
+      return '角鷹';
+    case 'eagle':
+      return '飛鷲';
+  }
 }
 
 export function kanjiToRole(str: string): Role[] {
@@ -340,7 +339,7 @@ export function kanjiToRole(str: string): Role[] {
       return ['rook'];
     case 'と':
     case 'と金':
-      return ['promotedpawn'];
+      return ['tokin', 'promotedpawn'];
     case '杏':
     case '仝':
     case '成香':
@@ -358,6 +357,7 @@ export function kanjiToRole(str: string): Role[] {
       return ['horse', 'horsepromoted'];
     case '龍':
     case '龍王':
+    case '竜':
     case '竜王':
       return ['dragon', 'dragonpromoted'];
     case '玉':
@@ -452,7 +452,7 @@ export function roleToCsa(role: Role): string | undefined {
       return 'KA';
     case 'rook':
       return 'HI';
-    case 'promotedpawn':
+    case 'tokin':
       return 'TO';
     case 'promotedlance':
       return 'NY';
@@ -488,7 +488,7 @@ export function csaToRole(str: string): Role | undefined {
     case 'HI':
       return 'rook';
     case 'TO':
-      return 'promotedpawn';
+      return 'tokin';
     case 'NY':
       return 'promotedlance';
     case 'NK':

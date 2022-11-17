@@ -65,8 +65,8 @@ export function makeKifBoard(board: Board, rules: Rules): string {
       }
       if (!piece) kifBoard += ' ・';
       else {
-        if (piece.color === 'gote') kifBoard += 'v' + roleToSingleKanji(rules)(piece.role);
-        else kifBoard += ' ' + roleToSingleKanji(rules)(piece.role);
+        if (piece.color === 'gote') kifBoard += 'v' + roleToSingleKanji(piece.role);
+        else kifBoard += ' ' + roleToSingleKanji(piece.role);
       }
       if (file === 0) {
         kifBoard += '|' + numberToKanji(rank + 1) + '\n';
@@ -81,7 +81,7 @@ export function makeKifHand(rules: Rules, hand: Hand): string {
   if (hand.isEmpty()) return 'なし';
   return handRoles(rules)
     .map(role => {
-      const r = roleToSingleKanji(rules)(role);
+      const r = roleToSingleKanji(role);
       const n = hand.get(role);
       return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
     })
@@ -256,7 +256,7 @@ export function parseKifMoves(kifMoves: string[], lastDest: Square | undefined =
 // Making kif formatted moves
 export function makeKifMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
   if (isDrop(move)) {
-    return makeJapaneseSquare(move.to) + roleToKanji(pos.rules)(move.role) + '打';
+    return makeJapaneseSquare(move.to) + roleToKanji(move.role) + '打';
   } else {
     const sameSquareSymbol = pos.rules === 'chushogi' ? '仝' : '同　',
       sameDest = (lastDest ?? pos.lastMove?.to) === move.to,
@@ -269,12 +269,11 @@ export function makeKifMove(pos: Position, move: Move, lastDest?: Square): strin
         const isIgui = move.to === move.from && pos.board.has(move.midStep),
           isJitto = move.to === move.from && !isIgui,
           midDestStr = sameDest ? sameSquareSymbol : makeJapaneseSquare(move.midStep),
-          move1 =
-            '一歩目 ' + midDestStr + roleToFullKanji(pos.rules)(role) + ' （←' + makeJapaneseSquare(move.from) + '）',
+          move1 = '一歩目 ' + midDestStr + roleToFullKanji(role) + ' （←' + makeJapaneseSquare(move.from) + '）',
           move2 =
             '二歩目 ' +
             moveDestStr +
-            roleToFullKanji(pos.rules)(role) +
+            roleToFullKanji(role) +
             (isIgui ? '（居食い）' : isJitto ? '(じっと)' : '') +
             ' （←' +
             makeJapaneseSquare(move.midStep) +
@@ -282,7 +281,7 @@ export function makeKifMove(pos: Position, move: Move, lastDest?: Square): strin
 
         return `${move1},${move2}`;
       }
-      return moveDestStr + roleToFullKanji(pos.rules)(role) + promStr + ' （←' + makeJapaneseSquare(move.from) + '）';
-    } else return moveDestStr + roleToKanji(pos.rules)(role) + promStr + '(' + makeNumberSquare(move.from) + ')';
+      return moveDestStr + roleToFullKanji(role) + promStr + ' （←' + makeJapaneseSquare(move.from) + '）';
+    } else return moveDestStr + roleToKanji(role) + promStr + '(' + makeNumberSquare(move.from) + ')';
   }
 }

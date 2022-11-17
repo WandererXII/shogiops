@@ -88,7 +88,7 @@ export function allRoles(rules: Rules): Role[] {
         'rookpromoted',
       ];
     case 'minishogi':
-      return ['rook', 'bishop', 'gold', 'silver', 'pawn', 'dragon', 'horse', 'promotedsilver', 'promotedpawn', 'king'];
+      return ['rook', 'bishop', 'gold', 'silver', 'pawn', 'dragon', 'horse', 'promotedsilver', 'tokin', 'king'];
     default:
       return [
         'rook',
@@ -100,7 +100,7 @@ export function allRoles(rules: Rules): Role[] {
         'pawn',
         'dragon',
         'horse',
-        'promotedpawn',
+        'tokin',
         'promotedsilver',
         'promotedknight',
         'promotedlance',
@@ -213,7 +213,7 @@ export function dimensions(rules: Rules): Dimensions {
 
 function standardUnpromote(role: Role): Role | undefined {
   switch (role) {
-    case 'promotedpawn':
+    case 'tokin':
       return 'pawn';
     case 'promotedlance':
       return 'lance';
@@ -276,7 +276,7 @@ function chuushogiPromote(role: Role): Role | undefined {
 function standardPromote(role: Role): Role | undefined {
   switch (role) {
     case 'pawn':
-      return 'promotedpawn';
+      return 'tokin';
     case 'lance':
       return 'promotedlance';
     case 'knight':

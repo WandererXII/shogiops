@@ -428,7 +428,7 @@ function minishogiRoleToForsyth(role: Role): string | undefined {
       return '+r';
     case 'pawn':
       return 'p';
-    case 'promotedpawn':
+    case 'tokin':
       return '+p';
     default:
       return;
@@ -456,7 +456,7 @@ function minishogiForsythToRole(ch: string): Role | undefined {
     case 'p':
       return 'pawn';
     case '+p':
-      return 'promotedpawn';
+      return 'tokin';
     default:
       return;
   }
@@ -490,7 +490,7 @@ function standardRoleToForsyth(role: Role): string | undefined {
       return '+r';
     case 'pawn':
       return 'p';
-    case 'promotedpawn':
+    case 'tokin':
       return '+p';
     default:
       return;
@@ -526,7 +526,7 @@ function standardForsythToRole(ch: string): Role | undefined {
     case 'p':
       return 'pawn';
     case '+p':
-      return 'promotedpawn';
+      return 'tokin';
     default:
       return;
   }

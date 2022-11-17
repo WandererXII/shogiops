@@ -52,7 +52,7 @@ export class Shogi extends Position {
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
         .union(
           goldAttacks(square, defender).intersect(
-            board.roles('gold', 'promotedpawn', 'promotedlance', 'promotedknight', 'promotedsilver')
+            board.roles('gold', 'tokin', 'promotedlance', 'promotedknight', 'promotedsilver')
           )
         )
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))

@@ -35,7 +35,7 @@ export class Minishogi extends Position {
       rookAttacks(square, occupied)
         .intersect(board.roles('rook', 'dragon'))
         .union(bishopAttacks(square, occupied).intersect(board.roles('bishop', 'horse')))
-        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'promotedpawn', 'promotedsilver')))
+        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'tokin', 'promotedsilver')))
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
         .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse')))

@@ -207,6 +207,7 @@ export class Chushogi extends Position {
               .roles('pawn', 'lance')
               .intersect(SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1))
           ),
+        theirKing = this.kingsOf(theirColor).singleSquare(),
         theirPieces = this.board
           .color(theirColor)
           .diff(
@@ -223,6 +224,7 @@ export class Chushogi extends Position {
         ourPieces.size() === 1 &&
         defined(ourKing) &&
         theirPieces.size() > 1 &&
+        defined(theirKing) &&
         !this.isCheck(theirColor) &&
         (theirPieces.size() > 2 || kingAttacks(ourKing).intersect(theirPieces).isEmpty())
       );
@@ -266,8 +268,11 @@ export class Chushogi extends Position {
 
   isLegal(move: Move, ctx?: Context): boolean {
     return (
-      super.isLegal(move, ctx) ||
-      (isNormal(move) && defined(move.midStep) && secondLionStepDests(this, move.from, move.midStep).has(move.to))
+      isNormal(move) &&
+      ((!defined(move.midStep) && super.isLegal(move, ctx)) ||
+        (defined(move.midStep) &&
+          super.isLegal({ from: move.from, to: move.midStep }, ctx) &&
+          secondLionStepDests(this, move.from, move.midStep).has(move.to)))
     );
   }
 }
@@ -312,7 +317,6 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
   if (piece.role === 'lion' || piece.role === 'lionpromoted') {
     if (!kingAttacks(initialSq).has(midSq)) return SquareSet.empty();
     let pseudoDests = kingAttacks(midSq)
-      .with(midSq)
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
     const oppColor = opposite(before.turn),
@@ -338,13 +342,12 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
     if (!pawnAttacks(initialSq, piece.color).has(midSq)) return SquareSet.empty();
 
     return goBetweenAttacks(midSq)
-      .with(midSq)
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
   } else if (piece.role === 'eagle') {
-    const pseudoDests = eagleLionAttacks(initialSq, piece.color).diff(before.board.color(before.turn));
-    if (!pseudoDests.has(midSq)) return SquareSet.empty();
+    const pseudoDests = eagleLionAttacks(initialSq, piece.color).diff(before.board.color(before.turn)).with(initialSq);
+    if (!pseudoDests.has(midSq) || squareDist(initialSq, midSq) > 1) return SquareSet.empty();
 
-    return pseudoDests.intersect(kingAttacks(midSq)).withMany(initialSq, midSq).intersect(fullSquareSet(before.rules));
+    return pseudoDests.intersect(kingAttacks(midSq)).intersect(fullSquareSet(before.rules));
   } else return SquareSet.empty();
 }

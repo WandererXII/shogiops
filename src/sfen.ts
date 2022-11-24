@@ -50,6 +50,17 @@ export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
   }
 }
 
+export function pieceToForsyth(rules: Rules, piece: Piece): string {
+  let r = roleToForsyth(rules)(piece.role)!;
+  if (piece.color === 'sente') r = r.toUpperCase();
+  return r;
+}
+
+export function forsythToPiece(rules: Rules, s: string): Piece | undefined {
+  const role = forsythToRole(rules)(s);
+  return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
+}
+
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
 }
@@ -58,17 +69,6 @@ function parseColorLetter(str: string): Color | undefined {
   if (str === 'b') return 'sente';
   else if (str === 'w') return 'gote';
   return;
-}
-
-function forsythToPiece(rules: Rules, s: string): Piece | undefined {
-  const role = forsythToRole(rules)(s);
-  return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
-}
-
-function pieceToForsyth(rules: Rules, piece: Piece): string {
-  let r = roleToForsyth(rules)(piece.role)!;
-  if (piece.color === 'sente') r = r.toUpperCase();
-  return r;
 }
 
 export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, SfenError> {

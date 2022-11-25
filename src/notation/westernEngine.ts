@@ -1,21 +1,36 @@
-import { makeSquare, roleToString } from '../util.js';
-import { Position } from '../shogi.js';
 import { Move, isDrop } from '../types.js';
-import { pieceCanPromote } from '../variantUtil.js';
-import { piecesAiming } from './notationUtil.js';
+import { defined, makeSquare } from '../util.js';
+import { Position } from '../variant/position.js';
+import { pieceCanPromote } from '../variant/util.js';
+import { aimingAt, roleToWestern } from './util.js';
 
 // P-7f
 export function makeWesternEngineMove(pos: Position, move: Move): string | undefined {
   if (isDrop(move)) {
-    return roleToString(move.role).toUpperCase() + '*' + makeSquare(move.to);
+    return roleToWestern(pos.rules)(move.role) + '*' + makeSquare(move.to);
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleToString(piece.role).toUpperCase();
-      const ambStr = piecesAiming(pos, piece, move.to).without(move.from).isEmpty() ? '' : makeSquare(move.from);
-      const actionStr = pos.board.has(move.to) ? 'x' : '-';
-      const promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to) ? '=' : '';
-      return `${roleStr}${ambStr}${actionStr}${makeSquare(move.to)}${promStr}`;
+      const roleStr = roleToWestern(pos.rules)(piece.role),
+        disambStr = aimingAt(pos, pos.board.pieces(piece.color, piece.role), move.to).without(move.from).isEmpty()
+          ? ''
+          : makeSquare(move.from),
+        toCapture = pos.board.get(move.to),
+        toStr = `${!!toCapture ? 'x' : '-'}${makeSquare(move.to)}`;
+      if (defined(move.midStep)) {
+        const midCapture = pos.board.get(move.midStep),
+          igui = !!midCapture && move.to === move.from;
+        if (igui) return `${roleStr}${disambStr}x!${makeSquare(move.midStep)}`;
+        else if (move.to === move.from) return `--`;
+        else return `${roleStr}${disambStr}${!!midCapture ? 'x' : '-'}${makeSquare(move.midStep)}${toStr}`;
+      } else {
+        const promStr = move.promotion
+          ? '+'
+          : pieceCanPromote(pos.rules)(piece, move.from, move.to, toCapture)
+          ? '='
+          : '';
+        return `${roleStr}${disambStr}${toStr}${promStr}`;
+      }
     } else return undefined;
   }
 }

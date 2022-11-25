@@ -1,11 +1,12 @@
-import { SquareName, Move, isDrop, Role } from './types.js';
-import { defined, makeSquare, parseUsi } from './util.js';
-import { Position } from './shogi.js';
+import { Move, PieceName, SquareName, isDrop } from './types.js';
+import { defined, makeSquare, parseSquare, parseUsi } from './util.js';
+import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
+import { Position } from './variant/position.js';
 
-export function shogigroundDests(pos: Position): Map<SquareName, SquareName[]> {
-  const result = new Map();
-  const ctx = pos.ctx();
-  for (const [from, squares] of pos.allDests(ctx)) {
+export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[]> {
+  const result: Map<SquareName, SquareName[]> = new Map(),
+    ctx = pos.ctx();
+  for (const [from, squares] of pos.allMoveDests(ctx)) {
     if (squares.nonEmpty()) {
       const d = Array.from(squares, s => makeSquare(s));
       result.set(makeSquare(from), d);
@@ -14,22 +15,29 @@ export function shogigroundDests(pos: Position): Map<SquareName, SquareName[]> {
   return result;
 }
 
-export function shogigroundDropDests(pos: Position, role?: Role): Map<Role, SquareName[]> {
-  const result = new Map();
-  if (role) {
-    const squares = pos.dropDests(role);
+export function shogigroundDropDests(pos: Position): Map<PieceName, SquareName[]> {
+  const result: Map<PieceName, SquareName[]> = new Map(),
+    ctx = pos.ctx();
+  for (const [pieceName, squares] of pos.allDropDests(ctx)) {
     if (squares.nonEmpty()) {
       const d = Array.from(squares, s => makeSquare(s));
-      result.set(role, d);
+      result.set(pieceName, d);
     }
-  } else {
-    const ctx = pos.ctx();
-    for (const [r, squares] of pos.allDropDests(ctx)) {
-      if (squares.nonEmpty()) {
-        const d = Array.from(squares, s => makeSquare(s));
-        result.set(r, d);
-      }
-    }
+  }
+
+  return result;
+}
+
+export function shogigroundSecondLionStep(
+  before: Chushogi,
+  initialSq: SquareName,
+  midSq: SquareName
+): Map<SquareName, SquareName[]> {
+  const result: Map<SquareName, SquareName[]> = new Map(),
+    squares = secondLionStepDests(before, parseSquare(initialSq), parseSquare(midSq));
+  if (squares.nonEmpty()) {
+    const d = Array.from(squares, s => makeSquare(s));
+    result.set(makeSquare(parseSquare(midSq)), d);
   }
   return result;
 }
@@ -41,4 +49,8 @@ export function usiToSquareNames(usi: string): SquareName[] {
 
 export function moveToSquareNames(move: Move): SquareName[] {
   return isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
+}
+
+export function checkSquareName(pos: Position): SquareName[] {
+  return pos.checkSquares().map(s => makeSquare(s));
 }

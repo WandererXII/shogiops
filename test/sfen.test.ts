@@ -1,10 +1,11 @@
-import { parseSfen, makeSfen, makeBoardSfen, initialSfen } from '../src/sfen';
 import { Board } from '../src/board';
-import { defaultPosition } from '../src/variant';
-import { Hands } from '../src/hand';
+import { Hands } from '../src/hands';
+import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '../src/sfen';
+import { parseSquare } from '../src/util';
+import { defaultPosition } from '../src/variant/variant';
 
 test('make board sfen', () => {
-  expect(makeBoardSfen('standard', Board.default())).toEqual(initialSfen('standard').split(' ')[0]);
+  expect(makeBoardSfen('standard', defaultPosition('standard').board)).toEqual(initialSfen('standard').split(' ')[0]);
   expect(makeBoardSfen('standard', Board.empty())).toEqual('9/9/9/9/9/9/9/9/9');
 });
 
@@ -14,18 +15,18 @@ test('make initial sfen', () => {
 
 test('parse initial sfen', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
-  expect(pos.board).toEqual(Board.default());
+  expect(pos.board).toEqual(defaultPosition('standard').board);
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
-  expect(pos.fullmoves).toEqual(1);
+  expect(pos.moveNumber).toEqual(1);
 });
 
 test('partial sfen', () => {
   const pos = parseSfen('standard', initialSfen('standard').split(' ')[0]).unwrap();
-  expect(pos.board).toEqual(Board.default());
+  expect(pos.board).toEqual(defaultPosition('standard').board);
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
-  expect(pos.fullmoves).toEqual(1);
+  expect(pos.moveNumber).toEqual(1);
 });
 
 test.each([
@@ -48,4 +49,21 @@ test('minishogi sfen', () => {
   expect(pos).toEqual(defaultPosition('minishogi'));
   expect(makeBoardSfen('minishogi', pos.board)).toEqual('rbsgk/4p/5/P4/KGSBR');
   expect(makeBoardSfen('minishogi', defaultPosition('minishogi').board)).toEqual('rbsgk/4p/5/P4/KGSBR');
+  expect(makeSfen(pos)).toEqual(initialSfen('minishogi'));
+});
+
+test('chushogi sfen', () => {
+  const pos = parseSfen(
+    'chushogi',
+    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1'
+  ).unwrap();
+  expect(pos).toEqual(defaultPosition('chushogi'));
+  expect(makeSfen(pos)).toEqual(initialSfen('chushogi'));
+
+  const pos2 = parseSfen(
+    'chushogi',
+    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b 5e 1'
+  ).unwrap();
+  expect(pos2.lastMove).toEqual({ to: parseSquare('5e') });
+  expect(pos2.lastCapture).toEqual({ role: 'lion', color: 'sente' });
 });

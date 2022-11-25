@@ -1,23 +1,26 @@
 import { Result } from '@badrap/result';
-import { Piece, Color, Rules } from './types.js';
 import { Board } from './board.js';
-import { defined, parseCoordinates, roleToString, stringToRole, toBW } from './util.js';
-import { Hand, Hands } from './hand.js';
-import { ROLES } from './types.js';
-import { Position } from './shogi.js';
-import { initializePosition } from './variant.js';
-import { dimensions } from './variantUtil.js';
+import { Hand, Hands } from './hands.js';
+import { Color, Move, Piece, Role, Rules, Square } from './types.js';
+import { defined, makeSquare, parseCoordinates, parseSquare, toBW } from './util.js';
+import { Position, PositionError } from './variant/position.js';
+import { dimensions, handRoles } from './variant/util.js';
+import { RulesTypeMap, initializePosition } from './variant/variant.js';
 
 export enum InvalidSfen {
   Sfen = 'ERR_SFEN',
-  Board = 'ERR_BOARD',
+  BoardDims = 'ERR_BOARD_DIMS',
+  BoardPiece = 'ERR_BOARD_PIECE',
   Hands = 'ERR_HANDS',
   Turn = 'ERR_TURN',
-  Fullmoves = 'ERR_FULLMOVES',
+  MoveNumber = 'ERR_MOVENUMBER',
 }
+export class SfenError extends Error {}
 
 export function initialSfen(rules: Rules): string {
   switch (rules) {
+    case 'chushogi':
+      return 'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1';
     case 'minishogi':
       return 'rbsgk/4p/5/P4/KGSBR b - 1';
     default:
@@ -25,15 +28,51 @@ export function initialSfen(rules: Rules): string {
   }
 }
 
-export class SfenError extends Error {}
+export function roleToForsyth(rules: Rules): (role: Role) => string | undefined {
+  switch (rules) {
+    case 'chushogi':
+      return chushogiRoleToForsyth;
+    case 'minishogi':
+      return minishogiRoleToForsyth;
+    default:
+      return standardRoleToForsyth;
+  }
+}
+
+export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
+  switch (rules) {
+    case 'chushogi':
+      return chushogiForsythToRole;
+    case 'minishogi':
+      return minishogiForsythToRole;
+    default:
+      return standardForsythToRole;
+  }
+}
+
+export function pieceToForsyth(rules: Rules): (piece: Piece) => string {
+  return piece => {
+    let r = roleToForsyth(rules)(piece.role)!;
+    if (piece.color === 'sente') r = r.toUpperCase();
+    return r;
+  };
+}
+
+export function forsythToPiece(rules: Rules): (s: string) => Piece | undefined {
+  return s => {
+    const role = forsythToRole(rules)(s);
+    return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
+  };
+}
 
 function parseSmallUint(str: string): number | undefined {
   return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
 }
 
-function stringToPiece(s: string): Piece | undefined {
-  const role = stringToRole(s);
-  return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
+function parseColorLetter(str: string): Color | undefined {
+  if (str === 'b') return 'sente';
+  else if (str === 'w') return 'gote';
+  return;
 }
 
 export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, SfenError> {
@@ -42,11 +81,11 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
   const dims = { files: ranks.length, ranks: ranks.length },
     ruleDims = dimensions(rules);
   if (dims.files !== ruleDims.files || dims.ranks !== ruleDims.ranks)
-    return Result.err(new SfenError(InvalidSfen.Board));
+    return Result.err(new SfenError(InvalidSfen.BoardDims));
   const board = Board.empty();
-  let empty = 0;
-  let rank = 0;
-  let file = dims.files - 1;
+  let empty = 0,
+    rank = 0,
+    file = dims.files - 1;
   for (let i = 0; i < boardPart.length; i++) {
     let c = boardPart[i];
     if (c === '/' && file < 0) {
@@ -55,16 +94,16 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
       rank++;
     } else {
       const step = parseInt(c, 10);
-      if (step) {
+      if (!isNaN(step)) {
         file = file + empty - (empty * 10 + step);
         empty = empty * 10 + step;
       } else {
         if (file < 0 || file >= dims.files || rank < 0 || rank >= dims.ranks)
-          return Result.err(new SfenError(InvalidSfen.Board));
+          return Result.err(new SfenError(InvalidSfen.BoardDims));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
-        const square = parseCoordinates(file, rank)!;
-        const piece = stringToPiece(c);
-        if (!piece) return Result.err(new SfenError(InvalidSfen.Board));
+        const square = parseCoordinates(file, rank)!,
+          piece = forsythToPiece(rules)(c);
+        if (!piece) return Result.err(new SfenError(InvalidSfen.BoardPiece));
         board.set(square, piece);
         empty = 0;
         file--;
@@ -72,11 +111,11 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
     }
   }
 
-  if (rank !== dims.ranks - 1 || file !== -1) return Result.err(new SfenError(InvalidSfen.Board));
+  if (rank !== dims.ranks - 1 || file !== -1) return Result.err(new SfenError(InvalidSfen.BoardDims));
   return Result.ok(board);
 }
 
-export function parseHands(handsPart: string): Result<Hands, SfenError> {
+export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenError> {
   const hands = Hands.empty();
   for (let i = 0; i < handsPart.length; i++) {
     if (handsPart[i] === '-') break;
@@ -89,76 +128,76 @@ export function parseHands(handsPart: string): Result<Hands, SfenError> {
         i++;
       }
     } else count = 1;
-    const piece = stringToPiece(handsPart[i]);
+    const piece = forsythToPiece(rules)(handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
-    hands[piece.color][piece.role] += count;
+    count += hands[piece.color].get(piece.role);
+    hands[piece.color].set(piece.role, count);
   }
   return Result.ok(hands);
 }
 
-export function parseSfen(rules: Rules, sfen: string, strict?: boolean): Result<Position, SfenError> {
+export function parseSfen<R extends keyof RulesTypeMap>(
+  rules: R,
+  sfen: string,
+  strict?: boolean
+): Result<RulesTypeMap[R], SfenError | PositionError> {
   const parts = sfen.split(' ');
 
   // Board
-  const boardPart = parts.shift()!;
-  const board: Result<Board, SfenError> = parseBoardSfen(rules, boardPart);
+  const boardPart = parts.shift()!,
+    board: Result<Board, SfenError> = parseBoardSfen(rules, boardPart);
 
   // Turn
-  const turnPart = parts.shift();
-  let turn: Color;
-  if (!defined(turnPart) || turnPart === 'b') turn = 'sente';
-  else if (turnPart === 'w') turn = 'gote';
-  else return Result.err(new SfenError(InvalidSfen.Turn));
+  const turnPart = parts.shift(),
+    turn = defined(turnPart) ? parseColorLetter(turnPart) : 'sente';
+  if (!defined(turn)) return Result.err(new SfenError(InvalidSfen.Turn));
 
   // Hands
   const handsPart = parts.shift();
-  let hands: Result<Hands, SfenError>;
-  if (!defined(handsPart)) hands = Result.ok(Hands.empty());
-  else hands = parseHands(handsPart);
+  let hands = Result.ok(Hands.empty()),
+    lastMove: Move | { to: Square } | undefined,
+    lastCapture: Piece | undefined;
+  if (rules === 'chushogi') {
+    const destSquare = defined(handsPart) ? parseSquare(handsPart) : undefined;
+    if (defined(destSquare)) {
+      lastMove = { to: destSquare };
+      lastCapture = { role: 'lion', color: turn };
+    }
+  } else if (defined(handsPart)) hands = parseHands(rules, handsPart);
 
-  // Turn
-  const fullmovesPart = parts.shift();
-  const fullmoves = defined(fullmovesPart) ? parseSmallUint(fullmovesPart) : 1;
-  if (!defined(fullmoves)) return Result.err(new SfenError(InvalidSfen.Fullmoves));
+  // Move number
+  const moveNumberPart = parts.shift(),
+    moveNumber = defined(moveNumberPart) ? parseSmallUint(moveNumberPart) : 1;
+  if (!defined(moveNumber)) return Result.err(new SfenError(InvalidSfen.MoveNumber));
 
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
 
   return board.chain(board =>
-    hands.chain(hands => {
-      return initializePosition(rules, board, hands, turn, Math.max(1, fullmoves), strict);
-    })
+    hands.chain(hands =>
+      initializePosition(
+        rules,
+        { board, hands, turn, moveNumber: Math.max(1, moveNumber), lastMove, lastCapture },
+        !!strict
+      )
+    )
   );
-}
-
-export function parsePiece(str: string): Piece | undefined {
-  if (!str) return;
-  const piece = stringToPiece(str[0]);
-  if (!piece) return;
-  else if (str.length > 1 && str[1] !== '+') return;
-  return piece;
-}
-
-export function makePiece(piece: Piece): string {
-  let r = roleToString(piece.role);
-  if (piece.color === 'sente') r = r.toUpperCase();
-  return r;
 }
 
 export function makeBoardSfen(rules: Rules, board: Board): string {
   const dims = dimensions(rules);
-  let sfen = '';
-  let empty = 0;
+  let sfen = '',
+    empty = 0;
   for (let rank = 0; rank < dims.ranks; rank++) {
     for (let file = dims.files - 1; file >= 0; file--) {
-      const square = parseCoordinates(file, rank)!;
-      const piece = board.get(square);
+      const square = parseCoordinates(file, rank)!,
+        piece = board.get(square);
       if (!piece) empty++;
       else {
         if (empty > 0) {
           sfen += empty;
           empty = 0;
         }
-        sfen += makePiece(piece);
+        sfen += pieceToForsyth(rules)(piece);
       }
 
       if (file === 0) {
@@ -173,24 +212,326 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
   return sfen;
 }
 
-export function makeHand(hand: Hand): string {
-  return ROLES.map(role => {
-    const r = roleToString(role);
-    const n = hand[role];
-    return n > 1 ? n + r : n === 1 ? r : '';
-  }).join('');
+export function makeHand(rules: Rules, hand: Hand): string {
+  return handRoles(rules)
+    .map(role => {
+      const r = roleToForsyth(rules)(role)!,
+        n = hand.get(role);
+      return n > 1 ? n + r : n === 1 ? r : '';
+    })
+    .join('');
 }
 
-export function makeHands(hands: Hands): string {
-  const handsStr = makeHand(hands.sente).toUpperCase() + makeHand(hands.gote);
+export function makeHands(rules: Rules, hands: Hands): string {
+  const handsStr = makeHand(rules, hands.color('sente')).toUpperCase() + makeHand(rules, hands.color('gote'));
   return handsStr === '' ? '-' : handsStr;
+}
+
+function lastLionCapture(pos: Position): string {
+  if (pos.lastMove && (pos.lastCapture?.role === 'lion' || pos.lastCapture?.role === 'lionpromoted'))
+    return makeSquare(pos.lastMove.to);
+  else return '-';
 }
 
 export function makeSfen(pos: Position): string {
   return [
     makeBoardSfen(pos.rules, pos.board),
     toBW(pos.turn),
-    makeHands(pos.hands),
-    Math.max(1, Math.min(pos.fullmoves, 9999)),
+    pos.rules === 'chushogi' ? lastLionCapture(pos) : makeHands(pos.rules, pos.hands),
+    Math.max(1, Math.min(pos.moveNumber, 9999)),
   ].join(' ');
+}
+
+function chushogiRoleToForsyth(role: Role): string | undefined {
+  switch (role) {
+    case 'lance':
+      return 'l';
+    case 'whitehorse':
+      return '+l';
+    case 'leopard':
+      return 'f';
+    case 'bishoppromoted':
+      return '+f';
+    case 'copper':
+      return 'c';
+    case 'sidemoverpromoted':
+      return '+c';
+    case 'silver':
+      return 's';
+    case 'verticalmoverpromoted':
+      return '+s';
+    case 'gold':
+      return 'g';
+    case 'rookpromoted':
+      return '+g';
+    case 'king':
+      return 'k';
+    case 'elephant':
+      return 'e';
+    case 'prince':
+      return '+e';
+    case 'chariot':
+      return 'a';
+    case 'whale':
+      return '+a';
+    case 'bishop':
+      return 'b';
+    case 'horsepromoted':
+      return '+b';
+    case 'tiger':
+      return 't';
+    case 'stag':
+      return '+t';
+    case 'kirin':
+      return 'o';
+    case 'lionpromoted':
+      return '+o';
+    case 'phoenix':
+      return 'x';
+    case 'queenpromoted':
+      return '+x';
+    case 'sidemover':
+      return 'm';
+    case 'boar':
+      return '+m';
+    case 'verticalmover':
+      return 'v';
+    case 'ox':
+      return '+v';
+    case 'rook':
+      return 'r';
+    case 'dragonpromoted':
+      return '+r';
+    case 'horse':
+      return 'h';
+    case 'falcon':
+      return '+h';
+    case 'dragon':
+      return 'd';
+    case 'eagle':
+      return '+d';
+    case 'lion':
+      return 'n';
+    case 'queen':
+      return 'q';
+    case 'pawn':
+      return 'p';
+    case 'promotedpawn':
+      return '+p';
+    case 'gobetween':
+      return 'i';
+    case 'elephantpromoted':
+      return '+i';
+    default:
+      return;
+  }
+}
+
+function chushogiForsythToRole(str: string): Role | undefined {
+  switch (str.toLowerCase()) {
+    case 'l':
+      return 'lance';
+    case '+l':
+      return 'whitehorse';
+    case 'f':
+      return 'leopard';
+    case '+f':
+      return 'bishoppromoted';
+    case 'c':
+      return 'copper';
+    case '+c':
+      return 'sidemoverpromoted';
+    case 's':
+      return 'silver';
+    case '+s':
+      return 'verticalmoverpromoted';
+    case 'g':
+      return 'gold';
+    case '+g':
+      return 'rookpromoted';
+    case 'k':
+      return 'king';
+    case 'e':
+      return 'elephant';
+    case '+e':
+      return 'prince';
+    case 'a':
+      return 'chariot';
+    case '+a':
+      return 'whale';
+    case 'b':
+      return 'bishop';
+    case '+b':
+      return 'horsepromoted';
+    case 't':
+      return 'tiger';
+    case '+t':
+      return 'stag';
+    case 'o':
+      return 'kirin';
+    case '+o':
+      return 'lionpromoted';
+    case 'x':
+      return 'phoenix';
+    case '+x':
+      return 'queenpromoted';
+    case 'm':
+      return 'sidemover';
+    case '+m':
+      return 'boar';
+    case 'v':
+      return 'verticalmover';
+    case '+v':
+      return 'ox';
+    case 'r':
+      return 'rook';
+    case '+r':
+      return 'dragonpromoted';
+    case 'h':
+      return 'horse';
+    case '+h':
+      return 'falcon';
+    case 'd':
+      return 'dragon';
+    case '+d':
+      return 'eagle';
+    case 'n':
+      return 'lion';
+    case 'q':
+      return 'queen';
+    case 'p':
+      return 'pawn';
+    case '+p':
+      return 'promotedpawn';
+    case 'i':
+      return 'gobetween';
+    case '+i':
+      return 'elephantpromoted';
+    default:
+      return;
+  }
+}
+
+function minishogiRoleToForsyth(role: Role): string | undefined {
+  switch (role) {
+    case 'king':
+      return 'k';
+    case 'gold':
+      return 'g';
+    case 'silver':
+      return 's';
+    case 'promotedsilver':
+      return '+s';
+    case 'bishop':
+      return 'b';
+    case 'horse':
+      return '+b';
+    case 'rook':
+      return 'r';
+    case 'dragon':
+      return '+r';
+    case 'pawn':
+      return 'p';
+    case 'tokin':
+      return '+p';
+    default:
+      return;
+  }
+}
+
+function minishogiForsythToRole(ch: string): Role | undefined {
+  switch (ch.toLowerCase()) {
+    case 'k':
+      return 'king';
+    case 's':
+      return 'silver';
+    case '+s':
+      return 'promotedsilver';
+    case 'g':
+      return 'gold';
+    case 'b':
+      return 'bishop';
+    case '+b':
+      return 'horse';
+    case 'r':
+      return 'rook';
+    case '+r':
+      return 'dragon';
+    case 'p':
+      return 'pawn';
+    case '+p':
+      return 'tokin';
+    default:
+      return;
+  }
+}
+
+function standardRoleToForsyth(role: Role): string | undefined {
+  switch (role) {
+    case 'lance':
+      return 'l';
+    case 'promotedlance':
+      return '+l';
+    case 'knight':
+      return 'n';
+    case 'promotedknight':
+      return '+n';
+    case 'silver':
+      return 's';
+    case 'promotedsilver':
+      return '+s';
+    case 'gold':
+      return 'g';
+    case 'king':
+      return 'k';
+    case 'bishop':
+      return 'b';
+    case 'horse':
+      return '+b';
+    case 'rook':
+      return 'r';
+    case 'dragon':
+      return '+r';
+    case 'pawn':
+      return 'p';
+    case 'tokin':
+      return '+p';
+    default:
+      return;
+  }
+}
+
+function standardForsythToRole(ch: string): Role | undefined {
+  switch (ch.toLowerCase()) {
+    case 'l':
+      return 'lance';
+    case '+l':
+      return 'promotedlance';
+    case 'n':
+      return 'knight';
+    case '+n':
+      return 'promotedknight';
+    case 's':
+      return 'silver';
+    case '+s':
+      return 'promotedsilver';
+    case 'g':
+      return 'gold';
+    case 'k':
+      return 'king';
+    case 'b':
+      return 'bishop';
+    case '+b':
+      return 'horse';
+    case 'r':
+      return 'rook';
+    case '+r':
+      return 'dragon';
+    case 'p':
+      return 'pawn';
+    case '+p':
+      return 'tokin';
+    default:
+      return;
+  }
 }

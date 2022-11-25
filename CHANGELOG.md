@@ -1,5 +1,29 @@
 # Changelog for shogiops
 
+## v0.10.0
+
+- Chushogi support added.
+- Files moved around - new variant directory, also reorganized and tweaked variant hierarchy.
+- In strict mode while parsing sfen both sides have to have a royal piece.
+- Drop dests for shogiground are now always return all pieces as keys, you can't select only one piece.
+- More specific variant types returned.
+- Renamed notationUtil.ts -> util.ts.
+- Renamed variantUtil.ts -> util.ts.
+- Renamed hand.ts -> hands.ts.
+- Reintroduce `Setup` in `initializePosition`.
+- `pieceCanPromote` now requires another argument - `capture`.
+- Renamed `pieceInDeadZone` to `pieceForcePromote`.
+- Key of drop dests is now `PieceName`('sente rook') not role.
+- Rename `fullmoves` to `moveNumber`.
+- Rename `dests` to `moveDests`.
+- Remove `variantEnd` and `variantOutcome`.
+- Remove `backrank` and `secondBackrank` functions.
+- `Map` used in `Board` instead of properties, use `board.role('role')` or `board.color('color')`.
+- `Map` used in `Hands` instead of properties.
+- Attack functions changed - check argument order.
+- `roleToString` and `stringToRole` was removed, use functions in Sfen.
+- New `Result` and `Outcome` types.
+
 ## v0.9.0
 
 - Remove `isImpasse`, wasn't used, doesn't account for handicaps, and uses only a specific rule anyway - might not be what people expect.

@@ -1,6 +1,6 @@
 import { makeKitaoKawasakiMove } from '../../src/notation/kitaoKawasaki';
-import { Shogi } from '../../src/shogi';
 import { parseUsi } from '../../src/util';
+import { Shogi } from '../../src/variant/shogi';
 
 test('basic moves', () => {
   const pos = Shogi.default();

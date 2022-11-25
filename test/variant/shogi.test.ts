@@ -1,7 +1,10 @@
-import { makeSfen, parseSfen } from '../src/sfen';
-import { Shogi, IllegalSetup } from '../src/shogi';
-import { perft } from '../src/debug';
-import { parseUsi } from '../src/util';
+import { perft } from '../../src/debug';
+import { makeSfen, parseSfen } from '../../src/sfen';
+import { parseUsi } from '../../src/util';
+import { IllegalSetup } from '../../src/variant/position';
+import { Shogi } from '../../src/variant/shogi';
+import { defaultPosition } from '../../src/variant/variant';
+import { usiFixture } from '../fixtures/usi';
 
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550&start=16
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550
@@ -89,48 +92,31 @@ test.each(random)('random perft: %s: %s', (_, sfen, d1, d2) => {
   expect(perft(pos, 2, false)).toBe(d2);
 });
 
-test('pawn checkmate', () => {
+test('pawn checkmate legality', () => {
   const pos = parseSfen('standard', '3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1').unwrap();
-  const pos2 = pos.clone();
-
   expect(pos.isLegal(parseUsi('L*5b')!)).toBe(true);
   expect(pos.isLegal(parseUsi('P*5b')!)).toBe(false);
 
-  // If pawn checkmate is played, opponent is victorious
-  pos.play(parseUsi('L*5b')!);
-  pos2.play(parseUsi('P*5b')!);
-  expect(pos.outcome()).toEqual({ winner: 'sente' });
-  expect(pos2.outcome()).toEqual({ winner: 'gote' });
-
   // Single king
   const skPos = parseSfen('standard', '3rkr3/9/8p/4N4/1B7/9/1SG6/2S6/9 b LPp 1').unwrap();
-  const skPos2 = skPos.clone();
-
   expect(skPos.isLegal(parseUsi('L*5b')!)).toBe(true);
   expect(skPos.isLegal(parseUsi('P*5b')!)).toBe(false);
-
-  // If pawn checkmate is played, opponent is victorious
-  skPos.play(parseUsi('L*5b')!);
-  skPos2.play(parseUsi('P*5b')!);
-  expect(skPos.outcome()).toEqual({ winner: 'sente' });
-  expect(skPos2.outcome()).toEqual({ winner: 'gote' });
 });
 
-const insufficientMaterial: [string, boolean, boolean][] = [
-  ['lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1', false, false],
-  ['9/4k4/9/9/9/9/9/4K4/9 b - 1', true, true],
-  ['9/4k4/9/9/9/9/2G6/4K4/9 b - 1', false, true],
+const insufficientMaterial: [string, boolean][] = [
+  ['lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1', false],
+  ['9/4k4/9/9/9/9/9/4K4/9 b - 1', true],
+  ['9/4k4/9/9/9/9/2G6/4K4/9 b - 1', false],
 ];
 
-test.each(insufficientMaterial)('insufficient material: %s', (sfen, sente, gote) => {
+test.each(insufficientMaterial)('insufficient material: %s', (sfen, insufficient) => {
   const pos = parseSfen('standard', sfen).unwrap();
-  expect(pos.hasInsufficientMaterial('sente')).toBe(sente);
-  expect(pos.hasInsufficientMaterial('gote')).toBe(gote);
+  expect(pos.isDraw()).toBe(insufficient);
 });
 
 test('impossible checker alignment', () => {
   // Multiple checkers aligned with king.
-  const r1 = parseSfen('standard', 'r8/4s4/7k1/b8/9/2K6/3b5/9/9 b - 1');
+  const r1 = parseSfen('standard', 'r8/4s4/7k1/b8/9/2K6/3b5/9/9 b - 1', true);
   expect(
     r1.unwrap(
       _ => undefined,
@@ -140,4 +126,15 @@ test('impossible checker alignment', () => {
 
   // Checkers aligned with opponent king are fine.
   parseSfen('standard', '9/9/2s4k1/9/6N2/9/9/3K5/7L1 w - 2').unwrap();
+});
+
+test('prod 500 usi', () => {
+  for (const usis of usiFixture) {
+    const pos = defaultPosition('standard');
+    for (const usi of usis.split(' ')) {
+      const move = parseUsi(usi)!;
+      expect(pos.isLegal(move)).toBe(true);
+      pos.play(move);
+    }
+  }
 });

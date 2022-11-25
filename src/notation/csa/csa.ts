@@ -1,12 +1,11 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
-import { Position } from '../../shogi.js';
-import { Color, isDrop, Move } from '../../types.js';
-import { csaToRole, defined, parseCoordinates, roleToCsa } from '../../util.js';
-import { Hand, Hands } from '../../hand.js';
-import { allRoles, dimensions, handRoles, promote } from '../../variantUtil.js';
-import { makeNumberSquare, parseNumberSquare } from '../notationUtil.js';
-import { initializePosition } from '../../variant.js';
+import { Hand, Hands } from '../../hands.js';
+import { Color, Move, isDrop } from '../../types.js';
+import { defined, parseCoordinates } from '../../util.js';
+import { Shogi, standardBoard } from '../../variant/shogi.js';
+import { allRoles, handRoles, promote } from '../../variant/util.js';
+import { csaToRole, makeNumberSquare, parseNumberSquare, roleToCsa } from '../util.js';
 
 // Olny supports standard shogi no variants
 
@@ -25,11 +24,11 @@ export enum InvalidCsa {
 export class CsaError extends Error {}
 
 // exporting handicaps differently is prob not worth it, so let's always go with the whole board
-export function makeCsaHeader(pos: Position): string {
+export function makeCsaHeader(pos: Shogi): string {
   return [
     makeCsaBoard(pos.board),
-    makeCsaHand(pos.hands.sente, 'P+'),
-    makeCsaHand(pos.hands.gote, 'P-'),
+    makeCsaHand(pos.hands.color('sente'), 'P+'),
+    makeCsaHand(pos.hands.color('gote'), 'P-'),
     pos.turn === 'gote' ? '-' : '+',
   ]
     .filter(p => p.length > 0)
@@ -61,7 +60,7 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
     handRoles('standard')
       .map(role => {
         const r = roleToCsa(role);
-        const n = hand[role];
+        const n = hand.get(role);
         return ('00' + r).repeat(Math.min(n, 18));
       })
       .filter(p => p.length > 0)
@@ -70,7 +69,7 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
 }
 
 // Import
-export function parseCsaHeader(csa: string): Result<Position, CsaError> {
+export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
   const lines = normalizedCsaLines(csa);
   const handicap = lines.find(l => l.startsWith('PI'));
   const isWholeBoard = lines.some(l => l.startsWith('P1'));
@@ -78,7 +77,10 @@ export function parseCsaHeader(csa: string): Result<Position, CsaError> {
     defined(handicap) && !isWholeBoard ? parseCsaHandicap(handicap) : parseCsaBoard(lines.filter(l => /^P\d/.test(l)));
   const turn: Color = lines.some(l => l === '-') ? 'gote' : 'sente';
   return baseBoard.chain(board => {
-    return initializePosition('standard', board, Hands.empty(), turn, 1).chain(pos =>
+    return Shogi.from(
+      { board, hands: Hands.empty(), turn, moveNumber: 1, lastMove: undefined, lastCapture: undefined },
+      true
+    ).chain(pos =>
       parseAdditions(
         pos,
         lines.filter(l => /P[\+|-]/.test(l))
@@ -89,7 +91,7 @@ export function parseCsaHeader(csa: string): Result<Position, CsaError> {
 
 export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
   const splitted = handicap.substring(2).match(/.{4}/g) || [];
-  const intitalBoard = Board.default();
+  const intitalBoard = standardBoard();
   for (const s of splitted) {
     const sq = parseNumberSquare(s.substring(0, 2));
     if (defined(sq)) {
@@ -127,7 +129,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   return Result.ok(board);
 }
 
-function parseAdditions(initialPos: Position, additions: string[]): Result<Position, CsaError> {
+function parseAdditions(initialPos: Shogi, additions: string[]): Result<Shogi, CsaError> {
   for (const line of additions) {
     const color: Color = line[1] === '+' ? 'sente' : 'gote';
     for (const sp of line.substring(2).match(/.{4}/g) || []) {
@@ -137,7 +139,7 @@ function parseAdditions(initialPos: Position, additions: string[]): Result<Posit
       if ((defined(sq) || sqString === '00') && defined(role)) {
         if (!defined(sq)) {
           if (!handRoles('standard').includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
-          initialPos.hands[color][role]++;
+          initialPos.hands[color].capture(role);
         } else {
           initialPos.board.set(sq, { role: role, color: color });
         }
@@ -166,7 +168,7 @@ export function normalizedCsaLines(csa: string): string[] {
 //
 
 // Parsing CSA moves
-export function parseCsaMove(pos: Position, csaMove: string): Move | undefined {
+export function parseCsaMove(pos: Shogi, csaMove: string): Move | undefined {
   // Normal move
   const match = csaMove.match(/(?:[\+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/);
   if (!match) {
@@ -188,7 +190,7 @@ export function parseCsaMove(pos: Position, csaMove: string): Move | undefined {
   };
 }
 
-export function parseCsaMoves(pos: Position, csaMoves: string[]): Move[] {
+export function parseCsaMoves(pos: Shogi, csaMoves: string[]): Move[] {
   pos = pos.clone();
   const moves: Move[] = [];
   for (const m of csaMoves) {
@@ -201,7 +203,7 @@ export function parseCsaMoves(pos: Position, csaMoves: string[]): Move[] {
 }
 
 // Making CSA formatted moves
-export function makeCsaMove(pos: Position, move: Move): string | undefined {
+export function makeCsaMove(pos: Shogi, move: Move): string | undefined {
   if (isDrop(move)) {
     return '00' + makeNumberSquare(move.to) + roleToCsa(move.role);
   } else {

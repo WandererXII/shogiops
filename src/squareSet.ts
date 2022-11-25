@@ -28,7 +28,8 @@ export type BitRows = [number, number, number, number, number, number, number, n
 // Assumes POV of sente player - up is smaller rank, down is greater rank, left is smaller file, right is greater file
 // Each element represents two ranks - board size 16x16
 export class SquareSet implements Iterable<Square> {
-  constructor(readonly dRows: BitRows) {
+  readonly dRows: BitRows;
+  constructor(dRows: BitRows) {
     this.dRows = [
       dRows[0] >>> 0,
       dRows[1] >>> 0,
@@ -53,9 +54,20 @@ export class SquareSet implements Iterable<Square> {
 
   static fromSquare(square: Square): SquareSet {
     if (square >= 256 || square < 0) return SquareSet.empty();
-    const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
-    const index = square >>> 5;
+    const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0],
+      index = square >>> 5;
     newRows[index] = 1 << (square - index * 32);
+    return new SquareSet(newRows);
+  }
+
+  static fromSquares(...squares: Square[]): SquareSet {
+    const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
+    for (const square of squares) {
+      if (square < 256 && square >= 0) {
+        const index = square >>> 5;
+        newRows[index] = newRows[index] | (1 << (square - index * 32));
+      }
+    }
     return new SquareSet(newRows);
   }
 
@@ -169,10 +181,10 @@ export class SquareSet implements Iterable<Square> {
   shr256(shift: number): SquareSet {
     if (shift >= 256) return SquareSet.empty();
     if (shift > 0) {
-      const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
-      const cutoff = shift >>> 5;
-      const shift1 = shift & 0x1f;
-      const shift2 = 32 - shift1;
+      const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0],
+        cutoff = shift >>> 5,
+        shift1 = shift & 0x1f,
+        shift2 = 32 - shift1;
 
       for (let i = 0; i < 8 - cutoff; i++) {
         newRows[i] = this.dRows[i + cutoff] >>> shift1;
@@ -187,10 +199,10 @@ export class SquareSet implements Iterable<Square> {
   shl256(shift: number): SquareSet {
     if (shift >= 256) return SquareSet.empty();
     if (shift > 0) {
-      const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
-      const cutoff = shift >>> 5;
-      const shift1 = shift & 0x1f;
-      const shift2 = 32 - shift1;
+      const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0],
+        cutoff = shift >>> 5,
+        shift1 = shift & 0x1f,
+        shift2 = 32 - shift1;
 
       for (let i = cutoff; i < 8; i++) {
         newRows[i] = this.dRows[i - cutoff] << shift1;
@@ -270,24 +282,46 @@ export class SquareSet implements Iterable<Square> {
 
   with(square: Square): SquareSet {
     if (square >= 256 || square < 0) return this;
-    const index = square >>> 5;
-    const newDRows: BitRows = [...this.dRows];
+    const index = square >>> 5,
+      newDRows: BitRows = [...this.dRows];
     newDRows[index] = newDRows[index] | (1 << (square - index * 32));
+    return new SquareSet(newDRows);
+  }
+
+  withMany(...squares: Square[]): SquareSet {
+    const newDRows: BitRows = [...this.dRows];
+    for (const square of squares) {
+      if (square < 256 && square >= 0) {
+        const index = square >>> 5;
+        newDRows[index] = newDRows[index] | (1 << (square - index * 32));
+      }
+    }
     return new SquareSet(newDRows);
   }
 
   without(square: Square): SquareSet {
     if (square >= 256 || square < 0) return this;
-    const index = square >>> 5;
-    const newDRows: BitRows = [...this.dRows];
+    const index = square >>> 5,
+      newDRows: BitRows = [...this.dRows];
     newDRows[index] = newDRows[index] & ~(1 << (square - index * 32));
+    return new SquareSet(newDRows);
+  }
+
+  withoutMany(...squares: Square[]): SquareSet {
+    const newDRows: BitRows = [...this.dRows];
+    for (const square of squares) {
+      if (square < 256 && square >= 0) {
+        const index = square >>> 5;
+        newDRows[index] = newDRows[index] & ~(1 << (square - index * 32));
+      }
+    }
     return new SquareSet(newDRows);
   }
 
   toggle(square: Square): SquareSet {
     if (square >= 256 || square < 0) return this;
-    const index = square >>> 5;
-    const newDRows: BitRows = [...this.dRows];
+    const index = square >>> 5,
+      newDRows: BitRows = [...this.dRows];
     newDRows[index] = newDRows[index] ^ (1 << (square - index * 32));
     return new SquareSet(newDRows);
   }
@@ -328,6 +362,15 @@ export class SquareSet implements Iterable<Square> {
 
   isSingleSquare(): boolean {
     return this.nonEmpty() && !this.moreThanOne();
+  }
+
+  hex(): string {
+    let s = '';
+    for (let i = 0; i < 8; i++) {
+      if (i > 0) s += ', ';
+      s += `0x${this.dRows[i].toString(16)}`;
+    }
+    return s;
   }
 
   visual(): string {

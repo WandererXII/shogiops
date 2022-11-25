@@ -1,4 +1,5 @@
-import { parseUsi, makeUsi, squareFile, squareRank, parseSquare } from '../src/util';
+import { makePieceName, makeUsi, parsePieceName, parseSquare, parseUsi, squareFile, squareRank } from '../src/util';
+import { usiFixture } from './fixtures/usi';
 
 test('square coordinates', () => {
   expect(squareFile(0)).toBe(0);
@@ -38,6 +39,7 @@ test('parse usi', () => {
   expect(parseUsi('2h2c=')).toEqual({ from: 113, to: 33, promotion: false });
   expect(parseUsi('2h2c')).toEqual({ from: 113, to: 33, promotion: false });
   expect(parseUsi('P*1g')).toEqual({ role: 'pawn', to: 96 });
+  expect(parseUsi('Z*1g')).toBeUndefined;
   expect(parseUsi('P*16a')).toEqual({ role: 'pawn', to: 15 });
   expect(parseUsi('P*16p')).toEqual({ role: 'pawn', to: 255 });
   expect(parseUsi('1a16p')).toEqual({ from: 0, to: 255, promotion: false });
@@ -46,6 +48,13 @@ test('parse usi', () => {
   expect(parseUsi('16o16p+')).toEqual({ from: 239, to: 255, promotion: true });
   expect(parseUsi('16p1a')).toEqual({ from: 255, to: 0, promotion: false });
   expect(parseUsi('16p1a+')).toEqual({ from: 255, to: 0, promotion: true });
+  // with midstep
+  expect(parseUsi('1a1a1a')).toEqual({ from: 0, to: 0, midStep: 0, promotion: false });
+  expect(parseUsi('1a1a1a=')).toEqual({ from: 0, to: 0, midStep: 0, promotion: false });
+  expect(parseUsi('1a1a1a+')).toEqual({ from: 0, to: 0, midStep: 0, promotion: true });
+  expect(parseUsi('16p16p16p')).toEqual({ from: 255, to: 255, midStep: 255, promotion: false });
+  expect(parseUsi('16p16p16p=')).toEqual({ from: 255, to: 255, midStep: 255, promotion: false });
+  expect(parseUsi('16p16p16p+')).toEqual({ from: 255, to: 255, midStep: 255, promotion: true });
 });
 
 test('make usi', () => {
@@ -59,4 +68,21 @@ test('make usi', () => {
   expect(makeUsi({ from: 0, to: 0, promotion: true })).toBe('1a1a+');
   expect(makeUsi({ from: 0, to: 0, promotion: false })).toBe('1a1a');
   expect(makeUsi({ from: 0, to: 0, promotion: undefined })).toBe('1a1a');
+  // with midstep
+  expect(makeUsi({ from: 0, to: 0, midStep: 255 })).toBe('1a16p1a');
+  expect(makeUsi({ from: 0, to: 0, midStep: 255, promotion: true })).toBe('1a16p1a+');
+});
+
+test('piece name', () => {
+  expect(makePieceName({ role: 'rook', color: 'sente' })).toEqual('sente rook');
+  expect(parsePieceName('sente rook')).toEqual({ color: 'sente', role: 'rook' });
+  expect(parsePieceName('gote bishop')).toEqual({ color: 'gote', role: 'bishop' });
+});
+
+test('usi prod 500', () => {
+  for (const usis of usiFixture) {
+    for (const usi of usis.split(' ')) {
+      expect(parseUsi(usi)).toBeDefined();
+    }
+  }
 });

@@ -1,4 +1,3 @@
-import { parseSfen } from '../../src/sfen';
 import {
   makeKifHeader,
   makeKifMove,
@@ -7,8 +6,9 @@ import {
   parseKifMoves,
   parseTags,
 } from '../../src/notation/kif/kif';
-import { Shogi } from '../../src/shogi';
+import { parseSfen } from '../../src/sfen';
 import { parseUsi } from '../../src/util';
+import { Shogi } from '../../src/variant/shogi';
 
 test('make kif header from some random position', () => {
   const pos = parseSfen('standard', 'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p').unwrap();
@@ -154,7 +154,7 @@ test('parse kif moves one by one', () => {
     m => parseUsi(m)!
   );
   for (const m of line) {
-    expect(parseKifMove(makeKifMove(pos, m)!)).toEqual(m);
+    expect(parseKifMove(makeKifMove(pos, m)!, pos.lastMove?.to)).toEqual(m);
     pos.play(m);
   }
   expect(pos.isCheckmate()).toBe(true);

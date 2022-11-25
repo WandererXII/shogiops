@@ -1,4 +1,3 @@
-import { initialSfen, parseSfen } from '../../src/sfen';
 import {
   makeCsaHeader,
   makeCsaMove,
@@ -7,9 +6,10 @@ import {
   parseCsaMoves,
   parseTags,
 } from '../../src/notation/csa/csa';
-import { parseNumberSquare } from '../../src/notation/notationUtil';
-import { Shogi } from '../../src/shogi';
+import { parseNumberSquare } from '../../src/notation/util';
+import { initialSfen, parseSfen } from '../../src/sfen';
 import { parseSquare, parseUsi } from '../../src/util';
+import { Shogi } from '../../src/variant/shogi';
 
 test('parse csa square', () => {
   expect(parseNumberSquare('11')).toEqual(parseSquare('1a'));

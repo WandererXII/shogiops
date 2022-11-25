@@ -1,8 +1,7 @@
-import { parseSfen } from '../../src/sfen';
-import { initializePosition } from '../../src/variant';
 import { makeJapaneseMove } from '../../src/notation/japanese';
-import { Shogi } from '../../src/shogi';
+import { parseSfen } from '../../src/sfen';
 import { parseUsi } from '../../src/util';
+import { Shogi } from '../../src/variant/shogi';
 
 test('basic moves', () => {
   const pos = Shogi.default();

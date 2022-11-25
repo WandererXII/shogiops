@@ -1,3 +1,7 @@
+import type { Board } from './board.js';
+import type { Hands } from './hands.js';
+import type { SquareSet } from './squareSet.js';
+
 export const FILE_NAMES = [
   '1',
   '2',
@@ -25,8 +29,6 @@ export type Square = number;
 
 export type SquareName = `${FileName}${RankName}`;
 
-export type BySquare<T> = T[];
-
 export const COLORS = ['sente', 'gote'] as const;
 
 export type Color = typeof COLORS[number];
@@ -36,42 +38,71 @@ export interface Dimensions {
   files: number;
 }
 
-export type ByColor<T> = {
-  [color in Color]: T;
-};
-
-// correct order for sfen hand exporting
 export const ROLES = [
-  'rook',
-  'bishop',
-  'gold',
-  'silver',
-  'knight',
   'lance',
+  'knight',
+  'silver',
+  'gold',
+  'king',
+  'bishop',
+  'rook',
   'pawn',
-  'dragon',
-  'horse',
+  'tokin',
+  'promotedlance',
   'promotedsilver',
   'promotedknight',
-  'promotedlance',
-  'tokin',
-  'king',
+  'horse',
+  'dragon',
+  // chushogi
+  'promotedpawn',
+  'leopard',
+  'copper',
+  'elephant',
+  'chariot',
+  'tiger',
+  'kirin',
+  'phoenix',
+  'sidemover',
+  'verticalmover',
+  'lion',
+  'queen',
+  'gobetween',
+  'whitehorse',
+  'lionpromoted',
+  'queenpromoted',
+  'bishoppromoted',
+  'sidemoverpromoted',
+  'verticalmoverpromoted',
+  'rookpromoted',
+  'prince',
+  'whale',
+  'horsepromoted',
+  'elephantpromoted',
+  'stag',
+  'boar',
+  'ox',
+  'falcon',
+  'eagle',
+  'dragonpromoted',
 ] as const;
 export type Role = typeof ROLES[number];
 
-export type ByRole<T> = {
-  [role in Role]: T;
-};
+export type RoleMap = Map<Role, SquareSet>;
+export type ColorMap = Map<Color, SquareSet>;
+export type HandMap = Map<Role, number>;
 
 export interface Piece {
   role: Role;
   color: Color;
 }
 
+export type PieceName = `${Color} ${Role}`;
+
 export interface NormalMove {
   from: Square;
   to: Square;
   promotion?: boolean;
+  midStep?: Square;
 }
 
 export interface DropMove {
@@ -89,9 +120,27 @@ export function isNormal(v: Move): v is NormalMove {
   return 'from' in v;
 }
 
-export const RULES = ['standard', 'minishogi'] as const;
+export interface Setup {
+  board: Board;
+  hands: Hands;
+  turn: Color;
+  moveNumber: number;
+  lastMove:
+    | Move
+    | {
+        to: Square;
+      }
+    | undefined;
+  lastCapture: Piece | undefined;
+}
+
+export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kinglost'] as const;
+export type Result = typeof RESULTS[number];
+
+export const RULES = ['standard', 'minishogi', 'chushogi'] as const;
 export type Rules = typeof RULES[number];
 
 export interface Outcome {
+  result: Result;
   winner: Color | undefined;
 }

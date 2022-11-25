@@ -29,6 +29,13 @@ test('fromSquare', () => {
   }
 });
 
+test('fromSquares', () => {
+  expect(SquareSet.fromSquares()).toEqual(SquareSet.empty());
+  expect(SquareSet.fromSquares(-1, -2, 256, 257)).toEqual(SquareSet.empty());
+  expect(SquareSet.fromSquares(128)).toEqual(SquareSet.empty().with(128));
+  expect(SquareSet.fromSquares(...Array(256).keys())).toEqual(SquareSet.full());
+});
+
 test('fromRank', () => {
   expect(SquareSet.fromRank(0)).toEqual(new SquareSet([0xffff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]));
   expect(SquareSet.fromRank(1)).toEqual(new SquareSet([0xffff0000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]));
@@ -299,6 +306,13 @@ test('size', () => {
     squares = squares.without(i);
     expect(squares.size()).toBe(i);
   }
+});
+
+test('with/without many', () => {
+  expect(SquareSet.empty().withMany(0, 1, 2)).toEqual(SquareSet.empty().with(0).with(1).with(2));
+  expect(SquareSet.empty().with(0).with(1).with(2).withoutMany(0, 1, 2)).toEqual(SquareSet.empty());
+  expect(SquareSet.full().withoutMany(...Array(256).keys())).toEqual(SquareSet.empty());
+  expect(SquareSet.empty().withMany(...Array(256).keys())).toEqual(SquareSet.full());
 });
 
 test('first/last', () => {

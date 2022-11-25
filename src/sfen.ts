@@ -50,15 +50,19 @@ export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
   }
 }
 
-export function pieceToForsyth(rules: Rules, piece: Piece): string {
-  let r = roleToForsyth(rules)(piece.role)!;
-  if (piece.color === 'sente') r = r.toUpperCase();
-  return r;
+export function pieceToForsyth(rules: Rules): (piece: Piece) => string {
+  return piece => {
+    let r = roleToForsyth(rules)(piece.role)!;
+    if (piece.color === 'sente') r = r.toUpperCase();
+    return r;
+  };
 }
 
-export function forsythToPiece(rules: Rules, s: string): Piece | undefined {
-  const role = forsythToRole(rules)(s);
-  return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
+export function forsythToPiece(rules: Rules): (s: string) => Piece | undefined {
+  return s => {
+    const role = forsythToRole(rules)(s);
+    return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
+  };
 }
 
 function parseSmallUint(str: string): number | undefined {
@@ -98,7 +102,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
           return Result.err(new SfenError(InvalidSfen.BoardDims));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
         const square = parseCoordinates(file, rank)!,
-          piece = forsythToPiece(rules, c);
+          piece = forsythToPiece(rules)(c);
         if (!piece) return Result.err(new SfenError(InvalidSfen.BoardPiece));
         board.set(square, piece);
         empty = 0;
@@ -124,7 +128,7 @@ export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenE
         i++;
       }
     } else count = 1;
-    const piece = forsythToPiece(rules, handsPart[i]);
+    const piece = forsythToPiece(rules)(handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
     count += hands[piece.color].get(piece.role);
     hands[piece.color].set(piece.role, count);
@@ -193,7 +197,7 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
           sfen += empty;
           empty = 0;
         }
-        sfen += pieceToForsyth(rules, piece);
+        sfen += pieceToForsyth(rules)(piece);
       }
 
       if (file === 0) {

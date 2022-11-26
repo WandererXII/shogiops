@@ -1,5 +1,5 @@
 import { SquareSet } from '../squareSet.js';
-import { Role, Rules, Square } from '../types.js';
+import { Piece, Role, Rules, Square } from '../types.js';
 import { squareFile, squareRank } from '../util.js';
 import { Position } from '../variant/position.js';
 
@@ -211,7 +211,7 @@ export function roleToKanji(role: Role): string {
   }
 }
 
-export function roleToSingleKanji(role: Role): string {
+export function roleToBoardKanji(role: Role): string {
   switch (role) {
     case 'promotedlance':
       return '杏';
@@ -220,9 +220,25 @@ export function roleToSingleKanji(role: Role): string {
     case 'promotedsilver':
       return '全';
     case 'bishoppromoted':
-      return '角';
+      return '成角';
     case 'rookpromoted':
-      return '車';
+      return '成飛';
+    case 'queenpromoted':
+      return '成奔';
+    case 'verticalmoverpromoted':
+      return '成竪';
+    case 'sidemoverpromoted':
+      return '成横';
+    case 'elephantpromoted':
+      return '成象';
+    case 'lionpromoted':
+      return '成獅';
+    case 'horsepromoted':
+      return '成馬';
+    case 'dragonpromoted':
+      return '成龍';
+    case 'promotedpawn':
+      return '成歩';
     default:
       return roleToKanji(role);
   }
@@ -331,6 +347,8 @@ export function kanjiToRole(str: string): Role[] {
     case '金':
     case '金将':
       return ['gold', 'promotedpawn'];
+    case '成歩':
+      return ['promotedpawn'];
     case '角':
     case '角行':
       return ['bishop'];
@@ -355,11 +373,16 @@ export function kanjiToRole(str: string): Role[] {
     case '龍馬':
     case '竜馬':
       return ['horse', 'horsepromoted'];
+    case '成馬':
+      return ['horsepromoted'];
     case '龍':
     case '龍王':
     case '竜':
     case '竜王':
       return ['dragon', 'dragonpromoted'];
+    case '成龍':
+    case '成竜':
+      ['dragonpromoted'];
     case '玉':
     case '王':
     case '王将':
@@ -374,6 +397,8 @@ export function kanjiToRole(str: string): Role[] {
     case '象':
     case '醉象':
       return ['elephant', 'elephantpromoted'];
+    case '成象':
+      return ['elephantpromoted'];
     case '反':
     case '反車':
       return ['chariot'];
@@ -389,16 +414,25 @@ export function kanjiToRole(str: string): Role[] {
     case '横':
     case '横行':
       return ['sidemover', 'sidemoverpromoted'];
+    case '成横':
+      return ['sidemoverpromoted'];
     case '竪':
     case '竪行':
       return ['verticalmover', 'verticalmoverpromoted'];
+    case '成竪':
+      return ['verticalmoverpromoted'];
     case '獅':
     case '師':
     case '獅子':
       return ['lion', 'lionpromoted'];
+    case '成獅':
+    case '成師':
+      return ['lionpromoted'];
     case '奔':
     case '奔王':
       return ['queen', 'queenpromoted'];
+    case '成奔':
+      return ['queenpromoted'];
     case '仲':
     case '仲人':
       return ['gobetween'];
@@ -406,9 +440,11 @@ export function kanjiToRole(str: string): Role[] {
     case '白駒':
       return ['whitehorse'];
     case '小角':
+    case '成角':
       return ['bishoppromoted'];
     case '金飛車':
     case '金飛':
+    case '成飛':
       return ['rookpromoted'];
     case '太':
     case '太子':
@@ -504,6 +540,22 @@ export function csaToRole(str: string): Role | undefined {
     default:
       return undefined;
   }
+}
+
+export function filesByRules(rules: Rules): string {
+  switch (rules) {
+    case 'chushogi':
+      return '  １２ １１ １０  ９   ８   ７   ６   ５   ４   ３   ２   １';
+    case 'minishogi':
+      return '  ５ ４ ３ ２ １';
+    default:
+      return '  ９ ８ ７ ６ ５ ４ ３ ２ １';
+  }
+}
+
+export function pieceToBoardKanji(piece: Piece): string {
+  if (piece.color === 'gote') return 'v' + roleToBoardKanji(piece.role);
+  else return roleToBoardKanji(piece.role);
 }
 
 export function makeNumberSquare(sq: Square): string {

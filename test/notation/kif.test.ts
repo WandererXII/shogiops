@@ -55,7 +55,7 @@ test('make kif header from handicap position', () => {
 
 test('parse kif header with kif board', () => {
   const pos = parseSfen('standard', 'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1').unwrap();
-  const kifHeader = `後手の持駒：飛二 角二 金二 銀 桂 香三 歩十五 
+  const kifHeader = `後手の持駒：飛二 角二 金二 銀 桂 香三 歩十五
   ９ ８ ７ ６ ５ ４ ３ ２ １
 +---------------------------+
 |v香v桂 金 ・ ・ ・ ・ ・ ・|一
@@ -68,7 +68,7 @@ test('parse kif header with kif board', () => {
 | ・ ・ ・ ・ ・ ・ ・ 玉 ・|八
 | ・ ・ ・ ・ ・ ・ ・ ・ ・|九
 +---------------------------+
-先手の持駒：金 銀 
+先手の持駒：金 銀
 後手番`;
   const kifPos = parseKifHeader(kifHeader).unwrap();
   expect(kifPos).toEqual(pos);
@@ -188,4 +188,47 @@ test('parse tags', () => {
     ['先手', 'Sova'],
     ['後手', 'Raze'],
   ]);
+});
+
+test('parse chushogi kif header', () => {
+  // board takes precedence
+  const pos = parseSfen('chushogi', '12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b - 1').unwrap();
+  const kifHeader = `  １２ １１ １０  ９   ８   ７   ６   ５   ４   ３   ２   １
+  +------------------------------------------------------------+
+  |  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |一
+  |  ・   ・   ・   ・   ・   ・   ・   ・   ・   獅   獅   ・ |二
+  |  ・   ・   鷹   鷹   ・   ・   ・   ・   ・   ・   ・   ・ |三
+  |  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |四
+  |  ・   ・   ・   ・   ・   ・   ・   ・   ・ v成獅   ・   ・ |五
+  |  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |六
+  |  ・   ・   ・   ・   ・   獅   ・   ・   ・   獅   ・   ・ |七
+  |  ・   ・   ・   ・   ・  成獅   ・   ・   ・   ・   ・   ・ |八
+  |  ・   ・   ・   ・   ・   ・   ・   ・   ・   鷹   ・   ・ |九
+  |  ・   ・   鷹   ・   ・   ・   ・   ・   ・   ・   ・   ・ |十
+  |  ・   ・   鷹   ・   ・   ・   ・   ・   ・   鷹   ・   ・ |十一
+  |  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |十二
+  +------------------------------------------------------------+`;
+  const kifPos = parseKifHeader(kifHeader).unwrap();
+  expect(kifPos).toEqual(pos);
+});
+
+test('make kif header - chushogi', () => {
+  const pos = parseSfen('chushogi', '12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b - 1').unwrap();
+  expect(makeKifHeader(pos)).toEqual(
+    `  １２ １１ １０  ９   ８   ７   ６   ５   ４   ３   ２   １
++------------------------------------------------------------+
+|  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |一
+|  ・   ・   ・   ・   ・   ・   ・   ・   ・   獅   獅   ・ |二
+|  ・   ・   鷹   鷹   ・   ・   ・   ・   ・   ・   ・   ・ |三
+|  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |四
+|  ・   ・   ・   ・   ・   ・   ・   ・   ・ v成獅   ・   ・ |五
+|  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |六
+|  ・   ・   ・   ・   ・   獅   ・   ・   ・   獅   ・   ・ |七
+|  ・   ・   ・   ・   ・  成獅   ・   ・   ・   ・   ・   ・ |八
+|  ・   ・   ・   ・   ・   ・   ・   ・   ・   鷹   ・   ・ |九
+|  ・   ・   鷹   ・   ・   ・   ・   ・   ・   ・   ・   ・ |十
+|  ・   ・   鷹   ・   ・   ・   ・   ・   ・   鷹   ・   ・ |十一
+|  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |十二
++------------------------------------------------------------+`
+  );
 });

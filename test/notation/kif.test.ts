@@ -8,6 +8,7 @@ import {
 } from '../../src/notation/kif/kif';
 import { parseSfen } from '../../src/sfen';
 import { parseUsi } from '../../src/util';
+import { Chushogi } from '../../src/variant/chushogi';
 import { Shogi } from '../../src/variant/shogi';
 
 test('make kif header from some random position', () => {
@@ -231,4 +232,23 @@ test('make kif header - chushogi', () => {
 |  ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・   ・ |十二
 +------------------------------------------------------------+`
   );
+});
+
+test('make chushogi moves', () => {
+  const pos = Chushogi.default();
+  expect(makeKifMove(pos, parseUsi('7i7h')!)).toEqual('7八歩兵 （←7九）');
+  pos.play(parseUsi('7i7h')!);
+  expect(makeKifMove(pos, parseUsi('7d7e')!)).toEqual('7五歩兵 （←7四）');
+  pos.play(parseUsi('7d7e')!);
+  expect(makeKifMove(pos, parseUsi('7j7i6h')!)).toEqual(`一歩目 7九獅子 （←7十）
+二歩目 6八獅子 （←7九）`);
+});
+
+test('parse chushogi moves', () => {
+  expect(parseKifMoves(['57手目一歩目 ▲6六獅子 （←7七）', '57手目二歩目 ▲7七獅子（居食い） （←6六）'])).toEqual([
+    parseUsi('7g6f7g'),
+  ]);
+  expect(parseKifMove('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
+  expect(parseKifMove('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
+  expect(parseKifMove('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });

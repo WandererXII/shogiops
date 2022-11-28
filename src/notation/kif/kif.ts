@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
 import { Hand, Hands } from '../../hands.js';
 import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
-import { Color, Move, Rules, Square, isDrop } from '../../types.js';
+import { Color, Move, Rules, Square, isDrop, isNormal } from '../../types.js';
 import { defined, parseCoordinates } from '../../util.js';
 import { Position } from '../../variant/position.js';
 import { allRoles, dimensions, handRoles, promote } from '../../variant/util.js';
@@ -12,6 +12,7 @@ import {
   kanjiToNumber,
   kanjiToRole,
   makeJapaneseSquare,
+  makeJapaneseSquareHalf,
   makeNumberSquare,
   numberToKanji,
   parseJapaneseSquare,
@@ -222,6 +223,23 @@ export function normalizedKifLines(kif: string): string[] {
 // KIF MOVES
 //
 
+export const chushogiKifMoveRegex =
+  /((?:(?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,2})((?:（居食い）)|不成|成)?\s?[（|\(|←]*((?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|\)]/;
+function parseChushogiMove(kifMove: string, lastDest: Square | undefined = undefined): Move | undefined {
+  const match = kifMove.match(chushogiKifMoveRegex);
+  if (match) {
+    const dest = parseJapaneseSquare(match[1]) ?? lastDest;
+    if (!defined(dest)) return;
+
+    return {
+      from: parseJapaneseSquare(match[4])!,
+      to: dest,
+      promotion: match[3] === '成',
+    };
+  }
+  return;
+}
+
 export const kifMoveRegex =
   /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(玉|飛|龍|角|馬|金|銀|成銀|桂|成桂|香|成香|歩|と)(不成|成)?\(([1-9][1-9])\)/;
 export const kifDropRegex = /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(飛|角|金|銀|桂|香|歩)打/;
@@ -242,7 +260,7 @@ export function parseKifMove(kifMove: string, lastDest: Square | undefined = und
   } else {
     // Drop
     const match = kifMove.match(kifDropRegex);
-    if (!match || !match[1]) return;
+    if (!match || !match[1]) return parseChushogiMove(kifMove, lastDest);
 
     return {
       role: kanjiToRole(match[2])[0]!,
@@ -251,10 +269,23 @@ export function parseKifMove(kifMove: string, lastDest: Square | undefined = und
   }
 }
 
+function isLionDouble(kifMove: string | undefined): boolean {
+  const m = defined(kifMove) ? (kifMove || '').split('*')[0].trim() : '';
+  return m.includes('一歩目') || m.includes('二歩目');
+}
+
 export function parseKifMoves(kifMoves: string[], lastDest: Square | undefined = undefined): Move[] {
   const moves: Move[] = [];
-  for (const m of kifMoves) {
-    const move = parseKifMove(m, lastDest);
+  for (let i = 0; i < kifMoves.length; i++) {
+    const m = kifMoves[i];
+    let move: Move | undefined;
+    if (isLionDouble(m) && isLionDouble(kifMoves[i + 1])) {
+      const firstMove = parseChushogiMove(m),
+        secondMove = parseChushogiMove(kifMoves[++i]);
+      if (firstMove && secondMove && isNormal(firstMove) && isNormal(secondMove)) {
+        move = { from: firstMove.from, to: secondMove.to, midStep: firstMove.to, promotion: false };
+      }
+    } else move = parseKifMove(m, lastDest);
     if (!move) return moves;
     lastDest = move.to;
     moves.push(move);
@@ -264,12 +295,13 @@ export function parseKifMoves(kifMoves: string[], lastDest: Square | undefined =
 
 // Making kif formatted moves
 export function makeKifMove(pos: Position, move: Move, lastDest?: Square): string | undefined {
+  const ms = pos.rules === 'chushogi' ? makeJapaneseSquareHalf : makeJapaneseSquare;
   if (isDrop(move)) {
-    return makeJapaneseSquare(move.to) + roleToKanji(move.role) + '打';
+    return ms(move.to) + roleToKanji(move.role) + '打';
   } else {
     const sameSquareSymbol = pos.rules === 'chushogi' ? '仝' : '同　',
       sameDest = (lastDest ?? pos.lastMove?.to) === move.to,
-      moveDestStr = sameDest ? sameSquareSymbol : makeJapaneseSquare(move.to),
+      moveDestStr = sameDest ? sameSquareSymbol : ms(move.to),
       promStr = move.promotion ? '成' : '',
       role = pos.board.getRole(move.from);
     if (!role) return undefined;
@@ -277,20 +309,20 @@ export function makeKifMove(pos: Position, move: Move, lastDest?: Square): strin
       if (defined(move.midStep)) {
         const isIgui = move.to === move.from && pos.board.has(move.midStep),
           isJitto = move.to === move.from && !isIgui,
-          midDestStr = sameDest ? sameSquareSymbol : makeJapaneseSquare(move.midStep),
-          move1 = '一歩目 ' + midDestStr + roleToFullKanji(role) + ' （←' + makeJapaneseSquare(move.from) + '）',
+          midDestStr = sameDest ? sameSquareSymbol : ms(move.midStep),
+          move1 = '一歩目 ' + midDestStr + roleToFullKanji(role) + ' （←' + ms(move.from) + '）',
           move2 =
             '二歩目 ' +
             moveDestStr +
             roleToFullKanji(role) +
             (isIgui ? '（居食い）' : isJitto ? '(じっと)' : '') +
             ' （←' +
-            makeJapaneseSquare(move.midStep) +
+            ms(move.midStep) +
             '）';
 
-        return `${move1},${move2}`;
+        return `${move1}\n${move2}`;
       }
-      return moveDestStr + roleToFullKanji(role) + promStr + ' （←' + makeJapaneseSquare(move.from) + '）';
+      return moveDestStr + roleToFullKanji(role) + promStr + ' （←' + ms(move.from) + '）';
     } else return moveDestStr + roleToKanji(role) + promStr + '(' + makeNumberSquare(move.from) + ')';
   }
 }

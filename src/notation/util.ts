@@ -585,6 +585,10 @@ export function makeJapaneseSquare(sq: Square): string {
   );
 }
 
+export function makeJapaneseSquareHalf(sq: Square): string {
+  return (squareFile(sq) + 1).toString().split('').join('') + numberToKanji(squareRank(sq) + 1);
+}
+
 export function parseJapaneseSquare(str: string): Square | undefined {
   if (str.length < 2 || str.length > 4) return;
   const fileOffset = str.length === 2 || (str.length === 3 && str[1] === '十') ? 1 : 2,

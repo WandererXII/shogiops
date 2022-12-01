@@ -51,6 +51,6 @@ export function moveToSquareNames(move: Move): SquareName[] {
   return isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
 }
 
-export function checkSquareName(pos: Position): SquareName[] {
+export function checksSquareNames(pos: Position): SquareName[] {
   return pos.checkSquares().map(s => makeSquare(s));
 }

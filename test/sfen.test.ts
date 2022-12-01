@@ -66,4 +66,12 @@ test('chushogi sfen', () => {
   ).unwrap();
   expect(pos2.lastMove).toEqual({ to: parseSquare('5e') });
   expect(pos2.lastCapture).toEqual({ role: 'lion', color: 'sente' });
+
+  const pos3 = parseSfen(
+    'chushogi',
+    '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1'
+  ).unwrap();
+  expect(makeSfen(pos3)).toEqual(
+    '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1'
+  );
 });

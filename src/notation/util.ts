@@ -545,7 +545,7 @@ export function csaToRole(str: string): Role | undefined {
 export function filesByRules(rules: Rules): string {
   switch (rules) {
     case 'chushogi':
-      return '  １２ １１ １０  ９   ８   ７   ６   ５   ４   ３   ２   １';
+      return ' １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １';
     case 'minishogi':
       return '  ５ ４ ３ ２ １';
     default:

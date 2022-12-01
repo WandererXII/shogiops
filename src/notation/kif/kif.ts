@@ -57,10 +57,10 @@ export function makeKifPositionHeader(pos: Position): string {
 export function makeKifBoard(rules: Rules, board: Board): string {
   const dims = dimensions(rules),
     kifFiles = filesByRules(rules),
-    space = rules === 'chushogi' ? 5 : 3,
-    separator = '+' + '-'.repeat(dims.files * space) + '+',
+    space = rules === 'chushogi' ? 3 : 2,
+    separator = '+' + '-'.repeat(dims.files * (space + 1)) + '+',
     offset = dims.files - 1,
-    emptySquare = rules === 'chushogi' ? '  ・ ' : ' ・';
+    emptySquare = rules === 'chushogi' ? '  ・' : ' ・';
   let kifBoard = kifFiles + `\n${separator}\n`;
   for (let rank = 0; rank < dims.ranks; rank++) {
     for (let file = offset; file >= 0; file--) {
@@ -70,10 +70,7 @@ export function makeKifBoard(rules: Rules, board: Board): string {
         kifBoard += '|';
       }
       if (!piece) kifBoard += emptySquare;
-      else
-        kifBoard += pieceToBoardKanji(piece)
-          .padStart(space / 2 + 1)
-          .padEnd(space - 1);
+      else kifBoard += pieceToBoardKanji(piece).padStart(space);
 
       if (file === 0) kifBoard += '|' + numberToKanji(rank + 1) + '\n';
     }

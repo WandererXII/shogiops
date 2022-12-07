@@ -26,6 +26,9 @@ export function sfenToHandicapName(sfen: string): string | undefined {
     // minishogi
     case 'rbsgk/4p/5/P4/KGSBR b -':
       return '5五将棋';
+    // chushogi
+    case 'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b -':
+      return ''; // for default chushogi position we avoid any handicap name
     default:
       return undefined;
   }

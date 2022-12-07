@@ -39,7 +39,7 @@ export class KifError extends Error {}
 // Export
 export function makeKifHeader(pos: Position): string {
   const handicap = sfenToHandicapName(makeSfen(pos));
-  if (defined(handicap)) return '手合割：' + handicap;
+  if (defined(handicap)) return handicap ? '手合割：' + handicap : '';
   return makeKifPositionHeader(pos);
 }
 

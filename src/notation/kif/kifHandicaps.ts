@@ -37,8 +37,6 @@ export function sfenToHandicapName(sfen: string): string | undefined {
 // Importing more handicaps
 export function handicapNameToSfen(name: string): string | undefined {
   switch (name) {
-    case '平手':
-      return 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1';
     case '香落ち':
       return 'lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1';
     case '右香落ち':

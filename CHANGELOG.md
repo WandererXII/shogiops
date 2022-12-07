@@ -1,5 +1,13 @@
 # Changelog for shogiops
 
+## v0.10.1
+
+- `makeKifHeader` returns empty string for default chushogi position.
+- Remove '平手' from `handicapNameToSfen`
+- Change default minishogi kif handicap name to '5 五将棋'.
+- Rename `checkSquareName` to `checksSquareNames`.
+- Kif chushogi format tweaked - smaller.
+
 ## v0.10.0
 
 - Chushogi support added.

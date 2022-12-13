@@ -48,7 +48,11 @@ export function usiToSquareNames(usi: string): SquareName[] {
 }
 
 export function moveToSquareNames(move: Move): SquareName[] {
-  return isDrop(move) ? [makeSquare(move.to)] : [makeSquare(move.from), makeSquare(move.to)];
+  return isDrop(move)
+    ? [makeSquare(move.to)]
+    : defined(move.midStep)
+    ? [makeSquare(move.from), makeSquare(move.midStep), makeSquare(move.to)]
+    : [makeSquare(move.from), makeSquare(move.to)];
 }
 
 export function checksSquareNames(pos: Position): SquareName[] {

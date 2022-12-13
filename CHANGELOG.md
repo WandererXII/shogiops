@@ -1,5 +1,9 @@
 # Changelog for shogiops
 
+## v0.10.3
+
+- Fix `moveToSquareNames` to include midStep if it's present.
+
 ## v0.10.2
 
 - `makeKifHeader` returns empty string for default chushogi position.

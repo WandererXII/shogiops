@@ -125,12 +125,11 @@ export interface Setup {
   hands: Hands;
   turn: Color;
   moveNumber: number;
-  lastMove:
+  lastMove?:
     | Move
     | {
         to: Square;
-      }
-    | undefined;
+      };
   lastLionCapture?: Square; // by non-lion piece
 }
 

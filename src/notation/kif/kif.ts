@@ -128,7 +128,6 @@ export function parseKifPositionHeader(kif: string): Result<Position, KifError> 
             hands: Hands.from(sHand, gHand),
             turn,
             moveNumber: 1,
-            lastMove: undefined,
           },
           false
         )

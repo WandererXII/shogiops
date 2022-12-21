@@ -54,6 +54,8 @@ export function makeSquare(square: Square): SquareName {
   return (FILE_NAMES[squareFile(square)] + RANK_NAMES[squareRank(square)]) as SquareName;
 }
 
+export const lionRoles: Role[] = ['lion', 'lionpromoted'];
+
 // other roles can't be dropped with any current variant
 function parseUsiDropRole(ch: string): Role | undefined {
   switch (ch.toUpperCase()) {

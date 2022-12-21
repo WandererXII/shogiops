@@ -32,7 +32,7 @@ import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
 import { Color, Move, Outcome, Piece, Role, Setup, Square, isNormal } from '../types.js';
-import { defined, opposite, squareDist } from '../util.js';
+import { defined, lionRoles, opposite, squareDist } from '../util.js';
 import { Context, IllegalSetup, Position, PositionError } from './position.js';
 import { allRoles, dimensions, fullSquareSet } from './util.js';
 
@@ -139,22 +139,17 @@ export class Chushogi extends Position {
       oppLions = this.board.color(oppColor).intersect(this.board.roles('lion', 'lionpromoted'));
 
     // considers only the first step destinations, for second step - secondLionStepDests
-    if (piece.role === 'lion' || piece.role === 'lionpromoted') {
+    if (lionRoles.includes(piece.role)) {
       const neighbors = kingAttacks(square);
       // don't allow capture of a non-adjacent lion protected by an enemy piece
       for (const lion of pseudo.diff(neighbors).intersect(oppLions)) {
         if (this.squareAttackers(lion, oppColor, this.board.occupied.without(square)).nonEmpty())
           pseudo = pseudo.without(lion);
       }
-    } else if (
-      this.lastMove &&
-      this.lastCapture &&
-      (this.lastCapture.role === 'lion' || this.lastCapture.role === 'lionpromoted')
-    ) {
-      const lastDest = this.lastMove.to;
-      // can't recapture lion on another square (allow capturing lion form kirin promotion)
+    } else if (defined(this.lastLionCapture)) {
+      // can't recapture lion on another square (allow capturing lion on the same square from kirin promotion)
       for (const lion of oppLions.intersect(pseudo)) {
-        if (lion !== lastDest) pseudo = pseudo.without(lion);
+        if (lion !== this.lastLionCapture) pseudo = pseudo.without(lion);
       }
     }
 
@@ -314,7 +309,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
   const piece = before.board.get(initialSq);
   if (!piece || piece.color !== before.turn) return SquareSet.empty();
 
-  if (piece.role === 'lion' || piece.role === 'lionpromoted') {
+  if (lionRoles.includes(piece.role)) {
     if (!kingAttacks(initialSq).has(midSq)) return SquareSet.empty();
     let pseudoDests = kingAttacks(midSq)
       .diff(before.board.color(before.turn).without(initialSq))

@@ -156,12 +156,12 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   const handsPart = parts.shift();
   let hands = Result.ok(Hands.empty()),
     lastMove: Move | { to: Square } | undefined,
-    lastCapture: Piece | undefined;
+    lastLionCapture: Square | undefined;
   if (rules === 'chushogi') {
     const destSquare = defined(handsPart) ? parseSquare(handsPart) : undefined;
     if (defined(destSquare)) {
       lastMove = { to: destSquare };
-      lastCapture = { role: 'lion', color: turn };
+      lastLionCapture = destSquare;
     }
   } else if (defined(handsPart)) hands = parseHands(rules, handsPart);
 
@@ -176,7 +176,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
     hands.chain(hands =>
       initializePosition(
         rules,
-        { board, hands, turn, moveNumber: Math.max(1, moveNumber), lastMove, lastCapture },
+        { board, hands, turn, moveNumber: Math.max(1, moveNumber), lastMove, lastLionCapture },
         !!strict
       )
     )
@@ -228,9 +228,7 @@ export function makeHands(rules: Rules, hands: Hands): string {
 }
 
 function lastLionCapture(pos: Position): string {
-  if (pos.lastMove && (pos.lastCapture?.role === 'lion' || pos.lastCapture?.role === 'lionpromoted'))
-    return makeSquare(pos.lastMove.to);
-  else return '-';
+  return defined(pos.lastLionCapture) ? makeSquare(pos.lastLionCapture) : '-';
 }
 
 export function makeSfen(pos: Position): string {

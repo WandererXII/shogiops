@@ -131,7 +131,7 @@ export interface Setup {
         to: Square;
       }
     | undefined;
-  lastCapture: Piece | undefined;
+  lastLionCapture?: Square; // by non-lion piece
 }
 
 export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kinglost'] as const;

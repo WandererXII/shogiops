@@ -3,8 +3,8 @@ import { between, ray } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { COLORS, Color, Move, Outcome, Piece, PieceName, Rules, Setup, Square, isDrop } from '../types.js';
-import { defined, makePieceName, opposite } from '../util.js';
+import { COLORS, Color, Move, Outcome, Piece, PieceName, Rules, Setup, Square, isDrop, isNormal } from '../types.js';
+import { defined, lionRoles, makePieceName, opposite } from '../util.js';
 import { allRoles, fullSquareSet, handRoles, pieceCanPromote, pieceForcePromote, promote, unpromote } from './util.js';
 
 export enum IllegalSetup {
@@ -33,7 +33,7 @@ export abstract class Position {
   turn: Color;
   moveNumber: number;
   lastMove: Move | { to: Square } | undefined;
-  lastCapture: Piece | undefined;
+  lastLionCapture: Square | undefined; // by non-lion piece
 
   protected constructor(readonly rules: Rules) {}
 
@@ -60,7 +60,7 @@ export abstract class Position {
     this.turn = setup.turn;
     this.moveNumber = setup.moveNumber;
     this.lastMove = setup.lastMove;
-    this.lastCapture = setup.lastCapture;
+    this.lastLionCapture = setup.lastLionCapture;
   }
 
   clone(): this {
@@ -70,7 +70,7 @@ export abstract class Position {
     pos.turn = this.turn;
     pos.moveNumber = this.moveNumber;
     pos.lastMove = this.lastMove;
-    pos.lastCapture = this.lastCapture;
+    pos.lastLionCapture = this.lastLionCapture;
     return pos;
   }
 
@@ -273,23 +273,29 @@ export abstract class Position {
     this.moveNumber += 1;
     this.turn = opposite(turn);
     this.lastMove = move;
-    this.lastCapture = this.board.get(move.to);
+    this.lastLionCapture = undefined;
 
     if (isDrop(move)) {
       this.board.set(move.to, { role: move.role, color: turn });
       this.hands[turn].drop(move.role);
     } else {
-      const piece = this.board.take(move.from);
-      if (!piece) return;
+      const piece = this.board.take(move.from),
+        role = piece?.role;
+      if (!role) return;
+
       if (
         (move.promotion && pieceCanPromote(this.rules)(piece, move.from, move.to, this.board.get(move.to))) ||
         pieceForcePromote(this.rules)(piece, move.to)
       )
-        piece.role = promote(this.rules)(piece.role) || piece.role;
+        piece.role = promote(this.rules)(role) || role;
 
       const capture = this.board.set(move.to, piece),
         secondCapture = defined(move.midStep) ? this.board.take(move.midStep) : undefined;
-      if (capture) this.storeCapture(capture);
+      if (capture) {
+        if (!lionRoles.includes(role) && capture.color === this.turn && lionRoles.includes(capture.role))
+          this.lastLionCapture = move.to;
+        this.storeCapture(capture);
+      }
       if (defined(secondCapture)) this.storeCapture(secondCapture);
     }
   }

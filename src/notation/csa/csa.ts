@@ -77,10 +77,7 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
     defined(handicap) && !isWholeBoard ? parseCsaHandicap(handicap) : parseCsaBoard(lines.filter(l => /^P\d/.test(l)));
   const turn: Color = lines.some(l => l === '-') ? 'gote' : 'sente';
   return baseBoard.chain(board => {
-    return Shogi.from(
-      { board, hands: Hands.empty(), turn, moveNumber: 1, lastMove: undefined, lastCapture: undefined },
-      true
-    ).chain(pos =>
+    return Shogi.from({ board, hands: Hands.empty(), turn, moveNumber: 1, lastMove: undefined }, true).chain(pos =>
       parseAdditions(
         pos,
         lines.filter(l => /P[\+|-]/.test(l))

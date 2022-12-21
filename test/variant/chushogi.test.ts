@@ -83,6 +83,10 @@ test('lion moves', () => {
   expect(pos3.isLegal(parseUsi('7k7j8k')!)).toBe(true);
   expect(pos3.isLegal(parseUsi('11g11i')!)).toBe(true);
   expect(pos3.isLegal(parseUsi('11g11h11i')!)).toBe(true);
+
+  const pos4 = parseSfen('chushogi', '11k/12/12/10bm/9N2/12/5n6/6N5/5r6/12/9K2/12 b').unwrap();
+  pos4.play(parseUsi('6h7g')!);
+  expect(pos4.isLegal(parseUsi('2d3e')!)).toBe(true);
 });
 
 test('wiki lion moves', () => {
@@ -119,18 +123,23 @@ test('wiki lion moves', () => {
   expect(pos6.isLegal(parseUsi('6g6f6e')!)).toBe(false);
   expect(pos6.isLegal(parseUsi('6g7f')!)).toBe(true);
   expect(pos6.isLegal(parseUsi('6g7f8f')!)).toBe(true);
-  const pos7 = parseSfen('chushogi', '12/12/12/12/12/4r7/12/12/5o3n2/4N7/12/6B5 w').unwrap();
+  const pos7 = parseSfen('chushogi', '12/12/12/12/12/4r7/12/12/5o3n1n/4N6P/12/6B5 w - 1').unwrap();
   const pos7Alt = pos7.clone();
   const pos7Alt2 = pos7.clone();
+  const pos7Alt3 = pos7.clone();
   pos7.play(parseUsi('8f8j')!);
   pos7Alt.play(parseUsi('7i8j+')!);
   pos7Alt2.play(parseUsi('7i8j')!);
+  pos7Alt3.play(parseUsi('3i4i3i')!);
   expect(pos7.isLegal(parseUsi('6l8j')!)).toBe(true);
   expect(pos7.isLegal(parseUsi('6l3i')!)).toBe(false);
+  expect(pos7Alt.lastLionCapture).toBe(parseSquare('8j'));
   expect(pos7Alt.isLegal(parseUsi('6l8j')!)).toBe(true);
   expect(pos7Alt.isLegal(parseUsi('6l3i')!)).toBe(false);
   expect(pos7Alt2.isLegal(parseUsi('6l8j')!)).toBe(true);
   expect(pos7Alt2.isLegal(parseUsi('6l3i')!)).toBe(false);
+  expect(pos7Alt3.isLegal(parseUsi('6l3i')!)).toBe(true);
+  expect(pos7Alt3.isLegal(parseUsi('1j1i')!)).toBe(true);
   const pos8 = parseSfen('chushogi', '12/12/3l8/12/3b4+o3/6n5/4N7/6R5/7K4/12/12/12 b - 1').unwrap();
   expect(pos8.isLegal(parseUsi('8g6f')!)).toBe(false);
 });

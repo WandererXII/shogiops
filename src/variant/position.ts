@@ -3,7 +3,7 @@ import { between, ray } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { COLORS, Color, Move, Outcome, Piece, PieceName, Rules, Setup, Square, isDrop, isNormal } from '../types.js';
+import { COLORS, Color, Move, Outcome, Piece, PieceName, Rules, Setup, Square, isDrop } from '../types.js';
 import { defined, lionRoles, makePieceName, opposite } from '../util.js';
 import { allRoles, fullSquareSet, handRoles, pieceCanPromote, pieceForcePromote, promote, unpromote } from './util.js';
 

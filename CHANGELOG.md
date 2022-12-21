@@ -1,5 +1,11 @@
 # Changelog for shogiops
 
+## v0.11.0
+
+- Remove `lastCapture` and replace it with `lastLionCapture` that takes into account only lion captures by non-lion pieces.
+- Fix jitto being considered a capture.
+- Make lastMove and lastLionCapture in setup optional.
+
 ## v0.10.3
 
 - Fix `moveToSquareNames` to include midStep if it's present.

@@ -20,10 +20,10 @@ export const FILE_NAMES = [
   '15',
   '16',
 ] as const;
-export type FileName = typeof FILE_NAMES[number];
+export type FileName = (typeof FILE_NAMES)[number];
 
 export const RANK_NAMES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'] as const;
-export type RankName = typeof RANK_NAMES[number];
+export type RankName = (typeof RANK_NAMES)[number];
 
 export type Square = number;
 
@@ -31,7 +31,7 @@ export type SquareName = `${FileName}${RankName}`;
 
 export const COLORS = ['sente', 'gote'] as const;
 
-export type Color = typeof COLORS[number];
+export type Color = (typeof COLORS)[number];
 
 export interface Dimensions {
   ranks: number;
@@ -85,7 +85,7 @@ export const ROLES = [
   'eagle',
   'dragonpromoted',
 ] as const;
-export type Role = typeof ROLES[number];
+export type Role = (typeof ROLES)[number];
 
 export type RoleMap = Map<Role, SquareSet>;
 export type ColorMap = Map<Color, SquareSet>;
@@ -134,10 +134,10 @@ export interface Setup {
 }
 
 export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kinglost'] as const;
-export type Result = typeof RESULTS[number];
+export type Result = (typeof RESULTS)[number];
 
 export const RULES = ['standard', 'minishogi', 'chushogi'] as const;
-export type Rules = typeof RULES[number];
+export type Rules = (typeof RULES)[number];
 
 export interface Outcome {
   result: Result;

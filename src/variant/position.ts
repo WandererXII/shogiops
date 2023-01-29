@@ -86,14 +86,14 @@ export abstract class Position {
     for (const role of this.board.presentRoles())
       if (!allRoles(this.rules).includes(role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
 
-    if (this.board.pieces('sente', 'king').size() > 2 || this.board.pieces('gote', 'king').size() > 2)
-      return Result.err(new PositionError(IllegalSetup.Kings));
-
     const otherKing = this.kingsOf(opposite(this.turn)).singleSquare();
     if (defined(otherKing) && this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
     if (!strict) return Result.ok(undefined);
+
+    if (this.board.pieces('sente', 'king').size() >= 2 || this.board.pieces('gote', 'king').size() >= 2)
+      return Result.err(new PositionError(IllegalSetup.Kings));
 
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.board.role('king').isEmpty()) return Result.err(new PositionError(IllegalSetup.Kings));

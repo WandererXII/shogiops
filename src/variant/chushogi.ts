@@ -67,6 +67,14 @@ export class Chushogi extends Position {
 
     if (!strict) return Result.ok(undefined);
 
+    if (
+      this.board.pieces('sente', 'king').size() >= 2 ||
+      this.board.pieces('gote', 'king').size() >= 2 ||
+      this.board.pieces('sente', 'prince').size() >= 2 ||
+      this.board.pieces('gote', 'prince').size() >= 2
+    )
+      return Result.err(new PositionError(IllegalSetup.Kings));
+
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
     if (this.kingsOf('sente').isEmpty() || this.kingsOf('gote').isEmpty())
       return Result.err(new PositionError(IllegalSetup.Kings));

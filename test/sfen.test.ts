@@ -74,4 +74,7 @@ test('chushogi sfen', () => {
   expect(makeSfen(pos3)).toEqual(
     '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1'
   );
+
+  expect(parseSfen('chushogi', '12/12/7k3p/12/7K4/12/12/9+E2/12/3X8/12/12 b', true).isOk).toBe(true);
+  expect(parseSfen('chushogi', '12/12/7k3p/12/7K4/12/12/9K2/12/3X8/12/12 b', true).isOk).toBe(false);
 });

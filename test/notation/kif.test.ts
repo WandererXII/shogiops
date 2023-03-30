@@ -252,3 +252,26 @@ test('parse chushogi moves', () => {
   expect(parseKifMove('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
   expect(parseKifMove('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });
+
+test('parse kif header and board with annan handicap name', () => {
+  // board takes precedence
+  const pos = parseSfen('annan', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1').unwrap();
+  const kifHeader = `手合割：安南
+    後手の持駒：金四　銀二　香三　歩十三　
+  ９ ８ ７ ６ ５ ４ ３ ２ １
++---------------------------+
+| ・ ・ ・v桂 ・ ・ ・ ・ ・|一
+|v玉 角v歩 馬 ・ ・ ・ ・ ・|二
+| ・ ・ ・ ・ ・ ・ ・ ・ ・|三
+| 桂 ・ ・v歩 ・ ・ ・ ・ ・|四
+|vとv桂 ・ ・v歩 ・ ・ ・ ・|五
+| ・ ・ 飛 ・v全 ・ ・ ・ ・|六
+|v歩 桂 ・ ・ ・ ・ ・ ・ ・|七
+| ・ 香 ・ ・ ・ ・ ・ ・ ・|八
+| ・v銀 ・ ・ 龍 ・ ・ ・ ・|九
++---------------------------+
+先手の持駒：なし
+  `;
+  const kifPos = parseKifHeader(kifHeader).unwrap();
+  expect(kifPos).toEqual(pos);
+});

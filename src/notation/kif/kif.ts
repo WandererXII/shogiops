@@ -64,8 +64,8 @@ export function makeKifBoard(rules: Rules, board: Board): string {
   let kifBoard = kifFiles + `\n${separator}\n`;
   for (let rank = 0; rank < dims.ranks; rank++) {
     for (let file = offset; file >= 0; file--) {
-      const square = parseCoordinates(file, rank)!;
-      const piece = board.get(square);
+      const square = parseCoordinates(file, rank)!,
+        piece = board.get(square);
       if (file === offset) {
         kifBoard += '|';
       }
@@ -83,8 +83,8 @@ export function makeKifHand(rules: Rules, hand: Hand): string {
   if (hand.isEmpty()) return 'なし';
   return handRoles(rules)
     .map(role => {
-      const r = roleToKanji(role);
-      const n = hand.get(role);
+      const r = roleToKanji(role),
+        n = hand.get(role);
       return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
     })
     .filter(p => p.length > 0)
@@ -97,26 +97,28 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
   return parseKifPositionHeader(kif).unwrap(
     kifBoard => Result.ok(kifBoard),
     () => {
-      const handicap = lines.find(l => l.startsWith('手合割：'));
-      const hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : initialSfen('standard');
+      const handicap = lines.find(l => l.startsWith('手合割：')),
+        hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : '';
+
       if (!defined(hSfen)) return Result.err(new KifError(InvalidKif.Handicap));
-      const rules = detectVariant(hSfen.split('/').length);
-      return parseSfen(rules, hSfen);
+      const rules = detectVariant(hSfen.split('/').length, handicap || '');
+      return parseSfen(rules, hSfen || initialSfen(rules));
     }
   );
 }
 
-export function parseKifPositionHeader(kif: string): Result<Position, KifError> {
-  const lines = normalizedKifLines(kif);
-  const rules = detectVariant(lines.filter(l => l.startsWith('|')).length);
-  const goteHandStr = lines.find(l => l.startsWith('後手の持駒：'));
-  const senteHandStr = lines.find(l => l.startsWith('先手の持駒：'));
-  const turn = lines.some(l => l.startsWith('後手番')) ? 'gote' : 'sente';
+function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {
+  const lines = normalizedKifLines(kif),
+    handicap = lines.find(l => l.startsWith('手合割：')),
+    rules = rulesOpt || detectVariant(lines.filter(l => l.startsWith('|')).length, handicap || ''),
+    goteHandStr = lines.find(l => l.startsWith('後手の持駒：')),
+    senteHandStr = lines.find(l => l.startsWith('先手の持駒：')),
+    turn = lines.some(l => l.startsWith('後手番')) ? 'gote' : 'sente';
 
   const board: Result<Board, KifError> = parseKifBoard(rules, kif);
 
-  const goteHand = defined(goteHandStr) ? parseKifHand(rules, goteHandStr.split('：')[1]) : Result.ok(Hand.empty());
-  const senteHand = defined(senteHandStr) ? parseKifHand(rules, senteHandStr.split('：')[1]) : Result.ok(Hand.empty());
+  const goteHand = defined(goteHandStr) ? parseKifHand(rules, goteHandStr.split('：')[1]) : Result.ok(Hand.empty()),
+    senteHand = defined(senteHandStr) ? parseKifHand(rules, senteHandStr.split('：')[1]) : Result.ok(Hand.empty());
 
   return board.chain(board =>
     goteHand.chain(gHand =>
@@ -136,9 +138,10 @@ export function parseKifPositionHeader(kif: string): Result<Position, KifError> 
   );
 }
 
-function detectVariant(lines: number): Rules {
+function detectVariant(lines: number, tag: string): Rules {
   if (lines === 12) return 'chushogi';
   else if (lines === 5) return 'minishogi';
+  else if (tag.startsWith('手合割：安南')) return 'annan';
   else return 'standard';
 }
 
@@ -148,13 +151,13 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
   const board = Board.empty();
 
   const offset = lines.length - 1;
-  let file = offset;
-  let rank = 0;
+  let file = offset,
+    rank = 0;
 
   for (const l of lines) {
     file = offset;
-    let gote = false;
-    let prom = false;
+    let gote = false,
+      prom = false;
     for (const c of l) {
       switch (c) {
         case '・':
@@ -187,8 +190,8 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
 }
 
 export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifError> {
-  const hand = Hand.empty();
-  const pieces = handPart.replace(/　/g, ' ').trim().split(' ');
+  const hand = Hand.empty(),
+    pieces = handPart.replace(/　/g, ' ').trim().split(' ');
 
   if (handPart.includes('なし')) return Result.ok(hand);
   for (const piece of pieces) {

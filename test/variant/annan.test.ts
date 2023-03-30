@@ -78,16 +78,16 @@ test('drop', () => {
 
 test('promotions', () => {
   const pos = parseSfen('annan', '9/3PL4/2P5N/k6N1/g8/G8/K8/9/5L3 b - 1').unwrap();
-  expect(pos.isLegal(parseUsi('6b6a'))).toBe(true);
-  expect(pos.isLegal(parseUsi('6b6a+'))).toBe(true);
-  expect(pos.isLegal(parseUsi('5b5a'))).toBe(true);
-  expect(pos.isLegal(parseUsi('5b5a+'))).toBe(true);
-  expect(pos.isLegal(parseUsi('2d3b'))).toBe(true);
-  expect(pos.isLegal(parseUsi('2d3b+'))).toBe(true);
-  expect(pos.isLegal(parseUsi('1c2a'))).toBe(true);
-  expect(pos.isLegal(parseUsi('1c2a+'))).toBe(true);
-  expect(pos.isLegal(parseUsi('4i4a'))).toBe(true);
-  expect(pos.isLegal(parseUsi('4i4a+'))).toBe(true);
+  expect(pos.isLegal(parseUsi('6b6a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('6b6a+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5b5a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5b5a+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('2d3b')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('2d3b+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('1c2a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('1c2a+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('4i4a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('4i4a+')!)).toBe(true);
 });
 
 test('capture attacker move giver', () => {

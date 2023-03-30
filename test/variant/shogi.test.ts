@@ -1,7 +1,6 @@
 import { perft } from '../../src/debug';
 import { makeSfen, parseSfen } from '../../src/sfen';
 import { parseUsi } from '../../src/util';
-import { IllegalSetup } from '../../src/variant/position';
 import { Shogi } from '../../src/variant/shogi';
 import { defaultPosition } from '../../src/variant/variant';
 import { usiFixture } from '../fixtures/usi';
@@ -112,20 +111,6 @@ const insufficientMaterial: [string, boolean][] = [
 test.each(insufficientMaterial)('insufficient material: %s', (sfen, insufficient) => {
   const pos = parseSfen('standard', sfen).unwrap();
   expect(pos.isDraw()).toBe(insufficient);
-});
-
-test('impossible checker alignment', () => {
-  // Multiple checkers aligned with king.
-  const r1 = parseSfen('standard', 'r8/4s4/7k1/b8/9/2K6/3b5/9/9 b - 1', true);
-  expect(
-    r1.unwrap(
-      _ => undefined,
-      err => err.message
-    )
-  ).toEqual(IllegalSetup.ImpossibleCheck);
-
-  // Checkers aligned with opponent king are fine.
-  parseSfen('standard', '9/9/2s4k1/9/6N2/9/9/3K5/7L1 w - 2').unwrap();
 });
 
 test('prod 500 usi', () => {

@@ -40,9 +40,9 @@ export function parseCoordinates(file: number, rank: number): Square | undefined
   return;
 }
 
-export function parseSquare(str: SquareName): Square;
-export function parseSquare(str: string): Square | undefined;
-export function parseSquare(str: string): Square | undefined {
+export function parseSquareName(str: SquareName): Square;
+export function parseSquareName(str: string): Square | undefined;
+export function parseSquareName(str: string): Square | undefined {
   if (str.length !== 2 && str.length !== 3) return;
   const file = parseInt(str.slice(0, -1)) - 1,
     rank = str.slice(-1).charCodeAt(0) - 'a'.charCodeAt(0);
@@ -50,7 +50,7 @@ export function parseSquare(str: string): Square | undefined {
   return file + 16 * rank;
 }
 
-export function makeSquare(square: Square): SquareName {
+export function makeSquareName(square: Square): SquareName {
   return (FILE_NAMES[squareFile(square)] + RANK_NAMES[squareRank(square)]) as SquareName;
 }
 
@@ -85,14 +85,14 @@ export function parseUsi(str: string): Move | undefined {
   const dropMatch = str.match(usiDropRegex);
   if (dropMatch) {
     const role = parseUsiDropRole(dropMatch[1]),
-      to = parseSquare(dropMatch[2]);
+      to = parseSquareName(dropMatch[2]);
     if (defined(role) && defined(to)) return { role, to };
   }
   const moveMatch = str.match(usiMoveRegex);
   if (moveMatch) {
-    const from = parseSquare(moveMatch[1]),
-      midStep = moveMatch[2] ? parseSquare(moveMatch[2]) : undefined,
-      to = parseSquare(moveMatch[3]),
+    const from = parseSquareName(moveMatch[1]),
+      midStep = moveMatch[2] ? parseSquareName(moveMatch[2]) : undefined,
+      to = parseSquareName(moveMatch[3]),
       promotion = moveMatch[4] === '+' ? true : false;
     if (defined(from) && defined(to)) return { from, to, promotion, midStep };
   }
@@ -104,11 +104,11 @@ function makeUsiDropRole(role: Role): string {
 }
 
 export function makeUsi(move: Move): string {
-  if (isDrop(move)) return `${makeUsiDropRole(move.role).toUpperCase()}*${makeSquare(move.to)}`;
+  if (isDrop(move)) return `${makeUsiDropRole(move.role).toUpperCase()}*${makeSquareName(move.to)}`;
   return (
-    makeSquare(move.from) +
-    (defined(move.midStep) ? makeSquare(move.midStep) : '') +
-    makeSquare(move.to) +
+    makeSquareName(move.from) +
+    (defined(move.midStep) ? makeSquareName(move.midStep) : '') +
+    makeSquareName(move.to) +
     (move.promotion ? '+' : '')
   );
 }

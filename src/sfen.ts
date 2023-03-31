@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Board } from './board.js';
 import { Hand, Hands } from './hands.js';
 import { Color, Move, Piece, Role, Rules, Square } from './types.js';
-import { defined, makeSquare, parseCoordinates, parseSquare, toBW } from './util.js';
+import { defined, makeSquareName, parseCoordinates, parseSquareName, toBW } from './util.js';
 import { Position, PositionError } from './variant/position.js';
 import { dimensions, handRoles } from './variant/util.js';
 import { RulesTypeMap, initializePosition } from './variant/variant.js';
@@ -160,7 +160,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
     lastMove: Move | { to: Square } | undefined,
     lastLionCapture: Square | undefined;
   if (rules === 'chushogi') {
-    const destSquare = defined(handsPart) ? parseSquare(handsPart) : undefined;
+    const destSquare = defined(handsPart) ? parseSquareName(handsPart) : undefined;
     if (defined(destSquare)) {
       lastMove = { to: destSquare };
       lastLionCapture = destSquare;
@@ -230,7 +230,7 @@ export function makeHandsSfen(rules: Rules, hands: Hands): string {
 }
 
 function lastLionCapture(pos: Position): string {
-  return defined(pos.lastLionCapture) ? makeSquare(pos.lastLionCapture) : '-';
+  return defined(pos.lastLionCapture) ? makeSquareName(pos.lastLionCapture) : '-';
 }
 
 export function makeSfen(pos: Position): string {

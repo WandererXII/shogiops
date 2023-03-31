@@ -8,15 +8,15 @@ import {
 } from '../../src/notation/csa/csa';
 import { parseNumberSquare } from '../../src/notation/util';
 import { initialSfen, parseSfen } from '../../src/sfen';
-import { parseSquare, parseUsi } from '../../src/util';
+import { parseSquareName, parseUsi } from '../../src/util';
 import { Shogi } from '../../src/variant/shogi';
 
 test('parse csa square', () => {
-  expect(parseNumberSquare('11')).toEqual(parseSquare('1a'));
-  expect(parseNumberSquare('12')).toEqual(parseSquare('1b'));
-  expect(parseNumberSquare('66')).toEqual(parseSquare('6f'));
-  expect(parseNumberSquare('89')).toEqual(parseSquare('8i'));
-  expect(parseNumberSquare('99')).toEqual(parseSquare('9i'));
+  expect(parseNumberSquare('11')).toEqual(parseSquareName('1a'));
+  expect(parseNumberSquare('12')).toEqual(parseSquareName('1b'));
+  expect(parseNumberSquare('66')).toEqual(parseSquareName('6f'));
+  expect(parseNumberSquare('89')).toEqual(parseSquareName('8i'));
+  expect(parseNumberSquare('99')).toEqual(parseSquareName('9i'));
 });
 
 test('make csa header from starting position', () => {

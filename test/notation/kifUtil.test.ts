@@ -5,34 +5,34 @@ import {
   numberToKanji,
   parseJapaneseSquare,
 } from '../../src/notation/util';
-import { parseSquare } from '../../src/util';
+import { parseSquareName } from '../../src/util';
 
 test('parse kif square', () => {
-  expect(parseJapaneseSquare('１一')).toEqual(parseSquare('1a'));
-  expect(parseJapaneseSquare('1一')).toEqual(parseSquare('1a'));
-  expect(parseJapaneseSquare('６六')).toEqual(parseSquare('6f'));
-  expect(parseJapaneseSquare('6六')).toEqual(parseSquare('6f'));
-  expect(parseJapaneseSquare('９九')).toEqual(parseSquare('9i'));
-  expect(parseJapaneseSquare('9九')).toEqual(parseSquare('9i'));
-  expect(parseJapaneseSquare('10九')).toEqual(parseSquare('10i'));
-  expect(parseJapaneseSquare('11九')).toEqual(parseSquare('11i'));
-  expect(parseJapaneseSquare('1十')).toEqual(parseSquare('1j'));
-  expect(parseJapaneseSquare('11十')).toEqual(parseSquare('11j'));
-  expect(parseJapaneseSquare('1十一')).toEqual(parseSquare('1k'));
-  expect(parseJapaneseSquare('11十一')).toEqual(parseSquare('11k'));
-  expect(parseJapaneseSquare('10十二')).toEqual(parseSquare('10l'));
+  expect(parseJapaneseSquare('１一')).toEqual(parseSquareName('1a'));
+  expect(parseJapaneseSquare('1一')).toEqual(parseSquareName('1a'));
+  expect(parseJapaneseSquare('６六')).toEqual(parseSquareName('6f'));
+  expect(parseJapaneseSquare('6六')).toEqual(parseSquareName('6f'));
+  expect(parseJapaneseSquare('９九')).toEqual(parseSquareName('9i'));
+  expect(parseJapaneseSquare('9九')).toEqual(parseSquareName('9i'));
+  expect(parseJapaneseSquare('10九')).toEqual(parseSquareName('10i'));
+  expect(parseJapaneseSquare('11九')).toEqual(parseSquareName('11i'));
+  expect(parseJapaneseSquare('1十')).toEqual(parseSquareName('1j'));
+  expect(parseJapaneseSquare('11十')).toEqual(parseSquareName('11j'));
+  expect(parseJapaneseSquare('1十一')).toEqual(parseSquareName('1k'));
+  expect(parseJapaneseSquare('11十一')).toEqual(parseSquareName('11k'));
+  expect(parseJapaneseSquare('10十二')).toEqual(parseSquareName('10l'));
 });
 
 test('make kif destination square', () => {
-  expect(makeJapaneseSquare(parseSquare('1a'))).toEqual('１一');
-  expect(makeJapaneseSquare(parseSquare('6f'))).toEqual('６六');
-  expect(makeJapaneseSquare(parseSquare('9i'))).toEqual('９九');
+  expect(makeJapaneseSquare(parseSquareName('1a'))).toEqual('１一');
+  expect(makeJapaneseSquare(parseSquareName('6f'))).toEqual('６六');
+  expect(makeJapaneseSquare(parseSquareName('9i'))).toEqual('９九');
 });
 
 test('make kif origination square', () => {
-  expect(makeNumberSquare(parseSquare('1a'))).toEqual('11');
-  expect(makeNumberSquare(parseSquare('6f'))).toEqual('66');
-  expect(makeNumberSquare(parseSquare('9i'))).toEqual('99');
+  expect(makeNumberSquare(parseSquareName('1a'))).toEqual('11');
+  expect(makeNumberSquare(parseSquareName('6f'))).toEqual('66');
+  expect(makeNumberSquare(parseSquareName('9i'))).toEqual('99');
 });
 
 test('all squares', () => {

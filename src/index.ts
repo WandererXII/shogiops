@@ -30,12 +30,12 @@ export {
 
 export {
   defined,
-  makeSquare,
+  makeSquareName,
   makeUsi,
   makePieceName,
   opposite,
   parseCoordinates,
-  parseSquare,
+  parseSquareName,
   parseUsi,
   parsePieceName,
   squareFile,

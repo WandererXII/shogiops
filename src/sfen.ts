@@ -214,7 +214,7 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
   return sfen;
 }
 
-export function makeHand(rules: Rules, hand: Hand): string {
+export function makeHandSfen(rules: Rules, hand: Hand): string {
   return handRoles(rules)
     .map(role => {
       const r = roleToForsyth(rules)(role)!,
@@ -224,8 +224,8 @@ export function makeHand(rules: Rules, hand: Hand): string {
     .join('');
 }
 
-export function makeHands(rules: Rules, hands: Hands): string {
-  const handsStr = makeHand(rules, hands.color('sente')).toUpperCase() + makeHand(rules, hands.color('gote'));
+export function makeHandsSfen(rules: Rules, hands: Hands): string {
+  const handsStr = makeHandSfen(rules, hands.color('sente')).toUpperCase() + makeHandSfen(rules, hands.color('gote'));
   return handsStr === '' ? '-' : handsStr;
 }
 
@@ -237,7 +237,7 @@ export function makeSfen(pos: Position): string {
   return [
     makeBoardSfen(pos.rules, pos.board),
     toBW(pos.turn),
-    pos.rules === 'chushogi' ? lastLionCapture(pos) : makeHands(pos.rules, pos.hands),
+    pos.rules === 'chushogi' ? lastLionCapture(pos) : makeHandsSfen(pos.rules, pos.hands),
     Math.max(1, Math.min(pos.moveNumber, 9999)),
   ].join(' ');
 }

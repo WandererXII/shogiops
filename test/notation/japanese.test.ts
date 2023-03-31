@@ -83,3 +83,9 @@ test('中 amb resolution', () => {
   expect(makeJapaneseMove(pos2, parseUsi('5g5f')!)).toEqual('５六馬中');
   expect(makeJapaneseMove(pos2, parseUsi('6g5f')!)).toEqual('５六馬左');
 });
+
+test('annan resolution', () => {
+  const pos1 = parseSfen('annan', '9/k8/9/9/9/5GGG1/5G1G1/5N1N1/K8 b - 1').unwrap();
+  expect(makeJapaneseMove(pos1, parseUsi('2f3e')!)).toEqual('３五金右上');
+  expect(makeJapaneseMove(pos1, parseUsi('2g3e')!)).toEqual('３五金右跳');
+});

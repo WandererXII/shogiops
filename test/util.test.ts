@@ -39,7 +39,7 @@ test('parse usi', () => {
   expect(parseUsi('2h2c=')).toEqual({ from: 113, to: 33, promotion: false });
   expect(parseUsi('2h2c')).toEqual({ from: 113, to: 33, promotion: false });
   expect(parseUsi('P*1g')).toEqual({ role: 'pawn', to: 96 });
-  expect(parseUsi('Z*1g')).toBeUndefined;
+  expect(parseUsi('Z*1g')).toBeUndefined();
   expect(parseUsi('P*16a')).toEqual({ role: 'pawn', to: 15 });
   expect(parseUsi('P*16p')).toEqual({ role: 'pawn', to: 255 });
   expect(parseUsi('1a16p')).toEqual({ from: 0, to: 255, promotion: false });

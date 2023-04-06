@@ -102,6 +102,14 @@ test('pawn checkmate legality', () => {
   expect(skPos.isLegal(parseUsi('P*5b')!)).toBe(false);
 });
 
+test('mulitple checkers', () => {
+  const pos = parseSfen('standard', '9/9/2B3B2/9/4k4/9/2B3B2/9/8K w').unwrap();
+  expect(pos.isLegal(parseUsi('5e5d')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5e5f')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5e4e')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5e6e')!)).toBe(true);
+});
+
 const insufficientMaterial: [string, boolean][] = [
   ['lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1', false],
   ['9/4k4/9/9/9/9/9/4K4/9 b - 1', true],

@@ -41,38 +41,47 @@ export class Annan extends Position {
     ctx = ctx || this.ctx();
     const realPiece = this.board.get(square);
     if (!realPiece || realPiece.color !== ctx.color) return SquareSet.empty();
-    const piece = this.board.get(directlyBehind(realPiece.color, square)) || realPiece;
+    const pieceBehind = this.board.get(directlyBehind(realPiece.color, square));
 
-    let pseudo = attacks(piece, square, this.board.occupied);
+    let pseudo = attacks(pieceBehind?.color === realPiece.color ? pieceBehind : realPiece, square, this.board.occupied);
     pseudo = pseudo.diff(this.board.color(ctx.color));
 
     if (defined(ctx.king)) {
-      if (piece.role === 'king') {
+      const stdAttackers = standardSquareAttacks(ctx.king, opposite(ctx.color), this.board, this.board.occupied);
+      pseudo = pseudo.diff(ctx.color === 'sente' ? stdAttackers.shr256(16) : stdAttackers.shl256(16));
+      if (realPiece.role === 'king') {
         const occ = this.board.occupied.without(square);
         for (const to of pseudo) {
           const boardClone = this.board.clone();
           boardClone.take(to);
-          if (
-            this.squareAttackers(to, opposite(ctx.color), occ).nonEmpty() &&
-            standardSquareAttacks(to, opposite(ctx.color), annanAttackBoard(boardClone), occ).nonEmpty()
-          )
+          if (standardSquareAttacks(to, opposite(ctx.color), annanAttackBoard(boardClone), occ).nonEmpty())
             pseudo = pseudo.without(to);
         }
       } else {
         if (ctx.checkers.nonEmpty()) {
-          const checker = ctx.checkers.singleSquare();
-          if (!defined(checker)) return SquareSet.empty();
-          const checkerPiece = this.board.get(checker);
-          let moveGiver;
-          if (
-            checkerPiece &&
-            !attacks(checkerPiece, checker, this.board.occupied).has(ctx.king) &&
-            pseudo.has(directlyBehind(checkerPiece.color, checker))
-          )
-            moveGiver = directlyBehind(checkerPiece.color, checker);
+          if (ctx.checkers.size() > 2) return SquareSet.empty();
+          const singularChecker = ctx.checkers.singleSquare(),
+            moveGivers = (ctx.color === 'sente' ? ctx.checkers.shr256(16) : ctx.checkers.shl256(16)).intersect(pseudo);
 
-          pseudo = pseudo.intersect(between(checker, ctx.king).with(checker));
-          if (defined(moveGiver)) pseudo = pseudo.with(moveGiver);
+          if (defined(singularChecker))
+            pseudo = pseudo.intersect(between(singularChecker, ctx.king).with(singularChecker));
+          else pseudo = SquareSet.empty();
+
+          for (const moveGiver of moveGivers) {
+            const boardClone = this.board.clone();
+            boardClone.take(square);
+            boardClone.set(moveGiver, realPiece);
+            if (
+              standardSquareAttacks(
+                ctx.king,
+                opposite(ctx.color),
+                annanAttackBoard(boardClone),
+                boardClone.occupied
+              ).isEmpty()
+            ) {
+              pseudo = pseudo.with(moveGiver);
+            }
+          }
         }
 
         if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
@@ -119,7 +128,7 @@ export const directlyBehind = (color: Color, square: Square): Square => {
 };
 
 // Changes the pieces in front of other friendly piece to said pieces
-const annanAttackBoard = (board: Board): Board => {
+export const annanAttackBoard = (board: Board): Board => {
   const newBoard = Board.empty();
   for (const [sq, piece] of board) {
     const pieceBehind = board.get(directlyBehind(piece.color, sq)),

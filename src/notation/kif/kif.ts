@@ -101,7 +101,7 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
         hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : '';
 
       if (!defined(hSfen)) return Result.err(new KifError(InvalidKif.Handicap));
-      const rules = detectVariant(hSfen.split('/').length, handicap || '');
+      const rules = detectVariant(hSfen.split('/').length, handicap ?? '');
       return parseSfen(rules, hSfen || initialSfen(rules));
     }
   );
@@ -110,7 +110,7 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
 function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {
   const lines = normalizedKifLines(kif),
     handicap = lines.find(l => l.startsWith('手合割：')),
-    rules = rulesOpt || detectVariant(lines.filter(l => l.startsWith('|')).length, handicap || ''),
+    rules = rulesOpt ?? detectVariant(lines.filter(l => l.startsWith('|')).length, handicap ?? ''),
     goteHandStr = lines.find(l => l.startsWith('後手の持駒：')),
     senteHandStr = lines.find(l => l.startsWith('先手の持駒：')),
     turn = lines.some(l => l.startsWith('後手番')) ? 'gote' : 'sente';

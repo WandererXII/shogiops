@@ -17,9 +17,9 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
 - Attacks and rays using hyperbola quintessence
 - Read and write USI, Japanese, Western and Kitao-Kawasaki move notation
 - Read and write KIF and CSA notation
-- Currently two variants supported - shogi, minishogi. More to come later!
-- [Compatibility with lishogi](https://lishogi.org)
+- Currently supported variants - shogi, minishogi, chushogi and annan shogi. More to come later!
 - [Compatibility with shogiground](https://github.com/WandererXII/shogiground)
+- [Compatibility with lishogi](https://lishogi.org)
 
 [File an issue](https://github.com/WandererXII/shogiops/issues/new) to request more or report a bug.
 

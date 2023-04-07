@@ -1,8 +1,9 @@
 import { perft } from '../../src/debug';
-import { makeSfen, parseSfen } from '../../src/sfen';
+import { initialSfen, makeSfen, parseSfen } from '../../src/sfen';
 import { parseUsi } from '../../src/util';
 import { Shogi } from '../../src/variant/shogi';
 import { defaultPosition } from '../../src/variant/variant';
+import { perfts } from '../fixtures/perftStandard';
 import { usiFixture } from '../fixtures/usi';
 
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550&start=16
@@ -130,4 +131,12 @@ test('prod 500 usi', () => {
       pos.play(move);
     }
   }
+});
+
+test('randomly generated perfts - for consistency', () => {
+  perfts.forEach(p => {
+    const [sfen, depth, res] = p,
+      pos = parseSfen('standard', sfen || initialSfen('standard')).unwrap();
+    expect(perft(pos, depth, false)).toBe(res);
+  });
 });

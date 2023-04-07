@@ -1,5 +1,5 @@
 import { Result } from '@badrap/result';
-import { between, ray } from '../attacks.js';
+import { between } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
@@ -10,7 +10,6 @@ import { allRoles, fullSquareSet, handRoles, pieceCanPromote, pieceForcePromote,
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
-  ImpossibleCheck = 'ERR_IMPOSSIBLE_CHECK',
   PiecesOutsideBoard = 'ERR_PIECES_OUTSIDE_BOARD',
   InvalidPieces = 'ERR_INVALID_PIECE',
   InvalidPiecesHand = 'ERR_INVALID_PIECE_IN_HAND',
@@ -102,13 +101,6 @@ export abstract class Position {
       if (pieceForcePromote(this.rules)(piece, sq))
         return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
 
-    const ourKing = this.kingsOf(this.turn).singleSquare();
-    if (defined(ourKing)) {
-      // Multiple sliding checkers aligned with king.
-      const checkers = this.squareAttackers(ourKing, opposite(this.turn), this.board.occupied);
-      if (checkers.size() > 2 || (checkers.size() === 2 && ray(checkers.first()!, checkers.last()!).has(ourKing)))
-        return Result.err(new PositionError(IllegalSetup.ImpossibleCheck));
-    }
     return Result.ok(undefined);
   }
 

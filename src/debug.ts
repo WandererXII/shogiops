@@ -1,6 +1,6 @@
 import { SquareSet } from './squareSet.js';
 import { NormalMove, PieceName, Role, Square } from './types.js';
-import { makeSquare, makeUsi, parsePieceName } from './util.js';
+import { makeSquareName, makeUsi, parsePieceName } from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
 import { pieceCanPromote, pieceForcePromote } from './variant/util.js';
@@ -8,7 +8,7 @@ import { pieceCanPromote, pieceForcePromote } from './variant/util.js';
 export function moveDests(moveDests: Map<Square, SquareSet>): string {
   const lines = [];
   for (const [from, to] of moveDests) {
-    lines.push(`${makeSquare(from)}: ${Array.from(to, makeSquare).join(' ')}`);
+    lines.push(`${makeSquareName(from)}: ${Array.from(to, makeSquareName).join(' ')}`);
   }
   return lines.join('\n');
 }
@@ -16,7 +16,7 @@ export function moveDests(moveDests: Map<Square, SquareSet>): string {
 export function dropDests(dropDests: Map<PieceName, SquareSet>): string {
   const lines = [];
   for (const [pn, to] of dropDests) {
-    lines.push(`${pn}: ${Array.from(to, makeSquare).join(' ')}`);
+    lines.push(`${pn}: ${Array.from(to, makeSquareName).join(' ')}`);
   }
   return lines.join('\n');
 }

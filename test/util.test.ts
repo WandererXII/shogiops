@@ -1,4 +1,4 @@
-import { makePieceName, makeUsi, parsePieceName, parseSquare, parseUsi, squareFile, squareRank } from '../src/util';
+import { makePieceName, makeUsi, parsePieceName, parseSquareName, parseUsi, squareFile, squareRank } from '../src/util';
 import { usiFixture } from './fixtures/usi';
 
 test('square coordinates', () => {
@@ -22,14 +22,14 @@ test('square coordinates', () => {
 });
 
 test('parse squares', () => {
-  expect(parseSquare('1a')).toEqual(0);
-  expect(parseSquare('16a')).toEqual(15);
-  expect(parseSquare('1b')).toEqual(16);
-  expect(parseSquare('1c')).toEqual(32);
-  expect(parseSquare('3c')).toEqual(34);
-  expect(parseSquare('16o')).toEqual(239);
-  expect(parseSquare('1p')).toEqual(240);
-  expect(parseSquare('16p')).toEqual(255);
+  expect(parseSquareName('1a')).toEqual(0);
+  expect(parseSquareName('16a')).toEqual(15);
+  expect(parseSquareName('1b')).toEqual(16);
+  expect(parseSquareName('1c')).toEqual(32);
+  expect(parseSquareName('3c')).toEqual(34);
+  expect(parseSquareName('16o')).toEqual(239);
+  expect(parseSquareName('1p')).toEqual(240);
+  expect(parseSquareName('16p')).toEqual(255);
 });
 
 test('parse usi', () => {
@@ -39,7 +39,7 @@ test('parse usi', () => {
   expect(parseUsi('2h2c=')).toEqual({ from: 113, to: 33, promotion: false });
   expect(parseUsi('2h2c')).toEqual({ from: 113, to: 33, promotion: false });
   expect(parseUsi('P*1g')).toEqual({ role: 'pawn', to: 96 });
-  expect(parseUsi('Z*1g')).toBeUndefined;
+  expect(parseUsi('Z*1g')).toBeUndefined();
   expect(parseUsi('P*16a')).toEqual({ role: 'pawn', to: 15 });
   expect(parseUsi('P*16p')).toEqual({ role: 'pawn', to: 255 });
   expect(parseUsi('1a16p')).toEqual({ from: 0, to: 255, promotion: false });

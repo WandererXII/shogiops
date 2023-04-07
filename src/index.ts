@@ -30,12 +30,12 @@ export {
 
 export {
   defined,
-  makeSquare,
+  makeSquareName,
   makeUsi,
   makePieceName,
   opposite,
   parseCoordinates,
-  parseSquare,
+  parseSquareName,
   parseUsi,
   parsePieceName,
   squareFile,
@@ -56,6 +56,8 @@ export { Shogi } from './variant/shogi.js';
 export { Minishogi } from './variant/minishogi.js';
 
 export { Chushogi } from './variant/chushogi.js';
+
+export { Annan } from './variant/annan.js';
 
 export * as variant from './variant/variant.js';
 

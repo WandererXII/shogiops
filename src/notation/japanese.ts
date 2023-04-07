@@ -48,6 +48,16 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
     } else return undefined;
   }
 }
+const silverGoldRoles: Role[] = [
+  'gold',
+  'silver',
+  'promotedlance',
+  'promotedknight',
+  'promotedsilver',
+  'promotedpawn',
+  'tokin',
+];
+const majorRoles: Role[] = ['bishop', 'rook', 'horse', 'dragon'];
 
 function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, others: SquareSet): string {
   const myRank = squareRank(orig),
@@ -59,17 +69,19 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
   const movingUp = myRank > destRank,
     movingDown = myRank < destRank;
 
+  const jumpsButShouldnt =
+    rules === 'annan' &&
+    piece.role !== 'knight' &&
+    Math.abs(myFile - destFile) === 1 &&
+    Math.abs(myRank - destRank) === 2;
+
   // special case - gold-like/silver piece is moving directly forward
-  const sRoles: Role[] = [
-    'gold',
-    'silver',
-    'promotedlance',
-    'promotedknight',
-    'promotedsilver',
-    'promotedpawn',
-    'tokin',
-  ];
-  if (myFile === destFile && (piece.color === 'sente') === movingUp && sRoles.includes(piece.role)) return '直';
+  if (
+    myFile === destFile &&
+    (piece.color === 'sente') === movingUp &&
+    (silverGoldRoles.includes(piece.role) || (rules === 'annan' && majorRoles.includes(piece.role)))
+  )
+    return '直';
 
   // special case for lion moves on the same file
   if (
@@ -82,7 +94,7 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
 
   // is this the only piece moving in certain vertical direction (up, down, none - horizontally)
   if (![...others].map(squareRank).some(r => r < destRank === movingDown && r > destRank === movingUp))
-    return verticalDisambiguation(rules, piece, movingUp, movingDown);
+    return verticalDisambiguation(rules, piece, movingUp, movingDown, jumpsButShouldnt);
 
   const othersFiles = [...others].map(squareFile),
     rightest = othersFiles.reduce((prev, cur) => (prev < cur ? prev : cur)),
@@ -94,12 +106,13 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
 
   return (
     sideDisambiguation(piece, rightest >= myFile, leftest <= myFile) +
-    verticalDisambiguation(rules, piece, movingUp, movingDown)
+    verticalDisambiguation(rules, piece, movingUp, movingDown, jumpsButShouldnt)
   );
 }
 
-function verticalDisambiguation(rules: Rules, piece: Piece, up: boolean, down: boolean): string {
-  if (up === down) return '寄';
+function verticalDisambiguation(rules: Rules, piece: Piece, up: boolean, down: boolean, jumpOver: boolean): string {
+  if (jumpOver) return '跳';
+  else if (up === down) return '寄';
   else if ((piece.color === 'sente' && up) || (piece.color === 'gote' && down))
     return rules !== 'chushogi' && ['horse', 'dragon'].includes(piece.role) ? '行' : '上';
   else return '引';

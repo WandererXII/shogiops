@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Board } from './board.js';
 import { Hand, Hands } from './hands.js';
 import { Color, Move, Piece, Role, Rules, Square } from './types.js';
-import { defined, makeSquare, parseCoordinates, parseSquare, toBW } from './util.js';
+import { defined, makeSquareName, parseCoordinates, parseSquareName, toBW } from './util.js';
 import { Position, PositionError } from './variant/position.js';
 import { dimensions, handRoles } from './variant/util.js';
 import { RulesTypeMap, initializePosition } from './variant/variant.js';
@@ -23,6 +23,8 @@ export function initialSfen(rules: Rules): string {
       return 'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1';
     case 'minishogi':
       return 'rbsgk/4p/5/P4/KGSBR b - 1';
+    case 'annan':
+      return 'lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1';
     default:
       return 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1';
   }
@@ -158,7 +160,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
     lastMove: Move | { to: Square } | undefined,
     lastLionCapture: Square | undefined;
   if (rules === 'chushogi') {
-    const destSquare = defined(handsPart) ? parseSquare(handsPart) : undefined;
+    const destSquare = defined(handsPart) ? parseSquareName(handsPart) : undefined;
     if (defined(destSquare)) {
       lastMove = { to: destSquare };
       lastLionCapture = destSquare;
@@ -212,7 +214,7 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
   return sfen;
 }
 
-export function makeHand(rules: Rules, hand: Hand): string {
+export function makeHandSfen(rules: Rules, hand: Hand): string {
   return handRoles(rules)
     .map(role => {
       const r = roleToForsyth(rules)(role)!,
@@ -222,20 +224,20 @@ export function makeHand(rules: Rules, hand: Hand): string {
     .join('');
 }
 
-export function makeHands(rules: Rules, hands: Hands): string {
-  const handsStr = makeHand(rules, hands.color('sente')).toUpperCase() + makeHand(rules, hands.color('gote'));
+export function makeHandsSfen(rules: Rules, hands: Hands): string {
+  const handsStr = makeHandSfen(rules, hands.color('sente')).toUpperCase() + makeHandSfen(rules, hands.color('gote'));
   return handsStr === '' ? '-' : handsStr;
 }
 
 function lastLionCapture(pos: Position): string {
-  return defined(pos.lastLionCapture) ? makeSquare(pos.lastLionCapture) : '-';
+  return defined(pos.lastLionCapture) ? makeSquareName(pos.lastLionCapture) : '-';
 }
 
 export function makeSfen(pos: Position): string {
   return [
     makeBoardSfen(pos.rules, pos.board),
     toBW(pos.turn),
-    pos.rules === 'chushogi' ? lastLionCapture(pos) : makeHands(pos.rules, pos.hands),
+    pos.rules === 'chushogi' ? lastLionCapture(pos) : makeHandsSfen(pos.rules, pos.hands),
     Math.max(1, Math.min(pos.moveNumber, 9999)),
   ].join(' ');
 }

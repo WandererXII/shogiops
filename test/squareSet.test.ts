@@ -317,7 +317,7 @@ test('with/without many', () => {
 
 test('first/last', () => {
   let squares = SquareSet.empty();
-  expect(squares.last()).toBeUndefined;
+  expect(squares.last()).toBeUndefined();
   for (let i = 0; i < 256; i++) {
     squares = squares.with(i);
     expect(squares.first()).toBe(0);
@@ -374,7 +374,7 @@ test('single square', () => {
   expect(new SquareSet([0x01, 0x0, 0x0, 0x0, 0x01, 0x0, 0x0, 0x0]).isSingleSquare()).toBe(false);
   expect(new SquareSet([0x07, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).isSingleSquare()).toBe(false);
   expect(new SquareSet([0x01, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).singleSquare()).toBe(0);
-  expect(new SquareSet([0x07, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).singleSquare()).toBeUndefined;
+  expect(new SquareSet([0x07, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).singleSquare()).toBeUndefined();
 });
 
 test('iterators', () => {

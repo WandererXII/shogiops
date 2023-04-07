@@ -1,6 +1,6 @@
 import { perft } from '../../src/debug';
 import { initialSfen, parseSfen } from '../../src/sfen';
-import { opposite, parseSquare, parseUsi } from '../../src/util';
+import { opposite, parseSquareName, parseUsi } from '../../src/util';
 import { perfts } from '../fixtures/perftChushogi';
 
 test('valid promotions', () => {
@@ -24,7 +24,7 @@ test('valid promotions', () => {
 
 test('lion moves', () => {
   const pos = parseSfen('chushogi', '12/12/12/12/12/6+O5/12/12/12/12/12/12 b').unwrap();
-  expect(pos.moveDests(parseSquare('6f')).size()).toBe(24);
+  expect(pos.moveDests(parseSquareName('6f')).size()).toBe(24);
   // 1 step, 0 dist move
   expect(pos.isLegal(parseUsi('6f6f')!)).toBe(false);
   // 1 step, 1 dist move
@@ -133,7 +133,7 @@ test('wiki lion moves', () => {
   pos7Alt3.play(parseUsi('3i4i3i')!);
   expect(pos7.isLegal(parseUsi('6l8j')!)).toBe(true);
   expect(pos7.isLegal(parseUsi('6l3i')!)).toBe(false);
-  expect(pos7Alt.lastLionCapture).toBe(parseSquare('8j'));
+  expect(pos7Alt.lastLionCapture).toBe(parseSquareName('8j'));
   expect(pos7Alt.isLegal(parseUsi('6l8j')!)).toBe(true);
   expect(pos7Alt.isLegal(parseUsi('6l3i')!)).toBe(false);
   expect(pos7Alt2.isLegal(parseUsi('6l8j')!)).toBe(true);

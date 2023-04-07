@@ -41,32 +41,11 @@ export class Shogi extends Position {
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
-    const defender = opposite(attacker),
-      board = this.board;
-    return board.color(attacker).intersect(
-      rookAttacks(square, occupied)
-        .intersect(board.roles('rook', 'dragon'))
-        .union(bishopAttacks(square, occupied).intersect(board.roles('bishop', 'horse')))
-        .union(lanceAttacks(square, defender, occupied).intersect(board.role('lance')))
-        .union(knightAttacks(square, defender).intersect(board.role('knight')))
-        .union(silverAttacks(square, defender).intersect(board.role('silver')))
-        .union(
-          goldAttacks(square, defender).intersect(
-            board.roles('gold', 'tokin', 'promotedlance', 'promotedknight', 'promotedsilver')
-          )
-        )
-        .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-        .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse')))
-    );
+    return standardSquareAttacks(square, attacker, this.board, occupied);
   }
 
   squareSnipers(square: number, attacker: Color): SquareSet {
-    const empty = SquareSet.empty();
-    return rookAttacks(square, empty)
-      .intersect(this.board.roles('rook', 'dragon'))
-      .union(bishopAttacks(square, empty).intersect(this.board.roles('bishop', 'horse')))
-      .union(lanceAttacks(square, opposite(attacker), empty).intersect(this.board.role('lance')))
-      .intersect(this.board.color(attacker));
+    return standardSquareSnipers(square, attacker, this.board);
   }
 
   dropDests(piece: Piece, ctx?: Context): SquareSet {
@@ -95,6 +74,39 @@ export const standardBoard = (): Board => {
     ['king', new SquareSet([0x10, 0x0, 0x0, 0x0, 0x10, 0x0, 0x0, 0x0])],
   ];
   return Board.from(occupied, colorIter, roleIter);
+};
+
+export const standardSquareAttacks = (
+  square: Square,
+  attacker: Color,
+  board: Board,
+  occupied: SquareSet
+): SquareSet => {
+  const defender = opposite(attacker);
+  return board.color(attacker).intersect(
+    rookAttacks(square, occupied)
+      .intersect(board.roles('rook', 'dragon'))
+      .union(bishopAttacks(square, occupied).intersect(board.roles('bishop', 'horse')))
+      .union(lanceAttacks(square, defender, occupied).intersect(board.role('lance')))
+      .union(knightAttacks(square, defender).intersect(board.role('knight')))
+      .union(silverAttacks(square, defender).intersect(board.role('silver')))
+      .union(
+        goldAttacks(square, defender).intersect(
+          board.roles('gold', 'tokin', 'promotedlance', 'promotedknight', 'promotedsilver')
+        )
+      )
+      .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
+      .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse')))
+  );
+};
+
+export const standardSquareSnipers = (square: number, attacker: Color, board: Board): SquareSet => {
+  const empty = SquareSet.empty();
+  return rookAttacks(square, empty)
+    .intersect(board.roles('rook', 'dragon'))
+    .union(bishopAttacks(square, empty).intersect(board.roles('bishop', 'horse')))
+    .union(lanceAttacks(square, opposite(attacker), empty).intersect(board.role('lance')))
+    .intersect(board.color(attacker));
 };
 
 export const standardMoveDests = (pos: Position, square: Square, ctx?: Context): SquareSet => {

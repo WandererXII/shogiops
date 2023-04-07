@@ -1,5 +1,5 @@
 import { Move, PieceName, SquareName, isDrop } from './types.js';
-import { defined, makeSquare, parseSquare, parseUsi } from './util.js';
+import { defined, makeSquareName, parseSquareName, parseUsi } from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
 
@@ -8,8 +8,8 @@ export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[
     ctx = pos.ctx();
   for (const [from, squares] of pos.allMoveDests(ctx)) {
     if (squares.nonEmpty()) {
-      const d = Array.from(squares, s => makeSquare(s));
-      result.set(makeSquare(from), d);
+      const d = Array.from(squares, s => makeSquareName(s));
+      result.set(makeSquareName(from), d);
     }
   }
   return result;
@@ -20,7 +20,7 @@ export function shogigroundDropDests(pos: Position): Map<PieceName, SquareName[]
     ctx = pos.ctx();
   for (const [pieceName, squares] of pos.allDropDests(ctx)) {
     if (squares.nonEmpty()) {
-      const d = Array.from(squares, s => makeSquare(s));
+      const d = Array.from(squares, s => makeSquareName(s));
       result.set(pieceName, d);
     }
   }
@@ -34,10 +34,10 @@ export function shogigroundSecondLionStep(
   midSq: SquareName
 ): Map<SquareName, SquareName[]> {
   const result: Map<SquareName, SquareName[]> = new Map(),
-    squares = secondLionStepDests(before, parseSquare(initialSq), parseSquare(midSq));
+    squares = secondLionStepDests(before, parseSquareName(initialSq), parseSquareName(midSq));
   if (squares.nonEmpty()) {
-    const d = Array.from(squares, s => makeSquare(s));
-    result.set(makeSquare(parseSquare(midSq)), d);
+    const d = Array.from(squares, s => makeSquareName(s));
+    result.set(makeSquareName(parseSquareName(midSq)), d);
   }
   return result;
 }
@@ -49,12 +49,12 @@ export function usiToSquareNames(usi: string): SquareName[] {
 
 export function moveToSquareNames(move: Move): SquareName[] {
   return isDrop(move)
-    ? [makeSquare(move.to)]
+    ? [makeSquareName(move.to)]
     : defined(move.midStep)
-    ? [makeSquare(move.from), makeSquare(move.midStep), makeSquare(move.to)]
-    : [makeSquare(move.from), makeSquare(move.to)];
+    ? [makeSquareName(move.from), makeSquareName(move.midStep), makeSquareName(move.to)]
+    : [makeSquareName(move.from), makeSquareName(move.to)];
 }
 
 export function checksSquareNames(pos: Position): SquareName[] {
-  return pos.checkSquares().map(s => makeSquare(s));
+  return pos.checkSquares().map(s => makeSquareName(s));
 }

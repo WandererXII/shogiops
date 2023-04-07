@@ -1,7 +1,6 @@
 import { perft } from '../../src/debug';
 import { makeSfen, parseSfen } from '../../src/sfen';
 import { parseUsi } from '../../src/util';
-import { IllegalSetup } from '../../src/variant/position';
 import { Shogi } from '../../src/variant/shogi';
 import { defaultPosition } from '../../src/variant/variant';
 import { usiFixture } from '../fixtures/usi';
@@ -103,6 +102,14 @@ test('pawn checkmate legality', () => {
   expect(skPos.isLegal(parseUsi('P*5b')!)).toBe(false);
 });
 
+test('mulitple checkers', () => {
+  const pos = parseSfen('standard', '9/9/2B3B2/9/4k4/9/2B3B2/9/8K w').unwrap();
+  expect(pos.isLegal(parseUsi('5e5d')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5e5f')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5e4e')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5e6e')!)).toBe(true);
+});
+
 const insufficientMaterial: [string, boolean][] = [
   ['lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1', false],
   ['9/4k4/9/9/9/9/9/4K4/9 b - 1', true],
@@ -112,20 +119,6 @@ const insufficientMaterial: [string, boolean][] = [
 test.each(insufficientMaterial)('insufficient material: %s', (sfen, insufficient) => {
   const pos = parseSfen('standard', sfen).unwrap();
   expect(pos.isDraw()).toBe(insufficient);
-});
-
-test('impossible checker alignment', () => {
-  // Multiple checkers aligned with king.
-  const r1 = parseSfen('standard', 'r8/4s4/7k1/b8/9/2K6/3b5/9/9 b - 1', true);
-  expect(
-    r1.unwrap(
-      _ => undefined,
-      err => err.message
-    )
-  ).toEqual(IllegalSetup.ImpossibleCheck);
-
-  // Checkers aligned with opponent king are fine.
-  parseSfen('standard', '9/9/2s4k1/9/6N2/9/9/3K5/7L1 w - 2').unwrap();
 });
 
 test('prod 500 usi', () => {

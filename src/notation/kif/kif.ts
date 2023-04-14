@@ -1,5 +1,6 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
+import { findHandicap } from '../../handicaps.js';
 import { Hand, Hands } from '../../hands.js';
 import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
 import { Color, Move, Rules, Square, isDrop, isNormal } from '../../types.js';
@@ -21,7 +22,6 @@ import {
   roleToFullKanji,
   roleToKanji,
 } from '../util.js';
-import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps.js';
 
 //
 // KIF HEADER
@@ -30,7 +30,6 @@ import { handicapNameToSfen, sfenToHandicapName } from './kifHandicaps.js';
 export enum InvalidKif {
   Kif = 'ERR_KIF',
   Board = 'ERR_BOARD',
-  Handicap = 'ERR_HANDICAP',
   Hands = 'ERR_HANDS',
 }
 
@@ -38,13 +37,16 @@ export class KifError extends Error {}
 
 // Export
 export function makeKifHeader(pos: Position): string {
-  const handicap = sfenToHandicapName(makeSfen(pos));
-  if (defined(handicap)) return handicap ? '手合割：' + handicap : '';
+  const sfen = makeSfen(pos),
+    handicap = pos.rules === 'standard' ? findHandicap({ sfen, rules: pos.rules }) : undefined;
+  if (sfen === initialSfen(pos.rules)) return '手合割：' + defaultHandicap(pos.rules);
+  else if (handicap) return '手合割：' + handicap.japaneseName;
   return makeKifPositionHeader(pos);
 }
 
 export function makeKifPositionHeader(pos: Position): string {
   return [
+    pos.rules === 'annan' ? '手合割：' + defaultHandicap(pos.rules) : '', // not sure about this, but we need something to indicate the variant
     pos.rules !== 'chushogi' ? '後手の持駒：' + makeKifHand(pos.rules, pos.hands.color('gote')) : '',
     makeKifBoard(pos.rules, pos.board),
     pos.rules !== 'chushogi' ? '先手の持駒：' + makeKifHand(pos.rules, pos.hands.color('sente')) : '',
@@ -91,26 +93,39 @@ export function makeKifHand(rules: Rules, hand: Hand): string {
     .join(' ');
 }
 
+function defaultHandicap(rules: Rules): string {
+  switch (rules) {
+    case 'minishogi':
+      return '5五将棋';
+    case 'chushogi':
+      return '';
+    case 'annan':
+      return '安南将棋';
+    default:
+      return '平手';
+  }
+}
+
 // Import
 export function parseKifHeader(kif: string): Result<Position, KifError> {
   const lines = normalizedKifLines(kif);
   return parseKifPositionHeader(kif).unwrap(
-    kifBoard => Result.ok(kifBoard),
+    pos => Result.ok(pos),
     () => {
-      const handicap = lines.find(l => l.startsWith('手合割：')),
-        hSfen = defined(handicap) ? handicapNameToSfen(handicap.split('：')[1]) : '';
+      const handicapTag = lines.find(l => l.startsWith('手合割：')),
+        handicap = defined(handicapTag) ? findHandicap({ japaneseName: handicapTag.split('：')[1] }) : undefined;
 
-      if (!defined(hSfen)) return Result.err(new KifError(InvalidKif.Handicap));
-      const rules = detectVariant(hSfen.split('/').length, handicap ?? '');
-      return parseSfen(rules, hSfen || initialSfen(rules));
+      const hSfen = handicap?.sfen,
+        rules = detectVariant(hSfen?.split('/').length, handicapTag);
+      return parseSfen(rules, hSfen ?? initialSfen(rules));
     }
   );
 }
 
 function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {
   const lines = normalizedKifLines(kif),
-    handicap = lines.find(l => l.startsWith('手合割：')),
-    rules = rulesOpt ?? detectVariant(lines.filter(l => l.startsWith('|')).length, handicap ?? ''),
+    handicapTag = lines.find(l => l.startsWith('手合割：')),
+    rules = rulesOpt ?? detectVariant(lines.filter(l => l.startsWith('|')).length, handicapTag),
     goteHandStr = lines.find(l => l.startsWith('後手の持駒：')),
     senteHandStr = lines.find(l => l.startsWith('先手の持駒：')),
     turn = lines.some(l => l.startsWith('後手番')) ? 'gote' : 'sente';
@@ -138,10 +153,10 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
   );
 }
 
-function detectVariant(lines: number, tag: string): Rules {
+function detectVariant(lines: number | undefined, tag: string | undefined): Rules {
   if (lines === 12) return 'chushogi';
   else if (lines === 5) return 'minishogi';
-  else if (tag.startsWith('手合割：安南')) return 'annan';
+  else if (defined(tag) && tag.startsWith('手合割：安南')) return 'annan';
   else return 'standard';
 }
 

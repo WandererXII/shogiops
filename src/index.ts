@@ -26,6 +26,7 @@ export {
   Rules,
   RULES,
   Outcome,
+  Handicap,
 } from './types.js';
 
 export {
@@ -71,9 +72,9 @@ export * as debug from './debug.js';
 
 export * as sfen from './sfen.js';
 
-export * as handicaps from './notation/kif/kifHandicaps.js';
-
 export * as hands from './hands.js';
+
+export * as handicaps from './handicaps.js';
 
 export * as japanese from './notation/japanese.js';
 

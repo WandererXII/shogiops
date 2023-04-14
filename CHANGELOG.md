@@ -1,12 +1,17 @@
 # Changelog for shogiops
 
+## v0.13.0
+
+- Added `handicaps`, `findHandicaps`, `findHandicap` and `isHandicap` in file `handicaps.ts` for various variants, replaces `kif/kifHandicaps.ts`, which was removed.
+- Varioud changes/fixes for kif of non-standard positions - hard to find any _standardized_ way of handling this.
+
 ## v0.12.0
 
-- Add new variant support Annan shogi
-- Rename `makeHand` and `makeHands` to `makeHandSfen` and `makeHandsSfen` respectively
-- Rename `makeSquare` to `makeSquare`
-- Rename `parseSquare` to `parseSquareNane`
-- No longer validate impossible check position (`ERR_IMPOSSIBLE_CHECK`), these positions are now considered valid, they can't happen in a real game, but no reason to prevent them altogether
+- Add new variant support Annan shogi.
+- Rename `makeHand` and `makeHands` to `makeHandSfen` and `makeHandsSfen` respectively.
+- Rename `makeSquare` to `makeSquareName`.
+- Rename `parseSquare` to `parseSquareName`.
+- No longer validate impossible check position (`ERR_IMPOSSIBLE_CHECK`), these positions are now considered valid, they can't happen in a real game, but no reason to prevent them altogether.
 
 ## v0.11.0
 

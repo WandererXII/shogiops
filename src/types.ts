@@ -143,3 +143,10 @@ export interface Outcome {
   result: Result;
   winner: Color | undefined;
 }
+
+export interface Handicap {
+  rules: Rules;
+  sfen: string;
+  japaneseName: string;
+  englishName: string;
+}

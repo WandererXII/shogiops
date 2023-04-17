@@ -136,7 +136,7 @@ export interface Setup {
 export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kinglost'] as const;
 export type Result = (typeof RESULTS)[number];
 
-export const RULES = ['standard', 'minishogi', 'chushogi', 'annan'] as const;
+export const RULES = ['standard', 'minishogi', 'chushogi', 'annan', 'kyotoshogi'] as const;
 export type Rules = (typeof RULES)[number];
 
 export interface Outcome {

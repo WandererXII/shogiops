@@ -17,6 +17,8 @@ export function pieceCanPromote(
               squareRank(to) === (piece.color === 'sente' ? 0 : dimensions(rules).ranks - 1)))
         );
       };
+    case 'kyotoshogi':
+      return () => false;
     default:
       return (piece: Piece, from: Square, to: Square) =>
         promotableRoles(rules).includes(piece.role) &&
@@ -28,6 +30,8 @@ export function pieceForcePromote(rules: Rules): (piece: Piece, sq: Square) => b
     case 'chushogi':
     case 'annan':
       return () => false;
+    case 'kyotoshogi':
+      return () => true;
     default:
       return (piece: Piece, sq: Square) => {
         const dims = dimensions(rules),
@@ -41,6 +45,15 @@ export function pieceForcePromote(rules: Rules): (piece: Piece, sq: Square) => b
           );
         else return false;
       };
+  }
+}
+
+export function promotableOnDrop(rules: Rules): (piece: Piece) => boolean {
+  switch (rules) {
+    case 'kyotoshogi':
+      return (piece: Piece) => promotableRoles(rules).includes(piece.role);
+    default:
+      return () => false;
   }
 }
 
@@ -90,6 +103,8 @@ export function allRoles(rules: Rules): Role[] {
       ];
     case 'minishogi':
       return ['rook', 'bishop', 'gold', 'silver', 'pawn', 'dragon', 'horse', 'promotedsilver', 'tokin', 'king'];
+    case 'kyotoshogi':
+      return ['rook', 'pawn', 'silver', 'bishop', 'gold', 'knight', 'lance', 'tokin', 'king'];
     default:
       return [
         'rook',
@@ -117,6 +132,8 @@ export function handRoles(rules: Rules): Role[] {
       return [];
     case 'minishogi':
       return ['rook', 'bishop', 'gold', 'silver', 'pawn'];
+    case 'kyotoshogi':
+      return ['tokin', 'gold', 'silver', 'pawn'];
     default:
       return ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'];
   }
@@ -147,6 +164,8 @@ export function promotableRoles(rules: Rules): Role[] {
       ];
     case 'minishogi':
       return ['pawn', 'silver', 'bishop', 'rook'];
+    case 'kyotoshogi':
+      return ['rook', 'pawn', 'silver', 'bishop', 'gold', 'knight', 'lance', 'tokin'];
     default:
       return ['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'];
   }
@@ -157,6 +176,7 @@ export function fullSquareSet(rules: Rules): SquareSet {
     case 'chushogi':
       return new SquareSet([0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0x0, 0x0]);
     case 'minishogi':
+    case 'kyotoshogi':
       return new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
     default:
       return new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]);
@@ -167,6 +187,8 @@ export function promote(rules: Rules): (role: Role) => Role | undefined {
   switch (rules) {
     case 'chushogi':
       return chuushogiPromote;
+    case 'kyotoshogi':
+      return kyotoPromote;
     default:
       return standardPromote;
   }
@@ -176,6 +198,8 @@ export function unpromote(rules: Rules): (role: Role) => Role | undefined {
   switch (rules) {
     case 'chushogi':
       return chuushogiUnpromote;
+    case 'kyotoshogi':
+      return kyotoPromote;
     default:
       return standardUnpromote;
   }
@@ -193,6 +217,8 @@ export function promotionZone(rules: Rules): (color: Color) => SquareSet {
         color === 'sente'
           ? new SquareSet([0x1f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])
           : new SquareSet([0x0, 0x0, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    case 'kyotoshogi':
+      return () => new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
     default:
       return (color: Color) =>
         color === 'sente'
@@ -206,9 +232,29 @@ export function dimensions(rules: Rules): Dimensions {
     case 'chushogi':
       return { files: 12, ranks: 12 };
     case 'minishogi':
+    case 'kyotoshogi':
       return { files: 5, ranks: 5 };
     default:
       return { files: 9, ranks: 9 };
+  }
+}
+
+function standardPromote(role: Role): Role | undefined {
+  switch (role) {
+    case 'pawn':
+      return 'tokin';
+    case 'lance':
+      return 'promotedlance';
+    case 'knight':
+      return 'promotedknight';
+    case 'silver':
+      return 'promotedsilver';
+    case 'bishop':
+      return 'horse';
+    case 'rook':
+      return 'dragon';
+    default:
+      return;
   }
 }
 
@@ -274,25 +320,6 @@ function chuushogiPromote(role: Role): Role | undefined {
   }
 }
 
-function standardPromote(role: Role): Role | undefined {
-  switch (role) {
-    case 'pawn':
-      return 'tokin';
-    case 'lance':
-      return 'promotedlance';
-    case 'knight':
-      return 'promotedknight';
-    case 'silver':
-      return 'promotedsilver';
-    case 'bishop':
-      return 'horse';
-    case 'rook':
-      return 'dragon';
-    default:
-      return;
-  }
-}
-
 function chuushogiUnpromote(role: Role): Role | undefined {
   switch (role) {
     case 'promotedpawn':
@@ -331,6 +358,29 @@ function chuushogiUnpromote(role: Role): Role | undefined {
       return 'silver';
     case 'rookpromoted':
       return 'gold';
+    default:
+      return;
+  }
+}
+
+function kyotoPromote(role: Role): Role | undefined {
+  switch (role) {
+    case 'rook':
+      return 'pawn';
+    case 'pawn':
+      return 'rook';
+    case 'silver':
+      return 'bishop';
+    case 'bishop':
+      return 'silver';
+    case 'gold':
+      return 'knight';
+    case 'knight':
+      return 'gold';
+    case 'tokin':
+      return 'lance';
+    case 'lance':
+      return 'tokin';
     default:
       return;
   }

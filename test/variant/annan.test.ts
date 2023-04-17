@@ -24,6 +24,11 @@ test('annan default', () => {
   expect(Annan.default()).toEqual(parseSfen('annan', initialSfen('annan')).unwrap());
 });
 
+test('pieces in dead zone', () => {
+  const posRes = parseSfen('annan', 'lPsgkgLnP/1r5b1/p1ppp1p1p/1p5pp/9/1P3P1P1/P1PP1P2P/1B5n1/lNSGKGpNL b');
+  expect(posRes.isOk).toBe(true);
+});
+
 test('only friednly pieces give you moves', () => {
   const pos = parseSfen('annan', '9/9/9/4P4/4r4/9/9/9/K7k b').unwrap();
   expect(pos.moveDests(parseSquareName('5d')).size()).toBe(1);

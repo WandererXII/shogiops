@@ -1,6 +1,7 @@
 import { perft } from '../../src/debug';
 import { initialSfen, parseSfen } from '../../src/sfen';
 import { opposite, parseSquareName, parseUsi } from '../../src/util';
+import { Chushogi } from '../../src/variant/chushogi';
 import { perfts } from '../fixtures/perftChushogi';
 
 test('valid promotions', () => {
@@ -196,6 +197,10 @@ const chushogiPerfts: [string, number, number][] = [
   ['11k/12/12/12/12/4r7/12/12/9n2/4+o7/12/6B4K b 8j', 1, 7],
   ['11k/12/12/12/12/4r7/12/12/9n2/4+o7/12/6B4K b -', 1, 8],
 ];
+
+test('chushogi default', () => {
+  expect(Chushogi.default()).toEqual(parseSfen('chushogi', initialSfen('chushogi')).unwrap());
+});
 
 test.each(chushogiPerfts)('chushogi perft: %s (%s): %s', (sfen, depth, res) => {
   const pos = parseSfen('chushogi', sfen || initialSfen('chushogi')).unwrap();

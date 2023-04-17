@@ -3,7 +3,7 @@ import { between } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { COLORS, Color, Move, Outcome, Piece, PieceName, Rules, Setup, Square, isDrop } from '../types.js';
+import { COLORS, Color, Move, Outcome, Piece, PieceName, Role, Rules, Setup, Square, isDrop } from '../types.js';
 import { defined, lionRoles, makePieceName, opposite } from '../util.js';
 import { allRoles, fullSquareSet, handRoles, pieceCanPromote, pieceForcePromote, promote, unpromote } from './util.js';
 
@@ -253,9 +253,17 @@ export abstract class Position {
     }
   }
 
+  private unpromoteForHand(role: Role): Role | undefined {
+    if (handRoles(this.rules).includes(role)) return role;
+    const unpromotedRole = unpromote(this.rules)(role);
+    if (unpromotedRole && handRoles(this.rules).includes(unpromotedRole)) return unpromotedRole;
+    return;
+  }
+
   private storeCapture(capture: Piece): void {
-    const unpromotedRole = unpromote(this.rules)(capture.role) || capture.role;
-    if (handRoles(this.rules).includes(unpromotedRole)) this.hands[opposite(capture.color)].capture(unpromotedRole);
+    const unpromotedRole = this.unpromoteForHand(capture.role);
+    if (unpromotedRole && handRoles(this.rules).includes(unpromotedRole))
+      this.hands[opposite(capture.color)].capture(unpromotedRole);
   }
 
   // doesn't care about validity, just tries to play the move
@@ -269,7 +277,7 @@ export abstract class Position {
 
     if (isDrop(move)) {
       this.board.set(move.to, { role: move.role, color: turn });
-      this.hands[turn].drop(move.role);
+      this.hands[turn].drop(this.unpromoteForHand(move.role) || move.role);
     } else {
       const piece = this.board.take(move.from),
         role = piece?.role;

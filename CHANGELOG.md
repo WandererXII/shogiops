@@ -1,5 +1,10 @@
 # Changelog for shogiops
 
+## v0.14.0
+
+- New variant - `Kyotoshogi`.
+- Renamed `annan` to `annanshogi` and `Annan` to `Annanshogi`.
+
 ## v0.13.0
 
 - Added `handicaps`, `findHandicaps`, `findHandicap` and `isHandicap` in file `handicaps.ts` for various variants, replaces `kif/kifHandicaps.ts`, which was removed.

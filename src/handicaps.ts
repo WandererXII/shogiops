@@ -300,6 +300,49 @@ export const handicaps: Handicap[] = [
     japaneseName: 'トンボ',
     englishName: 'Dragonfly',
   },
+  // kyoto
+  {
+    rules: 'kyotoshogi',
+    sfen: 'pgks1/5/5/5/TSKGP w - 1',
+    japaneseName: 'と落ち',
+    englishName: 'Tokin',
+  },
+  {
+    rules: 'kyotoshogi',
+    sfen: 'pgk1t/5/5/5/TSKGP w - 1',
+    japaneseName: '銀落ち',
+    englishName: 'Silver',
+  },
+  {
+    rules: 'kyotoshogi',
+    sfen: '1gkst/5/5/5/TSKGP w - 1',
+    japaneseName: '歩落ち',
+    englishName: 'Pawn',
+  },
+  {
+    rules: 'kyotoshogi',
+    sfen: 'p1kst/5/5/5/TSKGP w - 1',
+    japaneseName: '金落ち',
+    englishName: 'Gold',
+  },
+  {
+    rules: 'kyotoshogi',
+    sfen: '1gks1/5/5/5/TSKGP w - 1',
+    japaneseName: '二枚落ち',
+    englishName: '2-piece',
+  },
+  {
+    rules: 'kyotoshogi',
+    sfen: '1gk2/5/5/5/TSKGP w - 1',
+    japaneseName: '三枚落ち',
+    englishName: '3-piece',
+  },
+  {
+    rules: 'kyotoshogi',
+    sfen: '2k2/5/5/5/TSKGP w - 1',
+    japaneseName: '裸玉',
+    englishName: 'Naked King',
+  },
 ];
 
 function compareSfens(a: string, b: string): boolean {

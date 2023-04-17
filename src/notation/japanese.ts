@@ -70,7 +70,7 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
     movingDown = myRank < destRank;
 
   const jumpsButShouldnt =
-    rules === 'annan' &&
+    rules === 'annanshogi' &&
     piece.role !== 'knight' &&
     Math.abs(myFile - destFile) === 1 &&
     Math.abs(myRank - destRank) === 2;
@@ -79,7 +79,7 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
   if (
     myFile === destFile &&
     (piece.color === 'sente') === movingUp &&
-    (silverGoldRoles.includes(piece.role) || (rules === 'annan' && majorRoles.includes(piece.role)))
+    (silverGoldRoles.includes(piece.role) || (rules === 'annanshogi' && majorRoles.includes(piece.role)))
   )
     return '直';
 

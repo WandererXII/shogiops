@@ -253,9 +253,9 @@ test('parse chushogi moves', () => {
   expect(parseKifMove('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });
 
-test('parse kif header and board with annan handicap name', () => {
+test('parse kif header and board with annanshogi handicap name', () => {
   // board takes precedence
-  const pos = parseSfen('annan', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1').unwrap(),
+  const pos = parseSfen('annanshogi', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1').unwrap(),
     kifHeader = `手合割：安南
     後手の持駒：金四　銀二　香三　歩十三　
   ９ ８ ７ ６ ５ ４ ３ ２ １
@@ -276,8 +276,8 @@ test('parse kif header and board with annan handicap name', () => {
   expect(kifPos).toEqual(pos);
 });
 
-test('annan kif header with board', () => {
-  const pos = parseSfen('annan', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p').unwrap(),
+test('annanshogi kif header with board', () => {
+  const pos = parseSfen('annanshogi', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p').unwrap(),
     kifHeader = `手合割：安南将棋
 後手の持駒：金四 銀二 香三 歩十三
   ９ ８ ７ ６ ５ ４ ３ ２ １
@@ -299,7 +299,7 @@ test('annan kif header with board', () => {
   expect(makeSfen(posFromKif)).toEqual('3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1');
   expect(kifFromPos).toEqual(kifHeader);
 
-  const defaultPos = parseSfen('annan', initialSfen('annan')).unwrap();
+  const defaultPos = parseSfen('annanshogi', initialSfen('annanshogi')).unwrap();
   expect(makeKifHeader(defaultPos)).toEqual(`手合割：安南将棋`);
   expect(parseKifHeader(`手合割：安南将棋`).unwrap()).toEqual(defaultPos);
 });

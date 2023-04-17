@@ -9,12 +9,12 @@ import { Context, Position, PositionError } from './position.js';
 import { standardSquareAttacks, standardSquareSnipers } from './shogi.js';
 import { fullSquareSet } from './util.js';
 
-export class Annan extends Position {
+export class Annanshogi extends Position {
   private constructor() {
-    super('annan');
+    super('annanshogi');
   }
 
-  static default(): Annan {
+  static default(): Annanshogi {
     const pos = new this();
     pos.board = annanBoard();
     pos.hands = Hands.empty();
@@ -23,7 +23,7 @@ export class Annan extends Position {
     return pos;
   }
 
-  static from(setup: Setup, strict: boolean): Result<Annan, PositionError> {
+  static from(setup: Setup, strict: boolean): Result<Annanshogi, PositionError> {
     const pos = new this();
     pos.fromSetup(setup);
     return pos.validate(strict).map(_ => pos);

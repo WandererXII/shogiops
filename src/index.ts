@@ -58,7 +58,7 @@ export { Minishogi } from './variant/minishogi.js';
 
 export { Chushogi } from './variant/chushogi.js';
 
-export { Annan } from './variant/annan.js';
+export { Annanshogi } from './variant/annanshogi.js';
 
 export { Kyotoshogi } from './variant/kyotoshogi.js';
 

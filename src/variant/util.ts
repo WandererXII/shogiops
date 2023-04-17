@@ -28,7 +28,7 @@ export function pieceCanPromote(
 export function pieceForcePromote(rules: Rules): (piece: Piece, sq: Square) => boolean {
   switch (rules) {
     case 'chushogi':
-    case 'annan':
+    case 'annanshogi':
       return () => false;
     case 'kyotoshogi':
       return () => true;

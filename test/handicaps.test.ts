@@ -6,7 +6,7 @@ test('proper count', () => {
   expect(findHandicaps({ rules: 'standard' })!.length).toBe(23);
   expect(findHandicaps({ rules: 'minishogi' })!.length).toBe(5);
   expect(findHandicaps({ rules: 'chushogi' })!.length).toBe(3);
-  expect(findHandicaps({ rules: 'annan' })!.length).toBe(15);
+  expect(findHandicaps({ rules: 'annanshogi' })!.length).toBe(15);
 });
 
 test('only one field', () => {

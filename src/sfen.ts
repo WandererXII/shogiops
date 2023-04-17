@@ -175,7 +175,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
 
   // Move number
   const moveNumberPart = parts.shift(),
-    moveNumber = defined(moveNumberPart) ? parseSmallUint(moveNumberPart) : 1;
+    moveNumber = defined(moveNumberPart) && moveNumberPart ? parseSmallUint(moveNumberPart) : 1;
   if (!defined(moveNumber)) return Result.err(new SfenError(InvalidSfen.MoveNumber));
 
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));

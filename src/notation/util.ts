@@ -27,6 +27,7 @@ export function roleToWestern(rules: Rules): (role: Role) => string {
       case 'rook':
         return 'R';
       case 'tokin':
+        return rules === 'kyotoshogi' ? 'T' : '+P';
       case 'promotedpawn':
         return '+P';
       case 'promotedlance':

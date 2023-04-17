@@ -27,6 +27,7 @@ test('partial sfen', () => {
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
   expect(pos.moveNumber).toEqual(1);
+  expect(parseSfen('standard', 'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b - ').isOk).toBe(true);
 });
 
 test.each([

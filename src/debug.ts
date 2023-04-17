@@ -3,7 +3,7 @@ import { NormalMove, PieceName, Role, Square } from './types.js';
 import { makeSquareName, makeUsi, parsePieceName } from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
-import { pieceCanPromote, pieceForcePromote } from './variant/util.js';
+import { pieceCanPromote, pieceForcePromote, promotableOnDrop, promote } from './variant/util.js';
 
 export function moveDests(moveDests: Map<Square, SquareSet>): string {
   const lines = [];
@@ -24,10 +24,11 @@ export function dropDests(dropDests: Map<PieceName, SquareSet>): string {
 export function perft(pos: Position, depth: number, log = false): number {
   if (depth < 1) return 1;
 
+  const logs = [];
   let nodes = 0;
   for (const [from, moveDests] of pos.allMoveDests()) {
     for (const to of moveDests) {
-      const promotions: Array<boolean> = [],
+      const promotions: boolean[] = [],
         piece = pos.board.get(from)!;
       if (pieceCanPromote(pos.rules)(piece, from, to, pos.board.get(to))) {
         promotions.push(true);
@@ -39,7 +40,7 @@ export function perft(pos: Position, depth: number, log = false): number {
           move = { from, to, promotion };
         child.play(move);
         const children = perft(child, depth - 1, false);
-        if (log) console.log(makeUsi(move), children, '(', depth, ')');
+        if (log) logs.push(`${makeUsi(move)}: ${children}`);
         nodes += children;
       }
       const roleWithLionPower: Role[] = ['lion', 'lionpromoted', 'eagle', 'falcon'];
@@ -50,22 +51,27 @@ export function perft(pos: Position, depth: number, log = false): number {
             move: NormalMove = { from, to, midStep: mid };
           child.play(move);
           const children = perft(child, depth - 1, false);
-          if (log) console.log(makeUsi(move), children, '(', depth, ')');
+          if (log) logs.push(`${makeUsi(move)}: ${children}`);
           nodes += children;
         }
       }
     }
   }
   for (const [pieceName, dropDestsOfRole] of pos.allDropDests()) {
-    for (const to of dropDestsOfRole) {
-      const child = pos.clone(),
-        piece = parsePieceName(pieceName),
-        move = { role: piece.role, to };
-      child.play(move);
-      const children = perft(child, depth - 1, false);
-      if (log) console.log(makeUsi(move), children, '(', depth, ')');
-      nodes += children;
+    const promotions: boolean[] = [false],
+      piece = parsePieceName(pieceName);
+    if (promotableOnDrop(pos.rules)(piece)) promotions.push(true);
+    for (const prom of promotions) {
+      for (const to of dropDestsOfRole) {
+        const child = pos.clone(),
+          move = { role: prom ? promote(pos.rules)(piece.role)! : piece.role, to };
+        child.play(move);
+        const children = perft(child, depth - 1, false);
+        if (log) logs.push(`${makeUsi(move)}: ${children}`);
+        nodes += children;
+      }
     }
   }
+  if (log) console.log(logs.join('\n'));
   return nodes;
 }

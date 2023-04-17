@@ -46,7 +46,7 @@ export function makeKifHeader(pos: Position): string {
 
 export function makeKifPositionHeader(pos: Position): string {
   return [
-    pos.rules === 'annan' ? '手合割：' + defaultHandicap(pos.rules) : '', // not sure about this, but we need something to indicate the variant
+    ['annan', 'kyotoshogi'].includes(pos.rules) ? '手合割：' + defaultHandicap(pos.rules) : '', // not sure about this, but we need something to indicate the variant
     pos.rules !== 'chushogi' ? '後手の持駒：' + makeKifHand(pos.rules, pos.hands.color('gote')) : '',
     makeKifBoard(pos.rules, pos.board),
     pos.rules !== 'chushogi' ? '先手の持駒：' + makeKifHand(pos.rules, pos.hands.color('sente')) : '',
@@ -101,6 +101,8 @@ function defaultHandicap(rules: Rules): string {
       return '';
     case 'annan':
       return '安南将棋';
+    case 'kyotoshogi':
+      return '京都将棋';
     default:
       return '平手';
   }
@@ -155,6 +157,7 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
 
 function detectVariant(lines: number | undefined, tag: string | undefined): Rules {
   if (lines === 12) return 'chushogi';
+  else if (lines === 5 && defined(tag) && tag.startsWith('手合割：京都')) return 'kyotoshogi';
   else if (lines === 5) return 'minishogi';
   else if (defined(tag) && tag.startsWith('手合割：安南')) return 'annan';
   else return 'standard';

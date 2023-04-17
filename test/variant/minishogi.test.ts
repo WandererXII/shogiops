@@ -1,5 +1,6 @@
 import { perft } from '../../src/debug';
 import { initialSfen, parseSfen } from '../../src/sfen';
+import { Minishogi } from '../../src/variant/minishogi';
 import { perfts } from '../fixtures/perftMinishogi';
 
 const minishogiPerfts: [string, number, number][] = [
@@ -18,6 +19,10 @@ test.each(minishogiPerfts)('minishogi perft: %s (%s): %s', (sfen, depth, res) =>
 test('minishogi checkmate', () => {
   const pos = parseSfen('minishogi', 'r1s1k/2b1g/5/r1G1B/KPS2 b p').unwrap();
   expect(pos.outcome()).toEqual({ result: 'checkmate', winner: 'gote' });
+});
+
+test('minishogi default', () => {
+  expect(Minishogi.default()).toEqual(parseSfen('minishogi', initialSfen('minishogi')).unwrap());
 });
 
 test('randomly generated perfts - for consistency', () => {

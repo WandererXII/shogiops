@@ -60,6 +60,8 @@ export { Chushogi } from './variant/chushogi.js';
 
 export { Annan } from './variant/annan.js';
 
+export { Kyotoshogi } from './variant/kyotoshogi.js';
+
 export * as variant from './variant/variant.js';
 
 export * as variantUtil from './variant/util.js';

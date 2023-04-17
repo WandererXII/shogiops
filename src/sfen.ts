@@ -25,6 +25,8 @@ export function initialSfen(rules: Rules): string {
       return 'rbsgk/4p/5/P4/KGSBR b - 1';
     case 'annan':
       return 'lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1';
+    case 'kyotoshogi':
+      return 'pgkst/5/5/5/TSKGP b - 1';
     default:
       return 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1';
   }
@@ -36,6 +38,8 @@ export function roleToForsyth(rules: Rules): (role: Role) => string | undefined 
       return chushogiRoleToForsyth;
     case 'minishogi':
       return minishogiRoleToForsyth;
+    case 'kyotoshogi':
+      return kyotoshogiRoleToForsyth;
     default:
       return standardRoleToForsyth;
   }
@@ -47,6 +51,8 @@ export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
       return chushogiForsythToRole;
     case 'minishogi':
       return minishogiForsythToRole;
+    case 'kyotoshogi':
+      return kyotoshogiForsythToRole;
     default:
       return standardForsythToRole;
   }
@@ -169,7 +175,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
 
   // Move number
   const moveNumberPart = parts.shift(),
-    moveNumber = defined(moveNumberPart) ? parseSmallUint(moveNumberPart) : 1;
+    moveNumber = defined(moveNumberPart) && moveNumberPart ? parseSmallUint(moveNumberPart) : 1;
   if (!defined(moveNumber)) return Result.err(new SfenError(InvalidSfen.MoveNumber));
 
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
@@ -531,6 +537,56 @@ function standardForsythToRole(ch: string): Role | undefined {
       return 'pawn';
     case '+p':
       return 'tokin';
+    default:
+      return;
+  }
+}
+
+function kyotoshogiRoleToForsyth(role: Role): string | undefined {
+  switch (role) {
+    case 'king':
+      return 'k';
+    case 'pawn':
+      return 'p';
+    case 'rook':
+      return 'r';
+    case 'silver':
+      return 's';
+    case 'bishop':
+      return 'b';
+    case 'gold':
+      return 'g';
+    case 'knight':
+      return 'n';
+    case 'tokin':
+      return 't';
+    case 'lance':
+      return 'l';
+    default:
+      return;
+  }
+}
+
+function kyotoshogiForsythToRole(ch: string): Role | undefined {
+  switch (ch.toLowerCase()) {
+    case 'k':
+      return 'king';
+    case 'p':
+      return 'pawn';
+    case 'r':
+      return 'rook';
+    case 's':
+      return 'silver';
+    case 'b':
+      return 'bishop';
+    case 'g':
+      return 'gold';
+    case 'n':
+      return 'knight';
+    case 't':
+      return 'tokin';
+    case 'l':
+      return 'lance';
     default:
       return;
   }

@@ -31,7 +31,7 @@ export function pieceForcePromote(rules: Rules): (piece: Piece, sq: Square) => b
     case 'annanshogi':
       return () => false;
     case 'kyotoshogi':
-      return () => true;
+      return (piece: Piece) => promotableRoles(rules).includes(piece.role);
     default:
       return (piece: Piece, sq: Square) => {
         const dims = dimensions(rules),

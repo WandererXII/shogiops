@@ -17,7 +17,7 @@ import { Color, Move, Piece, Role, Setup, Square, isDrop } from '../types.js';
 import { defined, opposite } from '../util.js';
 import { Context, IllegalSetup, Position, PositionError } from './position.js';
 import { standardMoveDests } from './shogi.js';
-import { allRoles, fullSquareSet, handRoles, unpromote } from './util.js';
+import { allRoles, fullSquareSet, handRoles, promotableRoles, unpromote } from './util.js';
 
 export class Kyotoshogi extends Position {
   private constructor() {
@@ -99,6 +99,7 @@ export class Kyotoshogi extends Position {
     } else {
       const piece = this.board.get(move.from);
       if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
+      if (move.promotion && !promotableRoles(this.rules).includes(piece.role)) return false;
 
       return this.moveDests(move.from, ctx).has(move.to);
     }

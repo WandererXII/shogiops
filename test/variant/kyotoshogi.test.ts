@@ -1,6 +1,6 @@
 import { perft } from '../../src/debug';
 import { initialSfen, parseSfen } from '../../src/sfen';
-import { parseSquareName } from '../../src/util';
+import { parseSquareName, parseUsi } from '../../src/util';
 import { Kyotoshogi } from '../../src/variant/kyotoshogi';
 import { perfts } from '../fixtures/perftKyotoshogi';
 
@@ -33,6 +33,12 @@ test('pieces in dead zone', () => {
   const posRes = parseSfen('kyotoshogi', 'PgksL/5/5/5/pSKGl b');
   expect(posRes.isOk).toBe(true);
   expect(posRes.unwrap().validate(true).isOk).toBe(true);
+});
+
+test('king cannnot promote', () => {
+  const pos = parseSfen('kyotoshogi', initialSfen('kyotoshogi')).unwrap();
+  expect(pos.isLegal(parseUsi('3e3d+')!)).toBe(false);
+  expect(pos.isLegal(parseUsi('3e3d')!)).toBe(true);
 });
 
 test('kyotoshogi default', () => {

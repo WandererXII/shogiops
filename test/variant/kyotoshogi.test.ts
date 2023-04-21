@@ -35,10 +35,14 @@ test('pieces in dead zone', () => {
   expect(posRes.unwrap().validate(true).isOk).toBe(true);
 });
 
-test('king cannnot promote', () => {
+test('promotion in usi', () => {
   const pos = parseSfen('kyotoshogi', initialSfen('kyotoshogi')).unwrap();
+  // king
   expect(pos.isLegal(parseUsi('3e3d+')!)).toBe(false);
   expect(pos.isLegal(parseUsi('3e3d')!)).toBe(true);
+  // gold
+  expect(pos.isLegal(parseUsi('2e3d+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('2e3d')!)).toBe(false);
 });
 
 test('kyotoshogi default', () => {

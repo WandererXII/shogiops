@@ -18,7 +18,7 @@ export function pieceCanPromote(
         );
       };
     case 'kyotoshogi':
-      return () => false;
+      return (piece: Piece) => promotableRoles(rules).includes(piece.role);
     default:
       return (piece: Piece, from: Square, to: Square) =>
         promotableRoles(rules).includes(piece.role) &&

@@ -36,12 +36,7 @@ export function makeKitaoKawasakiMove(pos: Position, move: Move, lastDest?: Squa
           )}${actionStr}${makeNumberSquare(move.to)}`;
       } else {
         const destStr = (lastDest ?? pos.lastMove?.to) === move.to ? '' : makeNumberSquare(move.to),
-          promStr =
-            move.promotion && pos.rules !== 'kyotoshogi'
-              ? '+'
-              : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture)
-              ? '='
-              : '';
+          promStr = move.promotion ? '+' : pieceCanPromote(pos.rules)(piece, move.from, move.to, capture) ? '=' : '';
         return `${roleStr}${ambStr}${actionStr}${destStr}${promStr}`;
       }
     } else return undefined;

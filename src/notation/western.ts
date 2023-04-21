@@ -24,12 +24,11 @@ export function makeWesternMove(pos: Position, move: Move): string | undefined {
         else if (move.to === move.from) return `--`;
         else return `${roleStr}${disambStr}${!!midCapture ? 'x' : '-'}${makeNumberSquare(move.midStep)}${toStr}`;
       } else {
-        const promStr =
-          move.promotion && pos.rules !== 'kyotoshogi'
-            ? '+'
-            : pieceCanPromote(pos.rules)(piece, move.from, move.to, toCapture)
-            ? '='
-            : '';
+        const promStr = move.promotion
+          ? '+'
+          : pieceCanPromote(pos.rules)(piece, move.from, move.to, toCapture)
+          ? '='
+          : '';
         return `${roleStr}${disambStr}${toStr}${promStr}`;
       }
     } else return undefined;

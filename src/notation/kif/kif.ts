@@ -325,7 +325,7 @@ export function makeKifMove(pos: Position, move: Move, lastDest?: Square): strin
     const sameSquareSymbol = pos.rules === 'chushogi' ? '仝' : '同　',
       sameDest = (lastDest ?? pos.lastMove?.to) === move.to,
       moveDestStr = sameDest ? sameSquareSymbol : ms(move.to),
-      promStr = move.promotion && pos.rules !== 'kyotoshogi' ? '成' : '',
+      promStr = move.promotion ? '成' : '',
       role = pos.board.getRole(move.from);
     if (!role) return undefined;
     if (pos.rules === 'chushogi') {

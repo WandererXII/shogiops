@@ -1,5 +1,11 @@
 # Changelog for shogiops
 
+## v0.14.1
+
+- Kyotoshogi fixes and tweaks - kif, notation, promotion, usi requires promotion now.
+- In kif add variant name tag for variants from custom positions.
+- Uwate/shitate in kif for games from handicap positions.
+
 ## v0.14.0
 
 - New variant - `Kyotoshogi`.

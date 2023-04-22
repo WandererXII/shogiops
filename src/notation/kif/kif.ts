@@ -1,6 +1,6 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
-import { findHandicap } from '../../handicaps.js';
+import { findHandicap, isHandicap } from '../../handicaps.js';
 import { Hand, Hands } from '../../hands.js';
 import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
 import { Color, Move, Rules, Square, isDrop, isNormal } from '../../types.js';
@@ -45,12 +45,17 @@ export function makeKifHeader(pos: Position): string {
 }
 
 export function makeKifPositionHeader(pos: Position): string {
+  const handicap = isHandicap({ sfen: makeSfen(pos) });
   return [
-    ['annanshogi', 'kyotoshogi'].includes(pos.rules) ? '手合割：' + defaultHandicap(pos.rules) : '', // not sure about this, but we need something to indicate the variant
-    pos.rules !== 'chushogi' ? '後手の持駒：' + makeKifHand(pos.rules, pos.hands.color('gote')) : '',
+    ['standard', 'chushogi'].includes(pos.rules) ? '' : '手合割：' + defaultHandicap(pos.rules), // not sure about this, but we need something to indicate the variant
+    pos.rules !== 'chushogi'
+      ? `${colorName('gote', handicap)}の持駒：` + makeKifHand(pos.rules, pos.hands.color('gote'))
+      : '',
     makeKifBoard(pos.rules, pos.board),
-    pos.rules !== 'chushogi' ? '先手の持駒：' + makeKifHand(pos.rules, pos.hands.color('sente')) : '',
-    ...(pos.turn === 'gote' ? ['後手番'] : []),
+    pos.rules !== 'chushogi'
+      ? `${colorName('sente', handicap)}の持駒：` + makeKifHand(pos.rules, pos.hands.color('sente'))
+      : '',
+    ...(pos.turn === 'gote' ? [`${colorName('gote', handicap)}番`] : []),
   ]
     .filter(l => l.length)
     .join('\n');
@@ -93,6 +98,11 @@ export function makeKifHand(rules: Rules, hand: Hand): string {
     .join(' ');
 }
 
+function colorName(color: Color, handicap: boolean): string {
+  if (handicap) return color === 'gote' ? '上手' : '下手';
+  else return color === 'gote' ? '後手' : '先手';
+}
+
 function defaultHandicap(rules: Rules): string {
   switch (rules) {
     case 'minishogi':
@@ -128,9 +138,9 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
   const lines = normalizedKifLines(kif),
     handicapTag = lines.find(l => l.startsWith('手合割：')),
     rules = rulesOpt ?? detectVariant(lines.filter(l => l.startsWith('|')).length, handicapTag),
-    goteHandStr = lines.find(l => l.startsWith('後手の持駒：')),
-    senteHandStr = lines.find(l => l.startsWith('先手の持駒：')),
-    turn = lines.some(l => l.startsWith('後手番')) ? 'gote' : 'sente';
+    goteHandStr = lines.find(l => l.startsWith('後手の持駒：') || l.startsWith('上手の持駒：')),
+    senteHandStr = lines.find(l => l.startsWith('先手の持駒：') || l.startsWith('下手の持駒：')),
+    turn = lines.some(l => l.startsWith('後手番') || l.startsWith('上手番')) ? 'gote' : 'sente';
 
   const board: Result<Board, KifError> = parseKifBoard(rules, kif);
 
@@ -157,8 +167,9 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
 
 function detectVariant(lines: number | undefined, tag: string | undefined): Rules {
   if (lines === 12) return 'chushogi';
-  else if (lines === 5 && defined(tag) && tag.startsWith('手合割：京都')) return 'kyotoshogi';
-  else if (lines === 5) return 'minishogi';
+  else if ((!defined(lines) || lines === 0 || lines === 5) && defined(tag) && tag.startsWith('手合割：京都'))
+    return 'kyotoshogi';
+  else if ((defined(tag) && tag.startsWith('手合割：5五')) || lines === 5) return 'minishogi';
   else if (defined(tag) && tag.startsWith('手合割：安南')) return 'annanshogi';
   else return 'standard';
 }

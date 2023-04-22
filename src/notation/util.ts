@@ -548,6 +548,7 @@ export function filesByRules(rules: Rules): string {
     case 'chushogi':
       return ' １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １';
     case 'minishogi':
+    case 'kyotoshogi':
       return '  ５ ４ ３ ２ １';
     default:
       return '  ９ ８ ７ ６ ５ ４ ３ ２ １';

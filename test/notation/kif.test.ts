@@ -35,7 +35,8 @@ test('make kif header from some random position', () => {
 test('make minishogi kif header', () => {
   const pos = parseSfen('minishogi', 'rbsgk/4p/P4/5/KGSBR w - 2').unwrap();
   expect(makeKifHeader(pos)).toEqual(
-    `後手の持駒：なし
+    `手合割：5五将棋
+後手の持駒：なし
   ５ ４ ３ ２ １
 +---------------+
 |v飛v角v銀v金v玉|一
@@ -77,7 +78,8 @@ test('parse kif header with kif board', () => {
 
 test('parse kif minishogi header with kif board', () => {
   const pos = parseSfen('minishogi', 'rbsgk/4p/P4/5/KGSBR w - 1').unwrap(),
-    kifHeader = `後手の持駒：なし
+    kifHeader = `手合割：5五将棋
+後手の持駒：なし
 ５ ４ ３ ２ １
 +---------------+
 |v飛v角v銀v金v玉|一
@@ -90,6 +92,12 @@ test('parse kif minishogi header with kif board', () => {
 後手番`;
   const kifPos = parseKifHeader(kifHeader).unwrap();
   expect(kifPos).toEqual(pos);
+});
+
+test('minishogi kif default', () => {
+  const defaultPos = parseSfen('minishogi', initialSfen('minishogi')).unwrap();
+  expect(makeKifHeader(defaultPos)).toEqual(`手合割：5五将棋`);
+  expect(parseKifHeader(`手合割：5五将棋`).unwrap()).toEqual(defaultPos);
 });
 
 test('parse kif header with handicap', () => {
@@ -253,6 +261,11 @@ test('parse chushogi moves', () => {
   expect(parseKifMove('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });
 
+test('chushogi kif default', () => {
+  const defaultPos = parseSfen('chushogi', initialSfen('chushogi')).unwrap();
+  expect(makeKifHeader(defaultPos)).toEqual(`手合割：`);
+});
+
 test('parse kif header and board with annanshogi handicap name', () => {
   // board takes precedence
   const pos = parseSfen('annanshogi', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1').unwrap(),
@@ -302,4 +315,29 @@ test('annanshogi kif header with board', () => {
   const defaultPos = parseSfen('annanshogi', initialSfen('annanshogi')).unwrap();
   expect(makeKifHeader(defaultPos)).toEqual(`手合割：安南将棋`);
   expect(parseKifHeader(`手合割：安南将棋`).unwrap()).toEqual(defaultPos);
+});
+
+test('kyoto kif default', () => {
+  const defaultPos = parseSfen('kyotoshogi', initialSfen('kyotoshogi')).unwrap();
+  expect(makeKifHeader(defaultPos)).toEqual(`手合割：京都将棋`);
+  expect(parseKifHeader(`手合割：京都将棋`).unwrap()).toEqual(defaultPos);
+});
+
+test('kyoto handicap', () => {
+  const pos = parseSfen('kyotoshogi', '1gks1/5/5/5/TSKGP w - ').unwrap();
+  const kif = `手合割：京都将棋
+上手の持駒：なし
+  ５ ４ ３ ２ １
++---------------+
+| ・v金v玉v銀 ・|一
+| ・ ・ ・ ・ ・|二
+| ・ ・ ・ ・ ・|三
+| ・ ・ ・ ・ ・|四
+| と 銀 玉 金 歩|五
++---------------+
+下手の持駒：なし
+上手番`;
+
+  expect(makeKifHeader(pos)).toEqual(kif);
+  expect(parseKifHeader(kif).unwrap()).toEqual(pos);
 });

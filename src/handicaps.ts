@@ -1,7 +1,7 @@
 import { Handicap } from './types';
 import { defined } from './util';
 
-export function findHandicaps(handicapOpt: Partial<Handicap>): Handicap[] | undefined {
+export function findHandicaps(handicapOpt: Partial<Handicap>): Handicap[] {
   return handicaps.filter(obj =>
     (Object.keys(handicapOpt) as Array<keyof typeof handicapOpt>).every(key => {
       if (key === 'sfen' && defined(handicapOpt.sfen)) return compareSfens(obj.sfen, handicapOpt.sfen);

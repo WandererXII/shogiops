@@ -1,5 +1,9 @@
 # Changelog for shogiops
 
+## v0.14.2
+
+- Fix parsing USI drop with tokin - kyotoshogi
+
 ## v0.14.1
 
 - Kyotoshogi fixes and tweaks - kif, notation, promotion, usi requires promotion now.

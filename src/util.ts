@@ -73,12 +73,14 @@ function parseUsiDropRole(ch: string): Role | undefined {
       return 'bishop';
     case 'R':
       return 'rook';
+    case 'T':
+      return 'tokin';
     default:
       return;
   }
 }
 
-export const usiDropRegex = /^([PLNSGBR])\*(\d\d?[a-p])$/;
+export const usiDropRegex = /^([PLNSGBRT])\*(\d\d?[a-p])$/;
 export const usiMoveRegex = /^(\d\d?[a-p])(\d\d?[a-p])?(\d\d?[a-p])(\+|=|\?)?$/;
 
 export function parseUsi(str: string): Move | undefined {

@@ -11,6 +11,7 @@ const kyotoshogiPerfts: [string, number, number][] = [
   ['', 4, 18268],
   // ['', 5, 225903],
   ['1S3/L2k1/5/1Kl2/2n2 w Psgp 58', 1, 120],
+  ['5/2k1l/5/5/pBK2 w Ggtsp 28', 1, 170],
   ['kl3/1n3/G4/5/TSK1P b P', 1, 47],
 ];
 
@@ -26,7 +27,15 @@ test('kyotoshogi checkmate', () => {
 
 test('pawn checkmate', () => {
   const pos = parseSfen('kyotoshogi', 'kl3/1n3/G4/5/TSK1P b P').unwrap();
-  expect(pos.isLegal({ to: parseSquareName('5b')!, role: 'pawn' })).toBe(true);
+  expect(pos.isLegal(parseUsi('P*5b')!)).toBe(true);
+  pos.play(parseUsi('P*5b')!);
+  expect(pos.isCheckmate()).toBe(true);
+});
+
+test('last rank', () => {
+  const pos = parseSfen('kyotoshogi', 'pgkst/R3P/5/5/TSKG1 b P').unwrap();
+  expect(pos.isLegal(parseUsi('1b1a+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5b5a+')!)).toBe(true);
 });
 
 test('pieces in dead zone', () => {
@@ -43,6 +52,19 @@ test('promotion in usi', () => {
   // gold
   expect(pos.isLegal(parseUsi('2e3d+')!)).toBe(true);
   expect(pos.isLegal(parseUsi('2e3d')!)).toBe(false);
+});
+
+test('drops', () => {
+  const pos = parseSfen('kyotoshogi', '5/5/5/5/k3K b PTGS').unwrap();
+  expect(pos.isLegal(parseUsi('T*3a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('S*3a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('G*3a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('P*3a')!)).toBe(true);
+
+  expect(pos.isLegal(parseUsi('L*3a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('B*3a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('N*3a')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('R*3a')!)).toBe(true);
 });
 
 test('kyotoshogi default', () => {

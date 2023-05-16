@@ -509,7 +509,7 @@ export function roleToCsa(role: Role): string | undefined {
 }
 
 export function csaToRole(str: string): Role | undefined {
-  switch (str) {
+  switch (str.toUpperCase()) {
     case 'FU':
       return 'pawn';
     case 'KY':

@@ -149,7 +149,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   sfen: string,
   strict?: boolean
 ): Result<RulesTypeMap[R], SfenError | PositionError> {
-  const parts = sfen.split(' ');
+  const parts = sfen.split(/[\s_]+/);
 
   // Board
   const boardPart = parts.shift()!,

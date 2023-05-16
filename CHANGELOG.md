@@ -1,5 +1,10 @@
 # Changelog for shogiops
 
+## v0.14.3
+
+- Accept lowercase CSA pieces.
+- Allow underscores and multiple spaces in SFEN.
+
 ## v0.14.2
 
 - Fix parsing USI drop with tokin - kyotoshogi

@@ -1,5 +1,9 @@
 # Changelog for shogiops
 
+## v0.14.4
+
+- Fix a bug in annan shogi move genetation.
+
 ## v0.14.3
 
 - Accept lowercase CSA pieces.

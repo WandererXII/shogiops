@@ -13,6 +13,7 @@ const annanPerfts: [string, number, number][] = [
   ['P1G+N3s1/lp7/2+N+Pp+P1+L+P/1sB1kP3/N1pl1s3/g6p1/+p1B2+p+p+l+p/1+s+r+n4R/1g1pK1+p2 b G3P 167', 1, 2],
   ['1n2g1g2/l2k1p3/p1p1psb1l/r4Ppp1/1p6p/P2p1PPpP/L3+n1S1L/1BKN2GS1/r1G4N1 b 2Psp 83', 1, 7],
   ['Pn2g4/+S2ps3l/4p1p1+P/sPpg1Pk2/lS1rr2pp/p2GnnPP1/LB+p4+nL/2B2K2+p/1p1GP2+p1 b - 129', 1, 46],
+  ['9/1k7/9/4b4/4p4/5N3/6K2/9/9 b - 1', 1, 6],
 ];
 
 test.each(annanPerfts)('annanshogi perft: %s (%s): %s', (sfen, depth, res) => {

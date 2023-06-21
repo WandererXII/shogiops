@@ -83,8 +83,22 @@ export class Annanshogi extends Position {
             }
           }
         }
-
-        if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
+        if (ctx.blockers.has(square)) {
+          let rayed = pseudo.intersect(ray(square, ctx.king));
+          const occ = this.board.occupied.without(square);
+          for (const to of pseudo.diff(rayed)) {
+            if (this.board.getColor(to) !== ctx.color) {
+              const boardClone = this.board.clone();
+              boardClone.take(square);
+              boardClone.set(to, realPiece);
+              if (standardSquareAttacks(ctx.king, opposite(ctx.color), annanAttackBoard(boardClone), occ).isEmpty()) {
+                rayed = rayed.with(to);
+                break;
+              }
+            }
+          }
+          pseudo = rayed;
+        }
       }
     }
     return pseudo.intersect(fullSquareSet(this.rules));

@@ -1,14 +1,19 @@
+import { SquareSet } from './squareSet.js';
 import { Move, PieceName, SquareName, isDrop } from './types.js';
 import { defined, makeSquareName, parseSquareName, parseUsi } from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
+
+export function squareSetToSquareNames(sqs: SquareSet): SquareName[] {
+  return Array.from(sqs, s => makeSquareName(s));
+}
 
 export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[]> {
   const result: Map<SquareName, SquareName[]> = new Map(),
     ctx = pos.ctx();
   for (const [from, squares] of pos.allMoveDests(ctx)) {
     if (squares.nonEmpty()) {
-      const d = Array.from(squares, s => makeSquareName(s));
+      const d = squareSetToSquareNames(squares);
       result.set(makeSquareName(from), d);
     }
   }
@@ -20,7 +25,7 @@ export function shogigroundDropDests(pos: Position): Map<PieceName, SquareName[]
     ctx = pos.ctx();
   for (const [pieceName, squares] of pos.allDropDests(ctx)) {
     if (squares.nonEmpty()) {
-      const d = Array.from(squares, s => makeSquareName(s));
+      const d = squareSetToSquareNames(squares);
       result.set(pieceName, d);
     }
   }
@@ -36,7 +41,7 @@ export function shogigroundSecondLionStep(
   const result: Map<SquareName, SquareName[]> = new Map(),
     squares = secondLionStepDests(before, parseSquareName(initialSq), parseSquareName(midSq));
   if (squares.nonEmpty()) {
-    const d = Array.from(squares, s => makeSquareName(s));
+    const d = squareSetToSquareNames(squares);
     result.set(makeSquareName(parseSquareName(midSq)), d);
   }
   return result;
@@ -56,5 +61,5 @@ export function moveToSquareNames(move: Move): SquareName[] {
 }
 
 export function checksSquareNames(pos: Position): SquareName[] {
-  return pos.checkSquares().map(s => makeSquareName(s));
+  return squareSetToSquareNames(pos.checks());
 }

@@ -142,11 +142,11 @@ export abstract class Position {
     return false;
   }
 
-  checkSquares(): Square[] {
-    const checks: Square[] = [];
+  checks(): SquareSet {
+    let checks = SquareSet.empty();
     COLORS.forEach(color => {
       for (const king of this.kingsOf(color)) {
-        if (this.squareAttackers(king, opposite(color), this.board.occupied).nonEmpty()) checks.push(king);
+        if (this.squareAttackers(king, opposite(color), this.board.occupied).nonEmpty()) checks = checks.with(king);
       }
     });
     return checks;

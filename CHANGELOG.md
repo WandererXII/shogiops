@@ -1,5 +1,11 @@
 # Changelog for shogiops
 
+## v0.15.0
+
+- New variant added - hasami shogi.
+- `checkSquares` renamed to `checks` and returns `SquareSet` now.
+- `squareSetToSquareNames` function added to `compat.ts`.
+
 ## v0.14.4
 
 - Fix a bug in annan shogi move genetation.

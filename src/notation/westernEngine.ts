@@ -11,7 +11,8 @@ export function makeWesternEngineMove(pos: Position, move: Move): string | undef
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleToWestern(pos.rules)(piece.role),
+      const roleStr =
+          pos.rules === 'hasamishogi' ? (piece.color === 'sente' ? 'P' : '+P') : roleToWestern(pos.rules)(piece.role),
         disambStr = aimingAt(pos, pos.board.pieces(piece.color, piece.role), move.to).without(move.from).isEmpty()
           ? ''
           : makeSquareName(move.from),

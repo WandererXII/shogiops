@@ -10,6 +10,7 @@ import { allRoles, fullSquareSet, handRoles, pieceCanPromote, pieceForcePromote,
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
   OppositeCheck = 'ERR_OPPOSITE_CHECK',
+  OppositeTurnEnd = 'ERR_OPPOSITE_TURN_END',
   PiecesOutsideBoard = 'ERR_PIECES_OUTSIDE_BOARD',
   InvalidPieces = 'ERR_INVALID_PIECE',
   InvalidPiecesHand = 'ERR_INVALID_PIECE_IN_HAND',
@@ -174,10 +175,19 @@ export abstract class Position {
     return false;
   }
 
+  lastManStanding(_ctx?: Context): boolean {
+    return false;
+  }
+
   isEnd(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     return (
-      this.isCheckmate(ctx) || this.isStalemate(ctx) || this.isDraw(ctx) || this.isBareKing(ctx) || this.kingsLost(ctx)
+      this.isCheckmate(ctx) ||
+      this.isStalemate(ctx) ||
+      this.isDraw(ctx) ||
+      this.isBareKing(ctx) ||
+      this.kingsLost(ctx) ||
+      this.lastManStanding(ctx)
     );
   }
 

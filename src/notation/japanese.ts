@@ -20,7 +20,7 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
   } else {
     const piece = pos.board.get(move.from);
     if (piece) {
-      const roleStr = roleToKanji(piece.role),
+      const roleStr = pos.rules === 'hasamishogi' ? (piece.color === 'sente' ? '歩' : 'と') : roleToKanji(piece.role),
         ambPieces = aimingAt(
           pos,
           pos.board

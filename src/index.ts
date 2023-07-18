@@ -62,6 +62,8 @@ export { Annanshogi } from './variant/annanshogi.js';
 
 export { Kyotoshogi } from './variant/kyotoshogi.js';
 
+export { Hasamishogi } from './variant/hasamishogi.js';
+
 export * as variant from './variant/variant.js';
 
 export * as variantUtil from './variant/util.js';

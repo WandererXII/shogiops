@@ -113,6 +113,8 @@ function defaultHandicap(rules: Rules): string {
       return '安南将棋';
     case 'kyotoshogi':
       return '京都将棋';
+    case 'hasamishogi':
+      return 'はさみ将棋';
     default:
       return '平手';
   }
@@ -171,6 +173,7 @@ function detectVariant(lines: number | undefined, tag: string | undefined): Rule
     return 'kyotoshogi';
   else if ((defined(tag) && tag.startsWith('手合割：5五')) || lines === 5) return 'minishogi';
   else if (defined(tag) && tag.startsWith('手合割：安南')) return 'annanshogi';
+  else if (defined(tag) && tag.startsWith('手合割：はさみ')) return 'hasamishogi';
   else return 'standard';
 }
 
@@ -357,6 +360,14 @@ export function makeKifMove(pos: Position, move: Move, lastDest?: Square): strin
         return `${move1}\n${move2}`;
       }
       return moveDestStr + roleToFullKanji(role) + promStr + ' （←' + ms(move.from) + '）';
-    } else return moveDestStr + roleToKanji(role) + promStr + '(' + makeNumberSquare(move.from) + ')';
+    } else
+      return (
+        moveDestStr +
+        (pos.rules === 'hasamishogi' ? (pos.turn === 'sente' ? '歩' : 'と') : roleToKanji(role)) +
+        promStr +
+        '(' +
+        makeNumberSquare(move.from) +
+        ')'
+      );
   }
 }

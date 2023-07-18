@@ -27,6 +27,8 @@ export function initialSfen(rules: Rules): string {
       return 'lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1';
     case 'kyotoshogi':
       return 'pgkst/5/5/5/TSKGP b - 1';
+    case 'hasamishogi':
+      return 'ppppppppp/9/9/9/9/9/9/9/PPPPPPPPP b - 1';
     default:
       return 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1';
   }
@@ -40,6 +42,8 @@ export function roleToForsyth(rules: Rules): (role: Role) => string | undefined 
       return minishogiRoleToForsyth;
     case 'kyotoshogi':
       return kyotoshogiRoleToForsyth;
+    case 'hasamishogi':
+      return hasamishogiRoleToForsyth;
     default:
       return standardRoleToForsyth;
   }
@@ -53,6 +57,8 @@ export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
       return minishogiForsythToRole;
     case 'kyotoshogi':
       return kyotoshogiForsythToRole;
+    case 'hasamishogi':
+      return hasamishogiForsythToRole;
     default:
       return standardForsythToRole;
   }
@@ -587,6 +593,24 @@ function kyotoshogiForsythToRole(ch: string): Role | undefined {
       return 'tokin';
     case 'l':
       return 'lance';
+    default:
+      return;
+  }
+}
+
+function hasamishogiRoleToForsyth(role: Role): string | undefined {
+  switch (role) {
+    case 'rook':
+      return 'p';
+    default:
+      return;
+  }
+}
+
+function hasamishogiForsythToRole(ch: string): Role | undefined {
+  switch (ch.toLowerCase()) {
+    case 'p':
+      return 'rook';
     default:
       return;
   }

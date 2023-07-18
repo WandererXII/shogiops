@@ -2,6 +2,7 @@ import { Result } from '@badrap/result';
 import { Setup } from '../types.js';
 import { Annanshogi } from './annanshogi.js';
 import { Chushogi } from './chushogi.js';
+import { Hasamishogi } from './hasamishogi.js';
 import { Kyotoshogi } from './kyotoshogi.js';
 import { Minishogi } from './minishogi.js';
 import { PositionError } from './position.js';
@@ -13,6 +14,7 @@ export interface RulesTypeMap {
   chushogi: Chushogi;
   annanshogi: Annanshogi;
   kyotoshogi: Kyotoshogi;
+  hasamishogi: Hasamishogi;
 }
 
 export function defaultPosition<R extends keyof RulesTypeMap>(rules: R): RulesTypeMap[R] {
@@ -25,6 +27,8 @@ export function defaultPosition<R extends keyof RulesTypeMap>(rules: R): RulesTy
       return Annanshogi.default();
     case 'kyotoshogi':
       return Kyotoshogi.default();
+    case 'hasamishogi':
+      return Hasamishogi.default();
     default:
       return Shogi.default();
   }
@@ -44,6 +48,8 @@ export function initializePosition<R extends keyof RulesTypeMap>(
       return Annanshogi.from(setup, strict);
     case 'kyotoshogi':
       return Kyotoshogi.from(setup, strict);
+    case 'hasamishogi':
+      return Hasamishogi.from(setup, strict);
     default:
       return Shogi.from(setup, strict);
   }

@@ -19,6 +19,8 @@ export function pieceCanPromote(
       };
     case 'kyotoshogi':
       return (piece: Piece) => promotableRoles(rules).includes(piece.role);
+    case 'hasamishogi':
+      return () => false;
     default:
       return (piece: Piece, from: Square, to: Square) =>
         promotableRoles(rules).includes(piece.role) &&
@@ -29,6 +31,7 @@ export function pieceForcePromote(rules: Rules): (piece: Piece, sq: Square) => b
   switch (rules) {
     case 'chushogi':
     case 'annanshogi':
+    case 'hasamishogi':
       return () => false;
     case 'kyotoshogi':
       return (piece: Piece) => promotableRoles(rules).includes(piece.role);
@@ -105,6 +108,8 @@ export function allRoles(rules: Rules): Role[] {
       return ['rook', 'bishop', 'gold', 'silver', 'pawn', 'dragon', 'horse', 'promotedsilver', 'tokin', 'king'];
     case 'kyotoshogi':
       return ['rook', 'pawn', 'silver', 'bishop', 'gold', 'knight', 'lance', 'tokin', 'king'];
+    case 'hasamishogi':
+      return ['rook'];
     default:
       return [
         'rook',
@@ -129,6 +134,7 @@ export function allRoles(rules: Rules): Role[] {
 export function handRoles(rules: Rules): Role[] {
   switch (rules) {
     case 'chushogi':
+    case 'hasamishogi':
       return [];
     case 'minishogi':
       return ['rook', 'bishop', 'gold', 'silver', 'pawn'];
@@ -166,6 +172,8 @@ export function promotableRoles(rules: Rules): Role[] {
       return ['pawn', 'silver', 'bishop', 'rook'];
     case 'kyotoshogi':
       return ['rook', 'pawn', 'silver', 'bishop', 'gold', 'knight', 'lance', 'tokin'];
+    case 'hasamishogi':
+      return [];
     default:
       return ['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'];
   }
@@ -189,6 +197,8 @@ export function promote(rules: Rules): (role: Role) => Role | undefined {
       return chuushogiPromote;
     case 'kyotoshogi':
       return kyotoPromote;
+    case 'hasamishogi':
+      return () => undefined;
     default:
       return standardPromote;
   }
@@ -200,6 +210,8 @@ export function unpromote(rules: Rules): (role: Role) => Role | undefined {
       return chuushogiUnpromote;
     case 'kyotoshogi':
       return kyotoPromote;
+    case 'hasamishogi':
+      return () => undefined;
     default:
       return standardUnpromote;
   }
@@ -219,6 +231,8 @@ export function promotionZone(rules: Rules): (color: Color) => SquareSet {
           : new SquareSet([0x0, 0x0, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
     case 'kyotoshogi':
       return () => new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    case 'hasamishogi':
+      return () => SquareSet.empty();
     default:
       return (color: Color) =>
         color === 'sente'

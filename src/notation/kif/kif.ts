@@ -113,6 +113,8 @@ function defaultHandicap(rules: Rules): string {
       return '安南将棋';
     case 'kyotoshogi':
       return '京都将棋';
+    case 'checkshogi':
+      return '王手将棋';
     default:
       return '平手';
   }
@@ -171,6 +173,7 @@ function detectVariant(lines: number | undefined, tag: string | undefined): Rule
     return 'kyotoshogi';
   else if ((defined(tag) && tag.startsWith('手合割：5五')) || lines === 5) return 'minishogi';
   else if (defined(tag) && tag.startsWith('手合割：安南')) return 'annanshogi';
+  else if (defined(tag) && tag.startsWith('手合割：王手')) return 'checkshogi';
   else return 'standard';
 }
 

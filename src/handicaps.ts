@@ -343,6 +343,67 @@ export const handicaps: Handicap[] = [
     japaneseName: '裸玉',
     englishName: 'Naked King',
   },
+  // checkshogi
+  {
+    sfen: 'lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '香落ち',
+    englishName: 'Lance',
+  },
+  {
+    sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '右香落ち',
+    englishName: 'Right Lance',
+  },
+  {
+    sfen: 'lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '角落ち',
+    englishName: 'Bishop',
+  },
+  {
+    sfen: 'lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '飛車落ち',
+    englishName: 'Rook',
+  },
+  {
+    sfen: 'lnsgkgsn1/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '飛香落ち',
+    englishName: 'Rook-Lance',
+  },
+  {
+    sfen: 'lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '二枚落ち',
+    englishName: '2-piece',
+  },
+  {
+    sfen: '1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '四枚落ち',
+    englishName: '4-piece',
+  },
+  {
+    sfen: '2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '六枚落ち',
+    englishName: '6-piece',
+  },
+  {
+    sfen: '3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '八枚落ち',
+    englishName: '8-piece',
+  },
+  {
+    sfen: '4k4/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    rules: 'checkshogi',
+    japaneseName: '十枚落ち',
+    englishName: '10-piece',
+  },
 ];
 
 function compareSfens(a: string, b: string): boolean {

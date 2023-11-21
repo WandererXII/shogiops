@@ -170,14 +170,23 @@ export abstract class Position {
     return false;
   }
 
-  kingsLost(_ctx?: Context): boolean {
+  isWithoutKings(_ctx?: Context): boolean {
+    return false;
+  }
+
+  isSpecialVariantEnd(_ctx?: Context): boolean {
     return false;
   }
 
   isEnd(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
     return (
-      this.isCheckmate(ctx) || this.isStalemate(ctx) || this.isDraw(ctx) || this.isBareKing(ctx) || this.kingsLost(ctx)
+      this.isCheckmate(ctx) ||
+      this.isStalemate(ctx) ||
+      this.isDraw(ctx) ||
+      this.isBareKing(ctx) ||
+      this.isWithoutKings(ctx) ||
+      this.isSpecialVariantEnd(ctx)
     );
   }
 

@@ -234,16 +234,16 @@ export class Chushogi extends Position {
     } else return this.isBareKing(this.ctx(this.turn)) || this.isBareKing(this.ctx(opposite(this.turn)));
   }
 
-  kingsLost(ctx?: Context): boolean {
+  isWithoutKings(ctx?: Context): boolean {
     const color = ctx?.color || this.turn;
     return this.kingsOf(color).isEmpty();
   }
 
   outcome(ctx?: Context | undefined): Outcome | undefined {
     ctx = ctx || this.ctx();
-    if (this.kingsLost(ctx))
+    if (this.isWithoutKings(ctx))
       return {
-        result: 'kinglost',
+        result: 'kingslost',
         winner: opposite(ctx.color),
       };
     else if (this.isStalemate(ctx)) {

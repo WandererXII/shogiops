@@ -133,10 +133,10 @@ export interface Setup {
   lastLionCapture?: Square; // by non-lion piece
 }
 
-export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kinglost'] as const;
+export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kingslost', 'specialVariantEnd'] as const;
 export type Result = (typeof RESULTS)[number];
 
-export const RULES = ['standard', 'minishogi', 'chushogi', 'annanshogi', 'kyotoshogi'] as const;
+export const RULES = ['standard', 'minishogi', 'chushogi', 'annanshogi', 'kyotoshogi', 'checkshogi'] as const;
 export type Rules = (typeof RULES)[number];
 
 export interface Outcome {

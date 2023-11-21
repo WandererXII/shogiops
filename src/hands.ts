@@ -62,7 +62,10 @@ export class Hand {
 }
 
 export class Hands {
-  private constructor(private sente: Hand, private gote: Hand) {}
+  private constructor(
+    private sente: Hand,
+    private gote: Hand
+  ) {}
 
   static empty(): Hands {
     return new Hands(Hand.empty(), Hand.empty());

@@ -27,8 +27,8 @@ export function makeWesternEngineMove(pos: Position, move: Move): string | undef
         const promStr = move.promotion
           ? '+'
           : pieceCanPromote(pos.rules)(piece, move.from, move.to, toCapture)
-          ? '='
-          : '';
+            ? '='
+            : '';
         return `${roleStr}${disambStr}${toStr}${promStr}`;
       }
     } else return undefined;

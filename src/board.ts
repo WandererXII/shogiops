@@ -2,7 +2,11 @@ import { SquareSet } from './squareSet.js';
 import { Color, ColorMap, Piece, ROLES, Role, RoleMap, Square } from './types.js';
 
 export class Board implements Iterable<[Square, Piece]> {
-  private constructor(public occupied: SquareSet, private colorMap: ColorMap, private roleMap: RoleMap) {}
+  private constructor(
+    public occupied: SquareSet,
+    private colorMap: ColorMap,
+    private roleMap: RoleMap
+  ) {}
 
   static empty(): Board {
     return new Board(SquareSet.empty(), new Map(), new Map());

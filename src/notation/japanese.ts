@@ -41,8 +41,8 @@ export function makeJapaneseMove(pos: Position, move: Move, lastDest?: Square): 
           promStr = move.promotion
             ? '成'
             : pieceCanPromote(pos.rules)(piece, move.from, move.to, pos.board.get(move.to))
-            ? '不成'
-            : '';
+              ? '不成'
+              : '';
         return `${destStr}${roleStr}${ambStr}${promStr}`;
       }
     } else return undefined;

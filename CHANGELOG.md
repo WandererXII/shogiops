@@ -1,5 +1,10 @@
 # Changelog for shogiops
 
+## v0.15.0
+
+- New variant - `checkshogi`.
+- Result `kinglost` changed to `kingslost` - used for chushogi.
+
 ## v0.14.4
 
 - Fix a bug in annan shogi move genetation.
@@ -21,7 +26,7 @@
 
 ## v0.14.0
 
-- New variant - `Kyotoshogi`.
+- New variant - `kyotoshogi`.
 - Renamed `annan` to `annanshogi` and `Annan` to `Annanshogi`.
 
 ## v0.13.0

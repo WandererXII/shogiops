@@ -33,3 +33,31 @@ test('check win', () => {
   expect(pos2.outcome()?.result).toBe('specialVariantEnd');
   expect(pos2.outcome()?.winner).toBe('gote');
 });
+
+test('pawn drop checkmate', () => {
+  const pos = parseSfen('checkshogi', '3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp', false).unwrap();
+  expect(pos.isCheck()).toBe(false);
+  expect(pos.isEnd()).toBe(false);
+  const move = parseUsi('P*5b')!;
+  expect(pos.isLegal(move)).toBe(false);
+  const move2 = parseUsi('L*5b')!;
+  expect(pos.isLegal(move2)).toBe(true);
+  pos.play(move2);
+  expect(pos.isCheck()).toBe(true);
+  expect(pos.isEnd()).toBe(true);
+  expect(pos.outcome()?.result).toBe('specialVariantEnd');
+  expect(pos.outcome()?.winner).toBe('sente');
+});
+
+test('pawn drop check', () => {
+  const pos = parseSfen('checkshogi', '3rk4/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1').unwrap();
+  expect(pos.isCheck()).toBe(false);
+  expect(pos.isEnd()).toBe(false);
+  const move = parseUsi('P*5b')!;
+  expect(pos.isLegal(move)).toBe(true);
+  pos.play(move);
+  expect(pos.isCheck()).toBe(true);
+  expect(pos.isEnd()).toBe(true);
+  expect(pos.outcome()?.result).toBe('specialVariantEnd');
+  expect(pos.outcome()?.winner).toBe('sente');
+});

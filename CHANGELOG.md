@@ -1,5 +1,10 @@
 # Changelog for shogiops
 
+## v0.15.1
+
+- Fix recognizing pawn drop checkmate for `checkshogi`.
+- Bump dependencies.
+
 ## v0.15.0
 
 - New variant - `checkshogi`.
@@ -7,7 +12,7 @@
 
 ## v0.14.4
 
-- Fix a bug in annan shogi move genetation.
+- Fix a bug in annan shogi move generation.
 
 ## v0.14.3
 

@@ -129,7 +129,9 @@ export class Annanshogi extends Position {
       if (defined(kingFront) && mask.has(kingFront)) {
         const child = this.clone();
         child.play({ role: 'pawn', to: kingFront });
-        if (defined(child.outcome())) mask = mask.without(kingFront);
+        const childCtx = child.ctx(),
+          checkmateOrStalemate = child.isCheckmate(childCtx) || child.isStalemate(childCtx);
+        if (checkmateOrStalemate) mask = mask.without(kingFront);
       }
     }
 

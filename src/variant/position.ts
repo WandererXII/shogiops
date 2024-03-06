@@ -3,7 +3,7 @@ import { between } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { COLORS, Color, Move, Outcome, Piece, PieceName, Role, Rules, Setup, Square, isDrop } from '../types.js';
+import { COLORS, Color, MoveOrDrop, Outcome, Piece, PieceName, Role, Rules, Setup, Square, isDrop } from '../types.js';
 import { defined, lionRoles, makePieceName, opposite } from '../util.js';
 import { allRoles, fullSquareSet, handRoles, pieceCanPromote, pieceForcePromote, promote, unpromote } from './util.js';
 
@@ -31,7 +31,7 @@ export abstract class Position {
   hands: Hands;
   turn: Color;
   moveNumber: number;
-  lastMove: Move | { to: Square } | undefined;
+  lastMoveOrDrop: MoveOrDrop | { to: Square } | undefined;
   lastLionCapture: Square | undefined; // by non-lion piece
 
   protected constructor(readonly rules: Rules) {}
@@ -58,7 +58,7 @@ export abstract class Position {
     this.hands = setup.hands.clone();
     this.turn = setup.turn;
     this.moveNumber = setup.moveNumber;
-    this.lastMove = setup.lastMove;
+    this.lastMoveOrDrop = setup.lastMoveOrDrop;
     this.lastLionCapture = setup.lastLionCapture;
   }
 
@@ -68,7 +68,7 @@ export abstract class Position {
     pos.hands = this.hands.clone();
     pos.turn = this.turn;
     pos.moveNumber = this.moveNumber;
-    pos.lastMove = this.lastMove;
+    pos.lastMoveOrDrop = this.lastMoveOrDrop;
     pos.lastLionCapture = this.lastLionCapture;
     return pos;
   }
@@ -243,22 +243,21 @@ export abstract class Position {
     return false;
   }
 
-  isLegal(move: Move, ctx?: Context): boolean {
+  isLegal(md: MoveOrDrop, ctx?: Context): boolean {
     const turn = ctx?.color || this.turn;
-    if (isDrop(move)) {
-      const role = move.role;
+    if (isDrop(md)) {
+      const role = md.role;
       if (!handRoles(this.rules).includes(role) || this.hands[turn].get(role) <= 0) return false;
-      return this.dropDests({ color: turn, role }, ctx).has(move.to);
+      return this.dropDests({ color: turn, role }, ctx).has(md.to);
     } else {
-      const piece = this.board.get(move.from);
+      const piece = this.board.get(md.from);
       if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
 
       // Checking whether we can promote
-      if (move.promotion && !pieceCanPromote(this.rules)(piece, move.from, move.to, this.board.get(move.to)))
-        return false;
-      if (!move.promotion && pieceForcePromote(this.rules)(piece, move.to)) return false;
+      if (md.promotion && !pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.get(md.to))) return false;
+      if (!md.promotion && pieceForcePromote(this.rules)(piece, md.to)) return false;
 
-      return this.moveDests(move.from, ctx).has(move.to);
+      return this.moveDests(md.from, ctx).has(md.to);
     }
   }
 
@@ -275,34 +274,34 @@ export abstract class Position {
       this.hands[opposite(capture.color)].capture(unpromotedRole);
   }
 
-  // doesn't care about validity, just tries to play the move
-  play(move: Move): void {
+  // doesn't care about validity, just tries to play the move/drop
+  play(md: MoveOrDrop): void {
     const turn = this.turn;
 
     this.moveNumber += 1;
     this.turn = opposite(turn);
-    this.lastMove = move;
+    this.lastMoveOrDrop = md;
     this.lastLionCapture = undefined;
 
-    if (isDrop(move)) {
-      this.board.set(move.to, { role: move.role, color: turn });
-      this.hands[turn].drop(this.unpromoteForHand(move.role) || move.role);
+    if (isDrop(md)) {
+      this.board.set(md.to, { role: md.role, color: turn });
+      this.hands[turn].drop(this.unpromoteForHand(md.role) || md.role);
     } else {
-      const piece = this.board.take(move.from),
+      const piece = this.board.take(md.from),
         role = piece?.role;
       if (!role) return;
 
       if (
-        (move.promotion && pieceCanPromote(this.rules)(piece, move.from, move.to, this.board.get(move.to))) ||
-        pieceForcePromote(this.rules)(piece, move.to)
+        (md.promotion && pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.get(md.to))) ||
+        pieceForcePromote(this.rules)(piece, md.to)
       )
         piece.role = promote(this.rules)(role) || role;
 
-      const capture = this.board.set(move.to, piece),
-        secondCapture = defined(move.midStep) ? this.board.take(move.midStep) : undefined;
+      const capture = this.board.set(md.to, piece),
+        secondCapture = defined(md.midStep) ? this.board.take(md.midStep) : undefined;
       if (capture) {
         if (!lionRoles.includes(role) && capture.color === this.turn && lionRoles.includes(capture.role))
-          this.lastLionCapture = move.to;
+          this.lastLionCapture = md.to;
         this.storeCapture(capture);
       }
       if (defined(secondCapture)) this.storeCapture(secondCapture);

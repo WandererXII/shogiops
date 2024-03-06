@@ -110,13 +110,13 @@ export interface DropMove {
   to: Square;
 }
 
-export type Move = NormalMove | DropMove;
+export type MoveOrDrop = NormalMove | DropMove;
 
-export function isDrop(v: Move): v is DropMove {
+export function isDrop(v: MoveOrDrop): v is DropMove {
   return 'role' in v;
 }
 
-export function isNormal(v: Move): v is NormalMove {
+export function isMove(v: MoveOrDrop): v is NormalMove {
   return 'from' in v;
 }
 
@@ -125,8 +125,8 @@ export interface Setup {
   hands: Hands;
   turn: Color;
   moveNumber: number;
-  lastMove?:
-    | Move
+  lastMoveOrDrop?:
+    | MoveOrDrop
     | {
         to: Square;
       };

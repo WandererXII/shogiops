@@ -1,9 +1,9 @@
 import {
   makeKifHeader,
-  makeKifMove,
+  makeKifMoveOrDrop,
   parseKifHeader,
-  parseKifMove,
-  parseKifMoves,
+  parseKifMoveOrDrop,
+  parseKifMovesOrDrops,
   parseTags,
 } from '../../src/notation/kif/kif';
 import { initialSfen, makeSfen, parseSfen } from '../../src/sfen';
@@ -140,36 +140,36 @@ test('parse empty kif header', () => {
   expect(kifPos).toEqual(Shogi.default());
 });
 
-test('make kif moves individually', () => {
+test('make kif moves/drops individually', () => {
   const pos = Shogi.default();
-  expect(makeKifMove(pos, parseUsi('7g7f')!)).toEqual('７六歩(77)');
-  expect(makeKifMove(pos, parseUsi('9i9h')!)).toEqual('９八香(99)');
-  expect(makeKifMove(pos, parseUsi('1a1b')!)).toEqual('１二香(11)');
-  expect(makeKifMove(pos, parseUsi('5i5h')!)).toEqual('５八玉(59)');
+  expect(makeKifMoveOrDrop(pos, parseUsi('7g7f')!)).toEqual('７六歩(77)');
+  expect(makeKifMoveOrDrop(pos, parseUsi('9i9h')!)).toEqual('９八香(99)');
+  expect(makeKifMoveOrDrop(pos, parseUsi('1a1b')!)).toEqual('１二香(11)');
+  expect(makeKifMoveOrDrop(pos, parseUsi('5i5h')!)).toEqual('５八玉(59)');
 
   const pos2 = parseSfen('standard', 'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10').unwrap(),
     line = ['R*5b', '6i7h', '5e5h+'].map(m => parseUsi(m)!);
-  expect(makeKifMove(pos2, line[0])).toEqual('５二飛打');
+  expect(makeKifMoveOrDrop(pos2, line[0])).toEqual('５二飛打');
   pos2.play(line.shift()!);
-  expect(makeKifMove(pos2, line[0])).toEqual('７八金(69)');
+  expect(makeKifMoveOrDrop(pos2, line[0])).toEqual('７八金(69)');
   pos2.play(line.shift()!);
-  expect(makeKifMove(pos2, line[0])).toEqual('５八飛成(55)');
+  expect(makeKifMoveOrDrop(pos2, line[0])).toEqual('５八飛成(55)');
   pos2.play(line.shift()!);
 });
 
-test('parse kif moves one by one', () => {
+test('parse kif moves/drops one by one', () => {
   const pos = Shogi.default(),
     line = ['7g7f', '8c8d', '5g5f', '5c5d', '2h5h', '3a4b', '5f5e', '5d5e', '8h5e', '8d8e', '5e7c+'].map(
       m => parseUsi(m)!
     );
   for (const m of line) {
-    expect(parseKifMove(makeKifMove(pos, m)!, pos.lastMove?.to)).toEqual(m);
+    expect(parseKifMoveOrDrop(makeKifMoveOrDrop(pos, m)!, pos.lastMoveOrDrop?.to)).toEqual(m);
     pos.play(m);
   }
   expect(pos.isCheckmate()).toBe(true);
 });
 
-test('parse kif moves', () => {
+test('parse kif moves/drops', () => {
   const pos = Shogi.default(),
     line = [
       ' 1 ７六歩(77)',
@@ -184,7 +184,7 @@ test('parse kif moves', () => {
       '10 ８五歩(84)',
       '11 ７三角成(55)',
     ];
-  for (const m of parseKifMoves(line)) pos.play(m);
+  for (const m of parseKifMovesOrDrops(line)) pos.play(m);
   expect(pos.isCheckmate()).toBe(true);
 });
 
@@ -244,21 +244,21 @@ test('make kif header - chushogi', () => {
 
 test('make chushogi moves', () => {
   const pos = Chushogi.default();
-  expect(makeKifMove(pos, parseUsi('7i7h')!)).toEqual('7八歩兵 （←7九）');
+  expect(makeKifMoveOrDrop(pos, parseUsi('7i7h')!)).toEqual('7八歩兵 （←7九）');
   pos.play(parseUsi('7i7h')!);
-  expect(makeKifMove(pos, parseUsi('7d7e')!)).toEqual('7五歩兵 （←7四）');
+  expect(makeKifMoveOrDrop(pos, parseUsi('7d7e')!)).toEqual('7五歩兵 （←7四）');
   pos.play(parseUsi('7d7e')!);
-  expect(makeKifMove(pos, parseUsi('7j7i6h')!)).toEqual(`一歩目 7九獅子 （←7十）
+  expect(makeKifMoveOrDrop(pos, parseUsi('7j7i6h')!)).toEqual(`一歩目 7九獅子 （←7十）
 二歩目 6八獅子 （←7九）`);
 });
 
 test('parse chushogi moves', () => {
-  expect(parseKifMoves(['57手目一歩目 ▲6六獅子 （←7七）', '57手目二歩目 ▲7七獅子（居食い） （←6六）'])).toEqual([
+  expect(parseKifMovesOrDrops(['57手目一歩目 ▲6六獅子 （←7七）', '57手目二歩目 ▲7七獅子（居食い） （←6六）'])).toEqual([
     parseUsi('7g6f7g'),
   ]);
-  expect(parseKifMove('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
-  expect(parseKifMove('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
-  expect(parseKifMove('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
+  expect(parseKifMoveOrDrop('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
+  expect(parseKifMoveOrDrop('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
+  expect(parseKifMoveOrDrop('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });
 
 test('chushogi kif default', () => {

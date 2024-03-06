@@ -1,5 +1,12 @@
 # Changelog for shogiops
 
+## v0.16.0
+
+- Renamed `Move` to `MoveOrDrop`, later `NormalMove` will be renamed to `Move` and `DropMove` to just `Drop`.
+- `isNormal` was renamed to `isMove`.
+- `lastMove` in `Position` and `Setup` was renamed to `lastMoveOrDrop`.
+- Many functions containing the word 'move' were renamed to include the word 'drop', such as changing `makeWesternMove` to `makeWesternMoveOrDrop`.
+
 ## v0.15.1
 
 - Fix recognizing pawn drop checkmate for `checkshogi`.

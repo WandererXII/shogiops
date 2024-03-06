@@ -10,12 +10,12 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
 - Read and write SFEN
 - Vocabulary (Square, SquareSet, Color, Role, Piece, Board, Position)
 - Shogi
-  - Move making
+  - Move/drop making
   - Legal move and drop move generation
   - Game end and outcome
   - Setup validation
 - Attacks and rays using hyperbola quintessence
-- Read and write USI, Japanese, Western and Kitao-Kawasaki move notation
+- Read and write USI, Japanese, Western and Kitao-Kawasaki notation
 - Read and write KIF and CSA notation
 - Currently supported variants - shogi, minishogi, chushogi, annan shogi and kyoto shogi.
 - [Compatibility with shogiground](https://github.com/WandererXII/shogiground)
@@ -27,13 +27,13 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
 
 Test directory has a lot of examples and use-cases.
 
-```javascript
-import { parseUsi } from 'shogiops/util';
+```typescript
 import { Shogi } from 'shogiops/shogi';
+import { parseUsi } from 'shogiops/util';
 
 const pos = Shogi.default();
-const move = parseUsi('7g7f')!;
-pos.play(move);
+const usi = parseUsi('7g7f')!;
+pos.play(usi);
 ```
 
 ## License

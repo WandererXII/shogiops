@@ -126,9 +126,9 @@ test('prod 500 usi', () => {
   for (const usis of usiFixture) {
     const pos = defaultPosition('standard');
     for (const usi of usis.split(' ')) {
-      const move = parseUsi(usi)!;
-      expect(pos.isLegal(move)).toBe(true);
-      pos.play(move);
+      const md = parseUsi(usi)!;
+      expect(pos.isLegal(md)).toBe(true);
+      pos.play(md);
     }
   }
 });

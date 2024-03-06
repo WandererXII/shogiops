@@ -13,7 +13,7 @@ import {
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { Color, Move, Piece, Role, Setup, Square, isDrop } from '../types.js';
+import { Color, MoveOrDrop, Piece, Role, Setup, Square, isDrop } from '../types.js';
 import { defined, opposite } from '../util.js';
 import { Context, IllegalSetup, Position, PositionError } from './position.js';
 import { standardMoveDests } from './shogi.js';
@@ -89,15 +89,15 @@ export class Kyotoshogi extends Position {
     return mask.intersect(fullSquareSet(this.rules));
   }
 
-  isLegal(move: Move, ctx?: Context | undefined): boolean {
+  isLegal(md: MoveOrDrop, ctx?: Context | undefined): boolean {
     const turn = ctx?.color || this.turn;
-    if (isDrop(move)) {
-      const roleInHand = !handRoles(this.rules).includes(move.role) ? unpromote(this.rules)(move.role) : move.role;
+    if (isDrop(md)) {
+      const roleInHand = !handRoles(this.rules).includes(md.role) ? unpromote(this.rules)(md.role) : md.role;
       if (!roleInHand || !handRoles(this.rules).includes(roleInHand) || this.hands[turn].get(roleInHand) <= 0)
         return false;
-      return this.dropDests({ color: turn, role: move.role }, ctx).has(move.to);
+      return this.dropDests({ color: turn, role: md.role }, ctx).has(md.to);
     } else {
-      return super.isLegal(move, ctx);
+      return super.isLegal(md, ctx);
     }
   }
 }

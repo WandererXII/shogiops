@@ -1,5 +1,5 @@
 import { SquareSet } from './squareSet.js';
-import { Move, PieceName, SquareName, isDrop } from './types.js';
+import { MoveOrDrop, PieceName, SquareName, isDrop } from './types.js';
 import { defined, makeSquareName, parseSquareName, parseUsi } from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
@@ -48,16 +48,16 @@ export function shogigroundSecondLionStep(
 }
 
 export function usiToSquareNames(usi: string): SquareName[] {
-  const move = parseUsi(usi);
-  return defined(move) ? moveToSquareNames(move) : [];
+  const md = parseUsi(usi);
+  return defined(md) ? moveToSquareNames(md) : [];
 }
 
-export function moveToSquareNames(move: Move): SquareName[] {
-  return isDrop(move)
-    ? [makeSquareName(move.to)]
-    : defined(move.midStep)
-      ? [makeSquareName(move.from), makeSquareName(move.midStep), makeSquareName(move.to)]
-      : [makeSquareName(move.from), makeSquareName(move.to)];
+export function moveToSquareNames(md: MoveOrDrop): SquareName[] {
+  return isDrop(md)
+    ? [makeSquareName(md.to)]
+    : defined(md.midStep)
+      ? [makeSquareName(md.from), makeSquareName(md.midStep), makeSquareName(md.to)]
+      : [makeSquareName(md.from), makeSquareName(md.to)];
 }
 
 export function checksSquareNames(pos: Position): SquareName[] {

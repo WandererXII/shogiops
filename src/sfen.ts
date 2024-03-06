@@ -1,7 +1,7 @@
 import { Result } from '@badrap/result';
 import { Board } from './board.js';
 import { Hand, Hands } from './hands.js';
-import { Color, Move, Piece, Role, Rules, Square } from './types.js';
+import { Color, MoveOrDrop, Piece, Role, Rules, Square } from './types.js';
 import { defined, makeSquareName, parseCoordinates, parseSquareName, toBW } from './util.js';
 import { Position, PositionError } from './variant/position.js';
 import { dimensions, handRoles } from './variant/util.js';
@@ -163,12 +163,12 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   // Hands
   const handsPart = parts.shift();
   let hands = Result.ok(Hands.empty()),
-    lastMove: Move | { to: Square } | undefined,
+    lastMoveOrDrop: MoveOrDrop | { to: Square } | undefined,
     lastLionCapture: Square | undefined;
   if (rules === 'chushogi') {
     const destSquare = defined(handsPart) ? parseSquareName(handsPart) : undefined;
     if (defined(destSquare)) {
-      lastMove = { to: destSquare };
+      lastMoveOrDrop = { to: destSquare };
       lastLionCapture = destSquare;
     }
   } else if (defined(handsPart)) hands = parseHands(rules, handsPart);
@@ -184,7 +184,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
     hands.chain(hands =>
       initializePosition(
         rules,
-        { board, hands, turn, moveNumber: Math.max(1, moveNumber), lastMove, lastLionCapture },
+        { board, hands, turn, moveNumber: Math.max(1, moveNumber), lastMoveOrDrop, lastLionCapture },
         !!strict
       )
     )

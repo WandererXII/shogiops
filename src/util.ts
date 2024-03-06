@@ -1,4 +1,15 @@
-import { Color, FILE_NAMES, Move, Piece, PieceName, RANK_NAMES, Role, Square, SquareName, isDrop } from './types.js';
+import {
+  Color,
+  FILE_NAMES,
+  MoveOrDrop,
+  Piece,
+  PieceName,
+  RANK_NAMES,
+  Role,
+  Square,
+  SquareName,
+  isDrop,
+} from './types.js';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;
@@ -83,7 +94,7 @@ function parseUsiDropRole(ch: string): Role | undefined {
 export const usiDropRegex = /^([PLNSGBRT])\*(\d\d?[a-p])$/;
 export const usiMoveRegex = /^(\d\d?[a-p])(\d\d?[a-p])?(\d\d?[a-p])(\+|=|\?)?$/;
 
-export function parseUsi(str: string): Move | undefined {
+export function parseUsi(str: string): MoveOrDrop | undefined {
   const dropMatch = str.match(usiDropRegex);
   if (dropMatch) {
     const role = parseUsiDropRole(dropMatch[1]),
@@ -105,13 +116,13 @@ function makeUsiDropRole(role: Role): string {
   return role === 'knight' ? 'N' : role[0].toUpperCase();
 }
 
-export function makeUsi(move: Move): string {
-  if (isDrop(move)) return `${makeUsiDropRole(move.role).toUpperCase()}*${makeSquareName(move.to)}`;
+export function makeUsi(md: MoveOrDrop): string {
+  if (isDrop(md)) return `${makeUsiDropRole(md.role).toUpperCase()}*${makeSquareName(md.to)}`;
   return (
-    makeSquareName(move.from) +
-    (defined(move.midStep) ? makeSquareName(move.midStep) : '') +
-    makeSquareName(move.to) +
-    (move.promotion ? '+' : '')
+    makeSquareName(md.from) +
+    (defined(md.midStep) ? makeSquareName(md.midStep) : '') +
+    makeSquareName(md.to) +
+    (md.promotion ? '+' : '')
   );
 }
 

@@ -1,9 +1,9 @@
 import {
   makeCsaHeader,
-  makeCsaMove,
+  makeCsaMoveOrDrop,
   parseCsaHeader,
-  parseCsaMove,
-  parseCsaMoves,
+  parseCsaMoveOrDrop,
+  parseCsaMovesOrDrops,
   parseTags,
 } from '../../src/notation/csa/csa';
 import { parseNumberSquare } from '../../src/notation/util';
@@ -98,46 +98,46 @@ test('parse CSA header with handicap and CSA board', () => {
   expect(csaPos).toEqual(pos);
 });
 
-test('make CSA moves individually', () => {
+test('make CSA moves/drops individually', () => {
   const pos = Shogi.default();
-  expect(makeCsaMove(pos, parseUsi('7g7f')!)).toEqual('7776FU');
-  expect(makeCsaMove(pos, parseUsi('9i9h')!)).toEqual('9998KY');
-  expect(makeCsaMove(pos, parseUsi('1a1b')!)).toEqual('1112KY');
-  expect(makeCsaMove(pos, parseUsi('5i5h')!)).toEqual('5958OU');
+  expect(makeCsaMoveOrDrop(pos, parseUsi('7g7f')!)).toEqual('7776FU');
+  expect(makeCsaMoveOrDrop(pos, parseUsi('9i9h')!)).toEqual('9998KY');
+  expect(makeCsaMoveOrDrop(pos, parseUsi('1a1b')!)).toEqual('1112KY');
+  expect(makeCsaMoveOrDrop(pos, parseUsi('5i5h')!)).toEqual('5958OU');
 
   const pos2 = parseSfen('standard', 'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10').unwrap();
   const line = ['R*5b', '6i7h', '5e5h+'].map(m => parseUsi(m)!);
-  expect(makeCsaMove(pos2, line[0])).toEqual('0052HI');
+  expect(makeCsaMoveOrDrop(pos2, line[0])).toEqual('0052HI');
   pos2.play(line.shift()!);
-  expect(makeCsaMove(pos2, line[0])).toEqual('6978KI');
+  expect(makeCsaMoveOrDrop(pos2, line[0])).toEqual('6978KI');
   pos2.play(line.shift()!);
-  expect(makeCsaMove(pos2, line[0])).toEqual('5558RY');
+  expect(makeCsaMoveOrDrop(pos2, line[0])).toEqual('5558RY');
   pos2.play(line.shift()!);
 });
 
-test('parse csa moves one by one', () => {
+test('parse csa moves/drops one by one', () => {
   const pos = Shogi.default();
   const line = ['7g7f', '8c8d', '5g5f', '5c5d', '2h5h', '3a4b', '5f5e', '5d5e', '8h5e', '8d8e', '5e7c+'].map(
     m => parseUsi(m)!
   );
   for (const m of line) {
-    expect(parseCsaMove(pos, makeCsaMove(pos, m)!)).toEqual(m);
+    expect(parseCsaMoveOrDrop(pos, makeCsaMoveOrDrop(pos, m)!)).toEqual(m);
     pos.play(m);
   }
   expect(pos.isCheckmate()).toBe(true);
 });
 
-test('parse moves', () => {
+test('parse moves/drops', () => {
   const pos = parseSfen('standard', 'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10').unwrap();
   const line = ['R*5b', '6i7h', '5e5h+'].map(m => parseUsi(m)!);
-  expect(parseCsaMove(pos, '0052HI')).toEqual(parseUsi('R*5b'));
+  expect(parseCsaMoveOrDrop(pos, '0052HI')).toEqual(parseUsi('R*5b'));
   pos.play(line.shift()!);
-  expect(parseCsaMove(pos, '6978KI')).toEqual(parseUsi('6i7h'));
+  expect(parseCsaMoveOrDrop(pos, '6978KI')).toEqual(parseUsi('6i7h'));
   pos.play(line.shift()!);
-  expect(parseCsaMove(pos, '5558RY')).toEqual(parseUsi('5e5h+'));
+  expect(parseCsaMoveOrDrop(pos, '5558RY')).toEqual(parseUsi('5e5h+'));
 });
 
-test('parse csa moves', () => {
+test('parse csa moves/drops', () => {
   const pos = Shogi.default();
   const line = [
     '7776FU',
@@ -152,7 +152,7 @@ test('parse csa moves', () => {
     '8485FU',
     '5573UM',
   ];
-  for (const m of parseCsaMoves(pos, line)) pos.play(m);
+  for (const m of parseCsaMovesOrDrops(pos, line)) pos.play(m);
   expect(pos.isCheckmate()).toBe(true);
 });
 

@@ -1,5 +1,5 @@
 import { SquareSet } from './squareSet.js';
-import { NormalMove, PieceName, Role, Square } from './types.js';
+import { DropMove, NormalMove, PieceName, Role, Square } from './types.js';
 import { makeSquareName, makeUsi, parsePieceName } from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
@@ -64,10 +64,10 @@ export function perft(pos: Position, depth: number, log = false): number {
     for (const prom of promotions) {
       for (const to of dropDestsOfRole) {
         const child = pos.clone(),
-          move = { role: prom ? promote(pos.rules)(piece.role)! : piece.role, to };
-        child.play(move);
+          drop: DropMove = { role: prom ? promote(pos.rules)(piece.role)! : piece.role, to };
+        child.play(drop);
         const children = perft(child, depth - 1, false);
-        if (log) logs.push(`${makeUsi(move)}: ${children}`);
+        if (log) logs.push(`${makeUsi(drop)}: ${children}`);
         nodes += children;
       }
     }

@@ -31,7 +31,7 @@ import {
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { Color, Move, Outcome, Piece, Role, Setup, Square, isNormal } from '../types.js';
+import { Color, MoveOrDrop, Outcome, Piece, Role, Setup, Square, isMove } from '../types.js';
 import { defined, lionRoles, opposite, squareDist } from '../util.js';
 import { Context, IllegalSetup, Position, PositionError } from './position.js';
 import { allRoles, dimensions, fullSquareSet } from './util.js';
@@ -269,13 +269,13 @@ export class Chushogi extends Position {
     } else return;
   }
 
-  isLegal(move: Move, ctx?: Context): boolean {
+  isLegal(md: MoveOrDrop, ctx?: Context): boolean {
     return (
-      isNormal(move) &&
-      ((!defined(move.midStep) && super.isLegal(move, ctx)) ||
-        (defined(move.midStep) &&
-          super.isLegal({ from: move.from, to: move.midStep }, ctx) &&
-          secondLionStepDests(this, move.from, move.midStep).has(move.to)))
+      isMove(md) &&
+      ((!defined(md.midStep) && super.isLegal(md, ctx)) ||
+        (defined(md.midStep) &&
+          super.isLegal({ from: md.from, to: md.midStep }, ctx) &&
+          secondLionStepDests(this, md.from, md.midStep).has(md.to)))
     );
   }
 }

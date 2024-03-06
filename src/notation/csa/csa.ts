@@ -1,7 +1,7 @@
 import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
 import { Hand, Hands } from '../../hands.js';
-import { Color, Move, isDrop } from '../../types.js';
+import { Color, MoveOrDrop, isDrop } from '../../types.js';
 import { defined, parseCoordinates } from '../../util.js';
 import { Shogi, standardBoard } from '../../variant/shogi.js';
 import { allRoles, handRoles, promote } from '../../variant/util.js';
@@ -161,16 +161,16 @@ export function normalizedCsaLines(csa: string): string[] {
 }
 
 //
-// CSA MOVES
+// CSA MOVES/DROPS
 //
 
-// Parsing CSA moves
-export function parseCsaMove(pos: Shogi, csaMove: string): Move | undefined {
-  // Normal move
-  const match = csaMove.match(/(?:[\+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/);
+// Parsing CSA moves/drops
+export function parseCsaMoveOrDrop(pos: Shogi, csaMd: string): MoveOrDrop | undefined {
+  // Move
+  const match = csaMd.match(/(?:[\+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/);
   if (!match) {
     // Drop
-    const match = csaMove.match(/(?:[\+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)/);
+    const match = csaMd.match(/(?:[\+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)/);
     if (!match) return;
     const drop = {
       role: csaToRole(match[2])!,
@@ -187,29 +187,29 @@ export function parseCsaMove(pos: Shogi, csaMove: string): Move | undefined {
   };
 }
 
-export function parseCsaMoves(pos: Shogi, csaMoves: string[]): Move[] {
+export function parseCsaMovesOrDrops(pos: Shogi, csaMds: string[]): MoveOrDrop[] {
   pos = pos.clone();
-  const moves: Move[] = [];
-  for (const m of csaMoves) {
-    const move = parseCsaMove(pos, m);
-    if (!move) return moves;
-    pos.play(move);
-    moves.push(move);
+  const mds: MoveOrDrop[] = [];
+  for (const m of csaMds) {
+    const md = parseCsaMoveOrDrop(pos, m);
+    if (!md) return mds;
+    pos.play(md);
+    mds.push(md);
   }
-  return moves;
+  return mds;
 }
 
-// Making CSA formatted moves
-export function makeCsaMove(pos: Shogi, move: Move): string | undefined {
-  if (isDrop(move)) {
-    return '00' + makeNumberSquare(move.to) + roleToCsa(move.role);
+// Making CSA formatted moves/drops
+export function makeCsaMoveOrDrop(pos: Shogi, md: MoveOrDrop): string | undefined {
+  if (isDrop(md)) {
+    return '00' + makeNumberSquare(md.to) + roleToCsa(md.role);
   } else {
-    const role = pos.board.getRole(move.from);
+    const role = pos.board.getRole(md.from);
     if (!role) return undefined;
     return (
-      makeNumberSquare(move.from) +
-      makeNumberSquare(move.to) +
-      roleToCsa((move.promotion && promote('standard')(role)) || role)
+      makeNumberSquare(md.from) +
+      makeNumberSquare(md.to) +
+      roleToCsa((md.promotion && promote('standard')(role)) || role)
     );
   }
 }

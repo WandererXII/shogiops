@@ -1,5 +1,9 @@
 # Changelog for shogiops
 
+## v0.16.1
+
+- Fixed `annanshogi` move generation.
+
 ## v0.16.0
 
 - Renamed `Move` to `MoveOrDrop`, later `NormalMove` will be renamed to `Move` and `DropMove` to just `Drop`.

@@ -47,8 +47,6 @@ export class Annanshogi extends Position {
     pseudo = pseudo.diff(this.board.color(ctx.color));
 
     if (defined(ctx.king)) {
-      const stdAttackers = standardSquareAttacks(ctx.king, opposite(ctx.color), this.board, this.board.occupied);
-      pseudo = pseudo.diff(ctx.color === 'sente' ? stdAttackers.shr256(16) : stdAttackers.shl256(16));
       if (realPiece.role === 'king') {
         const occ = this.board.occupied.without(square);
         for (const to of pseudo) {
@@ -58,6 +56,10 @@ export class Annanshogi extends Position {
             pseudo = pseudo.without(to);
         }
       } else {
+        const stdAttackers = standardSquareAttacks(ctx.king, opposite(ctx.color), this.board, this.board.occupied);
+        pseudo = pseudo.diff(
+          (ctx.color === 'sente' ? stdAttackers.shr256(16) : stdAttackers.shl256(16)).intersect(this.board.occupied)
+        );
         if (ctx.checkers.nonEmpty()) {
           if (ctx.checkers.size() > 2) return SquareSet.empty();
           const singularChecker = ctx.checkers.singleSquare(),

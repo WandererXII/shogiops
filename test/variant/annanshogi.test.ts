@@ -167,6 +167,14 @@ test('do not allow discovering check by capturing move giver', () => {
   expect(perft(pos2, 1, false)).toBe(10);
 });
 
+test('allow moving/capturing square behind attacker with king', () => {
+  const pos = parseSfen('annanshogi', '5K3/9/9/9/3B5/4k4/9/9/9 w - 1').unwrap();
+  expect(pos.moveDests(parseSquareName('5f')).has(parseSquareName('6f'))).toBe(true);
+  expect(perft(pos, 1, false)).toBe(7);
+  const pos2 = parseSfen('annanshogi', '5K3/9/9/9/3B5/3Bk4/9/9/9 w - 1').unwrap();
+  expect(pos2.moveDests(parseSquareName('5f')).has(parseSquareName('6f'))).toBe(true);
+});
+
 test('proper parse', () => {
   const pos1 = parseSfen('annanshogi', '9/4kP3/5+R3/2B6/9/9/9/9/8K w - 1', true);
   expect(pos1.isOk).toBe(true);

@@ -1,5 +1,9 @@
 # Changelog for shogiops
 
+## v0.16.2
+
+- Fixed `chushogi` bug where non-Lion double movers making a mid-step Lion capture was not preventing Lion counterstrike.
+
 ## v0.16.1
 
 - Fixed `annanshogi` move generation.

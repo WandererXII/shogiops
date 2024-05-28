@@ -298,13 +298,19 @@ export abstract class Position {
         piece.role = promote(this.rules)(role) || role;
 
       const capture = this.board.set(md.to, piece),
-        secondCapture = defined(md.midStep) ? this.board.take(md.midStep) : undefined;
+        midCapture = defined(md.midStep) ? this.board.take(md.midStep) : undefined;
+
+      // process midCapture (if exists) before final destination capture
+      if (defined(midCapture)) {
+        if (!lionRoles.includes(role) && midCapture.color === this.turn && lionRoles.includes(midCapture.role))
+          this.lastLionCapture = md.midStep;
+        this.storeCapture(midCapture);
+      }
       if (capture) {
         if (!lionRoles.includes(role) && capture.color === this.turn && lionRoles.includes(capture.role))
           this.lastLionCapture = md.to;
         this.storeCapture(capture);
       }
-      if (defined(secondCapture)) this.storeCapture(secondCapture);
     }
   }
 }

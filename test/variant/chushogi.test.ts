@@ -88,6 +88,17 @@ test('lion moves', () => {
   const pos4 = parseSfen('chushogi', '11k/12/12/10bm/9N2/12/5n6/6N5/5r6/12/9K2/12 b').unwrap();
   pos4.play(parseUsi('6h7g')!);
   expect(pos4.isLegal(parseUsi('2d3e')!)).toBe(true);
+
+  const pos5 = parseSfen('chushogi', '12/12/12/12/12/12/12/12/4+ho3n2/4N7/12/6B5 w').unwrap(),
+    pos5Alt = pos5.clone(),
+    pos5Alt2 = pos5.clone();
+  pos5.play(parseUsi('8i8j8i')!);
+  pos5Alt.play(parseUsi('8i8j')!);
+  pos5Alt2.play(parseUsi('7i8j+')!);
+  expect(pos5.isLegal(parseUsi('6l3i')!)).toBe(false);
+  expect(pos5Alt.isLegal(parseUsi('6l3i')!)).toBe(false);
+  expect(pos5Alt2.isLegal(parseUsi('6l3i')!)).toBe(false);
+  expect(pos5Alt2.isLegal(parseUsi('6l8j')!)).toBe(true);
 });
 
 test('wiki lion moves', () => {

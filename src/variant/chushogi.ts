@@ -312,7 +312,7 @@ const chushogiBoard = (): Board => {
   return Board.from(occupied, colorIter, roleIter);
 };
 
-// expects position before piece moves to it's first destination
+// chushogi position before piece is moved from initial square
 export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: Square): SquareSet {
   const piece = before.board.get(initialSq);
   if (!piece || piece.color !== before.turn) return SquareSet.empty();
@@ -332,7 +332,7 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
 
     // can't capture a non-adjacent lion protected by an enemy piece,
     // unless we captured something valuable first (not a pawn or go-between)
-    for (const lion of oppLions.intersect(pseudoDests)) {
+    for (const lion of oppLions) {
       if (
         squareDist(initialSq, lion) > 1 &&
         before.squareAttackers(lion, oppColor, clearOccupied).nonEmpty() &&
@@ -344,13 +344,29 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
   } else if (piece.role === 'falcon') {
     if (!pawnAttacks(initialSq, piece.color).has(midSq)) return SquareSet.empty();
 
-    return goBetweenAttacks(midSq)
+    let pseudoDests = goBetweenAttacks(midSq)
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
+
+    if (defined(before.lastLionCapture)) pseudoDests = removeLions(before, pseudoDests);
+
+    return pseudoDests;
   } else if (piece.role === 'eagle') {
-    const pseudoDests = eagleLionAttacks(initialSq, piece.color).diff(before.board.color(before.turn)).with(initialSq);
+    let pseudoDests = eagleLionAttacks(initialSq, piece.color).diff(before.board.color(before.turn)).with(initialSq);
     if (!pseudoDests.has(midSq) || squareDist(initialSq, midSq) > 1) return SquareSet.empty();
 
-    return pseudoDests.intersect(kingAttacks(midSq)).intersect(fullSquareSet(before.rules));
+    pseudoDests = pseudoDests.intersect(kingAttacks(midSq)).intersect(fullSquareSet(before.rules));
+    if (defined(before.lastLionCapture)) pseudoDests = removeLions(before, pseudoDests);
+
+    return pseudoDests;
   } else return SquareSet.empty();
+}
+
+function removeLions(pos: Chushogi, dests: SquareSet): SquareSet {
+  const oppColor = opposite(pos.turn),
+    oppLions = pos.board.color(oppColor).intersect(pos.board.roles('lion', 'lionpromoted')).intersect(dests);
+  for (const lion of oppLions) {
+    if (lion !== pos.lastLionCapture) dests = dests.without(lion);
+  }
+  return dests;
 }

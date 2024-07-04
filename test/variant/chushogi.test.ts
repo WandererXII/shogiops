@@ -1,3 +1,4 @@
+import { shogigroundSecondLionStep } from '../../src/compat';
 import { perft } from '../../src/debug';
 import { initialSfen, parseSfen } from '../../src/sfen';
 import { opposite, parseSquareName, parseUsi } from '../../src/util';
@@ -101,7 +102,7 @@ test('lion moves', () => {
   expect(pos5Alt2.isLegal(parseUsi('6l8j')!)).toBe(true);
 });
 
-test('wiki lion moves', () => {
+test('wiki lion moves and more', () => {
   const pos = parseSfen('chushogi', '12/12/12/12/7g4/6n5/5N6/12/12/12/12/12 b').unwrap();
   expect(pos.isLegal(parseUsi('7g6f')!)).toBe(true);
   expect(pos.isLegal(parseUsi('7g6f5e')!)).toBe(true);
@@ -154,6 +155,24 @@ test('wiki lion moves', () => {
   expect(pos7Alt3.isLegal(parseUsi('1j1i')!)).toBe(true);
   const pos8 = parseSfen('chushogi', '12/12/3l8/12/3b4+o3/6n5/4N7/6R5/7K4/12/12/12 b - 1').unwrap();
   expect(pos8.isLegal(parseUsi('8g6f')!)).toBe(false);
+});
+
+test('falcon/eagle second move', () => {
+  const pos = parseSfen('chushogi', 'k11/12/12/12/6n5/6P5/12/5+h6/12/5N6/12/11K b').unwrap();
+  expect(pos.isLegal(parseUsi('6f6e')!)).toBe(true);
+  pos.play(parseUsi('6f6e')!);
+  expect(pos.isLegal(parseUsi('7h7i')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('7h7i7j')!)).toBe(false);
+  const dests = shogigroundSecondLionStep(pos, '7h', '7i').get('7i');
+  expect(dests && !dests.includes('7j') && dests.length > 0).toBe(true);
+
+  const pos2 = parseSfen('chushogi', 'k11/12/12/12/6n5/6P5/12/7+d4/12/5N6/12/11K b').unwrap();
+  pos2.play(parseUsi('6f6e')!);
+  expect(pos2.isLegal(parseUsi('5h6i')!)).toBe(true);
+  expect(pos2.isLegal(parseUsi('5h6i7j')!)).toBe(false);
+  const dests2 = shogigroundSecondLionStep(pos2, '5h', '6i').get('6i');
+
+  expect(dests2 && !dests2.includes('7j') && dests2.length > 0).toBe(true);
 });
 
 test('bare king', () => {

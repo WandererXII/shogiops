@@ -79,7 +79,8 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
   if (
     myFile === destFile &&
     (piece.color === 'sente') === movingUp &&
-    (silverGoldRoles.includes(piece.role) || (rules === 'annanshogi' && majorRoles.includes(piece.role)))
+    (silverGoldRoles.includes(piece.role) || (rules === 'annanshogi' && majorRoles.includes(piece.role))) &&
+    others.intersect(SquareSet.fromRank(myRank)).nonEmpty()
   )
     return '直';
 

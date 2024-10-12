@@ -47,6 +47,26 @@ export abstract class Position {
   abstract moveDests(square: Square, ctx?: Context): SquareSet;
   abstract dropDests(piece: Piece, ctx?: Context): SquareSet;
 
+  // Doesn't consider safety of the king
+  illegalMoveDests(square: Square): SquareSet {
+    return this.moveDests(square, {
+      king: undefined,
+      color: this.turn,
+      blockers: SquareSet.empty(),
+      checkers: SquareSet.empty(),
+    });
+  }
+
+  // Doesn't consider safety of the king
+  illegalDropDests(piece: Piece): SquareSet {
+    return this.dropDests(piece, {
+      king: undefined,
+      color: this.turn,
+      blockers: SquareSet.empty(),
+      checkers: SquareSet.empty(),
+    });
+  }
+
   // Attackers' pieces attacking square - useful for checks for example
   abstract squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet;
 

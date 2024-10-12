@@ -24,7 +24,7 @@ test('corect move amb resolution', () => {
   const pos = parseSfen('standard', 'k7K/9/9/9/9/9/2G6/3G5/2G6 b - 1').unwrap();
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('7g7h')!)).toEqual('７八金引');
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('6h7h')!)).toEqual('７八金寄');
-  expect(makeJapaneseMoveOrDrop(pos, parseUsi('7i7h')!)).toEqual('７八金直');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('7i7h')!)).toEqual('７八金上');
 
   const pos2 = parseSfen('standard', '3k1K3/9/9/5B3/9/9/9/1B7/9 b - 1').unwrap();
   expect(makeJapaneseMoveOrDrop(pos2, parseUsi('4d6f')!)).toEqual('６六角引');
@@ -48,7 +48,7 @@ test('corect move amb resolution', () => {
 
 test('corect move amb resolution - gote pov', () => {
   const pos = parseSfen('standard', 'k7K/9/9/9/9/9/2g6/3g5/2g6 w - 1').unwrap();
-  expect(makeJapaneseMoveOrDrop(pos, parseUsi('7g7h')!)).toEqual('７八金直');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('7g7h')!)).toEqual('７八金上');
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('6h7h')!)).toEqual('７八金寄');
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('7i7h')!)).toEqual('７八金引');
 
@@ -88,4 +88,17 @@ test('annanshogi resolution', () => {
   const pos1 = parseSfen('annanshogi', '9/k8/9/9/9/5GGG1/5G1G1/5N1N1/K8 b - 1').unwrap();
   expect(makeJapaneseMoveOrDrop(pos1, parseUsi('2f3e')!)).toEqual('３五金右上');
   expect(makeJapaneseMoveOrDrop(pos1, parseUsi('2g3e')!)).toEqual('３五金右跳');
+});
+
+test('illegal moves disambiguation - (https://github.com/WandererXII/lishogi/issues/874)', () => {
+  const pos = parseSfen('standard', '5l3/3S3S1/2b6/4GS3/2r1GK1G1/3G1S2G/9/3S3S1/5r3 b - 1').unwrap();
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('6b5c')!)).toEqual('５三銀引不成');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('6b5c+')!)).toEqual('５三銀引成');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('2b3c')!)).toEqual('３三銀引不成');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('2b3c+')!)).toEqual('３三銀引成');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('5d6d')!)).toEqual('６四金寄');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('6f5f')!)).toEqual('５六金寄');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('6h5g')!)).toEqual('５七銀上');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('2h3g')!)).toEqual('３七銀上');
+  expect(makeJapaneseMoveOrDrop(pos, parseUsi('1f1e')!)).toEqual('１五金上');
 });

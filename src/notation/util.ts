@@ -5,7 +5,7 @@ import { Position } from '../variant/position.js';
 
 export function aimingAt(pos: Position, pieces: SquareSet, to: Square): SquareSet {
   let ambs = SquareSet.empty();
-  for (const p of pieces) if (pos.moveDests(p).has(to)) ambs = ambs.with(p);
+  for (const p of pieces) if (pos.illegalMoveDests(p).has(to)) ambs = ambs.with(p);
   return ambs;
 }
 

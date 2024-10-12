@@ -239,7 +239,7 @@ export class Chushogi extends Position {
     return this.kingsOf(color).isEmpty();
   }
 
-  outcome(ctx?: Context | undefined): Outcome | undefined {
+  outcome(ctx?: Context): Outcome | undefined {
     ctx = ctx || this.ctx();
     if (this.isWithoutKings(ctx))
       return {

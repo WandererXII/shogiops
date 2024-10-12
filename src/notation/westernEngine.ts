@@ -16,13 +16,13 @@ export function makeWesternEngineMoveOrDrop(pos: Position, md: MoveOrDrop): stri
           ? ''
           : makeSquareName(md.from),
         toCapture = pos.board.get(md.to),
-        toStr = `${!!toCapture ? 'x' : '-'}${makeSquareName(md.to)}`;
+        toStr = `${toCapture ? 'x' : '-'}${makeSquareName(md.to)}`;
       if (defined(md.midStep)) {
         const midCapture = pos.board.get(md.midStep),
           igui = !!midCapture && md.to === md.from;
         if (igui) return `${roleStr}${disambStr}x!${makeSquareName(md.midStep)}`;
         else if (md.to === md.from) return `--`;
-        else return `${roleStr}${disambStr}${!!midCapture ? 'x' : '-'}${makeSquareName(md.midStep)}${toStr}`;
+        else return `${roleStr}${disambStr}${midCapture ? 'x' : '-'}${makeSquareName(md.midStep)}${toStr}`;
       } else {
         const promStr = md.promotion ? '+' : pieceCanPromote(pos.rules)(piece, md.from, md.to, toCapture) ? '=' : '';
         return `${roleStr}${disambStr}${toStr}${promStr}`;

@@ -83,7 +83,7 @@ export abstract class Position {
   }
 
   clone(): this {
-    const pos = new (this as any).constructor();
+    const pos = new (this.constructor as new () => this)();
     pos.board = this.board.clone();
     pos.hands = this.hands.clone();
     pos.turn = this.turn;

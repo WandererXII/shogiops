@@ -141,3 +141,7 @@ export function toColor(color: string): Color {
   if (color[0] === 'w' || color[0] === 'g') return 'gote';
   return 'sente';
 }
+
+export function boolToColor(b: boolean): Color {
+  return b ? 'sente' : 'gote';
+}

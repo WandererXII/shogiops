@@ -2,7 +2,7 @@ import { Result } from '@badrap/result';
 import { Board } from '../../board.js';
 import { Hand, Hands } from '../../hands.js';
 import { Color, MoveOrDrop, isDrop } from '../../types.js';
-import { defined, parseCoordinates } from '../../util.js';
+import { boolToColor, defined, parseCoordinates } from '../../util.js';
 import { Shogi, standardBoard } from '../../variant/shogi.js';
 import { allRoles, handRoles, promote } from '../../variant/util.js';
 import { csaToRole, makeNumberSquare, parseNumberSquare, roleToCsa } from '../util.js';
@@ -80,7 +80,7 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
     return Shogi.from({ board, hands: Hands.empty(), turn, moveNumber: 1 }, true).chain(pos =>
       parseAdditions(
         pos,
-        lines.filter(l => /P[\+|-]/.test(l))
+        lines.filter(l => /P[+|-]/.test(l))
       )
     );
   });
@@ -114,7 +114,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
         if (!defined(square)) return Result.err(new CsaError(InvalidCsa.Board));
         const role = csaToRole(s.substring(1));
         if (defined(role) && allRoles('standard').includes(role)) {
-          const piece = { role: role, color: (s.startsWith('-') ? 'gote' : 'sente') as Color };
+          const piece = { role: role, color: boolToColor(!s.startsWith('-')) };
           board.set(square, piece);
           file--;
         }
@@ -167,10 +167,10 @@ export function normalizedCsaLines(csa: string): string[] {
 // Parsing CSA moves/drops
 export function parseCsaMoveOrDrop(pos: Shogi, csaMd: string): MoveOrDrop | undefined {
   // Move
-  const match = csaMd.match(/(?:[\+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/);
+  const match = csaMd.match(/(?:[+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/);
   if (!match) {
     // Drop
-    const match = csaMd.match(/(?:[\+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)/);
+    const match = csaMd.match(/(?:[+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)/);
     if (!match) return;
     const drop = {
       role: csaToRole(match[2])!,

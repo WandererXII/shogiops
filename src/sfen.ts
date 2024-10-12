@@ -58,11 +58,11 @@ export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
   }
 }
 
-export function pieceToForsyth(rules: Rules): (piece: Piece) => string {
+export function pieceToForsyth(rules: Rules): (piece: Piece) => string | undefined {
   return piece => {
-    let r = roleToForsyth(rules)(piece.role)!;
-    if (piece.color === 'sente') r = r.toUpperCase();
-    return r;
+    const r = roleToForsyth(rules)(piece.role);
+    if (defined(r) && piece.color === 'sente') return r.toUpperCase();
+    else return r;
   };
 }
 
@@ -80,7 +80,7 @@ function parseSmallUint(str: string): number | undefined {
 function parseColorLetter(str: string): Color | undefined {
   if (str === 'b') return 'sente';
   else if (str === 'w') return 'gote';
-  return;
+  else return;
 }
 
 export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, SfenError> {
@@ -205,7 +205,7 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
           sfen += empty;
           empty = 0;
         }
-        sfen += pieceToForsyth(rules)(piece);
+        sfen += pieceToForsyth(rules)(piece)!;
       }
 
       if (file === 0) {

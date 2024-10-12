@@ -3,11 +3,11 @@ import { initialSfen, parseSfen } from '../src/sfen';
 import { RULES } from '../src/types';
 
 test('proper count', () => {
-  expect(findHandicaps({ rules: 'standard' })!.length).toBe(23);
-  expect(findHandicaps({ rules: 'minishogi' })!.length).toBe(5);
-  expect(findHandicaps({ rules: 'chushogi' })!.length).toBe(3);
-  expect(findHandicaps({ rules: 'annanshogi' })!.length).toBe(15);
-  expect(findHandicaps({ rules: 'kyotoshogi' })!.length).toBe(7);
+  expect(findHandicaps({ rules: 'standard' }).length).toBe(23);
+  expect(findHandicaps({ rules: 'minishogi' }).length).toBe(5);
+  expect(findHandicaps({ rules: 'chushogi' }).length).toBe(3);
+  expect(findHandicaps({ rules: 'annanshogi' }).length).toBe(15);
+  expect(findHandicaps({ rules: 'kyotoshogi' }).length).toBe(7);
 });
 
 test('only one field', () => {

@@ -4,7 +4,7 @@ import { findHandicap, isHandicap } from '../../handicaps.js';
 import { Hand, Hands } from '../../hands.js';
 import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
 import { Color, MoveOrDrop, Rules, Square, isDrop, isMove } from '../../types.js';
-import { defined, parseCoordinates } from '../../util.js';
+import { boolToColor, defined, parseCoordinates } from '../../util.js';
 import { Position } from '../../variant/position.js';
 import { allRoles, dimensions, handRoles, promote } from '../../variant/util.js';
 import { initializePosition } from '../../variant/variant.js';
@@ -201,19 +201,20 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
         case '成':
           prom = true;
           break;
-        default:
+        default: {
           const cSoFar = rules === 'chushogi' && prom ? `成${c}` : c,
             roles = kanjiToRole(cSoFar),
             role = roles.find(r => allRoles(rules).includes(r));
           if (defined(role) && allRoles(rules).includes(role)) {
             const square = parseCoordinates(file, rank);
             if (!defined(square)) return Result.err(new KifError(InvalidKif.Board));
-            const piece = { role: (prom && promote(rules)(role)) || role, color: (gote ? 'gote' : 'sente') as Color };
+            const piece = { role: (prom && promote(rules)(role)) || role, color: boolToColor(!gote) };
             board.set(square, piece);
             prom = false;
             gote = false;
             file--;
           }
+        }
       }
     }
     rank++;
@@ -261,7 +262,7 @@ export function normalizedKifLines(kif: string): string[] {
 //
 
 export const chushogiKifMoveRegex =
-  /((?:(?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,2})((?:（居食い）)|不成|成)?\s?[（|\(|←]*((?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|\)]/;
+  /((?:(?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,2})((?:（居食い）)|不成|成)?\s?[（|(|←]*((?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
 function parseChushogiMove(kifMd: string, lastDest: Square | undefined = undefined): MoveOrDrop | undefined {
   const match = kifMd.match(chushogiKifMoveRegex);
   if (match) {
@@ -300,7 +301,7 @@ export function parseKifMoveOrDrop(kifMd: string, lastDest: Square | undefined =
     if (!match || !match[1]) return parseChushogiMove(kifMd, lastDest);
 
     return {
-      role: kanjiToRole(match[2])[0]!,
+      role: kanjiToRole(match[2])[0],
       to: parseJapaneseSquare(match[1])!,
     };
   }

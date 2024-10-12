@@ -383,7 +383,7 @@ export function kanjiToRole(str: string): Role[] {
       return ['dragon', 'dragonpromoted'];
     case '成龍':
     case '成竜':
-      ['dragonpromoted'];
+      return ['dragonpromoted'];
     case '玉':
     case '王':
     case '王将':

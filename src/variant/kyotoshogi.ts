@@ -41,7 +41,7 @@ export class Kyotoshogi extends Position {
 
   validate(strict: boolean): Result<undefined, PositionError> {
     const validated = super.validate(strict);
-    if (validated.isErr && validated.error.message === IllegalSetup.InvalidPiecesPromotionZone)
+    if (validated.isErr && (validated.error.message as IllegalSetup) === IllegalSetup.InvalidPiecesPromotionZone)
       return Result.ok(undefined);
     else return validated;
   }
@@ -89,7 +89,7 @@ export class Kyotoshogi extends Position {
     return mask.intersect(fullSquareSet(this.rules));
   }
 
-  isLegal(md: MoveOrDrop, ctx?: Context | undefined): boolean {
+  isLegal(md: MoveOrDrop, ctx?: Context): boolean {
     const turn = ctx?.color || this.turn;
     if (isDrop(md)) {
       const roleInHand = !handRoles(this.rules).includes(md.role) ? unpromote(this.rules)(md.role) : md.role;

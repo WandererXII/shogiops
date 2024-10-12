@@ -1,6 +1,6 @@
 import { perft } from '../../src/debug';
 import { initialSfen, parseSfen } from '../../src/sfen';
-import { parseSquareName, parseUsi } from '../../src/util';
+import { parseUsi } from '../../src/util';
 import { Kyotoshogi } from '../../src/variant/kyotoshogi';
 import { perfts } from '../fixtures/perftKyotoshogi';
 

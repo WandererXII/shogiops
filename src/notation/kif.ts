@@ -1,13 +1,13 @@
 import { Result } from '@badrap/result';
-import { Board } from '../../board.js';
-import { findHandicap, isHandicap } from '../../handicaps.js';
-import { Hand, Hands } from '../../hands.js';
-import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
-import { Color, MoveOrDrop, Rules, Square, isDrop, isMove } from '../../types.js';
-import { boolToColor, defined, parseCoordinates } from '../../util.js';
-import { Position } from '../../variant/position.js';
-import { allRoles, dimensions, handRoles, promote } from '../../variant/util.js';
-import { initializePosition } from '../../variant/variant.js';
+import { Board } from '../board.js';
+import { findHandicap, isHandicap } from '../handicaps.js';
+import { Hand, Hands } from '../hands.js';
+import { initialSfen, makeSfen, parseSfen } from '../sfen.js';
+import { Color, MoveOrDrop, Rules, Square, isDrop, isMove } from '../types.js';
+import { boolToColor, defined, parseCoordinates } from '../util.js';
+import { Position } from '../variant/position.js';
+import { allRoles, dimensions, handRoles, promote } from '../variant/util.js';
+import { initializePosition } from '../variant/variant.js';
 import {
   filesByRules,
   kanjiToNumber,
@@ -21,7 +21,7 @@ import {
   pieceToBoardKanji,
   roleToFullKanji,
   roleToKanji,
-} from '../util.js';
+} from './util.js';
 
 //
 // KIF HEADER

@@ -5,7 +5,7 @@ import {
   parseKifMoveOrDrop,
   parseKifMovesOrDrops,
   parseTags,
-} from '../../src/notation/kif/kif.js';
+} from '../../src/notation/kif.js';
 import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
 import { parseUsi } from '../../src/util.js';
 import { Chushogi } from '../../src/variant/chushogi.js';

@@ -88,8 +88,8 @@ export * as western from './notation/western.js';
 
 export * as westernEngine from './notation/westernEngine.js';
 
-export * as kif from './notation/kif/kif.js';
+export * as kif from './notation/kif.js';
 
-export * as csa from './notation/csa/csa.js';
+export * as csa from './notation/csa.js';
 
 export * as notationUtil from './notation/util.js';

@@ -63,7 +63,8 @@ export class Chushogi extends Position {
     if (this.hands.count()) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
 
     for (const role of this.board.presentRoles())
-      if (!allRoles(this.rules).includes(role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
+      if (!allRoles(this.rules).includes(role))
+        return Result.err(new PositionError(IllegalSetup.InvalidPieces));
 
     if (!strict) return Result.ok(undefined);
 
@@ -97,21 +98,45 @@ export class Chushogi extends Position {
             board.roles('king', 'prince', 'dragon', 'dragonpromoted', 'horse', 'horsepromoted')
           )
         )
-        .union(elephantAttacks(square, defender).intersect(board.roles('elephant', 'elephantpromoted')))
+        .union(
+          elephantAttacks(square, defender).intersect(board.roles('elephant', 'elephantpromoted'))
+        )
         .union(chariotAttacks(square, occupied).intersect(board.role('chariot')))
         .union(
           bishopAttacks(square, occupied).intersect(
-            board.roles('bishop', 'bishoppromoted', 'horse', 'horsepromoted', 'queen', 'queenpromoted')
+            board.roles(
+              'bishop',
+              'bishoppromoted',
+              'horse',
+              'horsepromoted',
+              'queen',
+              'queenpromoted'
+            )
           )
         )
         .union(tigerAttacks(square, defender).intersect(board.role('tiger')))
         .union(kirinAttacks(square).intersect(board.role('kirin')))
         .union(phoenixAttacks(square).intersect(board.role('phoenix')))
-        .union(sideMoverAttacks(square, occupied).intersect(board.roles('sidemover', 'sidemoverpromoted')))
-        .union(verticalMoverAttacks(square, occupied).intersect(board.roles('verticalmover', 'verticalmoverpromoted')))
+        .union(
+          sideMoverAttacks(square, occupied).intersect(
+            board.roles('sidemover', 'sidemoverpromoted')
+          )
+        )
+        .union(
+          verticalMoverAttacks(square, occupied).intersect(
+            board.roles('verticalmover', 'verticalmoverpromoted')
+          )
+        )
         .union(
           rookAttacks(square, occupied).intersect(
-            board.roles('rook', 'rookpromoted', 'dragon', 'dragonpromoted', 'queen', 'queenpromoted')
+            board.roles(
+              'rook',
+              'rookpromoted',
+              'dragon',
+              'dragonpromoted',
+              'queen',
+              'queenpromoted'
+            )
           )
         )
         .union(lionAttacks(square).intersect(board.roles('lion', 'lionpromoted')))
@@ -184,7 +209,9 @@ export class Chushogi extends Position {
           .intersect(this.board.color('sente').intersect(SquareSet.fromRank(0)))
           .union(
             oneWayRoles.intersect(
-              this.board.color('gote').intersect(SquareSet.fromRank(dimensions(this.rules).ranks - 1))
+              this.board
+                .color('gote')
+                .intersect(SquareSet.fromRank(dimensions(this.rules).ranks - 1))
             )
           )
       );
@@ -208,7 +235,9 @@ export class Chushogi extends Position {
           .diff(
             this.board
               .roles('pawn', 'lance')
-              .intersect(SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1))
+              .intersect(
+                SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1)
+              )
           ),
         theirKing = this.kingsOf(theirColor).singleSquare(),
         theirPieces = this.board
@@ -219,7 +248,11 @@ export class Chushogi extends Position {
               .union(
                 this.board
                   .role('lance')
-                  .intersect(SquareSet.fromRank(theirColor === 'sente' ? 0 : dimensions(this.rules).ranks - 1))
+                  .intersect(
+                    SquareSet.fromRank(
+                      theirColor === 'sente' ? 0 : dimensions(this.rules).ranks - 1
+                    )
+                  )
               )
           );
 
@@ -231,7 +264,8 @@ export class Chushogi extends Position {
         !this.isCheck(theirColor) &&
         (theirPieces.size() > 2 || kingAttacks(ourKing).intersect(theirPieces).isEmpty())
       );
-    } else return this.isBareKing(this.ctx(this.turn)) || this.isBareKing(this.ctx(opposite(this.turn)));
+    } else
+      return this.isBareKing(this.ctx(this.turn)) || this.isBareKing(this.ctx(opposite(this.turn)));
   }
 
   isWithoutKings(ctx?: Context): boolean {
@@ -281,7 +315,9 @@ export class Chushogi extends Position {
 }
 
 const chushogiBoard = (): Board => {
-  const occupied = new SquareSet([0xaf50fff, 0xfff0fff, 0x108, 0x1080000, 0xfff0fff, 0xfff0af5, 0x0, 0x0]);
+  const occupied = new SquareSet([
+    0xaf50fff, 0xfff0fff, 0x108, 0x1080000, 0xfff0fff, 0xfff0af5, 0x0, 0x0,
+  ]);
   const colorIter: [Color, SquareSet][] = [
     ['sente', new SquareSet([0x0, 0x0, 0x0, 0x1080000, 0xfff0fff, 0xfff0af5, 0x0, 0x0])],
     ['gote', new SquareSet([0xaf50fff, 0xfff0fff, 0x108, 0x0, 0x0, 0x0, 0x0, 0x0])],
@@ -352,7 +388,9 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
 
     return pseudoDests;
   } else if (piece.role === 'eagle') {
-    let pseudoDests = eagleLionAttacks(initialSq, piece.color).diff(before.board.color(before.turn)).with(initialSq);
+    let pseudoDests = eagleLionAttacks(initialSq, piece.color)
+      .diff(before.board.color(before.turn))
+      .with(initialSq);
     if (!pseudoDests.has(midSq) || squareDist(initialSq, midSq) > 1) return SquareSet.empty();
 
     pseudoDests = pseudoDests.intersect(kingAttacks(midSq)).intersect(fullSquareSet(before.rules));
@@ -364,7 +402,10 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
 
 function removeLions(pos: Chushogi, dests: SquareSet): SquareSet {
   const oppColor = opposite(pos.turn),
-    oppLions = pos.board.color(oppColor).intersect(pos.board.roles('lion', 'lionpromoted')).intersect(dests);
+    oppLions = pos.board
+      .color(oppColor)
+      .intersect(pos.board.roles('lion', 'lionpromoted'))
+      .intersect(dests);
   for (const lion of oppLions) {
     if (lion !== pos.lastLionCapture) dests = dests.without(lion);
   }

@@ -36,7 +36,10 @@ P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
 });
 
 test('make csa header from some random position', () => {
-  const pos = parseSfen('standard', 'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p').unwrap();
+  const pos = parseSfen(
+    'standard',
+    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p'
+  ).unwrap();
   expect(makeCsaHeader(pos)).toEqual(
     `P1-KY-KE+KI *  *  *  *  *  * 
 P2 *  * +TO *  *  *  * +NG-KE
@@ -54,7 +57,10 @@ P-00HI00HI00KA00KA00KI00KI00GI00KE00KY00KY00KY00FU00FU00FU00FU00FU00FU00FU00FU00
 });
 
 test('parse CSA header with CSA board', () => {
-  const pos = parseSfen('standard', 'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1').unwrap();
+  const pos = parseSfen(
+    'standard',
+    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1'
+  ).unwrap();
   const csaHeader = `P1-KY-KE+KI *  *  *  *  *  *
   P2 *  * +TO *  *  *  * +NG-KE
   P3-OU-FU *  *  * +NG *  *  *
@@ -71,7 +77,10 @@ test('parse CSA header with CSA board', () => {
 });
 
 test('parse CSA header with handicap', () => {
-  const pos = parseSfen('standard', 'lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1').unwrap();
+  const pos = parseSfen(
+    'standard',
+    'lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1'
+  ).unwrap();
   const csaHeader = `PI82HI22KA
   -`;
   const csaPos = parseCsaHeader(csaHeader).unwrap();
@@ -80,7 +89,10 @@ test('parse CSA header with handicap', () => {
 
 test('parse CSA header with handicap and CSA board', () => {
   // board takes precedence
-  const pos = parseSfen('standard', 'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1').unwrap();
+  const pos = parseSfen(
+    'standard',
+    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1'
+  ).unwrap();
   const csaHeader = `P1-KY-KE+KI *  *  *  *  *  *
   P2 *  * +TO *  *  *  * +NG-KE
   P3-OU-FU *  *  * +NG *  *  *
@@ -105,7 +117,10 @@ test('make CSA moves/drops individually', () => {
   expect(makeCsaMoveOrDrop(pos, parseUsi('1a1b')!)).toEqual('1112KY');
   expect(makeCsaMoveOrDrop(pos, parseUsi('5i5h')!)).toEqual('5958OU');
 
-  const pos2 = parseSfen('standard', 'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10').unwrap();
+  const pos2 = parseSfen(
+    'standard',
+    'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10'
+  ).unwrap();
   const line = ['R*5b', '6i7h', '5e5h+'].map(m => parseUsi(m)!);
   expect(makeCsaMoveOrDrop(pos2, line[0])).toEqual('0052HI');
   pos2.play(line.shift()!);
@@ -117,9 +132,19 @@ test('make CSA moves/drops individually', () => {
 
 test('parse csa moves/drops one by one', () => {
   const pos = Shogi.default();
-  const line = ['7g7f', '8c8d', '5g5f', '5c5d', '2h5h', '3a4b', '5f5e', '5d5e', '8h5e', '8d8e', '5e7c+'].map(
-    m => parseUsi(m)!
-  );
+  const line = [
+    '7g7f',
+    '8c8d',
+    '5g5f',
+    '5c5d',
+    '2h5h',
+    '3a4b',
+    '5f5e',
+    '5d5e',
+    '8h5e',
+    '8d8e',
+    '5e7c+',
+  ].map(m => parseUsi(m)!);
   for (const m of line) {
     expect(parseCsaMoveOrDrop(pos, makeCsaMoveOrDrop(pos, m)!)).toEqual(m);
     pos.play(m);
@@ -128,7 +153,10 @@ test('parse csa moves/drops one by one', () => {
 });
 
 test('parse moves/drops', () => {
-  const pos = parseSfen('standard', 'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10').unwrap();
+  const pos = parseSfen(
+    'standard',
+    'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10'
+  ).unwrap();
   const line = ['R*5b', '6i7h', '5e5h+'].map(m => parseUsi(m)!);
   expect(parseCsaMoveOrDrop(pos, '0052HI')).toEqual(parseUsi('R*5b'));
   pos.play(line.shift()!);

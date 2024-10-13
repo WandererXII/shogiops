@@ -12,7 +12,9 @@ export function makeWesternMoveOrDrop(pos: Position, md: MoveOrDrop): string | u
     const piece = pos.board.get(md.from);
     if (piece) {
       const roleStr = roleToWestern(pos.rules)(piece.role),
-        disambStr = aimingAt(pos, pos.board.pieces(piece.color, piece.role), md.to).without(md.from).isEmpty()
+        disambStr = aimingAt(pos, pos.board.pieces(piece.color, piece.role), md.to)
+          .without(md.from)
+          .isEmpty()
           ? ''
           : makeNumberSquare(md.from),
         toCapture = pos.board.get(md.to),
@@ -22,9 +24,14 @@ export function makeWesternMoveOrDrop(pos: Position, md: MoveOrDrop): string | u
           igui = !!midCapture && md.to === md.from;
         if (igui) return `${roleStr}${disambStr}x!${makeNumberSquare(md.midStep)}`;
         else if (md.to === md.from) return `--`;
-        else return `${roleStr}${disambStr}${midCapture ? 'x' : '-'}${makeNumberSquare(md.midStep)}${toStr}`;
+        else
+          return `${roleStr}${disambStr}${midCapture ? 'x' : '-'}${makeNumberSquare(md.midStep)}${toStr}`;
       } else {
-        const promStr = md.promotion ? '+' : pieceCanPromote(pos.rules)(piece, md.from, md.to, toCapture) ? '=' : '';
+        const promStr = md.promotion
+          ? '+'
+          : pieceCanPromote(pos.rules)(piece, md.from, md.to, toCapture)
+            ? '='
+            : '';
         return `${roleStr}${disambStr}${toStr}${promStr}`;
       }
     } else return undefined;

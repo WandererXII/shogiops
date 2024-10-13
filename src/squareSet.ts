@@ -44,7 +44,8 @@ export class SquareSet implements Iterable<Square> {
 
   static full(): SquareSet {
     return new SquareSet([
-      0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
+      0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
+      0xffffffff,
     ]);
   }
 

@@ -7,11 +7,17 @@ import { pieceCanPromote } from '../variant/util.js';
 import { aimingAt, makeJapaneseSquare, roleKanjiDuplicates, roleToKanji } from './util.js';
 
 // ７六歩
-export function makeJapaneseMoveOrDrop(pos: Position, md: MoveOrDrop, lastDest?: Square): string | undefined {
+export function makeJapaneseMoveOrDrop(
+  pos: Position,
+  md: MoveOrDrop,
+  lastDest?: Square
+): string | undefined {
   if (isDrop(md)) {
     const ambStr = aimingAt(
       pos,
-      pos.board.roles(md.role, ...roleKanjiDuplicates(pos.rules)(md.role)).intersect(pos.board.color(pos.turn)),
+      pos.board
+        .roles(md.role, ...roleKanjiDuplicates(pos.rules)(md.role))
+        .intersect(pos.board.color(pos.turn)),
       md.to
     ).isEmpty()
       ? ''
@@ -28,16 +34,20 @@ export function makeJapaneseMoveOrDrop(pos: Position, md: MoveOrDrop, lastDest?:
             .intersect(pos.board.color(piece.color)),
           md.to
         ).without(md.from),
-        ambStr = ambPieces.isEmpty() ? '' : disambiguate(pos.rules, piece, md.from, md.to, ambPieces);
+        ambStr = ambPieces.isEmpty()
+          ? ''
+          : disambiguate(pos.rules, piece, md.from, md.to, ambPieces);
 
       if (defined(md.midStep)) {
         const midCapture = pos.board.get(md.midStep),
           igui = !!midCapture && md.to === md.from;
         if (igui) return `${makeJapaneseSquare(md.midStep)}居喰い`;
         else if (md.to === md.from) return 'じっと';
-        else return `${makeJapaneseSquare(md.midStep)}・${makeJapaneseSquare(md.to)}${roleStr}${ambStr}`;
+        else
+          return `${makeJapaneseSquare(md.midStep)}・${makeJapaneseSquare(md.to)}${roleStr}${ambStr}`;
       } else {
-        const destStr = (lastDest ?? pos.lastMoveOrDrop?.to) === md.to ? '同　' : makeJapaneseSquare(md.to),
+        const destStr =
+            (lastDest ?? pos.lastMoveOrDrop?.to) === md.to ? '同　' : makeJapaneseSquare(md.to),
           promStr = md.promotion
             ? '成'
             : pieceCanPromote(pos.rules)(piece, md.from, md.to, pos.board.get(md.to))
@@ -59,7 +69,13 @@ const silverGoldRoles: Role[] = [
 ];
 const majorRoles: Role[] = ['bishop', 'rook', 'horse', 'dragon'];
 
-function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, others: SquareSet): string {
+function disambiguate(
+  rules: Rules,
+  piece: Piece,
+  orig: Square,
+  dest: Square,
+  others: SquareSet
+): string {
   const myRank = squareRank(orig),
     myFile = squareFile(orig);
 
@@ -79,7 +95,8 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
   if (
     myFile === destFile &&
     (piece.color === 'sente') === movingUp &&
-    (silverGoldRoles.includes(piece.role) || (rules === 'annanshogi' && majorRoles.includes(piece.role))) &&
+    (silverGoldRoles.includes(piece.role) ||
+      (rules === 'annanshogi' && majorRoles.includes(piece.role))) &&
     others.intersect(SquareSet.fromRank(myRank)).nonEmpty()
   )
     return '直';
@@ -94,7 +111,9 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
   }
 
   // is this the only piece moving in certain vertical direction (up, down, none - horizontally)
-  if (![...others].map(squareRank).some(r => r < destRank === movingDown && r > destRank === movingUp))
+  if (
+    ![...others].map(squareRank).some(r => r < destRank === movingDown && r > destRank === movingUp)
+  )
     return verticalDisambiguation(rules, piece, movingUp, movingDown, jumpsButShouldnt);
 
   const othersFiles = [...others].map(squareFile),
@@ -102,7 +121,11 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
     leftest = othersFiles.reduce((prev, cur) => (prev > cur ? prev : cur));
 
   // is this piece positioned most on one side or in the middle
-  if (rightest > myFile || leftest < myFile || (others.size() === 2 && rightest < myFile && leftest > myFile))
+  if (
+    rightest > myFile ||
+    leftest < myFile ||
+    (others.size() === 2 && rightest < myFile && leftest > myFile)
+  )
     return sideDisambiguation(piece, rightest > myFile, leftest < myFile);
 
   return (
@@ -111,7 +134,13 @@ function disambiguate(rules: Rules, piece: Piece, orig: Square, dest: Square, ot
   );
 }
 
-function verticalDisambiguation(rules: Rules, piece: Piece, up: boolean, down: boolean, jumpOver: boolean): string {
+function verticalDisambiguation(
+  rules: Rules,
+  piece: Piece,
+  up: boolean,
+  down: boolean,
+  jumpOver: boolean
+): string {
   if (jumpOver) return '跳';
   else if (up === down) return '寄';
   else if ((piece.color === 'sente' && up) || (piece.color === 'gote' && down))

@@ -12,7 +12,10 @@ import { Chushogi } from '../../src/variant/chushogi.js';
 import { Shogi } from '../../src/variant/shogi.js';
 
 test('make kif header from some random position', () => {
-  const pos = parseSfen('standard', 'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p').unwrap();
+  const pos = parseSfen(
+    'standard',
+    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p'
+  ).unwrap();
   expect(makeKifHeader(pos)).toEqual(
     `後手の持駒：飛二 角二 金二 銀 桂 香三 歩十五
   ９ ８ ７ ６ ５ ４ ３ ２ １
@@ -51,12 +54,18 @@ test('make minishogi kif header', () => {
 });
 
 test('make kif header from handicap position', () => {
-  const pos = parseSfen('standard', '3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1').unwrap();
+  const pos = parseSfen(
+    'standard',
+    '3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1'
+  ).unwrap();
   expect(makeKifHeader(pos)).toEqual(`手合割：八枚落ち`);
 });
 
 test('parse kif header with kif board', () => {
-  const pos = parseSfen('standard', 'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1').unwrap(),
+  const pos = parseSfen(
+      'standard',
+      'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1'
+    ).unwrap(),
     kifHeader = `後手の持駒：飛二 角二 金二 銀 桂 香三 歩十五
   ９ ８ ７ ６ ５ ４ ３ ２ １
 +---------------------------+
@@ -101,7 +110,10 @@ test('minishogi kif default', () => {
 });
 
 test('parse kif header with handicap', () => {
-  const pos = parseSfen('standard', 'lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1').unwrap(),
+  const pos = parseSfen(
+      'standard',
+      'lnsgkgsnl/7b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1'
+    ).unwrap(),
     kifHeader = `手合割：飛車落ち
   先手：
   後手：
@@ -112,7 +124,10 @@ test('parse kif header with handicap', () => {
 
 test('parse kif header with handicap and kif board', () => {
   // board takes precedence
-  const pos = parseSfen('standard', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1').unwrap(),
+  const pos = parseSfen(
+      'standard',
+      '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1'
+    ).unwrap(),
     kifHeader = `手合割：平手
     後手の持駒：金四　銀二　香三　歩十三　
   ９ ８ ７ ６ ５ ４ ３ ２ １
@@ -147,7 +162,10 @@ test('make kif moves/drops individually', () => {
   expect(makeKifMoveOrDrop(pos, parseUsi('1a1b')!)).toEqual('１二香(11)');
   expect(makeKifMoveOrDrop(pos, parseUsi('5i5h')!)).toEqual('５八玉(59)');
 
-  const pos2 = parseSfen('standard', 'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10').unwrap(),
+  const pos2 = parseSfen(
+      'standard',
+      'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10'
+    ).unwrap(),
     line = ['R*5b', '6i7h', '5e5h+'].map(m => parseUsi(m)!);
   expect(makeKifMoveOrDrop(pos2, line[0])).toEqual('５二飛打');
   pos2.play(line.shift()!);
@@ -159,9 +177,19 @@ test('make kif moves/drops individually', () => {
 
 test('parse kif moves/drops one by one', () => {
   const pos = Shogi.default(),
-    line = ['7g7f', '8c8d', '5g5f', '5c5d', '2h5h', '3a4b', '5f5e', '5d5e', '8h5e', '8d8e', '5e7c+'].map(
-      m => parseUsi(m)!
-    );
+    line = [
+      '7g7f',
+      '8c8d',
+      '5g5f',
+      '5c5d',
+      '2h5h',
+      '3a4b',
+      '5f5e',
+      '5d5e',
+      '8h5e',
+      '8d8e',
+      '5e7c+',
+    ].map(m => parseUsi(m)!);
   for (const m of line) {
     expect(parseKifMoveOrDrop(makeKifMoveOrDrop(pos, m)!, pos.lastMoveOrDrop?.to)).toEqual(m);
     pos.play(m);
@@ -201,7 +229,10 @@ test('parse tags', () => {
 
 test('parse chushogi kif header', () => {
   // board takes precedence
-  const pos = parseSfen('chushogi', '12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b - 1').unwrap(),
+  const pos = parseSfen(
+      'chushogi',
+      '12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b - 1'
+    ).unwrap(),
     kifHeader = ` １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １
   +------------------------------------------------+
   |  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・  ・|一
@@ -222,7 +253,10 @@ test('parse chushogi kif header', () => {
 });
 
 test('make kif header - chushogi', () => {
-  const pos = parseSfen('chushogi', '12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b - 1').unwrap();
+  const pos = parseSfen(
+    'chushogi',
+    '12/9NN1/2+H+H8/12/9+o2/12/5N3N2/5+O6/9+H2/2+H9/2+H6+H2/12 b - 1'
+  ).unwrap();
   expect(makeKifHeader(pos)).toEqual(
     ` １２ １１ １０ ９  ８  ７  ６  ５  ４  ３  ２  １
 +------------------------------------------------+
@@ -253,9 +287,12 @@ test('make chushogi moves', () => {
 });
 
 test('parse chushogi moves', () => {
-  expect(parseKifMovesOrDrops(['57手目一歩目 ▲6六獅子 （←7七）', '57手目二歩目 ▲7七獅子（居食い） （←6六）'])).toEqual([
-    parseUsi('7g6f7g'),
-  ]);
+  expect(
+    parseKifMovesOrDrops([
+      '57手目一歩目 ▲6六獅子 （←7七）',
+      '57手目二歩目 ▲7七獅子（居食い） （←6六）',
+    ])
+  ).toEqual([parseUsi('7g6f7g')]);
   expect(parseKifMoveOrDrop('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
   expect(parseKifMoveOrDrop('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
   expect(parseKifMoveOrDrop('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
@@ -268,7 +305,10 @@ test('chushogi kif default', () => {
 
 test('parse kif header and board with annanshogi handicap name', () => {
   // board takes precedence
-  const pos = parseSfen('annanshogi', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1').unwrap(),
+  const pos = parseSfen(
+      'annanshogi',
+      '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1'
+    ).unwrap(),
     kifHeader = `手合割：安南
     後手の持駒：金四　銀二　香三　歩十三　
   ９ ８ ７ ６ ５ ４ ３ ２ １
@@ -290,7 +330,10 @@ test('parse kif header and board with annanshogi handicap name', () => {
 });
 
 test('annanshogi kif header with board', () => {
-  const pos = parseSfen('annanshogi', '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p').unwrap(),
+  const pos = parseSfen(
+      'annanshogi',
+      '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p'
+    ).unwrap(),
     kifHeader = `手合割：安南将棋
 後手の持駒：金四 銀二 香三 歩十三
   ９ ８ ７ ６ ５ ４ ３ ２ １
@@ -309,7 +352,9 @@ test('annanshogi kif header with board', () => {
   const posFromKif = parseKifHeader(kifHeader).unwrap(),
     kifFromPos = makeKifHeader(pos);
   expect(posFromKif).toEqual(pos);
-  expect(makeSfen(posFromKif)).toEqual('3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1');
+  expect(makeSfen(posFromKif)).toEqual(
+    '3n5/kBp+B5/9/N2p5/+pn2p4/2R1+s4/pN7/1L7/1s2+R4 b 4g2s3l13p 1'
+  );
   expect(kifFromPos).toEqual(kifHeader);
 
   const defaultPos = parseSfen('annanshogi', initialSfen('annanshogi')).unwrap();

@@ -599,7 +599,9 @@ export function parseJapaneseSquare(str: string): Square | undefined {
         str
           .slice(0, fileOffset)
           .split('')
-          .map(c => (c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c))
+          .map(c =>
+            c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c
+          )
           .join('')
       ) - 1,
     rank = kanjiToNumber(str.slice(fileOffset)) - 1;

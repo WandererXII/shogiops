@@ -121,7 +121,8 @@ export const standardMoveDests = (pos: Position, square: Square, ctx?: Context):
     if (piece.role === 'king') {
       const occ = pos.board.occupied.without(square);
       for (const to of pseudo) {
-        if (pos.squareAttackers(to, opposite(ctx.color), occ).nonEmpty()) pseudo = pseudo.without(to);
+        if (pos.squareAttackers(to, opposite(ctx.color), occ).nonEmpty())
+          pseudo = pseudo.without(to);
       }
     } else {
       if (ctx.checkers.nonEmpty()) {
@@ -146,7 +147,9 @@ export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): S
   if (role === 'pawn' || role === 'lance')
     mask = mask.diff(SquareSet.fromRank(ctx.color === 'sente' ? 0 : dims.ranks - 1));
   else if (role === 'knight')
-    mask = mask.diff(ctx.color === 'sente' ? SquareSet.ranksAbove(2) : SquareSet.ranksBelow(dims.ranks - 3));
+    mask = mask.diff(
+      ctx.color === 'sente' ? SquareSet.ranksAbove(2) : SquareSet.ranksBelow(dims.ranks - 3)
+    );
 
   if (defined(ctx.king) && ctx.checkers.nonEmpty()) {
     const checker = ctx.checkers.singleSquare();
@@ -163,7 +166,11 @@ export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): S
     }
     // Checking for a pawn checkmate
     const kingSquare = pos.kingsOf(opposite(ctx.color)).singleSquare(),
-      kingFront = defined(kingSquare) ? (ctx.color === 'sente' ? kingSquare + 16 : kingSquare - 16) : undefined;
+      kingFront = defined(kingSquare)
+        ? ctx.color === 'sente'
+          ? kingSquare + 16
+          : kingSquare - 16
+        : undefined;
     if (defined(kingFront) && mask.has(kingFront)) {
       const child = pos.clone();
       child.play({ role: 'pawn', to: kingFront });

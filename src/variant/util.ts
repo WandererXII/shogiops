@@ -102,7 +102,18 @@ export function allRoles(rules: Rules): Role[] {
         'rookpromoted',
       ];
     case 'minishogi':
-      return ['rook', 'bishop', 'gold', 'silver', 'pawn', 'dragon', 'horse', 'promotedsilver', 'tokin', 'king'];
+      return [
+        'rook',
+        'bishop',
+        'gold',
+        'silver',
+        'pawn',
+        'dragon',
+        'horse',
+        'promotedsilver',
+        'tokin',
+        'king',
+      ];
     case 'kyotoshogi':
       return ['rook', 'pawn', 'silver', 'bishop', 'gold', 'knight', 'lance', 'tokin', 'king'];
     default:
@@ -174,7 +185,9 @@ export function promotableRoles(rules: Rules): Role[] {
 export function fullSquareSet(rules: Rules): SquareSet {
   switch (rules) {
     case 'chushogi':
-      return new SquareSet([0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0x0, 0x0]);
+      return new SquareSet([
+        0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0xfff0fff, 0x0, 0x0,
+      ]);
     case 'minishogi':
     case 'kyotoshogi':
       return new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);

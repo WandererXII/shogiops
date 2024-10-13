@@ -43,7 +43,11 @@ export class Annanshogi extends Position {
     if (!realPiece || realPiece.color !== ctx.color) return SquareSet.empty();
     const pieceBehind = this.board.get(directlyBehind(realPiece.color, square));
 
-    let pseudo = attacks(pieceBehind?.color === realPiece.color ? pieceBehind : realPiece, square, this.board.occupied);
+    let pseudo = attacks(
+      pieceBehind?.color === realPiece.color ? pieceBehind : realPiece,
+      square,
+      this.board.occupied
+    );
     pseudo = pseudo.diff(this.board.color(ctx.color));
 
     if (defined(ctx.king)) {
@@ -52,18 +56,34 @@ export class Annanshogi extends Position {
         for (const to of pseudo) {
           const boardClone = this.board.clone();
           boardClone.take(to);
-          if (standardSquareAttacks(to, opposite(ctx.color), annanAttackBoard(boardClone), occ).nonEmpty())
+          if (
+            standardSquareAttacks(
+              to,
+              opposite(ctx.color),
+              annanAttackBoard(boardClone),
+              occ
+            ).nonEmpty()
+          )
             pseudo = pseudo.without(to);
         }
       } else {
-        const stdAttackers = standardSquareAttacks(ctx.king, opposite(ctx.color), this.board, this.board.occupied);
+        const stdAttackers = standardSquareAttacks(
+          ctx.king,
+          opposite(ctx.color),
+          this.board,
+          this.board.occupied
+        );
         pseudo = pseudo.diff(
-          (ctx.color === 'sente' ? stdAttackers.shr256(16) : stdAttackers.shl256(16)).intersect(this.board.occupied)
+          (ctx.color === 'sente' ? stdAttackers.shr256(16) : stdAttackers.shl256(16)).intersect(
+            this.board.occupied
+          )
         );
         if (ctx.checkers.nonEmpty()) {
           if (ctx.checkers.size() > 2) return SquareSet.empty();
           const singularChecker = ctx.checkers.singleSquare(),
-            moveGivers = (ctx.color === 'sente' ? ctx.checkers.shr256(16) : ctx.checkers.shl256(16)).intersect(pseudo);
+            moveGivers = (
+              ctx.color === 'sente' ? ctx.checkers.shr256(16) : ctx.checkers.shl256(16)
+            ).intersect(pseudo);
 
           if (defined(singularChecker))
             pseudo = pseudo.intersect(between(singularChecker, ctx.king).with(singularChecker));
@@ -93,7 +113,14 @@ export class Annanshogi extends Position {
               const boardClone = this.board.clone();
               boardClone.take(square);
               boardClone.set(to, realPiece);
-              if (standardSquareAttacks(ctx.king, opposite(ctx.color), annanAttackBoard(boardClone), occ).isEmpty()) {
+              if (
+                standardSquareAttacks(
+                  ctx.king,
+                  opposite(ctx.color),
+                  annanAttackBoard(boardClone),
+                  occ
+                ).isEmpty()
+              ) {
                 rayed = rayed.with(to);
                 break;
               }
@@ -127,7 +154,11 @@ export class Annanshogi extends Position {
       }
       // Checking for a pawn checkmate
       const kingSquare = this.kingsOf(opposite(ctx.color)).singleSquare(),
-        kingFront = defined(kingSquare) ? (ctx.color === 'sente' ? kingSquare + 16 : kingSquare - 16) : undefined;
+        kingFront = defined(kingSquare)
+          ? ctx.color === 'sente'
+            ? kingSquare + 16
+            : kingSquare - 16
+          : undefined;
       if (defined(kingFront) && mask.has(kingFront)) {
         const child = this.clone();
         child.play({ role: 'pawn', to: kingFront });

@@ -4,7 +4,8 @@ import { defined } from './util.js';
 export function findHandicaps(handicapOpt: Partial<Handicap>): Handicap[] {
   return handicaps.filter(obj =>
     (Object.keys(handicapOpt) as Array<keyof typeof handicapOpt>).every(key => {
-      if (key === 'sfen' && defined(handicapOpt.sfen)) return compareSfens(obj.sfen, handicapOpt.sfen);
+      if (key === 'sfen' && defined(handicapOpt.sfen))
+        return compareSfens(obj.sfen, handicapOpt.sfen);
       else return obj[key] === handicapOpt[key];
     })
   );

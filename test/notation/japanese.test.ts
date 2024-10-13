@@ -91,7 +91,10 @@ test('annanshogi resolution', () => {
 });
 
 test('illegal moves disambiguation - (https://github.com/WandererXII/lishogi/issues/874)', () => {
-  const pos = parseSfen('standard', '5l3/3S3S1/2b6/4GS3/2r1GK1G1/3G1S2G/9/3S3S1/5r3 b - 1').unwrap();
+  const pos = parseSfen(
+    'standard',
+    '5l3/3S3S1/2b6/4GS3/2r1GK1G1/3G1S2G/9/3S3S1/5r3 b - 1'
+  ).unwrap();
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('6b5c')!)).toEqual('５三銀引不成');
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('6b5c+')!)).toEqual('５三銀引成');
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('2b3c')!)).toEqual('３三銀引不成');

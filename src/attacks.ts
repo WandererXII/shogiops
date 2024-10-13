@@ -4,7 +4,9 @@ import { opposite, squareFile, squareRank } from './util.js';
 
 function computeRange(square: Square, deltas: number[]): SquareSet {
   const file = squareFile(square),
-    dests: Square[] = deltas.map(delta => square + delta).filter(sq => Math.abs(file - squareFile(sq)) <= 2);
+    dests: Square[] = deltas
+      .map(delta => square + delta)
+      .filter(sq => Math.abs(file - squareFile(sq)) <= 2);
   return SquareSet.fromSquares(...dests);
 }
 
@@ -29,13 +31,17 @@ const FILE_RANGE = tabulateSquares(sq => SquareSet.fromFile(squareFile(sq)).with
 const RANK_RANGE = tabulateSquares(sq => SquareSet.fromRank(squareRank(sq)).without(sq));
 
 const DIAG_RANGE = tabulateSquares(sq => {
-  const diag = new SquareSet([0x20001, 0x80004, 0x200010, 0x800040, 0x2000100, 0x8000400, 0x20001000, 0x80004000]),
+  const diag = new SquareSet([
+      0x20001, 0x80004, 0x200010, 0x800040, 0x2000100, 0x8000400, 0x20001000, 0x80004000,
+    ]),
     shift = 16 * (squareRank(sq) - squareFile(sq));
   return (shift >= 0 ? diag.shl256(shift) : diag.shr256(-shift)).without(sq);
 });
 
 const ANTI_DIAG_RANGE = tabulateSquares(sq => {
-  const diag = new SquareSet([0x40008000, 0x10002000, 0x4000800, 0x1000200, 0x400080, 0x100020, 0x40008, 0x10002]),
+  const diag = new SquareSet([
+      0x40008000, 0x10002000, 0x4000800, 0x1000200, 0x400080, 0x100020, 0x40008, 0x10002,
+    ]),
     shift = 16 * (squareRank(sq) + squareFile(sq) - 15);
   return (shift >= 0 ? diag.shl256(shift) : diag.shr256(-shift)).without(sq);
 });
@@ -89,7 +95,9 @@ export function pawnAttacks(square: Square, color: Color): SquareSet {
 
 export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
   const bit = SquareSet.fromSquare(square);
-  return hyperbola(bit, DIAG_RANGE[square], occupied).xor(hyperbola(bit, ANTI_DIAG_RANGE[square], occupied));
+  return hyperbola(bit, DIAG_RANGE[square], occupied).xor(
+    hyperbola(bit, ANTI_DIAG_RANGE[square], occupied)
+  );
 }
 
 export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
@@ -97,7 +105,8 @@ export function rookAttacks(square: Square, occupied: SquareSet): SquareSet {
 }
 
 export function lanceAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
-  if (color === 'sente') return fileAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]);
+  if (color === 'sente')
+    return fileAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]);
   else return fileAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]);
 }
 
@@ -128,7 +137,8 @@ export function verticalMoverAttacks(square: Square, occupied: SquareSet): Squar
 }
 
 export function copperAttacks(square: Square, color: Color): SquareSet {
-  if (color === 'sente') return NEIGHBORS[square].withoutMany(square + 17, square + 15, square + 1, square - 1);
+  if (color === 'sente')
+    return NEIGHBORS[square].withoutMany(square + 17, square + 15, square + 1, square - 1);
   else return NEIGHBORS[square].withoutMany(square - 17, square - 15, square - 1, square + 1);
 }
 

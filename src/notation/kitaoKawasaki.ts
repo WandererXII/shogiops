@@ -5,7 +5,11 @@ import { pieceCanPromote } from '../variant/util.js';
 import { aimingAt, makeNumberSquare, roleKanjiDuplicates, roleToKanji } from './util.js';
 
 // 歩-76
-export function makeKitaoKawasakiMoveOrDrop(pos: Position, md: MoveOrDrop, lastDest?: Square): string | undefined {
+export function makeKitaoKawasakiMoveOrDrop(
+  pos: Position,
+  md: MoveOrDrop,
+  lastDest?: Square
+): string | undefined {
   if (isDrop(md)) {
     return roleToKanji(md.role) + '*' + makeNumberSquare(md.to);
   } else {
@@ -35,8 +39,13 @@ export function makeKitaoKawasakiMoveOrDrop(pos: Position, md: MoveOrDrop, lastD
             md.midStep
           )}${actionStr}${makeNumberSquare(md.to)}`;
       } else {
-        const destStr = (lastDest ?? pos.lastMoveOrDrop?.to) === md.to ? '' : makeNumberSquare(md.to),
-          promStr = md.promotion ? '+' : pieceCanPromote(pos.rules)(piece, md.from, md.to, toCapture) ? '=' : '';
+        const destStr =
+            (lastDest ?? pos.lastMoveOrDrop?.to) === md.to ? '' : makeNumberSquare(md.to),
+          promStr = md.promotion
+            ? '+'
+            : pieceCanPromote(pos.rules)(piece, md.from, md.to, toCapture)
+              ? '='
+              : '';
         return `${roleStr}${ambStr}${actionStr}${destStr}${promStr}`;
       }
     } else return undefined;

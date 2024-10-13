@@ -1,6 +1,13 @@
 import { SquareSet } from './squareSet.js';
 import { MoveOrDrop, PieceName, Rules, Square, SquareName, isDrop } from './types.js';
-import { defined, makeSquareName, parseSquareName, parseUsi, squareFile, squareRank } from './util.js';
+import {
+  defined,
+  makeSquareName,
+  parseSquareName,
+  parseUsi,
+  squareFile,
+  squareRank,
+} from './util.js';
 import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
 import { Position } from './variant/position.js';
 import { dimensions, fullSquareSet } from './variant/util.js';
@@ -72,19 +79,27 @@ export function scalashogiCharPair(md: MoveOrDrop, rules: Rules): string {
     return charOffset + squareRank(sq) * dimensions(rules).files + squareFile(sq);
   }
   function lionMoveToChar(orig: Square, dest: Square, ms: Square, rules: Rules): number {
-    const toMidStep = (squareFile(orig) - squareFile(ms) + 1 + 3 * (squareRank(orig) - squareRank(ms) + 1) + 4) % 9,
-      toDest = (squareFile(ms) - squareFile(dest) + 1 + 3 * (squareRank(ms) - squareRank(dest) + 1) + 4) % 9;
+    const toMidStep =
+        (squareFile(orig) - squareFile(ms) + 1 + 3 * (squareRank(orig) - squareRank(ms) + 1) + 4) %
+        9,
+      toDest =
+        (squareFile(ms) - squareFile(dest) + 1 + 3 * (squareRank(ms) - squareRank(dest) + 1) + 4) %
+        9;
     return charOffset + fullSquareSet(rules).size() + toMidStep + 8 * toDest;
   }
 
   if (isDrop(md))
     return String.fromCharCode(
       squareToCharCode(md.to),
-      charOffset + 81 + ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'].indexOf(md.role)
+      charOffset +
+        81 +
+        ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'].indexOf(md.role)
     );
   else {
     const from = squareToCharCode(md.from),
-      to = defined(md.midStep) ? lionMoveToChar(md.from, md.to, md.midStep, rules) : squareToCharCode(md.to);
+      to = defined(md.midStep)
+        ? lionMoveToChar(md.from, md.to, md.midStep, rules)
+        : squareToCharCode(md.to);
     if (md.promotion) return String.fromCharCode(to, from);
     else return String.fromCharCode(from, to);
   }

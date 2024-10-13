@@ -22,7 +22,24 @@ export const FILE_NAMES = [
 ] as const;
 export type FileName = (typeof FILE_NAMES)[number];
 
-export const RANK_NAMES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'] as const;
+export const RANK_NAMES = [
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'm',
+  'n',
+  'o',
+  'p',
+] as const;
 export type RankName = (typeof RANK_NAMES)[number];
 
 export type Square = number;
@@ -133,10 +150,24 @@ export interface Setup {
   lastLionCapture?: Square; // by non-lion piece
 }
 
-export const RESULTS = ['checkmate', 'stalemate', 'draw', 'bareking', 'kingslost', 'specialVariantEnd'] as const;
+export const RESULTS = [
+  'checkmate',
+  'stalemate',
+  'draw',
+  'bareking',
+  'kingslost',
+  'specialVariantEnd',
+] as const;
 export type Result = (typeof RESULTS)[number];
 
-export const RULES = ['standard', 'minishogi', 'chushogi', 'annanshogi', 'kyotoshogi', 'checkshogi'] as const;
+export const RULES = [
+  'standard',
+  'minishogi',
+  'chushogi',
+  'annanshogi',
+  'kyotoshogi',
+  'checkshogi',
+] as const;
 export type Rules = (typeof RULES)[number];
 
 export interface Outcome {

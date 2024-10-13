@@ -3,9 +3,29 @@ import { between } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { COLORS, Color, MoveOrDrop, Outcome, Piece, PieceName, Role, Rules, Setup, Square, isDrop } from '../types.js';
+import {
+  COLORS,
+  Color,
+  MoveOrDrop,
+  Outcome,
+  Piece,
+  PieceName,
+  Role,
+  Rules,
+  Setup,
+  Square,
+  isDrop,
+} from '../types.js';
 import { defined, lionRoles, makePieceName, opposite } from '../util.js';
-import { allRoles, fullSquareSet, handRoles, pieceCanPromote, pieceForcePromote, promote, unpromote } from './util.js';
+import {
+  allRoles,
+  fullSquareSet,
+  handRoles,
+  pieceCanPromote,
+  pieceForcePromote,
+  promote,
+  unpromote,
+} from './util.js';
 
 export enum IllegalSetup {
   Empty = 'ERR_EMPTY',
@@ -98,20 +118,29 @@ export abstract class Position {
       return Result.err(new PositionError(IllegalSetup.PiecesOutsideBoard));
 
     for (const [r] of this.hands.color('sente'))
-      if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+      if (!handRoles(this.rules).includes(r))
+        return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
     for (const [r] of this.hands.color('gote'))
-      if (!handRoles(this.rules).includes(r)) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+      if (!handRoles(this.rules).includes(r))
+        return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
 
     for (const role of this.board.presentRoles())
-      if (!allRoles(this.rules).includes(role)) return Result.err(new PositionError(IllegalSetup.InvalidPieces));
+      if (!allRoles(this.rules).includes(role))
+        return Result.err(new PositionError(IllegalSetup.InvalidPieces));
 
     const otherKing = this.kingsOf(opposite(this.turn)).singleSquare();
-    if (defined(otherKing) && this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty())
+    if (
+      defined(otherKing) &&
+      this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()
+    )
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
     if (!strict) return Result.ok(undefined);
 
-    if (this.board.pieces('sente', 'king').size() >= 2 || this.board.pieces('gote', 'king').size() >= 2)
+    if (
+      this.board.pieces('sente', 'king').size() >= 2 ||
+      this.board.pieces('gote', 'king').size() >= 2
+    )
       return Result.err(new PositionError(IllegalSetup.Kings));
 
     if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
@@ -166,7 +195,8 @@ export abstract class Position {
     let checks = SquareSet.empty();
     COLORS.forEach(color => {
       for (const king of this.kingsOf(color)) {
-        if (this.squareAttackers(king, opposite(color), this.board.occupied).nonEmpty()) checks = checks.with(king);
+        if (this.squareAttackers(king, opposite(color), this.board.occupied).nonEmpty())
+          checks = checks.with(king);
       }
     });
     return checks;
@@ -274,7 +304,11 @@ export abstract class Position {
       if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
 
       // Checking whether we can promote
-      if (md.promotion && !pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.get(md.to))) return false;
+      if (
+        md.promotion &&
+        !pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.get(md.to))
+      )
+        return false;
       if (!md.promotion && pieceForcePromote(this.rules)(piece, md.to)) return false;
 
       return this.moveDests(md.from, ctx).has(md.to);
@@ -312,7 +346,8 @@ export abstract class Position {
       if (!role) return;
 
       if (
-        (md.promotion && pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.get(md.to))) ||
+        (md.promotion &&
+          pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.get(md.to))) ||
         pieceForcePromote(this.rules)(piece, md.to)
       )
         piece.role = promote(this.rules)(role) || role;
@@ -322,12 +357,20 @@ export abstract class Position {
 
       // process midCapture (if exists) before final destination capture
       if (defined(midCapture)) {
-        if (!lionRoles.includes(role) && midCapture.color === this.turn && lionRoles.includes(midCapture.role))
+        if (
+          !lionRoles.includes(role) &&
+          midCapture.color === this.turn &&
+          lionRoles.includes(midCapture.role)
+        )
           this.lastLionCapture = md.midStep;
         this.storeCapture(midCapture);
       }
       if (capture) {
-        if (!lionRoles.includes(role) && capture.color === this.turn && lionRoles.includes(capture.role))
+        if (
+          !lionRoles.includes(role) &&
+          capture.color === this.turn &&
+          lionRoles.includes(capture.role)
+        )
           this.lastLionCapture = md.to;
         this.storeCapture(capture);
       }

@@ -13,17 +13,21 @@ test('proper count', () => {
 test('only one field', () => {
   expect(findHandicap({ rules: 'standard' })).toBeDefined();
   expect(findHandicap({ sfen: 'standard' })).toBeUndefined();
-  expect(findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1' })?.englishName).toBe(
-    'Right Lance'
-  );
-  expect(findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w -' })?.englishName).toBe(
-    'Right Lance'
-  );
-  expect(findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w' })?.englishName).toBe(
-    'Right Lance'
-  );
   expect(
-    findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL ' })?.englishName
+    findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1' })
+      ?.englishName
+  ).toBe('Right Lance');
+  expect(
+    findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w -' })
+      ?.englishName
+  ).toBe('Right Lance');
+  expect(
+    findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w' })
+      ?.englishName
+  ).toBe('Right Lance');
+  expect(
+    findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL ' })
+      ?.englishName
   ).toBeUndefined();
   expect(
     findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL' })?.englishName

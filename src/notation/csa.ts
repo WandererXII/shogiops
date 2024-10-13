@@ -74,7 +74,9 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
   const handicap = lines.find(l => l.startsWith('PI'));
   const isWholeBoard = lines.some(l => l.startsWith('P1'));
   const baseBoard =
-    defined(handicap) && !isWholeBoard ? parseCsaHandicap(handicap) : parseCsaBoard(lines.filter(l => /^P\d/.test(l)));
+    defined(handicap) && !isWholeBoard
+      ? parseCsaHandicap(handicap)
+      : parseCsaBoard(lines.filter(l => /^P\d/.test(l)));
   const turn: Color = lines.some(l => l === '-') ? 'gote' : 'sente';
   return baseBoard.chain(board => {
     return Shogi.from({ board, hands: Hands.empty(), turn, moveNumber: 1 }, true).chain(pos =>
@@ -135,7 +137,8 @@ function parseAdditions(initialPos: Shogi, additions: string[]): Result<Shogi, C
       const role = csaToRole(sp.substring(2, 4));
       if ((defined(sq) || sqString === '00') && defined(role)) {
         if (!defined(sq)) {
-          if (!handRoles('standard').includes(role)) return Result.err(new CsaError(InvalidCsa.Hands));
+          if (!handRoles('standard').includes(role))
+            return Result.err(new CsaError(InvalidCsa.Hands));
           initialPos.hands[color].capture(role);
         } else {
           initialPos.board.set(sq, { role: role, color: color });
@@ -167,7 +170,9 @@ export function normalizedCsaLines(csa: string): string[] {
 // Parsing CSA moves/drops
 export function parseCsaMoveOrDrop(pos: Shogi, csaMd: string): MoveOrDrop | undefined {
   // Move
-  const match = csaMd.match(/(?:[+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/);
+  const match = csaMd.match(
+    /(?:[+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/
+  );
   if (!match) {
     // Drop
     const match = csaMd.match(/(?:[+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)/);

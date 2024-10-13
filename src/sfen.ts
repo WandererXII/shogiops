@@ -119,7 +119,8 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
     }
   }
 
-  if (rank !== dims.ranks - 1 || file !== -1) return Result.err(new SfenError(InvalidSfen.BoardDims));
+  if (rank !== dims.ranks - 1 || file !== -1)
+    return Result.err(new SfenError(InvalidSfen.BoardDims));
   return Result.ok(board);
 }
 
@@ -184,7 +185,14 @@ export function parseSfen<R extends keyof RulesTypeMap>(
     hands.chain(hands =>
       initializePosition(
         rules,
-        { board, hands, turn, moveNumber: Math.max(1, moveNumber), lastMoveOrDrop, lastLionCapture },
+        {
+          board,
+          hands,
+          turn,
+          moveNumber: Math.max(1, moveNumber),
+          lastMoveOrDrop,
+          lastLionCapture,
+        },
         !!strict
       )
     )
@@ -231,7 +239,9 @@ export function makeHandSfen(rules: Rules, hand: Hand): string {
 }
 
 export function makeHandsSfen(rules: Rules, hands: Hands): string {
-  const handsStr = makeHandSfen(rules, hands.color('sente')).toUpperCase() + makeHandSfen(rules, hands.color('gote'));
+  const handsStr =
+    makeHandSfen(rules, hands.color('sente')).toUpperCase() +
+    makeHandSfen(rules, hands.color('gote'));
   return handsStr === '' ? '-' : handsStr;
 }
 

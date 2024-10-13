@@ -1,5 +1,13 @@
 # Changelog for shogiops
 
+## v0.17.0
+
+- When creating notation illegal moves are now also considered - changes notation output.
+- Moved `kif` and `csa` to `notation` directory directly.
+- Added `scalashogiCharPair` function.
+- Files are now compiled into `/esm/` directory.
+- `.d.ts.map` is now generated for every file.
+
 ## v0.16.3
 
 - Fixed `chushogi` bug where second move of falcon/eagle was not respecting the lion recapture rule.

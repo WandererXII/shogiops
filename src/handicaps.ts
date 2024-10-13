@@ -1,5 +1,5 @@
-import { Handicap } from './types';
-import { defined } from './util';
+import { Handicap } from './types.js';
+import { defined } from './util.js';
 
 export function findHandicaps(handicapOpt: Partial<Handicap>): Handicap[] {
   return handicaps.filter(obj =>

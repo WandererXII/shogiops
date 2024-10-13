@@ -46,7 +46,7 @@ export {
   toColor,
 } from './util.js';
 
-export { SquareSet } from './squareSet.js';
+export { SquareSet, BitRows } from './squareSet.js';
 
 export { Board } from './board.js';
 
@@ -68,7 +68,7 @@ export * as variant from './variant/variant.js';
 
 export * as variantUtil from './variant/util.js';
 
-export * as attacks from './attacks';
+export * as attacks from './attacks.js';
 
 export * as compat from './compat.js';
 

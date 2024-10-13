@@ -1,13 +1,6 @@
 node_modules/
-docs/
-coverage/
-.vscode/
-
-/notation/
-/variant/
-
-*.js
-*.d.ts
-*.js.map
+/docs/
+/esm/
+/.vscode/
 
 *.tsbuildinfo

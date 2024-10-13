@@ -1,10 +1,10 @@
-import { perft } from '../../src/debug';
-import { initialSfen, parseSfen } from '../../src/sfen';
-import { SquareSet } from '../../src/squareSet';
-import { parseSquareName, parseUsi } from '../../src/util';
-import { Annanshogi } from '../../src/variant/annanshogi';
-import { fullSquareSet } from '../../src/variant/util';
-import { perfts } from '../fixtures/perftAnnan';
+import { perft } from '../../src/debug.js';
+import { initialSfen, parseSfen } from '../../src/sfen.js';
+import { SquareSet } from '../../src/squareSet.js';
+import { parseSquareName, parseUsi } from '../../src/util.js';
+import { Annanshogi } from '../../src/variant/annanshogi.js';
+import { fullSquareSet } from '../../src/variant/util.js';
+import { perfts } from '../fixtures/perftAnnan.js';
 
 const annanPerfts: [string, number, number][] = [
   ['', 1, 28],

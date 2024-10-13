@@ -1,10 +1,10 @@
-import { perft } from '../../src/debug';
-import { initialSfen, makeSfen, parseSfen } from '../../src/sfen';
-import { parseUsi } from '../../src/util';
-import { Shogi } from '../../src/variant/shogi';
-import { defaultPosition } from '../../src/variant/variant';
-import { perfts } from '../fixtures/perftStandard';
-import { usiFixture } from '../fixtures/usi';
+import { perft } from '../../src/debug.js';
+import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
+import { parseUsi } from '../../src/util.js';
+import { Shogi } from '../../src/variant/shogi.js';
+import { defaultPosition } from '../../src/variant/variant.js';
+import { perfts } from '../fixtures/perftStandard.js';
+import { usiFixture } from '../fixtures/usi.js';
 
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550&start=16
 // http://www.talkchess.com/forum3/viewtopic.php?f=7&t=71550

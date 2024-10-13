@@ -1,7 +1,7 @@
-import { makeWesternMoveOrDrop } from '../../src/notation/western';
-import { parseUsi } from '../../src/util';
-import { Minishogi } from '../../src/variant/minishogi';
-import { Shogi } from '../../src/variant/shogi';
+import { makeWesternMoveOrDrop } from '../../src/notation/western.js';
+import { parseUsi } from '../../src/util.js';
+import { Minishogi } from '../../src/variant/minishogi.js';
+import { Shogi } from '../../src/variant/shogi.js';
 
 test('basic moves', () => {
   const pos = Shogi.default();

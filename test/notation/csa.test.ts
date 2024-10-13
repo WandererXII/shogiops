@@ -5,11 +5,11 @@ import {
   parseCsaMoveOrDrop,
   parseCsaMovesOrDrops,
   parseTags,
-} from '../../src/notation/csa/csa';
-import { parseNumberSquare } from '../../src/notation/util';
-import { initialSfen, parseSfen } from '../../src/sfen';
-import { parseSquareName, parseUsi } from '../../src/util';
-import { Shogi } from '../../src/variant/shogi';
+} from '../../src/notation/csa/csa.js';
+import { parseNumberSquare } from '../../src/notation/util.js';
+import { initialSfen, parseSfen } from '../../src/sfen.js';
+import { parseSquareName, parseUsi } from '../../src/util.js';
+import { Shogi } from '../../src/variant/shogi.js';
 
 test('parse csa square', () => {
   expect(parseNumberSquare('11')).toEqual(parseSquareName('1a'));

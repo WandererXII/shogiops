@@ -1,7 +1,7 @@
-import { perft } from '../../src/debug';
-import { initialSfen, parseSfen } from '../../src/sfen';
-import { Minishogi } from '../../src/variant/minishogi';
-import { perfts } from '../fixtures/perftMinishogi';
+import { perft } from '../../src/debug.js';
+import { initialSfen, parseSfen } from '../../src/sfen.js';
+import { Minishogi } from '../../src/variant/minishogi.js';
+import { perfts } from '../fixtures/perftMinishogi.js';
 
 const minishogiPerfts: [string, number, number][] = [
   ['', 1, 14],

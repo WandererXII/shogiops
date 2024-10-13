@@ -4,8 +4,8 @@ import {
   makeNumberSquare,
   numberToKanji,
   parseJapaneseSquare,
-} from '../../src/notation/util';
-import { parseSquareName } from '../../src/util';
+} from '../../src/notation/util.js';
+import { parseSquareName } from '../../src/util.js';
 
 test('parse kif square', () => {
   expect(parseJapaneseSquare('１一')).toEqual(parseSquareName('1a'));

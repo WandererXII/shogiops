@@ -11,8 +11,8 @@ import {
   ray,
   rookAttacks,
   silverAttacks,
-} from '../src/attacks';
-import { SquareSet } from '../src/squareSet';
+} from '../src/attacks.js';
+import { SquareSet } from '../src/squareSet.js';
 
 test('ray', () => {
   expect(ray(0, 240)).toEqual(SquareSet.fromFile(0));

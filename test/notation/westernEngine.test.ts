@@ -1,6 +1,6 @@
-import { makeWesternEngineMoveOrDrop } from '../../src/notation/westernEngine';
-import { parseUsi } from '../../src/util';
-import { Shogi } from '../../src/variant/shogi';
+import { makeWesternEngineMoveOrDrop } from '../../src/notation/westernEngine.js';
+import { parseUsi } from '../../src/util.js';
+import { Shogi } from '../../src/variant/shogi.js';
 
 test('basic moves', () => {
   const pos = Shogi.default();

@@ -1,5 +1,13 @@
-import { makePieceName, makeUsi, parsePieceName, parseSquareName, parseUsi, squareFile, squareRank } from '../src/util';
-import { usiFixture } from './fixtures/usi';
+import {
+  makePieceName,
+  makeUsi,
+  parsePieceName,
+  parseSquareName,
+  parseUsi,
+  squareFile,
+  squareRank,
+} from '../src/util.js';
+import { usiFixture } from './fixtures/usi.js';
 
 test('square coordinates', () => {
   expect(squareFile(0)).toBe(0);

@@ -1,6 +1,6 @@
-import { findHandicap, findHandicaps, handicaps, isHandicap } from '../src/handicaps';
-import { initialSfen, parseSfen } from '../src/sfen';
-import { RULES } from '../src/types';
+import { findHandicap, findHandicaps, handicaps, isHandicap } from '../src/handicaps.js';
+import { initialSfen, parseSfen } from '../src/sfen.js';
+import { RULES } from '../src/types.js';
 
 test('proper count', () => {
   expect(findHandicaps({ rules: 'standard' }).length).toBe(23);

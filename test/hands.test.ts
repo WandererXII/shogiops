@@ -1,4 +1,4 @@
-import { Hands } from '../src/hands';
+import { Hands } from '../src/hands.js';
 
 test('set and get', () => {
   const hands = Hands.empty();

@@ -1,8 +1,8 @@
-import { Board } from '../src/board';
-import { Hands } from '../src/hands';
-import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '../src/sfen';
-import { parseSquareName } from '../src/util';
-import { defaultPosition } from '../src/variant/variant';
+import { Board } from '../src/board.js';
+import { Hands } from '../src/hands.js';
+import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '../src/sfen.js';
+import { parseSquareName } from '../src/util.js';
+import { defaultPosition } from '../src/variant/variant.js';
 
 test('make board sfen', () => {
   expect(makeBoardSfen('standard', defaultPosition('standard').board)).toEqual(initialSfen('standard').split(' ')[0]);

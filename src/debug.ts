@@ -1,8 +1,9 @@
-import { SquareSet } from './squareSet.js';
-import { DropMove, NormalMove, PieceName, Role, Square } from './types.js';
+import type { SquareSet } from './squareSet.js';
+import type { DropMove, NormalMove, PieceName, Role, Square } from './types.js';
 import { makeSquareName, makeUsi, parsePieceName } from './util.js';
-import { Chushogi, secondLionStepDests } from './variant/chushogi.js';
-import { Position } from './variant/position.js';
+import type { Chushogi } from './variant/chushogi.js';
+import { secondLionStepDests } from './variant/chushogi.js';
+import type { Position } from './variant/position.js';
 import { pieceCanPromote, pieceForcePromote, promotableOnDrop, promote } from './variant/util.js';
 
 export function moveDests(moveDests: Map<Square, SquareSet>): string {

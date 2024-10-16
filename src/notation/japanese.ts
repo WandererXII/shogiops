@@ -1,8 +1,8 @@
 import { kingAttacks } from '../attacks.js';
 import { SquareSet } from '../squareSet.js';
-import { MoveOrDrop, Piece, Role, Rules, Square, isDrop } from '../types.js';
-import { defined, squareDist, squareFile, squareRank } from '../util.js';
-import { Position } from '../variant/position.js';
+import type { MoveOrDrop, Piece, Role, Rules, Square } from '../types.js';
+import { defined, isDrop, squareDist, squareFile, squareRank } from '../util.js';
+import type { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
 import { aimingAt, makeJapaneseSquare, roleKanjiDuplicates, roleToKanji } from './util.js';
 

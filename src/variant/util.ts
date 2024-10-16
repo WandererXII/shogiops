@@ -1,5 +1,5 @@
 import { SquareSet } from '../squareSet.js';
-import { Color, Dimensions, Piece, Role, Rules, Square } from '../types.js';
+import type { Color, Dimensions, Piece, Role, Rules, Square } from '../types.js';
 import { squareRank } from '../util.js';
 
 export function pieceCanPromote(

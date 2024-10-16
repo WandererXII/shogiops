@@ -1,5 +1,6 @@
+import { ROLES } from './constants.js';
 import { SquareSet } from './squareSet.js';
-import { Color, ColorMap, Piece, ROLES, Role, RoleMap, Square } from './types.js';
+import type { Color, ColorMap, Piece, Role, RoleMap, Square } from './types.js';
 
 export class Board implements Iterable<[Square, Piece]> {
   private constructor(

@@ -1,4 +1,5 @@
-import { Color, HandMap, ROLES, Role } from './types.js';
+import { ROLES } from './constants.js';
+import type { Color, HandMap, Role } from './types.js';
 
 // Hand alone can store any role
 export class Hand {

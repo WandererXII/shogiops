@@ -1,52 +1,15 @@
 import type { Board } from './board.js';
+import type { COLORS, FILE_NAMES, RANK_NAMES, RESULTS, ROLES, RULES } from './constants.js';
 import type { Hands } from './hands.js';
 import type { SquareSet } from './squareSet.js';
 
-export const FILE_NAMES = [
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
-  '12',
-  '13',
-  '14',
-  '15',
-  '16',
-] as const;
 export type FileName = (typeof FILE_NAMES)[number];
 
-export const RANK_NAMES = [
-  'a',
-  'b',
-  'c',
-  'd',
-  'e',
-  'f',
-  'g',
-  'h',
-  'i',
-  'j',
-  'k',
-  'l',
-  'm',
-  'n',
-  'o',
-  'p',
-] as const;
 export type RankName = (typeof RANK_NAMES)[number];
 
 export type Square = number;
 
 export type SquareName = `${FileName}${RankName}`;
-
-export const COLORS = ['sente', 'gote'] as const;
 
 export type Color = (typeof COLORS)[number];
 
@@ -55,53 +18,6 @@ export interface Dimensions {
   files: number;
 }
 
-export const ROLES = [
-  'lance',
-  'knight',
-  'silver',
-  'gold',
-  'king',
-  'bishop',
-  'rook',
-  'pawn',
-  'tokin',
-  'promotedlance',
-  'promotedsilver',
-  'promotedknight',
-  'horse',
-  'dragon',
-  // chushogi
-  'promotedpawn',
-  'leopard',
-  'copper',
-  'elephant',
-  'chariot',
-  'tiger',
-  'kirin',
-  'phoenix',
-  'sidemover',
-  'verticalmover',
-  'lion',
-  'queen',
-  'gobetween',
-  'whitehorse',
-  'lionpromoted',
-  'queenpromoted',
-  'bishoppromoted',
-  'sidemoverpromoted',
-  'verticalmoverpromoted',
-  'rookpromoted',
-  'prince',
-  'whale',
-  'horsepromoted',
-  'elephantpromoted',
-  'stag',
-  'boar',
-  'ox',
-  'falcon',
-  'eagle',
-  'dragonpromoted',
-] as const;
 export type Role = (typeof ROLES)[number];
 
 export type RoleMap = Map<Role, SquareSet>;
@@ -129,14 +45,6 @@ export interface DropMove {
 
 export type MoveOrDrop = NormalMove | DropMove;
 
-export function isDrop(v: MoveOrDrop): v is DropMove {
-  return 'role' in v;
-}
-
-export function isMove(v: MoveOrDrop): v is NormalMove {
-  return 'from' in v;
-}
-
 export interface Setup {
   board: Board;
   hands: Hands;
@@ -150,24 +58,8 @@ export interface Setup {
   lastLionCapture?: Square; // by non-lion piece
 }
 
-export const RESULTS = [
-  'checkmate',
-  'stalemate',
-  'draw',
-  'bareking',
-  'kingslost',
-  'specialVariantEnd',
-] as const;
 export type Result = (typeof RESULTS)[number];
 
-export const RULES = [
-  'standard',
-  'minishogi',
-  'chushogi',
-  'annanshogi',
-  'kyotoshogi',
-  'checkshogi',
-] as const;
 export type Rules = (typeof RULES)[number];
 
 export interface Outcome {

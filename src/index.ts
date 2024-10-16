@@ -1,15 +1,11 @@
-export {
-  FILE_NAMES,
-  RANK_NAMES,
+export type {
   FileName,
   RankName,
   Square,
   SquareName,
   Color,
-  COLORS,
   Dimensions,
   Role,
-  ROLES,
   Piece,
   PieceName,
   RoleMap,
@@ -18,13 +14,9 @@ export {
   NormalMove,
   DropMove,
   MoveOrDrop,
-  isDrop,
-  isMove,
   Setup,
   Result,
-  RESULTS,
   Rules,
-  RULES,
   Outcome,
   Handicap,
 } from './types.js';
@@ -39,18 +31,25 @@ export {
   parseSquareName,
   parseUsi,
   parsePieceName,
+  isDrop,
+  isMove,
   squareFile,
   squareRank,
   toBW,
   toBlackWhite,
   toColor,
+  boolToColor,
 } from './util.js';
 
-export { SquareSet, BitRows } from './squareSet.js';
+export { FILE_NAMES, RANK_NAMES, COLORS, ROLES, RESULTS, RULES } from './constants.js';
+
+export type { BitRows } from './squareSet.js';
+export { SquareSet } from './squareSet.js';
 
 export { Board } from './board.js';
 
-export { IllegalSetup, Position, PositionError, Context } from './variant/position.js';
+export type { Context } from './variant/position.js';
+export { IllegalSetup, Position, PositionError } from './variant/position.js';
 
 export { Shogi } from './variant/shogi.js';
 

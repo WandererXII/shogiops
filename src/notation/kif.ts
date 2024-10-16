@@ -3,9 +3,9 @@ import { Board } from '../board.js';
 import { findHandicap, isHandicap } from '../handicaps.js';
 import { Hand, Hands } from '../hands.js';
 import { initialSfen, makeSfen, parseSfen } from '../sfen.js';
-import { Color, MoveOrDrop, Rules, Square, isDrop, isMove } from '../types.js';
-import { boolToColor, defined, parseCoordinates } from '../util.js';
-import { Position } from '../variant/position.js';
+import type { Color, MoveOrDrop, Rules, Square } from '../types.js';
+import { boolToColor, defined, isDrop, isMove, parseCoordinates } from '../util.js';
+import type { Position } from '../variant/position.js';
 import { allRoles, dimensions, handRoles, promote } from '../variant/util.js';
 import { initializePosition } from '../variant/variant.js';
 import {
@@ -141,7 +141,7 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
 function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {
   const lines = normalizedKifLines(kif),
     handicapTag = lines.find(l => l.startsWith('手合割：')),
-    rules = rulesOpt ?? detectVariant(lines.filter(l => l.startsWith('|')).length, handicapTag),
+    rules = rulesOpt || detectVariant(lines.filter(l => l.startsWith('|')).length, handicapTag),
     goteHandStr = lines.find(l => l.startsWith('後手の持駒：') || l.startsWith('上手の持駒：')),
     senteHandStr = lines.find(l => l.startsWith('先手の持駒：') || l.startsWith('下手の持駒：')),
     turn = lines.some(l => l.startsWith('後手番') || l.startsWith('上手番')) ? 'gote' : 'sente';
@@ -252,7 +252,7 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
         ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'].includes(piece[i])
       )
         countStr += piece[i++];
-      const count = (kanjiToNumber(countStr) || 1) + hand.get(role);
+      const count = (Math.max(kanjiToNumber(countStr) ?? 1), 1) + hand.get(role);
       hand.set(role, count);
     }
   }

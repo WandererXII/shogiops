@@ -1,6 +1,6 @@
-import { MoveOrDrop, isDrop } from '../types.js';
-import { defined } from '../util.js';
-import { Position } from '../variant/position.js';
+import type { MoveOrDrop } from '../types.js';
+import { defined, isDrop } from '../util.js';
+import type { Position } from '../variant/position.js';
 import { pieceCanPromote } from '../variant/util.js';
 import { aimingAt, makeNumberSquare, roleToWestern } from './util.js';
 

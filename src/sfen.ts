@@ -1,11 +1,13 @@
 import { Result } from '@badrap/result';
 import { Board } from './board.js';
-import { Hand, Hands } from './hands.js';
-import { Color, MoveOrDrop, Piece, Role, Rules, Square } from './types.js';
+import type { Hand } from './hands.js';
+import { Hands } from './hands.js';
+import type { Color, MoveOrDrop, Piece, Role, Rules, Square } from './types.js';
 import { defined, makeSquareName, parseCoordinates, parseSquareName, toBW } from './util.js';
-import { Position, PositionError } from './variant/position.js';
+import type { Position, PositionError } from './variant/position.js';
 import { dimensions, handRoles } from './variant/util.js';
-import { RulesTypeMap, initializePosition } from './variant/variant.js';
+import type { RulesTypeMap } from './variant/variant.js';
+import { initializePosition } from './variant/variant.js';
 
 export enum InvalidSfen {
   Sfen = 'ERR_SFEN',

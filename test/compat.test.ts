@@ -1,6 +1,6 @@
 import { scalashogiCharPair, shogigroundDropDests, shogigroundMoveDests } from '../src/compat.js';
 import { parseSfen } from '../src/sfen.js';
-import { Rules } from '../src/types.js';
+import type { Rules } from '../src/types.js';
 import { parseUsi } from '../src/util.js';
 import { Shogi } from '../src/variant/shogi.js';
 

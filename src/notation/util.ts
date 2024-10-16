@@ -1,7 +1,7 @@
 import { SquareSet } from '../squareSet.js';
-import { Piece, Role, Rules, Square } from '../types.js';
+import type { Piece, Role, Rules, Square } from '../types.js';
 import { squareFile, squareRank } from '../util.js';
-import { Position } from '../variant/position.js';
+import type { Position } from '../variant/position.js';
 
 export function aimingAt(pos: Position, pieces: SquareSet, to: Square): SquareSet {
   let ambs = SquareSet.empty();

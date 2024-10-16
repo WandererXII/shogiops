@@ -1,10 +1,10 @@
 import { Result } from '@badrap/result';
 import { between } from '../attacks.js';
-import { Board } from '../board.js';
-import { Hands } from '../hands.js';
+import type { Board } from '../board.js';
+import { COLORS } from '../constants.js';
+import type { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import {
-  COLORS,
+import type {
   Color,
   MoveOrDrop,
   Outcome,
@@ -14,9 +14,8 @@ import {
   Rules,
   Setup,
   Square,
-  isDrop,
 } from '../types.js';
-import { defined, lionRoles, makePieceName, opposite } from '../util.js';
+import { defined, isDrop, lionRoles, makePieceName, opposite } from '../util.js';
 import {
   allRoles,
   fullSquareSet,

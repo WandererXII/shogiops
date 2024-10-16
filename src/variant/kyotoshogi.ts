@@ -13,9 +13,10 @@ import {
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { Color, MoveOrDrop, Piece, Role, Setup, Square, isDrop } from '../types.js';
-import { defined, opposite } from '../util.js';
-import { Context, IllegalSetup, Position, PositionError } from './position.js';
+import type { Color, MoveOrDrop, Piece, Role, Setup, Square } from '../types.js';
+import { defined, isDrop, opposite } from '../util.js';
+import type { Context, PositionError } from './position.js';
+import { IllegalSetup, Position } from './position.js';
 import { standardMoveDests } from './shogi.js';
 import { fullSquareSet, handRoles, unpromote } from './util.js';
 

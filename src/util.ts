@@ -1,14 +1,14 @@
-import {
+import { FILE_NAMES, RANK_NAMES } from './constants.js';
+import type {
   Color,
-  FILE_NAMES,
+  DropMove,
   MoveOrDrop,
+  NormalMove,
   Piece,
   PieceName,
-  RANK_NAMES,
   Role,
   Square,
   SquareName,
-  isDrop,
 } from './types.js';
 
 export function defined<A>(v: A | undefined): v is A {
@@ -63,6 +63,14 @@ export function parseSquareName(str: string): Square | undefined {
 
 export function makeSquareName(square: Square): SquareName {
   return (FILE_NAMES[squareFile(square)] + RANK_NAMES[squareRank(square)]) as SquareName;
+}
+
+export function isDrop(v: MoveOrDrop): v is DropMove {
+  return 'role' in v;
+}
+
+export function isMove(v: MoveOrDrop): v is NormalMove {
+  return 'from' in v;
 }
 
 export const lionRoles: Role[] = ['lion', 'lionpromoted'];

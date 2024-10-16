@@ -31,9 +31,10 @@ import {
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
 import { SquareSet } from '../squareSet.js';
-import { Color, MoveOrDrop, Outcome, Piece, Role, Setup, Square, isMove } from '../types.js';
-import { defined, lionRoles, opposite, squareDist } from '../util.js';
-import { Context, IllegalSetup, Position, PositionError } from './position.js';
+import type { Color, MoveOrDrop, Outcome, Piece, Role, Setup, Square } from '../types.js';
+import { defined, isMove, lionRoles, opposite, squareDist } from '../util.js';
+import type { Context } from './position.js';
+import { IllegalSetup, Position, PositionError } from './position.js';
 import { allRoles, dimensions, fullSquareSet } from './util.js';
 
 export class Chushogi extends Position {
@@ -60,7 +61,8 @@ export class Chushogi extends Position {
     if (!this.board.occupied.intersect(fullSquareSet(this.rules)).equals(this.board.occupied))
       return Result.err(new PositionError(IllegalSetup.PiecesOutsideBoard));
 
-    if (this.hands.count()) return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
+    if (this.hands.count() > 0)
+      return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
 
     for (const role of this.board.presentRoles())
       if (!allRoles(this.rules).includes(role))

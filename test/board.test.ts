@@ -1,5 +1,5 @@
 import { Board } from '../src/board.js';
-import { Piece } from '../src/types.js';
+import type { Piece } from '../src/types.js';
 
 test('set and get', () => {
   const board = Board.empty();

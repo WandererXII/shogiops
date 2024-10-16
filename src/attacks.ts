@@ -1,5 +1,5 @@
 import { SquareSet } from './squareSet.js';
-import { Color, Piece, Square } from './types.js';
+import type { Color, Piece, Square } from './types.js';
 import { opposite, squareFile, squareRank } from './util.js';
 
 function computeRange(square: Square, deltas: number[]): SquareSet {

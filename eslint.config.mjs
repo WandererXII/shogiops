@@ -15,6 +15,8 @@ export default tseslint.config(
       'linebreak-style': ['error', 'unix'],
       eqeqeq: ['error', 'always'],
       'no-irregular-whitespace': 'off',
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/consistent-type-exports': 'error',
       '@typescript-eslint/no-empty-function': 'error',
       '@typescript-eslint/no-unnecessary-condition': 'error',
       '@typescript-eslint/no-unused-vars': [
@@ -23,7 +25,10 @@ export default tseslint.config(
           argsIgnorePattern: '^_',
         },
       ],
-      '@typescript-eslint/strict-boolean-expressions': ['error', { allowNullableBoolean: true }],
+      '@typescript-eslint/strict-boolean-expressions': [
+        'error',
+        { allowNullableBoolean: true, allowNumber: false },
+      ],
     },
     files: ['src/**/*.ts', 'test/**/*.ts'],
   },

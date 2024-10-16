@@ -2,6 +2,14 @@
   "name": "shogiops",
   "version": "0.17.0",
   "description": "Shogi rules and operations",
+  "author": "Niklas Fiekas (chessops), WandererXII (shogiops)",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WandererXII/shogiops"
+  },
+  "bugs": "https://github.com/WandererXII/shogiops/issues",
+  "funding": "https://lishogi.org/patron",
   "keywords": [
     "shogi",
     "lishogi",
@@ -9,12 +17,7 @@
     "usi",
     "typescript"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/WandererXII/shogiops"
-  },
-  "author": "Niklas Fiekas <niklas.fiekas@backscattering.de>(chessops), WandererXII(shogiops)",
-  "license": "GPL-3.0-or-later",
+  "sideEffects": false,
   "type": "module",
   "module": "esm/index.js",
   "types": "esm/index.d.ts",
@@ -35,7 +38,6 @@
       ]
     }
   },
-  "sideEffects": false,
   "dependencies": {
     "@badrap/result": "^0.2"
   },
@@ -53,13 +55,14 @@
     "typescript-eslint": "^8"
   },
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "prepare": "$npm_execpath run compile",
     "precompile": "del esm",
     "compile": "tsc -b tsconfig.build.json",
-    "prepare": "npm run compile",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "doc": "typedoc src/index.ts",
     "lint": "eslint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check-format": "prettier --check ."
   },
   "files": [
     "esm",

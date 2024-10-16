@@ -252,7 +252,7 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
         ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'].includes(piece[i])
       )
         countStr += piece[i++];
-      const count = (Math.max(kanjiToNumber(countStr) ?? 1), 1) + hand.get(role);
+      const count = Math.max(kanjiToNumber(countStr) ?? 1, 1) + hand.get(role);
       hand.set(role, count);
     }
   }

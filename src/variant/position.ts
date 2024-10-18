@@ -92,7 +92,7 @@ export abstract class Position {
   // Attackers' long-range pieces at least x-raying square - for finding blockers
   protected abstract squareSnipers(square: Square, attacker: Color): SquareSet;
 
-  protected fromSetup(setup: Setup) {
+  protected fromSetup(setup: Setup): void {
     this.board = setup.board.clone();
     this.hands = setup.hands.clone();
     this.turn = setup.turn;

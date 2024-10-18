@@ -99,8 +99,8 @@ function parseUsiDropRole(ch: string): Role | undefined {
   }
 }
 
-export const usiDropRegex = /^([PLNSGBRT])\*(\d\d?[a-p])$/;
-export const usiMoveRegex = /^(\d\d?[a-p])(\d\d?[a-p])?(\d\d?[a-p])(\+|=|\?)?$/;
+export const usiDropRegex: RegExp = /^([PLNSGBRT])\*(\d\d?[a-p])$/;
+export const usiMoveRegex: RegExp = /^(\d\d?[a-p])(\d\d?[a-p])?(\d\d?[a-p])(\+|=|\?)?$/;
 
 export function parseUsi(str: string): MoveOrDrop | undefined {
   const dropMatch = str.match(usiDropRegex);

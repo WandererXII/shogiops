@@ -59,9 +59,9 @@
     "type-check": "tsc --noEmit",
     "test": "vitest",
     "doc": "typedoc src/index.ts",
-    "lint": "eslint",
-    "format": "prettier --write .",
-    "check-format": "prettier --check ."
+    "lint": "eslint --cache",
+    "format": "prettier --cache --write .",
+    "format-check": "prettier --cache --check ."
   },
   "files": [
     "esm",

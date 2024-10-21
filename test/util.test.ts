@@ -6,7 +6,8 @@ import {
   parseUsi,
   squareFile,
   squareRank,
-} from '../src/util.js';
+} from '@/util.js';
+import { expect, test } from 'vitest';
 import { usiFixture } from './fixtures/usi.js';
 
 test('square coordinates', () => {

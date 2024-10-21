@@ -1,8 +1,9 @@
-import { scalashogiCharPair, shogigroundDropDests, shogigroundMoveDests } from '../src/compat.js';
-import { parseSfen } from '../src/sfen.js';
-import type { Rules } from '../src/types.js';
-import { parseUsi } from '../src/util.js';
-import { Shogi } from '../src/variant/shogi.js';
+import { scalashogiCharPair, shogigroundDropDests, shogigroundMoveDests } from '@/compat.js';
+import { parseSfen } from '@/sfen.js';
+import type { Rules } from '@/types.js';
+import { parseUsi } from '@/util.js';
+import { Shogi } from '@/variant/shogi.js';
+import { expect, test } from 'vitest';
 
 test('shogiground dests', () => {
   const pos = Shogi.default();

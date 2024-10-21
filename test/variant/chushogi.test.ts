@@ -1,8 +1,9 @@
-import { shogigroundSecondLionStep } from '../../src/compat.js';
-import { perft } from '../../src/debug.js';
-import { initialSfen, parseSfen } from '../../src/sfen.js';
-import { opposite, parseSquareName, parseUsi } from '../../src/util.js';
-import { Chushogi } from '../../src/variant/chushogi.js';
+import { shogigroundSecondLionStep } from '@/compat.js';
+import { perft } from '@/debug.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
+import { opposite, parseSquareName, parseUsi } from '@/util.js';
+import { Chushogi } from '@/variant/chushogi.js';
+import { expect, test } from 'vitest';
 import { perfts } from '../fixtures/perftChushogi.js';
 
 test('valid promotions', () => {

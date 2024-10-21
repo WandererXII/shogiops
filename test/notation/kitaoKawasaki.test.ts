@@ -1,6 +1,7 @@
-import { makeKitaoKawasakiMoveOrDrop } from '../../src/notation/kitaoKawasaki.js';
-import { parseUsi } from '../../src/util.js';
-import { Shogi } from '../../src/variant/shogi.js';
+import { makeKitaoKawasakiMoveOrDrop } from '@/notation/kitaoKawasaki.js';
+import { parseUsi } from '@/util.js';
+import { Shogi } from '@/variant/shogi.js';
+import { expect, test } from 'vitest';
 
 test('basic moves', () => {
   const pos = Shogi.default();

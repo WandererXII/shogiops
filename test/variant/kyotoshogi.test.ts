@@ -1,7 +1,8 @@
-import { perft } from '../../src/debug.js';
-import { initialSfen, parseSfen } from '../../src/sfen.js';
-import { parseUsi } from '../../src/util.js';
-import { Kyotoshogi } from '../../src/variant/kyotoshogi.js';
+import { perft } from '@/debug.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
+import { parseUsi } from '@/util.js';
+import { Kyotoshogi } from '@/variant/kyotoshogi.js';
+import { expect, test } from 'vitest';
 import { perfts } from '../fixtures/perftKyotoshogi.js';
 
 const kyotoshogiPerfts: [string, number, number][] = [

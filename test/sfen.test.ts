@@ -1,8 +1,9 @@
-import { Board } from '../src/board.js';
-import { Hands } from '../src/hands.js';
-import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '../src/sfen.js';
-import { parseSquareName } from '../src/util.js';
-import { defaultPosition } from '../src/variant/variant.js';
+import { Board } from '@/board.js';
+import { Hands } from '@/hands.js';
+import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '@/sfen.js';
+import { parseSquareName } from '@/util.js';
+import { defaultPosition } from '@/variant/variant.js';
+import { expect, test } from 'vitest';
 
 test('make board sfen', () => {
   expect(makeBoardSfen('standard', defaultPosition('standard').board)).toEqual(

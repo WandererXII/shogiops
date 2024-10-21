@@ -1,6 +1,7 @@
-import { RULES } from '../src/constants.js';
-import { findHandicap, findHandicaps, handicaps, isHandicap } from '../src/handicaps.js';
-import { initialSfen, parseSfen } from '../src/sfen.js';
+import { RULES } from '@/constants.js';
+import { findHandicap, findHandicaps, handicaps, isHandicap } from '@/handicaps.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
+import { expect, test } from 'vitest';
 
 test('proper count', () => {
   expect(findHandicaps({ rules: 'standard' }).length).toBe(23);

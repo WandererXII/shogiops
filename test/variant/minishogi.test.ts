@@ -1,6 +1,7 @@
-import { perft } from '../../src/debug.js';
-import { initialSfen, parseSfen } from '../../src/sfen.js';
-import { Minishogi } from '../../src/variant/minishogi.js';
+import { perft } from '@/debug.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
+import { Minishogi } from '@/variant/minishogi.js';
+import { expect, test } from 'vitest';
 import { perfts } from '../fixtures/perftMinishogi.js';
 
 const minishogiPerfts: [string, number, number][] = [

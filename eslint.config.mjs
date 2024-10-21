@@ -33,6 +33,6 @@ export default tseslint.config(
     files: ['src/**/*.ts', 'test/**/*.ts'],
   },
   {
-    ignores: ['eslint.config.mjs', 'esm', 'docs'],
+    ignores: ['eslint.config.mjs', 'vitest.*.ts', 'esm', 'docs'],
   }
 );

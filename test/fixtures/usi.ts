@@ -1,4 +1,4 @@
-export const usiFixture = [
+export const usiFixture: string[] = [
   '3g3f 8c8d 3f3e 8d8e 6i7h 8e8f 8g8f 8b8f P*8g 8f8e 2h3h 4a3b 7g7f P*8f 8g8f 8e8f 3h3f 7a6b 3i3h 6a7b 9g9f 3a4b 5i5h 5a5b 1g1f 1c1d 2i3g 8f8d P*8g 2b1c 3e3d 1c2b 3d3c+ 4b3c 3g4e 3c4b 3f3b+ 2b8h+ 7i8h B*2h B*4a 5b6a G*5b 6a7a 5b6b 7b6b 3b4b G*6a 4e5c 2h6d+ 5c6a+ 6b6a S*5c',
   '2g2f 3c3d 6i7h 8b5b 2f2e 3a3b 2e2d 2c2d 2h2d 3b3c 2d2c+ 4a3b 2c2e 5a6b P*2c P*2d 2c2b+ 2d2e 2b3b 5b3b G*2c 3b3a 2c3c 3a3c 1g1f 2e2f 7g7f G*4d 3i3h 3c2c S*2h 2a3c 9g9f R*2b 2i1g 2f2g+ 2h2g P*2f 2g3f 3d3e 8h4d 4c4d 3f3e 2b4b P*2d 2c2a 3e2f 6a5b 7i6h 5b4c 1g2e 3c2e 2f2e B*3d 2e3d 4c3d 5i6i 2a2d B*1e 2d2b 1e4b+ 2b4b R*2a S*2b 9f9e B*4c B*3a 4b5b 2a2b+ 5b2b 3a2b+',
   '2g2f 8c8d 2f2e 3c3d 5i5h 8d8e 6i7h 8e8f 8g8f 8b8f 2e2d 2c2d P*8g 8f8c 2h2d 2b4d 2d2a+ P*8d 2a2h P*2a 3i3h 8d8e 2h2a 8e8f 8g8f 8c8f 7g7f 8f7f 8h4d 7f7d 4d1a+ 4a3b N*2d 3b2b 2a3a 5a5b 3a2b 5b5a G*4b 5a6b 4b4c 6b5a 2b4b',

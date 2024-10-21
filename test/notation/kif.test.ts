@@ -5,11 +5,12 @@ import {
   parseKifMoveOrDrop,
   parseKifMovesOrDrops,
   parseTags,
-} from '../../src/notation/kif.js';
-import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
-import { parseUsi } from '../../src/util.js';
-import { Chushogi } from '../../src/variant/chushogi.js';
-import { Shogi } from '../../src/variant/shogi.js';
+} from '@/notation/kif.js';
+import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
+import { parseUsi } from '@/util.js';
+import { Chushogi } from '@/variant/chushogi.js';
+import { Shogi } from '@/variant/shogi.js';
+import { expect, test } from 'vitest';
 
 test('make kif header from some random position', () => {
   const pos = parseSfen(

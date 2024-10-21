@@ -1,7 +1,8 @@
-import { makeJapaneseMoveOrDrop } from '../../src/notation/japanese.js';
-import { parseSfen } from '../../src/sfen.js';
-import { parseUsi } from '../../src/util.js';
-import { Shogi } from '../../src/variant/shogi.js';
+import { makeJapaneseMoveOrDrop } from '@/notation/japanese.js';
+import { parseSfen } from '@/sfen.js';
+import { parseUsi } from '@/util.js';
+import { Shogi } from '@/variant/shogi.js';
+import { expect, test } from 'vitest';
 
 test('basic moves', () => {
   const pos = Shogi.default();

@@ -1,8 +1,9 @@
-import { perft } from '../../src/debug.js';
-import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
-import { parseUsi } from '../../src/util.js';
-import { Shogi } from '../../src/variant/shogi.js';
-import { defaultPosition } from '../../src/variant/variant.js';
+import { perft } from '@/debug.js';
+import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
+import { parseUsi } from '@/util.js';
+import { Shogi } from '@/variant/shogi.js';
+import { defaultPosition } from '@/variant/variant.js';
+import { expect, test } from 'vitest';
 import { perfts } from '../fixtures/perftStandard.js';
 import { usiFixture } from '../fixtures/usi.js';
 

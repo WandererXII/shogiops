@@ -1,6 +1,6 @@
 import { perft } from '@/debug.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
-import { SquareSet } from '@/squareSet.js';
+import { SquareSet } from '@/square-set.js';
 import { parseSquareName, parseUsi } from '@/util.js';
 import { Annanshogi } from '@/variant/annanshogi.js';
 import { fullSquareSet } from '@/variant/util.js';

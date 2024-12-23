@@ -1,5 +1,5 @@
-import type { BitRows } from '@/squareSet.js';
-import { SquareSet } from '@/squareSet.js';
+import type { BitRows } from '@/square-set.js';
+import { SquareSet } from '@/square-set.js';
 import { expect, test } from 'vitest';
 
 test('full set has all', () => {

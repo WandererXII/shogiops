@@ -1,4 +1,4 @@
-import { makeWesternEngineMoveOrDrop } from '@/notation/westernEngine.js';
+import { makeWesternEngineMoveOrDrop } from '@/notation/western-engine.js';
 import { parseUsi } from '@/util.js';
 import { Shogi } from '@/variant/shogi.js';
 import { expect, test } from 'vitest';

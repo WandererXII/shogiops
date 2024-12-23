@@ -3,7 +3,7 @@ import { between } from '../attacks.js';
 import type { Board } from '../board.js';
 import { COLORS } from '../constants.js';
 import type { Hands } from '../hands.js';
-import { SquareSet } from '../squareSet.js';
+import { SquareSet } from '../square-set.js';
 import type {
   Color,
   MoveOrDrop,

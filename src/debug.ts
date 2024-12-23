@@ -1,4 +1,4 @@
-import type { SquareSet } from './squareSet.js';
+import type { SquareSet } from './square-set.js';
 import type { DropMove, NormalMove, PieceName, Role, Square } from './types.js';
 import { makeSquareName, makeUsi, parsePieceName } from './util.js';
 import type { Chushogi } from './variant/chushogi.js';

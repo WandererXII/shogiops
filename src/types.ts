@@ -1,7 +1,7 @@
 import type { Board } from './board.js';
 import type { COLORS, FILE_NAMES, RANK_NAMES, RESULTS, ROLES, RULES } from './constants.js';
 import type { Hands } from './hands.js';
-import type { SquareSet } from './squareSet.js';
+import type { SquareSet } from './square-set.js';
 
 export type FileName = (typeof FILE_NAMES)[number];
 

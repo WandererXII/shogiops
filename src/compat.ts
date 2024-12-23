@@ -1,4 +1,4 @@
-import type { SquareSet } from './squareSet.js';
+import type { SquareSet } from './square-set.js';
 import type { MoveOrDrop, PieceName, Rules, Square, SquareName } from './types.js';
 import {
   defined,

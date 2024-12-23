@@ -1,5 +1,5 @@
 import { kingAttacks } from '../attacks.js';
-import { SquareSet } from '../squareSet.js';
+import { SquareSet } from '../square-set.js';
 import type { MoveOrDrop, Piece, Role, Rules, Square } from '../types.js';
 import { defined, isDrop, squareDist, squareFile, squareRank } from '../util.js';
 import type { Position } from '../variant/position.js';

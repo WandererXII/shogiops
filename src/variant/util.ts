@@ -1,4 +1,4 @@
-import { SquareSet } from '../squareSet.js';
+import { SquareSet } from '../square-set.js';
 import type { Color, Dimensions, Piece, Role, Rules, Square } from '../types.js';
 import { squareRank } from '../util.js';
 

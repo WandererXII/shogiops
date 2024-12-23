@@ -30,7 +30,7 @@ import {
 } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
-import { SquareSet } from '../squareSet.js';
+import { SquareSet } from '../square-set.js';
 import type { Color, MoveOrDrop, Outcome, Piece, Role, Setup, Square } from '../types.js';
 import { defined, isMove, lionRoles, opposite, squareDist } from '../util.js';
 import type { Context } from './position.js';

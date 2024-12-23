@@ -2,7 +2,7 @@ import type { Result } from '@badrap/result';
 import { attacks, between, ray } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
-import { SquareSet } from '../squareSet.js';
+import { SquareSet } from '../square-set.js';
 import type { Color, Piece, Role, Setup, Square } from '../types.js';
 import { defined, opposite, squareFile } from '../util.js';
 import type { Context, PositionError } from './position.js';

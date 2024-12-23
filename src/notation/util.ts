@@ -1,4 +1,4 @@
-import { SquareSet } from '../squareSet.js';
+import { SquareSet } from '../square-set.js';
 import type { Piece, Role, Rules, Square } from '../types.js';
 import { squareFile, squareRank } from '../util.js';
 import type { Position } from '../variant/position.js';

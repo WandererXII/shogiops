@@ -12,7 +12,7 @@ import {
   rookAttacks,
   silverAttacks,
 } from '@/attacks.js';
-import { SquareSet } from '@/squareSet.js';
+import { SquareSet } from '@/square-set.js';
 import { expect, test } from 'vitest';
 
 test('ray', () => {

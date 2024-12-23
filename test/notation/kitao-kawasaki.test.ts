@@ -1,4 +1,4 @@
-import { makeKitaoKawasakiMoveOrDrop } from '@/notation/kitaoKawasaki.js';
+import { makeKitaoKawasakiMoveOrDrop } from '@/notation/kitao-kawasaki.js';
 import { parseUsi } from '@/util.js';
 import { Shogi } from '@/variant/shogi.js';
 import { expect, test } from 'vitest';

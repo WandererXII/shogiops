@@ -43,8 +43,8 @@ export {
 
 export { FILE_NAMES, RANK_NAMES, COLORS, ROLES, RESULTS, RULES } from './constants.js';
 
-export type { BitRows } from './squareSet.js';
-export { SquareSet } from './squareSet.js';
+export type { BitRows } from './square-set.js';
+export { SquareSet } from './square-set.js';
 
 export { Board } from './board.js';
 
@@ -81,11 +81,11 @@ export * as handicaps from './handicaps.js';
 
 export * as japanese from './notation/japanese.js';
 
-export * as kitaoKawasaki from './notation/kitaoKawasaki.js';
+export * as kitaoKawasaki from './notation/kitao-kawasaki.js';
 
 export * as western from './notation/western.js';
 
-export * as westernEngine from './notation/westernEngine.js';
+export * as westernEngine from './notation/western-engine.js';
 
 export * as kif from './notation/kif.js';
 

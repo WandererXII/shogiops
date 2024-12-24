@@ -15,6 +15,7 @@ test('jp conversion', () => {
   expect(convertJapaneseToYorozuya(makeJapaneseSquare(parseSquareName('1l')))).toEqual('子十二');
   expect(convertJapaneseToYorozuya(makeJapaneseSquare(parseSquareName('12a')))).toEqual('亥一');
   expect(convertJapaneseToYorozuya('6三・6二獅')).toEqual('巳三・巳二獅');
+  expect(convertJapaneseToYorozuya('4三龍')).toEqual('卯三龍');
   expect(convertJapaneseToYorozuya('4三龍不成')).toEqual('卯三龍');
   expect(convertJapaneseToYorozuya('4三龍成')).toEqual('卯三龍ナル');
   expect(convertJapaneseToYorozuya('4三龍')).toEqual('卯三龍');
@@ -35,4 +36,5 @@ test('jp conversion', () => {
   expect(convertJapaneseToYorozuya('10七金')).toEqual('酉七金');
   expect(convertJapaneseToYorozuya('3三銀')).toEqual('寅三銀');
   expect(convertJapaneseToYorozuya('9九王')).toEqual('申九王');
+  expect(convertJapaneseToYorozuya('５六金寄')).toEqual('辰六金寄');
 });

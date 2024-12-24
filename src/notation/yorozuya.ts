@@ -1,5 +1,6 @@
-import { MoveOrDrop, Square } from '@/types.js';
-import { Position } from '@/variant/position.js';
+import type { MoveOrDrop, Square } from '../types.js';
+import { defined } from '../util.js';
+import type { Position } from '../variant/position.js';
 import { makeJapaneseMoveOrDrop } from './japanese.js';
 
 const DIZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
@@ -11,7 +12,7 @@ export function makeYorozuyaMoveOrDrop(
 ): string | undefined {
   const jpMove = makeJapaneseMoveOrDrop(pos, md, lastDest);
 
-  return jpMove ? convertJapaneseToYorozuya(jpMove) : jpMove;
+  return defined(jpMove) ? convertJapaneseToYorozuya(jpMove) : jpMove;
 }
 
 export function convertJapaneseToYorozuya(jp: string): string {

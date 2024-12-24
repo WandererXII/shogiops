@@ -1,10 +1,25 @@
 {
-  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "noEmitOnError": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "target": "ES2017",
+    "lib": ["ES2017"],
+    "module": "node16",
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+    "rootDir": "./src",
+    "outDir": "./esm",
+    "declarationDir": "./esm",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "isolatedDeclarations": true,
+    "isolatedModules": true,
+    "incremental": true
   },
-  "include": ["./src", "./test", "vitest.d.ts"]
+  "include": ["./src"]
 }

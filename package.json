@@ -53,9 +53,9 @@
     "vitest": "^2"
   },
   "scripts": {
-    "prepare": "$npm_execpath run compile",
+    "prepare": "$npm_execpath run clean && $npm_execpath run compile",
     "clean": "del esm && del *.tsbuildinfo",
-    "compile": "tsc -b tsconfig.build.json",
+    "compile": "tsc",
     "type-check": "tsc --noEmit",
     "test": "vitest",
     "doc": "typedoc src/index.ts",

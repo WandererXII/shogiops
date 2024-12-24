@@ -1,5 +1,11 @@
 # Changelog for shogiops
 
+## v0.18.0
+
+- All files now use hyphen in file names instead of camelCase e.g. (file `squareSet.ts` is now `square-set.ts`). Update your imports.
+- Added new notation system - Yorozuya. Compatible with variants of board size 12x12 (currently all of them).
+- Files are now compiled into `/dist/` directory.
+
 ## v0.17.0
 
 - When creating notation illegal moves are now also considered - changes notation output.

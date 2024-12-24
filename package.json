@@ -19,22 +19,22 @@
   ],
   "sideEffects": false,
   "type": "module",
-  "module": "esm/index.js",
-  "types": "esm/index.d.ts",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./esm/index.d.ts",
-      "import": "./esm/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./*": {
-      "types": "./esm/*.d.ts",
-      "import": "./esm/*.js"
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
     }
   },
   "typesVersions": {
     "*": {
       "*": [
-        "esm/*"
+        "dist/*"
       ]
     }
   },
@@ -54,7 +54,7 @@
   },
   "scripts": {
     "prepare": "$npm_execpath run clean && $npm_execpath run compile",
-    "clean": "del esm && del *.tsbuildinfo",
+    "clean": "del dist && del *.tsbuildinfo",
     "compile": "tsc",
     "type-check": "tsc --noEmit",
     "test": "vitest",
@@ -64,7 +64,7 @@
     "format-check": "prettier --cache --check ."
   },
   "files": [
-    "esm",
+    "dist",
     "src"
   ]
 }

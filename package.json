@@ -1,6 +1,6 @@
 {
   "name": "shogiops",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "Shogi rules and operations",
   "author": "Niklas Fiekas (chessops), WandererXII (shogiops)",
   "license": "GPL-3.0-or-later",

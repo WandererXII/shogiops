@@ -34,5 +34,5 @@ export default tseslint.config(
   },
   {
     ignores: ['eslint.config.mjs', 'vitest.config.ts', 'test/vitest.d.ts', 'dist', 'docs'],
-  }
+  },
 );

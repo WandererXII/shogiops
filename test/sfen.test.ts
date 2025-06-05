@@ -7,7 +7,7 @@ import { expect, test } from 'vitest';
 
 test('make board sfen', () => {
   expect(makeBoardSfen('standard', defaultPosition('standard').board)).toEqual(
-    initialSfen('standard').split(' ')[0]
+    initialSfen('standard').split(' ')[0],
   );
   expect(makeBoardSfen('standard', Board.empty())).toEqual('9/9/9/9/9/9/9/9/9');
 });
@@ -43,7 +43,7 @@ test.each([
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b 15p 10',
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b 10p 10',
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b 15R10P10p 10',
-])('parse and make sfen', sfen => {
+])('parse and make sfen', (sfen) => {
   const pos = parseSfen('standard', sfen).unwrap();
   expect(makeSfen(pos)).toEqual(sfen);
 });
@@ -53,7 +53,7 @@ test('minishogi sfen', () => {
   expect(pos).toEqual(defaultPosition('minishogi'));
   expect(makeBoardSfen('minishogi', pos.board)).toEqual('rbsgk/4p/5/P4/KGSBR');
   expect(makeBoardSfen('minishogi', defaultPosition('minishogi').board)).toEqual(
-    'rbsgk/4p/5/P4/KGSBR'
+    'rbsgk/4p/5/P4/KGSBR',
   );
   expect(makeSfen(pos)).toEqual(initialSfen('minishogi'));
 });
@@ -61,30 +61,30 @@ test('minishogi sfen', () => {
 test('chushogi sfen', () => {
   const pos = parseSfen(
     'chushogi',
-    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1'
+    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1',
   ).unwrap();
   expect(pos).toEqual(defaultPosition('chushogi'));
   expect(makeSfen(pos)).toEqual(initialSfen('chushogi'));
 
   const pos2 = parseSfen(
     'chushogi',
-    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b 5e 1'
+    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b 5e 1',
   ).unwrap();
   expect(pos2.lastMoveOrDrop).toEqual({ to: parseSquareName('5e') });
   expect(pos2.lastLionCapture).toEqual(parseSquareName('5e'));
 
   const pos3 = parseSfen(
     'chushogi',
-    '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1'
+    '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1',
   ).unwrap();
   expect(makeSfen(pos3)).toEqual(
-    '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1'
+    '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1',
   );
 
   expect(parseSfen('chushogi', '12/12/7k3p/12/7K4/12/12/9+E2/12/3X8/12/12 b', true).isOk).toBe(
-    true
+    true,
   );
   expect(parseSfen('chushogi', '12/12/7k3p/12/7K4/12/12/9K2/12/3X8/12/12 b', true).isOk).toBe(
-    false
+    false,
   );
 });

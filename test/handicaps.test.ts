@@ -16,22 +16,23 @@ test('only one field', () => {
   expect(findHandicap({ sfen: 'standard' })).toBeUndefined();
   expect(
     findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1' })
-      ?.englishName
+      ?.englishName,
   ).toBe('Right Lance');
   expect(
     findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w -' })
-      ?.englishName
+      ?.englishName,
   ).toBe('Right Lance');
   expect(
     findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w' })
-      ?.englishName
+      ?.englishName,
   ).toBe('Right Lance');
   expect(
     findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL ' })
-      ?.englishName
+      ?.englishName,
   ).toBeUndefined();
   expect(
-    findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL' })?.englishName
+    findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL' })
+      ?.englishName,
   ).toBeUndefined();
   expect(findHandicap({ sfen: '1nsgkgsnl/1r5b1/ppppppppp' })).toBeUndefined();
 });
@@ -42,14 +43,14 @@ test('multiple fields', () => {
 });
 
 test('parse validly', () => {
-  handicaps.forEach(h => {
+  handicaps.forEach((h) => {
     expect(parseSfen(h.rules, h.sfen, true).isOk).toBe(true);
     expect(parseSfen(h.rules, h.sfen, true).unwrap().turn).toBe('gote');
   });
 });
 
 test('default not handicap', () => {
-  RULES.forEach(r => {
+  RULES.forEach((r) => {
     expect(isHandicap({ sfen: initialSfen(r) })).toBe(false);
   });
 });

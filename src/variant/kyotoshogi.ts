@@ -37,7 +37,7 @@ export class Kyotoshogi extends Position {
   static from(setup: Setup, strict: boolean): Result<Kyotoshogi, PositionError> {
     const pos = new this();
     pos.fromSetup(setup);
-    return pos.validate(strict).map(_ => pos);
+    return pos.validate(strict).map((_) => pos);
   }
 
   validate(strict: boolean): Result<undefined, PositionError> {
@@ -62,7 +62,7 @@ export class Kyotoshogi extends Position {
         .union(goldAttacks(square, defender).intersect(board.roles('gold', 'tokin')))
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-        .union(kingAttacks(square).intersect(board.role('king')))
+        .union(kingAttacks(square).intersect(board.role('king'))),
     );
   }
 

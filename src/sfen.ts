@@ -61,7 +61,7 @@ export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
 }
 
 export function pieceToForsyth(rules: Rules): (piece: Piece) => string | undefined {
-  return piece => {
+  return (piece) => {
     const r = roleToForsyth(rules)(piece.role);
     if (defined(r) && piece.color === 'sente') return r.toUpperCase();
     else return r;
@@ -69,7 +69,7 @@ export function pieceToForsyth(rules: Rules): (piece: Piece) => string | undefin
 }
 
 export function forsythToPiece(rules: Rules): (s: string) => Piece | undefined {
-  return s => {
+  return (s) => {
     const role = forsythToRole(rules)(s);
     return role && { role, color: s.toLowerCase() === s ? 'gote' : 'sente' };
   };
@@ -150,7 +150,7 @@ export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenE
 export function parseSfen<R extends keyof RulesTypeMap>(
   rules: R,
   sfen: string,
-  strict?: boolean
+  strict?: boolean,
 ): Result<RulesTypeMap[R], SfenError | PositionError> {
   const parts = sfen.split(/[\s_]+/);
 
@@ -183,8 +183,8 @@ export function parseSfen<R extends keyof RulesTypeMap>(
 
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
 
-  return board.chain(board =>
-    hands.chain(hands =>
+  return board.chain((board) =>
+    hands.chain((hands) =>
       initializePosition(
         rules,
         {
@@ -195,9 +195,9 @@ export function parseSfen<R extends keyof RulesTypeMap>(
           lastMoveOrDrop,
           lastLionCapture,
         },
-        !!strict
-      )
-    )
+        !!strict,
+      ),
+    ),
   );
 }
 
@@ -232,7 +232,7 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
 
 export function makeHandSfen(rules: Rules, hand: Hand): string {
   return handRoles(rules)
-    .map(role => {
+    .map((role) => {
       const r = roleToForsyth(rules)(role)!,
         n = hand.get(role);
       return n > 1 ? n + r : n === 1 ? r : '';

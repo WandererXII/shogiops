@@ -27,7 +27,7 @@ export class Annanshogi extends Position {
   static from(setup: Setup, strict: boolean): Result<Annanshogi, PositionError> {
     const pos = new this();
     pos.fromSetup(setup);
-    return pos.validate(strict).map(_ => pos);
+    return pos.validate(strict).map((_) => pos);
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
@@ -47,7 +47,7 @@ export class Annanshogi extends Position {
     let pseudo = attacks(
       pieceBehind?.color === realPiece.color ? pieceBehind : realPiece,
       square,
-      this.board.occupied
+      this.board.occupied,
     );
     pseudo = pseudo.diff(this.board.color(ctx.color));
 
@@ -62,7 +62,7 @@ export class Annanshogi extends Position {
               to,
               opposite(ctx.color),
               annanAttackBoard(boardClone),
-              occ
+              occ,
             ).nonEmpty()
           )
             pseudo = pseudo.without(to);
@@ -72,12 +72,12 @@ export class Annanshogi extends Position {
           ctx.king,
           opposite(ctx.color),
           this.board,
-          this.board.occupied
+          this.board.occupied,
         );
         pseudo = pseudo.diff(
           (ctx.color === 'sente' ? stdAttackers.shr256(16) : stdAttackers.shl256(16)).intersect(
-            this.board.occupied
-          )
+            this.board.occupied,
+          ),
         );
         if (ctx.checkers.nonEmpty()) {
           if (ctx.checkers.size() > 2) return SquareSet.empty();
@@ -99,7 +99,7 @@ export class Annanshogi extends Position {
                 ctx.king,
                 opposite(ctx.color),
                 annanAttackBoard(boardClone),
-                boardClone.occupied
+                boardClone.occupied,
               ).isEmpty()
             ) {
               pseudo = pseudo.with(moveGiver);
@@ -119,7 +119,7 @@ export class Annanshogi extends Position {
                   ctx.king,
                   opposite(ctx.color),
                   annanAttackBoard(boardClone),
-                  occ
+                  occ,
                 ).isEmpty()
               ) {
                 rayed = rayed.with(to);

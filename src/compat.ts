@@ -15,7 +15,7 @@ import type { Position } from './variant/position.js';
 import { dimensions, fullSquareSet } from './variant/util.js';
 
 export function squareSetToSquareNames(sqs: SquareSet): SquareName[] {
-  return Array.from(sqs, s => makeSquareName(s));
+  return Array.from(sqs, (s) => makeSquareName(s));
 }
 
 export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[]> {
@@ -46,7 +46,7 @@ export function shogigroundDropDests(pos: Position): Map<PieceName, SquareName[]
 export function shogigroundSecondLionStep(
   before: Chushogi,
   initialSq: SquareName,
-  midSq: SquareName
+  midSq: SquareName,
 ): Map<SquareName, SquareName[]> {
   const result: Map<SquareName, SquareName[]> = new Map(),
     squares = secondLionStepDests(before, parseSquareName(initialSq), parseSquareName(midSq));
@@ -95,7 +95,7 @@ export function scalashogiCharPair(md: MoveOrDrop, rules: Rules): string {
       squareToCharCode(md.to),
       charOffset +
         81 +
-        ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'].indexOf(md.role)
+        ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'].indexOf(md.role),
     );
   else {
     const from = squareToCharCode(md.from),

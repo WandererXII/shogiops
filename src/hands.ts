@@ -40,11 +40,11 @@ export class Hand {
   }
 
   equals(other: Hand): boolean {
-    return ROLES.every(role => this.get(role) === other.get(role));
+    return ROLES.every((role) => this.get(role) === other.get(role));
   }
 
   nonEmpty(): boolean {
-    return ROLES.some(role => this.get(role) > 0);
+    return ROLES.some((role) => this.get(role) > 0);
   }
 
   isEmpty(): boolean {
@@ -65,7 +65,7 @@ export class Hand {
 export class Hands {
   private constructor(
     private sente: Hand,
-    private gote: Hand
+    private gote: Hand,
   ) {}
 
   static empty(): Hands {

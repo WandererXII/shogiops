@@ -10,7 +10,7 @@ export function aimingAt(pos: Position, pieces: SquareSet, to: Square): SquareSe
 }
 
 export function roleToWestern(rules: Rules): (role: Role) => string {
-  return role => {
+  return (role) => {
     switch (role) {
       case 'pawn':
         return 'P';
@@ -107,7 +107,7 @@ export function roleToWestern(rules: Rules): (role: Role) => string {
 // for kanji disambiguation
 export function roleKanjiDuplicates(rules: Rules): (role: Role) => Role[] {
   if (rules === 'chushogi')
-    return role => {
+    return (role) => {
       const roles: Role[][] = [
         ['gold', 'promotedpawn'],
         ['elephant', 'elephantpromoted'],
@@ -119,7 +119,7 @@ export function roleKanjiDuplicates(rules: Rules): (role: Role) => Role[] {
         ['queen', 'queenpromoted'],
       ];
       for (const rs of roles) {
-        if (rs.includes(role)) return rs.filter(r => r !== role);
+        if (rs.includes(role)) return rs.filter((r) => r !== role);
       }
       return [];
     };
@@ -582,7 +582,7 @@ export function makeJapaneseSquare(sq: Square): string {
     (squareFile(sq) + 1)
       .toString()
       .split('')
-      .map(c => String.fromCharCode(c.charCodeAt(0) + 0xfee0))
+      .map((c) => String.fromCharCode(c.charCodeAt(0) + 0xfee0))
       .join('') + numberToKanji(squareRank(sq) + 1)
   );
 }
@@ -599,10 +599,10 @@ export function parseJapaneseSquare(str: string): Square | undefined {
         str
           .slice(0, fileOffset)
           .split('')
-          .map(c =>
-            c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c
+          .map((c) =>
+            c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c,
           )
-          .join('')
+          .join(''),
       ) - 1,
     rank = kanjiToNumber(str.slice(fileOffset)) - 1;
   if (isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;

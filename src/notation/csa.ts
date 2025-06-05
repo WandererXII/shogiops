@@ -32,7 +32,7 @@ export function makeCsaHeader(pos: Shogi): string {
     makeCsaHand(pos.hands.color('gote'), 'P-'),
     pos.turn === 'gote' ? '-' : '+',
   ]
-    .filter(p => p.length > 0)
+    .filter((p) => p.length > 0)
     .join('\n');
 }
 
@@ -59,12 +59,12 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
   return (
     prefix +
     handRoles('standard')
-      .map(role => {
+      .map((role) => {
         const r = roleToCsa(role);
         const n = hand.get(role);
         return ('00' + r).repeat(Math.min(n, 18));
       })
-      .filter(p => p.length > 0)
+      .filter((p) => p.length > 0)
       .join('')
   );
 }
@@ -72,19 +72,19 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
 // Import
 export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
   const lines = normalizedCsaLines(csa);
-  const handicap = lines.find(l => l.startsWith('PI'));
-  const isWholeBoard = lines.some(l => l.startsWith('P1'));
+  const handicap = lines.find((l) => l.startsWith('PI'));
+  const isWholeBoard = lines.some((l) => l.startsWith('P1'));
   const baseBoard =
     defined(handicap) && !isWholeBoard
       ? parseCsaHandicap(handicap)
-      : parseCsaBoard(lines.filter(l => /^P\d/.test(l)));
-  const turn: Color = lines.some(l => l === '-') ? 'gote' : 'sente';
-  return baseBoard.chain(board => {
-    return Shogi.from({ board, hands: Hands.empty(), turn, moveNumber: 1 }, true).chain(pos =>
+      : parseCsaBoard(lines.filter((l) => /^P\d/.test(l)));
+  const turn: Color = lines.some((l) => l === '-') ? 'gote' : 'sente';
+  return baseBoard.chain((board) => {
+    return Shogi.from({ board, hands: Hands.empty(), turn, moveNumber: 1 }, true).chain((pos) =>
       parseAdditions(
         pos,
-        lines.filter(l => /P[+|-]/.test(l))
-      )
+        lines.filter((l) => /P[+|-]/.test(l)),
+      ),
     );
   });
 }
@@ -108,7 +108,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   const board = Board.empty();
   let rank = 0;
 
-  for (const r of csaBoard.map(r => r.substring(2))) {
+  for (const r of csaBoard.map((r) => r.substring(2))) {
     let file = 8;
     for (const s of r.match(/.{1,3}/g) || []) {
       if (s.includes('*')) file--;
@@ -152,16 +152,16 @@ function parseAdditions(initialPos: Shogi, additions: string[]): Result<Shogi, C
 
 export function parseTags(csa: string): [string, string][] {
   return normalizedCsaLines(csa)
-    .filter(l => l.startsWith('$'))
-    .map(l => l.substring(1).split(/:(.*)/, 2) as [string, string]);
+    .filter((l) => l.startsWith('$'))
+    .map((l) => l.substring(1).split(/:(.*)/, 2) as [string, string]);
 }
 
 export function normalizedCsaLines(csa: string): string[] {
   return csa
     .replace(/,/g, '\n')
     .split(/[\r\n]+/)
-    .map(l => l.trim())
-    .filter(l => l);
+    .map((l) => l.trim())
+    .filter((l) => l);
 }
 
 //
@@ -172,7 +172,7 @@ export function normalizedCsaLines(csa: string): string[] {
 export function parseCsaMoveOrDrop(pos: Shogi, csaMd: string): MoveOrDrop | undefined {
   // Move
   const match = csaMd.match(
-    /(?:[+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/
+    /(?:[+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/,
   );
   if (!match) {
     // Drop

@@ -6,7 +6,7 @@ export class Board implements Iterable<[Square, Piece]> {
   private constructor(
     public occupied: SquareSet,
     private colorMap: ColorMap,
-    private roleMap: RoleMap
+    private roleMap: RoleMap,
   ) {}
 
   static empty(): Board {
@@ -16,7 +16,7 @@ export class Board implements Iterable<[Square, Piece]> {
   static from(
     occupied: SquareSet,
     colorsIter: Iterable<[Color, SquareSet]>,
-    rolesIter: Iterable<[Role, SquareSet]>
+    rolesIter: Iterable<[Role, SquareSet]>,
   ): Board {
     return new Board(occupied, new Map(colorsIter), new Map(rolesIter));
   }
@@ -37,7 +37,7 @@ export class Board implements Iterable<[Square, Piece]> {
 
   equals(other: Board): boolean {
     if (!this.color('gote').equals(other.color('gote'))) return false;
-    return ROLES.every(role => this.role(role).equals(other.role(role)));
+    return ROLES.every((role) => this.role(role).equals(other.role(role)));
   }
 
   getColor(square: Square): Color | undefined {

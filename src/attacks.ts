@@ -5,8 +5,8 @@ import { opposite, squareFile, squareRank } from './util.js';
 function computeRange(square: Square, deltas: number[]): SquareSet {
   const file = squareFile(square),
     dests: Square[] = deltas
-      .map(delta => square + delta)
-      .filter(sq => Math.abs(file - squareFile(sq)) <= 2);
+      .map((delta) => square + delta)
+      .filter((sq) => Math.abs(file - squareFile(sq)) <= 2);
   return SquareSet.fromSquares(...dests);
 }
 
@@ -22,15 +22,15 @@ function tabulateRanks(f: (rank: number) => SquareSet): SquareSet[] {
   return table;
 }
 
-const FORW_RANKS = tabulateRanks(rank => SquareSet.ranksAbove(rank));
-const BACK_RANKS = tabulateRanks(rank => SquareSet.ranksBelow(rank));
+const FORW_RANKS = tabulateRanks((rank) => SquareSet.ranksAbove(rank));
+const BACK_RANKS = tabulateRanks((rank) => SquareSet.ranksBelow(rank));
 
-const NEIGHBORS = tabulateSquares(sq => computeRange(sq, [-17, -16, -15, -1, 1, 15, 16, 17]));
+const NEIGHBORS = tabulateSquares((sq) => computeRange(sq, [-17, -16, -15, -1, 1, 15, 16, 17]));
 
-const FILE_RANGE = tabulateSquares(sq => SquareSet.fromFile(squareFile(sq)).without(sq));
-const RANK_RANGE = tabulateSquares(sq => SquareSet.fromRank(squareRank(sq)).without(sq));
+const FILE_RANGE = tabulateSquares((sq) => SquareSet.fromFile(squareFile(sq)).without(sq));
+const RANK_RANGE = tabulateSquares((sq) => SquareSet.fromRank(squareRank(sq)).without(sq));
 
-const DIAG_RANGE = tabulateSquares(sq => {
+const DIAG_RANGE = tabulateSquares((sq) => {
   const diag = new SquareSet([
       0x20001, 0x80004, 0x200010, 0x800040, 0x2000100, 0x8000400, 0x20001000, 0x80004000,
     ]),
@@ -38,7 +38,7 @@ const DIAG_RANGE = tabulateSquares(sq => {
   return (shift >= 0 ? diag.shl256(shift) : diag.shr256(-shift)).without(sq);
 });
 
-const ANTI_DIAG_RANGE = tabulateSquares(sq => {
+const ANTI_DIAG_RANGE = tabulateSquares((sq) => {
   const diag = new SquareSet([
       0x40008000, 0x10002000, 0x4000800, 0x1000200, 0x400080, 0x100020, 0x40008, 0x10002,
     ]),
@@ -96,7 +96,7 @@ export function pawnAttacks(square: Square, color: Color): SquareSet {
 export function bishopAttacks(square: Square, occupied: SquareSet): SquareSet {
   const bit = SquareSet.fromSquare(square);
   return hyperbola(bit, DIAG_RANGE[square], occupied).xor(
-    hyperbola(bit, ANTI_DIAG_RANGE[square], occupied)
+    hyperbola(bit, ANTI_DIAG_RANGE[square], occupied),
   );
 }
 
@@ -186,11 +186,11 @@ export function boarAttacks(square: Square, occupied: SquareSet): SquareSet {
 export function whaleAttacks(square: Square, color: Color, occupied: SquareSet): SquareSet {
   if (color === 'sente')
     return fileAttacks(square, occupied).union(
-      bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)])
+      bishopAttacks(square, occupied).intersect(BACK_RANKS[squareRank(square)]),
     );
   else
     return fileAttacks(square, occupied).union(
-      bishopAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)])
+      bishopAttacks(square, occupied).intersect(FORW_RANKS[squareRank(square)]),
     );
 }
 
@@ -234,7 +234,7 @@ export function eagleAttacks(square: Square, color: Color, occupied: SquareSet):
 
 export function lionAttacks(square: Square): SquareSet {
   return NEIGHBORS[square].union(
-    computeRange(square, [-34, -33, -32, -31, -30, -18, -14, -2, 2, 14, 18, 30, 31, 32, 33, 34])
+    computeRange(square, [-34, -33, -32, -31, -30, -18, -14, -2, 2, 14, 18, 30, 31, 32, 33, 34]),
   );
 }
 

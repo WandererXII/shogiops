@@ -37,7 +37,7 @@ export function defaultPosition<R extends keyof RulesTypeMap>(rules: R): RulesTy
 export function initializePosition<R extends keyof RulesTypeMap>(
   rules: R,
   setup: Setup,
-  strict: boolean
+  strict: boolean,
 ): Result<RulesTypeMap[R], PositionError> {
   switch (rules) {
     case 'chushogi':

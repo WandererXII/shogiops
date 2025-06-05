@@ -33,7 +33,7 @@ export class Minishogi extends Position {
   static from(setup: Setup, strict: boolean): Result<Minishogi, PositionError> {
     const pos = new this();
     pos.fromSetup(setup);
-    return pos.validate(strict).map(_ => pos);
+    return pos.validate(strict).map((_) => pos);
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
@@ -44,11 +44,11 @@ export class Minishogi extends Position {
         .intersect(board.roles('rook', 'dragon'))
         .union(bishopAttacks(square, occupied).intersect(board.roles('bishop', 'horse')))
         .union(
-          goldAttacks(square, defender).intersect(board.roles('gold', 'tokin', 'promotedsilver'))
+          goldAttacks(square, defender).intersect(board.roles('gold', 'tokin', 'promotedsilver')),
         )
         .union(silverAttacks(square, defender).intersect(board.role('silver')))
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-        .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse')))
+        .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse'))),
     );
   }
 

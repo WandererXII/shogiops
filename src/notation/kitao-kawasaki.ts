@@ -8,7 +8,7 @@ import { aimingAt, makeNumberSquare, roleKanjiDuplicates, roleToKanji } from './
 export function makeKitaoKawasakiMoveOrDrop(
   pos: Position,
   md: MoveOrDrop,
-  lastDest?: Square
+  lastDest?: Square,
 ): string | undefined {
   if (isDrop(md)) {
     return roleToKanji(md.role) + '*' + makeNumberSquare(md.to);
@@ -21,7 +21,7 @@ export function makeKitaoKawasakiMoveOrDrop(
           pos.board
             .roles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
             .intersect(pos.board.color(piece.color)),
-          md.to
+          md.to,
         )
           .without(md.from)
           .isEmpty()
@@ -36,7 +36,7 @@ export function makeKitaoKawasakiMoveOrDrop(
         else if (md.to === md.from) return `--`;
         else
           return `${roleStr}${ambStr}${midCapture ? 'x' : '-'}${makeNumberSquare(
-            md.midStep
+            md.midStep,
           )}${actionStr}${makeNumberSquare(md.to)}`;
       } else {
         const destStr =

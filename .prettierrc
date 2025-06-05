@@ -3,8 +3,6 @@
   "tabWidth": 2,
   "useTabs": false,
   "singleQuote": true,
-  "arrowParens": "avoid",
-  "trailingComma": "es5",
   "importOrder": ["^[./]"],
   "importOrderSortSpecifiers": true,
   "importOrderParserPlugins": ["typescript"],

@@ -38,7 +38,7 @@ export class Shogi extends Position {
   static from(setup: Setup, strict: boolean): Result<Shogi, PositionError> {
     const pos = new this();
     pos.fromSetup(setup);
-    return pos.validate(strict).map(_ => pos);
+    return pos.validate(strict).map((_) => pos);
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
@@ -81,7 +81,7 @@ export const standardSquareAttacks = (
   square: Square,
   attacker: Color,
   board: Board,
-  occupied: SquareSet
+  occupied: SquareSet,
 ): SquareSet => {
   const defender = opposite(attacker);
   return board.color(attacker).intersect(
@@ -93,11 +93,11 @@ export const standardSquareAttacks = (
       .union(silverAttacks(square, defender).intersect(board.role('silver')))
       .union(
         goldAttacks(square, defender).intersect(
-          board.roles('gold', 'tokin', 'promotedlance', 'promotedknight', 'promotedsilver')
-        )
+          board.roles('gold', 'tokin', 'promotedlance', 'promotedknight', 'promotedsilver'),
+        ),
       )
       .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-      .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse')))
+      .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse'))),
   );
 };
 
@@ -149,7 +149,7 @@ export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): S
     mask = mask.diff(SquareSet.fromRank(ctx.color === 'sente' ? 0 : dims.ranks - 1));
   else if (role === 'knight')
     mask = mask.diff(
-      ctx.color === 'sente' ? SquareSet.ranksAbove(2) : SquareSet.ranksBelow(dims.ranks - 3)
+      ctx.color === 'sente' ? SquareSet.ranksAbove(2) : SquareSet.ranksBelow(dims.ranks - 3),
     );
 
   if (defined(ctx.king) && ctx.checkers.nonEmpty()) {

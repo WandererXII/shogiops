@@ -265,7 +265,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   nonEmpty(): boolean {
-    return this.dRows.some(r => r !== 0);
+    return this.dRows.some((r) => r !== 0);
   }
 
   has(square: Square): boolean {
@@ -353,8 +353,8 @@ export class SquareSet implements Iterable<Square> {
   }
 
   moreThanOne(): boolean {
-    const occ = this.dRows.filter(r => r !== 0);
-    return occ.length > 1 || occ.some(r => (r & (r - 1)) !== 0);
+    const occ = this.dRows.filter((r) => r !== 0);
+    return occ.length > 1 || occ.some((r) => (r & (r - 1)) !== 0);
   }
 
   singleSquare(): Square | undefined {

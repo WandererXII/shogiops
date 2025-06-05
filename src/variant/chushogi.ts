@@ -54,7 +54,7 @@ export class Chushogi extends Position {
   static from(setup: Setup, strict: boolean): Result<Chushogi, PositionError> {
     const pos = new this();
     pos.fromSetup(setup);
-    return pos.validate(strict).map(_ => pos);
+    return pos.validate(strict).map((_) => pos);
   }
 
   validate(strict: boolean): Result<undefined, PositionError> {
@@ -97,11 +97,11 @@ export class Chushogi extends Position {
         .union(goldAttacks(square, defender).intersect(board.roles('gold', 'promotedpawn')))
         .union(
           kingAttacks(square).intersect(
-            board.roles('king', 'prince', 'dragon', 'dragonpromoted', 'horse', 'horsepromoted')
-          )
+            board.roles('king', 'prince', 'dragon', 'dragonpromoted', 'horse', 'horsepromoted'),
+          ),
         )
         .union(
-          elephantAttacks(square, defender).intersect(board.roles('elephant', 'elephantpromoted'))
+          elephantAttacks(square, defender).intersect(board.roles('elephant', 'elephantpromoted')),
         )
         .union(chariotAttacks(square, occupied).intersect(board.role('chariot')))
         .union(
@@ -112,22 +112,22 @@ export class Chushogi extends Position {
               'horse',
               'horsepromoted',
               'queen',
-              'queenpromoted'
-            )
-          )
+              'queenpromoted',
+            ),
+          ),
         )
         .union(tigerAttacks(square, defender).intersect(board.role('tiger')))
         .union(kirinAttacks(square).intersect(board.role('kirin')))
         .union(phoenixAttacks(square).intersect(board.role('phoenix')))
         .union(
           sideMoverAttacks(square, occupied).intersect(
-            board.roles('sidemover', 'sidemoverpromoted')
-          )
+            board.roles('sidemover', 'sidemoverpromoted'),
+          ),
         )
         .union(
           verticalMoverAttacks(square, occupied).intersect(
-            board.roles('verticalmover', 'verticalmoverpromoted')
-          )
+            board.roles('verticalmover', 'verticalmoverpromoted'),
+          ),
         )
         .union(
           rookAttacks(square, occupied).intersect(
@@ -137,9 +137,9 @@ export class Chushogi extends Position {
               'dragon',
               'dragonpromoted',
               'queen',
-              'queenpromoted'
-            )
-          )
+              'queenpromoted',
+            ),
+          ),
         )
         .union(lionAttacks(square).intersect(board.roles('lion', 'lionpromoted')))
         .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
@@ -150,7 +150,7 @@ export class Chushogi extends Position {
         .union(boarAttacks(square, occupied).intersect(board.role('boar')))
         .union(oxAttacks(square, occupied).intersect(board.role('ox')))
         .union(falconAttacks(square, defender, occupied).intersect(board.role('falcon')))
-        .union(eagleAttacks(square, defender, occupied).intersect(board.role('eagle')))
+        .union(eagleAttacks(square, defender, occupied).intersect(board.role('eagle'))),
     );
   }
 
@@ -213,9 +213,9 @@ export class Chushogi extends Position {
             oneWayRoles.intersect(
               this.board
                 .color('gote')
-                .intersect(SquareSet.fromRank(dimensions(this.rules).ranks - 1))
-            )
-          )
+                .intersect(SquareSet.fromRank(dimensions(this.rules).ranks - 1)),
+            ),
+          ),
       );
     return (
       occ.size() === 2 &&
@@ -238,8 +238,8 @@ export class Chushogi extends Position {
             this.board
               .roles('pawn', 'lance')
               .intersect(
-                SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1)
-              )
+                SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1),
+              ),
           ),
         theirKing = this.kingsOf(theirColor).singleSquare(),
         theirPieces = this.board
@@ -252,10 +252,10 @@ export class Chushogi extends Position {
                   .role('lance')
                   .intersect(
                     SquareSet.fromRank(
-                      theirColor === 'sente' ? 0 : dimensions(this.rules).ranks - 1
-                    )
-                  )
-              )
+                      theirColor === 'sente' ? 0 : dimensions(this.rules).ranks - 1,
+                    ),
+                  ),
+              ),
           );
 
       return (

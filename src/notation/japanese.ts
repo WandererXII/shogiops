@@ -10,7 +10,7 @@ import { aimingAt, makeJapaneseSquare, roleKanjiDuplicates, roleToKanji } from '
 export function makeJapaneseMoveOrDrop(
   pos: Position,
   md: MoveOrDrop,
-  lastDest?: Square
+  lastDest?: Square,
 ): string | undefined {
   if (isDrop(md)) {
     const ambStr = aimingAt(
@@ -18,7 +18,7 @@ export function makeJapaneseMoveOrDrop(
       pos.board
         .roles(md.role, ...roleKanjiDuplicates(pos.rules)(md.role))
         .intersect(pos.board.color(pos.turn)),
-      md.to
+      md.to,
     ).isEmpty()
       ? ''
       : '打';
@@ -32,7 +32,7 @@ export function makeJapaneseMoveOrDrop(
           pos.board
             .roles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
             .intersect(pos.board.color(piece.color)),
-          md.to
+          md.to,
         ).without(md.from),
         ambStr = ambPieces.isEmpty()
           ? ''
@@ -74,7 +74,7 @@ function disambiguate(
   piece: Piece,
   orig: Square,
   dest: Square,
-  others: SquareSet
+  others: SquareSet,
 ): string {
   const myRank = squareRank(orig),
     myFile = squareFile(orig);
@@ -112,7 +112,9 @@ function disambiguate(
 
   // is this the only piece moving in certain vertical direction (up, down, none - horizontally)
   if (
-    ![...others].map(squareRank).some(r => r < destRank === movingDown && r > destRank === movingUp)
+    ![...others]
+      .map(squareRank)
+      .some((r) => r < destRank === movingDown && r > destRank === movingUp)
   )
     return verticalDisambiguation(rules, piece, movingUp, movingDown, jumpsButShouldnt);
 
@@ -139,7 +141,7 @@ function verticalDisambiguation(
   piece: Piece,
   up: boolean,
   down: boolean,
-  jumpOver: boolean
+  jumpOver: boolean,
 ): string {
   if (jumpOver) return '跳';
   else if (up === down) return '寄';

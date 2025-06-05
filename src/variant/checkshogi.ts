@@ -30,7 +30,7 @@ export class Checkshogi extends Position {
   static from(setup: Setup, strict: boolean): Result<Checkshogi, PositionError> {
     const pos = new this();
     pos.fromSetup(setup);
-    return pos.validate(strict).map(_ => pos);
+    return pos.validate(strict).map((_) => pos);
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {

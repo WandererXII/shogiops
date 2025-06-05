@@ -32,14 +32,14 @@ P6 *  *  *  *  *  *  *  *  *
 P7+FU+FU+FU+FU+FU+FU+FU+FU+FU
 P8 * +KA *  *  *  *  * +HI * 
 P9+KY+KE+GI+KI+OU+KI+GI+KE+KY
-+`
++`,
   );
 });
 
 test('make csa header from some random position', () => {
   const pos = parseSfen(
     'standard',
-    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p'
+    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p',
   ).unwrap();
   expect(makeCsaHeader(pos)).toEqual(
     `P1-KY-KE+KI *  *  *  *  *  * 
@@ -53,14 +53,14 @@ P8 *  *  *  *  *  *  * +OU *
 P9 *  *  *  *  *  *  *  *  * 
 P+00KI00GI
 P-00HI00HI00KA00KA00KI00KI00GI00KE00KY00KY00KY00FU00FU00FU00FU00FU00FU00FU00FU00FU00FU00FU00FU00FU00FU00FU
--`
+-`,
   );
 });
 
 test('parse CSA header with CSA board', () => {
   const pos = parseSfen(
     'standard',
-    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1'
+    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1',
   ).unwrap();
   const csaHeader = `P1-KY-KE+KI *  *  *  *  *  *
   P2 *  * +TO *  *  *  * +NG-KE
@@ -80,7 +80,7 @@ test('parse CSA header with CSA board', () => {
 test('parse CSA header with handicap', () => {
   const pos = parseSfen(
     'standard',
-    'lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1'
+    'lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
   ).unwrap();
   const csaHeader = `PI82HI22KA
   -`;
@@ -92,7 +92,7 @@ test('parse CSA header with handicap and CSA board', () => {
   // board takes precedence
   const pos = parseSfen(
     'standard',
-    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1'
+    'lnG6/2+P4+Sn/kp3+S3/2p6/1n7/9/9/7K1/9 w GS2r2b2gsn3l15p 1',
   ).unwrap();
   const csaHeader = `P1-KY-KE+KI *  *  *  *  *  *
   P2 *  * +TO *  *  *  * +NG-KE
@@ -120,9 +120,9 @@ test('make CSA moves/drops individually', () => {
 
   const pos2 = parseSfen(
     'standard',
-    'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10'
+    'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10',
   ).unwrap();
-  const line = ['R*5b', '6i7h', '5e5h+'].map(m => parseUsi(m)!);
+  const line = ['R*5b', '6i7h', '5e5h+'].map((m) => parseUsi(m)!);
   expect(makeCsaMoveOrDrop(pos2, line[0])).toEqual('0052HI');
   pos2.play(line.shift()!);
   expect(makeCsaMoveOrDrop(pos2, line[0])).toEqual('6978KI');
@@ -145,7 +145,7 @@ test('parse csa moves/drops one by one', () => {
     '8h5e',
     '8d8e',
     '5e7c+',
-  ].map(m => parseUsi(m)!);
+  ].map((m) => parseUsi(m)!);
   for (const m of line) {
     expect(parseCsaMoveOrDrop(pos, makeCsaMoveOrDrop(pos, m)!)).toEqual(m);
     pos.play(m);
@@ -156,9 +156,9 @@ test('parse csa moves/drops one by one', () => {
 test('parse moves/drops', () => {
   const pos = parseSfen(
     'standard',
-    'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10'
+    'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10',
   ).unwrap();
-  const line = ['R*5b', '6i7h', '5e5h+'].map(m => parseUsi(m)!);
+  const line = ['R*5b', '6i7h', '5e5h+'].map((m) => parseUsi(m)!);
   expect(parseCsaMoveOrDrop(pos, '0052HI')).toEqual(parseUsi('R*5b'));
   pos.play(line.shift()!);
   expect(parseCsaMoveOrDrop(pos, '6978KI')).toEqual(parseUsi('6i7h'));
@@ -189,7 +189,7 @@ test('parse tags', () => {
   expect(
     parseTags(`
     $EVENT:Championship
-    $SITE:lishogi`)
+    $SITE:lishogi`),
   ).toEqual([
     ['EVENT', 'Championship'],
     ['SITE', 'lishogi'],

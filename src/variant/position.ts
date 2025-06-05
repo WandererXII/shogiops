@@ -192,7 +192,7 @@ export abstract class Position {
 
   checks(): SquareSet {
     let checks = SquareSet.empty();
-    COLORS.forEach(color => {
+    COLORS.forEach((color) => {
       for (const king of this.kingsOf(color)) {
         if (this.squareAttackers(king, opposite(color), this.board.occupied).nonEmpty())
           checks = checks.with(king);
@@ -212,7 +212,7 @@ export abstract class Position {
   }
 
   isDraw(_ctx?: Context): boolean {
-    return COLORS.every(color => this.board.color(color).size() + this.hands[color].count() < 2);
+    return COLORS.every((color) => this.board.color(color).size() + this.hands[color].count() < 2);
   }
 
   isBareKing(_ctx?: Context): boolean {

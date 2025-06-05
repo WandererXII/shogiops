@@ -57,7 +57,7 @@ export function makeKifPositionHeader(pos: Position): string {
       : '',
     ...(pos.turn === 'gote' ? [`${colorName('gote', handicap)}番`] : []),
   ]
-    .filter(l => l.length)
+    .filter((l) => l.length)
     .join('\n');
 }
 
@@ -89,12 +89,12 @@ export function makeKifBoard(rules: Rules, board: Board): string {
 export function makeKifHand(rules: Rules, hand: Hand): string {
   if (hand.isEmpty()) return 'なし';
   return handRoles(rules)
-    .map(role => {
+    .map((role) => {
       const r = roleToKanji(role),
         n = hand.get(role);
       return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
     })
-    .filter(p => p.length > 0)
+    .filter((p) => p.length > 0)
     .join(' ');
 }
 
@@ -124,9 +124,9 @@ function defaultHandicap(rules: Rules): string {
 export function parseKifHeader(kif: string): Result<Position, KifError> {
   const lines = normalizedKifLines(kif);
   return parseKifPositionHeader(kif).unwrap(
-    pos => Result.ok(pos),
+    (pos) => Result.ok(pos),
     () => {
-      const handicapTag = lines.find(l => l.startsWith('手合割：')),
+      const handicapTag = lines.find((l) => l.startsWith('手合割：')),
         handicap = defined(handicapTag)
           ? findHandicap({ japaneseName: handicapTag.split('：')[1] })
           : undefined;
@@ -134,17 +134,17 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
       const hSfen = handicap?.sfen,
         rules = detectVariant(hSfen?.split('/').length, handicapTag);
       return parseSfen(rules, hSfen ?? initialSfen(rules));
-    }
+    },
   );
 }
 
 function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {
   const lines = normalizedKifLines(kif),
-    handicapTag = lines.find(l => l.startsWith('手合割：')),
-    rules = rulesOpt || detectVariant(lines.filter(l => l.startsWith('|')).length, handicapTag),
-    goteHandStr = lines.find(l => l.startsWith('後手の持駒：') || l.startsWith('上手の持駒：')),
-    senteHandStr = lines.find(l => l.startsWith('先手の持駒：') || l.startsWith('下手の持駒：')),
-    turn = lines.some(l => l.startsWith('後手番') || l.startsWith('上手番')) ? 'gote' : 'sente';
+    handicapTag = lines.find((l) => l.startsWith('手合割：')),
+    rules = rulesOpt || detectVariant(lines.filter((l) => l.startsWith('|')).length, handicapTag),
+    goteHandStr = lines.find((l) => l.startsWith('後手の持駒：') || l.startsWith('上手の持駒：')),
+    senteHandStr = lines.find((l) => l.startsWith('先手の持駒：') || l.startsWith('下手の持駒：')),
+    turn = lines.some((l) => l.startsWith('後手番') || l.startsWith('上手番')) ? 'gote' : 'sente';
 
   const board: Result<Board, KifError> = parseKifBoard(rules, kif);
 
@@ -155,9 +155,9 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
       ? parseKifHand(rules, senteHandStr.split('：')[1])
       : Result.ok(Hand.empty());
 
-  return board.chain(board =>
-    goteHand.chain(gHand =>
-      senteHand.chain(sHand =>
+  return board.chain((board) =>
+    goteHand.chain((gHand) =>
+      senteHand.chain((sHand) =>
         initializePosition(
           rules,
           {
@@ -166,10 +166,10 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
             turn,
             moveNumber: 1,
           },
-          false
-        )
-      )
-    )
+          false,
+        ),
+      ),
+    ),
   );
 }
 
@@ -188,7 +188,7 @@ function detectVariant(lines: number | undefined, tag: string | undefined): Rule
 }
 
 export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, KifError> {
-  const lines = normalizedKifLines(kifBoard).filter(l => l.startsWith('|'));
+  const lines = normalizedKifLines(kifBoard).filter((l) => l.startsWith('|'));
   if (lines.length === 0) return Result.err(new KifError(InvalidKif.Board));
   const board = Board.empty();
 
@@ -214,7 +214,7 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
         default: {
           const cSoFar = rules === 'chushogi' && prom ? `成${c}` : c,
             roles = kanjiToRole(cSoFar),
-            role = roles.find(r => allRoles(rules).includes(r));
+            role = roles.find((r) => allRoles(rules).includes(r));
           if (defined(role) && allRoles(rules).includes(role)) {
             const square = parseCoordinates(file, rank);
             if (!defined(square)) return Result.err(new KifError(InvalidKif.Board));
@@ -243,7 +243,7 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
   for (const piece of pieces) {
     for (let i = 0; i < piece.length; i++) {
       const roles = kanjiToRole(piece[i++]),
-        role = roles.find(r => allRoles(rules).includes(r));
+        role = roles.find((r) => allRoles(rules).includes(r));
       if (!role || !handRoles(rules).includes(role))
         return Result.err(new KifError(InvalidKif.Hands));
       let countStr = '';
@@ -261,8 +261,8 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
 
 export function parseTags(kif: string): [string, string][] {
   return normalizedKifLines(kif)
-    .filter(l => !l.startsWith('#') && !l.startsWith('*'))
-    .map(l => l.replace('：', ':').split(/:(.*)/, 2) as [string, string]);
+    .filter((l) => !l.startsWith('#') && !l.startsWith('*'))
+    .map((l) => l.replace('：', ':').split(/:(.*)/, 2) as [string, string]);
 }
 
 export function normalizedKifLines(kif: string): string[] {
@@ -270,8 +270,8 @@ export function normalizedKifLines(kif: string): string[] {
     .replace(/:/g, '：')
     .replace(/　/g, ' ') // full-width space to normal space
     .split(/[\r\n]+/)
-    .map(l => l.trim())
-    .filter(l => l);
+    .map((l) => l.trim())
+    .filter((l) => l);
 }
 
 //
@@ -282,7 +282,7 @@ export const chushogiKifMoveRegex: RegExp =
   /((?:(?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,2})((?:（居食い）)|不成|成)?\s?[（|(|←]*((?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
 function parseChushogiMove(
   kifMd: string,
-  lastDest: Square | undefined = undefined
+  lastDest: Square | undefined = undefined,
 ): MoveOrDrop | undefined {
   const match = kifMd.match(chushogiKifMoveRegex);
   if (match) {
@@ -306,7 +306,7 @@ export const kifDropRegex: RegExp =
 // Parsing kif moves/drops
 export function parseKifMoveOrDrop(
   kifMd: string,
-  lastDest: Square | undefined = undefined
+  lastDest: Square | undefined = undefined,
 ): MoveOrDrop | undefined {
   // Move
   const match = kifMd.match(kifMoveRegex);
@@ -338,7 +338,7 @@ function isLionDouble(kifMd: string | undefined): boolean {
 
 export function parseKifMovesOrDrops(
   kifMds: string[],
-  lastDest: Square | undefined = undefined
+  lastDest: Square | undefined = undefined,
 ): MoveOrDrop[] {
   const mds: MoveOrDrop[] = [];
   for (let i = 0; i < kifMds.length; i++) {
@@ -362,7 +362,7 @@ export function parseKifMovesOrDrops(
 export function makeKifMoveOrDrop(
   pos: Position,
   md: MoveOrDrop,
-  lastDest?: Square
+  lastDest?: Square,
 ): string | undefined {
   const ms = pos.rules === 'chushogi' ? makeJapaneseSquareHalf : makeJapaneseSquare;
   if (isDrop(md)) {

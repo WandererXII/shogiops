@@ -1,8 +1,8 @@
-import { perft } from '@/debug.js';
 import { parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 import { Checkshogi } from '@/variant/checkshogi.js';
 import { expect, test } from 'vitest';
+import { perft } from '../debug.js';
 
 // from standard
 test('starting perft', () => {

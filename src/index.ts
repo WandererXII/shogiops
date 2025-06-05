@@ -71,8 +71,6 @@ export * as attacks from './attacks.js';
 
 export * as compat from './compat.js';
 
-export * as debug from './debug.js';
-
 export * as sfen from './sfen.js';
 
 export * as hands from './hands.js';

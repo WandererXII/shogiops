@@ -1,8 +1,8 @@
-import { perft } from '@/debug.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 import { Kyotoshogi } from '@/variant/kyotoshogi.js';
 import { expect, test } from 'vitest';
+import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftKyotoshogi.js';
 
 const kyotoshogiPerfts: [string, number, number][] = [
@@ -73,7 +73,7 @@ test('kyotoshogi default', () => {
 });
 
 test('randomly generated perfts - for consistency', () => {
-  perfts.forEach(p => {
+  perfts.forEach((p) => {
     const [sfen, depth, res] = p,
       pos = parseSfen('kyotoshogi', sfen || initialSfen('kyotoshogi')).unwrap();
     expect(perft(pos, depth, false)).toBe(res);

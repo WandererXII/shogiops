@@ -1,15 +1,15 @@
 import { shogigroundSecondLionStep } from '@/compat.js';
-import { perft } from '@/debug.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { opposite, parseSquareName, parseUsi } from '@/util.js';
 import { Chushogi } from '@/variant/chushogi.js';
 import { expect, test } from 'vitest';
+import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftChushogi.js';
 
 test('valid promotions', () => {
   const pos = parseSfen(
     'chushogi',
-    '10p1/2I1pP2p1LL/1Rp1PB2LL2/12/7L4/1p10/12/12/11k/12/11K/12 b - 1'
+    '10p1/2I1pP2p1LL/1Rp1PB2LL2/12/7L4/1p10/12/12/11k/12/11K/12 b - 1',
   ).unwrap();
   // capture inside prom zone
   expect(pos.isLegal(parseUsi('7c8b+')!)).toBe(true);
@@ -47,7 +47,7 @@ test('lion moves', () => {
 
   const pos2 = parseSfen(
     'chushogi',
-    '3l8/11p/10p1/3n5+D2/2i1f7/3N5G2/9+H2/2t2P1i4/2p3+D5/2+H9/12/12 b'
+    '3l8/11p/10p1/3n5+D2/2i1f7/3N5G2/9+H2/2t2P1i4/2p3+D5/2+H9/12/12 b',
   ).unwrap();
   // jumps
   expect(pos2.isLegal(parseUsi('3g3e')!)).toBe(true);
@@ -77,7 +77,7 @@ test('lion moves', () => {
 
   const pos3 = parseSfen(
     'chushogi',
-    '11l/6l5/5Nn5/11n/9N2/12/1N10/9n2/1n7N2/4r7/4nN6/4r7 b'
+    '11l/6l5/5Nn5/11n/9N2/12/1N10/9n2/1n7N2/4r7/4nN6/4r7 b',
   ).unwrap();
   expect(pos3.isLegal(parseUsi('7c6c')!)).toBe(true);
   expect(pos3.isLegal(parseUsi('7c6b6c')!)).toBe(true);
@@ -203,7 +203,7 @@ test('bare king', () => {
 
   const pos3 = parseSfen(
     'chushogi',
-    '1P3PP3P1/12/12/12/6k5/12/12/6K5/12/12/12/l10l b - 1'
+    '1P3PP3P1/12/12/12/6k5/12/12/6K5/12/12/12/l10l b - 1',
   ).unwrap();
   expect(pos3.isBareKing()).toBe(false);
   expect(pos3.isDraw()).toBe(true);
@@ -251,7 +251,7 @@ test.each(chushogiPerfts)('chushogi perft: %s (%s): %s', (sfen, depth, res) => {
 });
 
 test('randomly generated perfts - for consistency', () => {
-  perfts.forEach(p => {
+  perfts.forEach((p) => {
     const [sfen, depth, res] = p,
       pos = parseSfen('chushogi', sfen || initialSfen('chushogi')).unwrap();
     expect(pos.isEnd()).toBe(false);

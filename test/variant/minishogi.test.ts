@@ -1,7 +1,7 @@
-import { perft } from '@/debug.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { Minishogi } from '@/variant/minishogi.js';
 import { expect, test } from 'vitest';
+import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftMinishogi.js';
 
 const minishogiPerfts: [string, number, number][] = [
@@ -27,7 +27,7 @@ test('minishogi default', () => {
 });
 
 test('randomly generated perfts - for consistency', () => {
-  perfts.forEach(p => {
+  perfts.forEach((p) => {
     const [sfen, depth, res] = p,
       pos = parseSfen('minishogi', sfen || initialSfen('minishogi')).unwrap();
     expect(perft(pos, depth, false)).toBe(res);

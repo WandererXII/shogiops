@@ -1,10 +1,10 @@
-import { perft } from '@/debug.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { SquareSet } from '@/square-set.js';
 import { parseSquareName, parseUsi } from '@/util.js';
 import { Annanshogi } from '@/variant/annanshogi.js';
 import { fullSquareSet } from '@/variant/util.js';
 import { expect, test } from 'vitest';
+import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftAnnan.js';
 
 const annanPerfts: [string, number, number][] = [
@@ -33,7 +33,7 @@ test('annanshogi default', () => {
 test('pieces in dead zone', () => {
   const posRes = parseSfen(
     'annanshogi',
-    'lPsgkgLnP/1r5b1/p1ppp1p1p/1p5pp/9/1P3P1P1/P1PP1P2P/1B5n1/lNSGKGpNL b'
+    'lPsgkgLnP/1r5b1/p1ppp1p1p/1p5pp/9/1P3P1P1/P1PP1P2P/1B5n1/lNSGKGpNL b',
   );
   expect(posRes.isOk).toBe(true);
 });
@@ -44,7 +44,7 @@ test('only friednly pieces give you moves', () => {
 
   const pos2 = parseSfen(
     'annanshogi',
-    '4k3S/r1l1gs3/n+N1s5/L+P4G1+B/1Pp1p1Rb1/4PNpN1/3+pPGPP1/6G1P/1p1K2S1+l w'
+    '4k3S/r1l1gs3/n+N1s5/L+P4G1+B/1Pp1p1Rb1/4PNpN1/3+pPGPP1/6G1P/1p1K2S1+l w',
   ).unwrap();
   expect(perft(pos2, 1, false)).toBe(35);
 });
@@ -52,7 +52,7 @@ test('only friednly pieces give you moves', () => {
 test('do not allow capturing move givers that prevent check', () => {
   const pos = parseSfen(
     'annanshogi',
-    '2k5N/3p2+P1G/1+P+P1s2+P+L/1pg1bS3/6Bp1/6G1P/1K1SL+pP2/+ln+pRG1+p1+p/1+lP1+p2R1 b SN2Pnp 205'
+    '2k5N/3p2+P1G/1+P+P1s2+P+L/1pg1bS3/6Bp1/6G1P/1K1SL+pP2/+ln+pRG1+p1+p/1+lP1+p2R1 b SN2Pnp 205',
   ).unwrap();
   expect(pos.moveDests(parseSquareName('4d')).has(parseSquareName('5c'))).toBe(false);
 });
@@ -79,25 +79,25 @@ test('drop', () => {
     pos3
       .dropDests({ color: 'sente', role: 'pawn' })
       .intersect(SquareSet.fromRank(0))
-      .equals(SquareSet.fromRank(0).intersect(fullSquareSet('annanshogi')))
+      .equals(SquareSet.fromRank(0).intersect(fullSquareSet('annanshogi'))),
   ).toBe(true);
   expect(
     pos3
       .dropDests({ color: 'sente', role: 'lance' })
       .intersect(SquareSet.fromRank(0))
-      .equals(SquareSet.fromRank(0).intersect(fullSquareSet('annanshogi')))
+      .equals(SquareSet.fromRank(0).intersect(fullSquareSet('annanshogi'))),
   ).toBe(true);
   expect(
     pos3
       .dropDests({ color: 'sente', role: 'knight' })
       .intersect(SquareSet.fromRank(0))
-      .equals(SquareSet.fromRank(0).intersect(fullSquareSet('annanshogi')))
+      .equals(SquareSet.fromRank(0).intersect(fullSquareSet('annanshogi'))),
   ).toBe(true);
   expect(
     pos3
       .dropDests({ color: 'sente', role: 'knight' })
       .intersect(SquareSet.fromRank(1))
-      .equals(SquareSet.fromRank(1).intersect(fullSquareSet('annanshogi')))
+      .equals(SquareSet.fromRank(1).intersect(fullSquareSet('annanshogi'))),
   ).toBe(true);
   expect(pos3.isLegal({ role: 'pawn', to: parseSquareName('5a') })).toBe(true);
   expect(pos3.isLegal({ role: 'lance', to: parseSquareName('5a') })).toBe(true);
@@ -137,7 +137,7 @@ test('capture attacker move giver', () => {
   // 2 checkers
   const pos2 = parseSfen(
     'annanshogi',
-    'P1G+N3s1/lp7/2+N+Pp+P1+L+P/1sB1kP3/N1pl1s3/g6p1/+p1B2+p+p+l+p/1+s+r+n4R/1g1pK1+p2 b G3P 167'
+    'P1G+N3s1/lp7/2+N+Pp+P1+L+P/1sB1kP3/N1pl1s3/g6p1/+p1B2+p+p+l+p/1+s+r+n4R/1g1pK1+p2 b G3P 167',
   ).unwrap();
   expect(perft(pos2, 1, false)).toBe(2);
 
@@ -192,7 +192,7 @@ test('proper parse', () => {
 });
 
 test('randomly generated perfts - for consistency', () => {
-  perfts.forEach(p => {
+  perfts.forEach((p) => {
     const [sfen, depth, res] = p,
       pos = parseSfen('annanshogi', sfen || initialSfen('annanshogi')).unwrap();
     expect(pos.isEnd()).toBe(false);

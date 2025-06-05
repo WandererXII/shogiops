@@ -44,20 +44,21 @@
   "devDependencies": {
     "@eslint/js": "^9",
     "@trivago/prettier-plugin-sort-imports": "^4",
+    "@types/node": "^22",
     "del-cli": "^6",
     "eslint": "^9",
     "prettier": "^3",
     "typedoc": "^0.26",
     "typescript": "^5",
     "typescript-eslint": "^8",
-    "vitest": "^2"
+    "vitest": "^3"
   },
   "scripts": {
     "prepare": "$npm_execpath run clean && $npm_execpath run compile",
     "clean": "del dist && del *.tsbuildinfo",
     "compile": "tsc",
     "type-check": "tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest --config test/vitest.config.ts",
     "doc": "typedoc src/index.ts",
     "lint": "eslint --cache",
     "format": "prettier --cache --write .",

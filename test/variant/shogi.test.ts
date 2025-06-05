@@ -1,9 +1,9 @@
-import { perft } from '@/debug.js';
 import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 import { Shogi } from '@/variant/shogi.js';
 import { defaultPosition } from '@/variant/variant.js';
 import { expect, test } from 'vitest';
+import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftStandard.js';
 import { usiFixture } from '../fixtures/usi.js';
 
@@ -175,20 +175,20 @@ test('promotion', () => {
 
   const pos2 = parseSfen(
     'standard',
-    'lnsgkgsn1/1r5b1/pppppp1p1/6p2/8L/9/PPPPPPPP1/1B5R1/LNSGKGSN1 b LPp 9'
+    'lnsgkgsn1/1r5b1/pppppp1p1/6p2/8L/9/PPPPPPPP1/1B5R1/LNSGKGSN1 b LPp 9',
   ).unwrap();
   pos2.play(parseUsi('1e1a')!);
   expect(makeSfen(pos2)).toEqual(
-    'lnsgkgsn+L/1r5b1/pppppp1p1/6p2/9/9/PPPPPPPP1/1B5R1/LNSGKGSN1 w LPp 10'
+    'lnsgkgsn+L/1r5b1/pppppp1p1/6p2/9/9/PPPPPPPP1/1B5R1/LNSGKGSN1 w LPp 10',
   );
 
   const pos3 = parseSfen(
     'standard',
-    'lnsgkgsn1/1r5b1/pppppp1p1/6p2/8L/9/PPPPPPPP1/1B5R1/LNSGKGSN1 b LPp 9'
+    'lnsgkgsn1/1r5b1/pppppp1p1/6p2/8L/9/PPPPPPPP1/1B5R1/LNSGKGSN1 b LPp 9',
   ).unwrap();
   pos3.play(parseUsi('1e1a+')!);
   expect(makeSfen(pos3)).toEqual(
-    'lnsgkgsn+L/1r5b1/pppppp1p1/6p2/9/9/PPPPPPPP1/1B5R1/LNSGKGSN1 w LPp 10'
+    'lnsgkgsn+L/1r5b1/pppppp1p1/6p2/9/9/PPPPPPPP1/1B5R1/LNSGKGSN1 w LPp 10',
   );
 });
 
@@ -240,7 +240,7 @@ test('prod 500 usi', () => {
 });
 
 test('randomly generated perfts - for consistency', () => {
-  perfts.forEach(p => {
+  perfts.forEach((p) => {
     const [sfen, depth, res] = p,
       pos = parseSfen('standard', sfen || initialSfen('standard')).unwrap();
     expect(perft(pos, depth, false)).toBe(res);

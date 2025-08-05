@@ -57,7 +57,7 @@ export function makeKifPositionHeader(pos: Position): string {
       : '',
     ...(pos.turn === 'gote' ? [`${colorName('gote', handicap)}番`] : []),
   ]
-    .filter((l) => l.length)
+    .filter((l) => l.length > 0)
     .join('\n');
 }
 

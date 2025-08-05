@@ -1,5 +1,5 @@
 import type { SquareSet } from './square-set.js';
-import type { MoveOrDrop, PieceName, Role, Rules, Square, SquareName } from './types.js';
+import type { MoveOrDrop, PieceName, Rules, Square, SquareName } from './types.js';
 import {
   defined,
   isDrop,
@@ -58,7 +58,7 @@ export function shogigroundSecondLionStep(
 }
 
 export function usiToSquareNames(usi: string | undefined): SquareName[] {
-  if (!usi) return [];
+  if (!defined(usi)) return [];
   const md = parseUsi(usi);
   return defined(md) ? moveToSquareNames(md) : [];
 }

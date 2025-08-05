@@ -1,5 +1,5 @@
 import path from 'path';
-import { UserConfigExport, defineConfig } from 'vitest/config';
+import { type UserConfigExport, defineConfig } from 'vitest/config';
 
 const config: UserConfigExport = defineConfig({
   test: {

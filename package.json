@@ -53,8 +53,8 @@
     "type-check": "tsc --noEmit",
     "test": "vitest --config test/vitest.config.ts",
     "lint": "eslint --cache",
-    "format": "prettier --cache --write .",
-    "format-check": "prettier --cache --check ."
+    "format": "prettier --cache --check .",
+    "format:write": "prettier --cache --write ."
   },
   "files": [
     "dist",

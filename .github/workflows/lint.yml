@@ -8,5 +8,5 @@ jobs:
       - uses: actions/setup-node@v4
       - run: npm install
       - run: npm run type-check
-      - run: npm run format-check
+      - run: npm run format
       - run: npm run lint

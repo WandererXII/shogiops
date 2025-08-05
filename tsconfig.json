@@ -19,6 +19,7 @@
     "sourceMap": true,
     "isolatedDeclarations": true,
     "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "incremental": true
   },
   "include": ["./src"]

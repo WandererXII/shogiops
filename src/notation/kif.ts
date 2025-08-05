@@ -27,11 +27,11 @@ import {
 // KIF HEADER
 //
 
-export enum InvalidKif {
-  Kif = 'ERR_KIF',
-  Board = 'ERR_BOARD',
-  Hands = 'ERR_HANDS',
-}
+export const InvalidKif = {
+  Kif: 'ERR_KIF',
+  Board: 'ERR_BOARD',
+  Hands: 'ERR_HANDS',
+} as const;
 
 export class KifError extends Error {}
 

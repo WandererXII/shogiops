@@ -32,10 +32,8 @@ export class Annanshogi extends Position {
 
   validate(strict: boolean): Result<undefined, PositionError> {
     const validated = super.validate(strict);
-    if (
-      validated.isErr &&
-      [IllegalSetup.InvalidPiecesDoublePawns].includes(validated.error.message as IllegalSetup)
-    )
+    const acceptableErrors: string[] = [IllegalSetup.InvalidPiecesDoublePawns];
+    if (validated.isErr && acceptableErrors.includes(validated.error.message))
       return Result.ok(undefined);
     else return validated;
   }

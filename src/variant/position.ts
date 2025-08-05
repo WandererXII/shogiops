@@ -26,16 +26,16 @@ import {
   unpromote,
 } from './util.js';
 
-export enum IllegalSetup {
-  Empty = 'ERR_EMPTY',
-  OppositeCheck = 'ERR_OPPOSITE_CHECK',
-  PiecesOutsideBoard = 'ERR_PIECES_OUTSIDE_BOARD',
-  InvalidPieces = 'ERR_INVALID_PIECE',
-  InvalidPiecesHand = 'ERR_INVALID_PIECE_IN_HAND',
-  InvalidPiecesPromotionZone = 'ERR_PIECES_MUST_PROMOTE',
-  InvalidPiecesDoublePawns = 'ERR_PIECES_DOUBLE_PAWNS',
-  Kings = 'ERR_KINGS',
-}
+export const IllegalSetup = {
+  Empty: 'ERR_EMPTY',
+  OppositeCheck: 'ERR_OPPOSITE_CHECK',
+  PiecesOutsideBoard: 'ERR_PIECES_OUTSIDE_BOARD',
+  InvalidPieces: 'ERR_INVALID_PIECE',
+  InvalidPiecesHand: 'ERR_INVALID_PIECE_IN_HAND',
+  InvalidPiecesPromotionZone: 'ERR_PIECES_MUST_PROMOTE',
+  InvalidPiecesDoublePawns: 'ERR_PIECES_DOUBLE_PAWNS',
+  Kings: 'ERR_KINGS',
+} as const;
 
 export class PositionError extends Error {}
 

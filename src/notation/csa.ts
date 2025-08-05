@@ -14,13 +14,13 @@ import { csaToRole, makeNumberSquare, parseNumberSquare, roleToCsa } from './uti
 // CSA HEADER
 //
 
-export enum InvalidCsa {
-  CSA = 'ERR_CSA',
-  Board = 'ERR_BOARD',
-  Handicap = 'ERR_HANDICAP',
-  Hands = 'ERR_HANDS',
-  AdditionalInfo = 'ERR_ADDITIONAL',
-}
+export const InvalidCsa = {
+  CSA: 'ERR_CSA',
+  Board: 'ERR_BOARD',
+  Handicap: 'ERR_HANDICAP',
+  Hands: 'ERR_HANDS',
+  AdditionalInfo: 'ERR_ADDITIONAL',
+} as const;
 
 export class CsaError extends Error {}
 

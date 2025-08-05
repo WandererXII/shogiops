@@ -9,14 +9,14 @@ import { dimensions, handRoles } from './variant/util.js';
 import type { RulesTypeMap } from './variant/variant.js';
 import { initializePosition } from './variant/variant.js';
 
-export enum InvalidSfen {
-  Sfen = 'ERR_SFEN',
-  BoardDims = 'ERR_BOARD_DIMS',
-  BoardPiece = 'ERR_BOARD_PIECE',
-  Hands = 'ERR_HANDS',
-  Turn = 'ERR_TURN',
-  MoveNumber = 'ERR_MOVENUMBER',
-}
+export const InvalidSfen = {
+  Sfen: 'ERR_SFEN',
+  BoardDims: 'ERR_BOARD_DIMS',
+  BoardPiece: 'ERR_BOARD_PIECE',
+  Hands: 'ERR_HANDS',
+  Turn: 'ERR_TURN',
+  MoveNumber: 'ERR_MOVENUMBER',
+} as const;
 export class SfenError extends Error {}
 
 export function initialSfen(rules: Rules): string {

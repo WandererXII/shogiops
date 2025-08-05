@@ -1,6 +1,7 @@
-import { Shogi, parseSquareName, parseUsi } from '@/index.js';
 import { makeJapaneseSquare } from '@/notation/util.js';
 import { convertJapaneseToYorozuya, makeYorozuyaMoveOrDrop } from '@/notation/yorozuya.js';
+import { parseSquareName, parseUsi } from '@/util.js';
+import { Shogi } from '@/variant/shogi.js';
 import { expect, test } from 'vitest';
 
 test('basic moves', () => {

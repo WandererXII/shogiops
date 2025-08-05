@@ -19,13 +19,7 @@
   ],
   "sideEffects": false,
   "type": "module",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
     "./*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js"
@@ -48,7 +42,6 @@
     "del-cli": "^6",
     "eslint": "^9",
     "prettier": "^3",
-    "typedoc": "^0.26",
     "typescript": "^5",
     "typescript-eslint": "^8",
     "vitest": "^3"
@@ -59,7 +52,6 @@
     "compile": "tsc",
     "type-check": "tsc --noEmit",
     "test": "vitest --config test/vitest.config.ts",
-    "doc": "typedoc src/index.ts",
     "lint": "eslint --cache",
     "format": "prettier --cache --write .",
     "format-check": "prettier --cache --check ."

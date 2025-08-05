@@ -1,5 +1,13 @@
 # Changelog for shogiops
 
+## v0.19.0
+
+- Removed barrel file (index.ts).
+- Replaced enums used to hold error values with objects.
+- `validate` now checks for double pawns in strict mode for variant where rule applies
+- `usiToSquareNames` now accepts `undefined` usi param.
+- Removed generated documentation.
+
 ## v0.18.0
 
 - All files now use hyphen in file names instead of camelCase e.g. (file `squareSet.ts` is now `square-set.ts`). Update your imports.

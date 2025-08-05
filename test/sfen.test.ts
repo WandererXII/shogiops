@@ -2,6 +2,7 @@ import { Board } from '@/board.js';
 import { Hands } from '@/hands.js';
 import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseSquareName } from '@/util.js';
+import { IllegalSetup } from '@/variant/position.js';
 import { defaultPosition } from '@/variant/variant.js';
 import { expect, test } from 'vitest';
 
@@ -17,7 +18,7 @@ test('make initial sfen', () => {
 });
 
 test('parse initial sfen', () => {
-  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  const pos = parseSfen('standard', initialSfen('standard'), true).unwrap();
   expect(pos.board).toEqual(defaultPosition('standard').board);
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
@@ -25,12 +26,22 @@ test('parse initial sfen', () => {
 });
 
 test('partial sfen', () => {
-  const pos = parseSfen('standard', initialSfen('standard').split(' ')[0]).unwrap();
+  const pos = parseSfen('standard', initialSfen('standard').split(' ')[0], true).unwrap();
   expect(pos.board).toEqual(defaultPosition('standard').board);
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
   expect(pos.moveNumber).toEqual(1);
-  expect(parseSfen('standard', 'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b - ').isOk).toBe(true);
+  expect(parseSfen('standard', 'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b - ', true).isOk).toBe(true);
+});
+
+test('invalid sfen', () => {
+  const pos = parseSfen(
+    'standard',
+    'lnsgkgsnl/1r5b1/ppppppppp/9/9/8P/PPPPPPP1P/1B5R1/LNSGKGSNL b - 1',
+    true,
+  );
+  expect(pos.isErr).toBe(true);
+  expect(pos.isErr ? pos.error.message : undefined).toBe(IllegalSetup.InvalidPiecesDoublePawns);
 });
 
 test.each([
@@ -44,12 +55,12 @@ test.each([
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b 10p 10',
   'lnsgkgsnl/9/9/9/9/9/9/9/LNSGKGSNL b 15R10P10p 10',
 ])('parse and make sfen', (sfen) => {
-  const pos = parseSfen('standard', sfen).unwrap();
+  const pos = parseSfen('standard', sfen, true).unwrap();
   expect(makeSfen(pos)).toEqual(sfen);
 });
 
 test('minishogi sfen', () => {
-  const pos = parseSfen('minishogi', 'rbsgk/4p/5/P4/KGSBR b - 1').unwrap();
+  const pos = parseSfen('minishogi', 'rbsgk/4p/5/P4/KGSBR b - 1', true).unwrap();
   expect(pos).toEqual(defaultPosition('minishogi'));
   expect(makeBoardSfen('minishogi', pos.board)).toEqual('rbsgk/4p/5/P4/KGSBR');
   expect(makeBoardSfen('minishogi', defaultPosition('minishogi').board)).toEqual(
@@ -62,6 +73,7 @@ test('chushogi sfen', () => {
   const pos = parseSfen(
     'chushogi',
     'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1',
+    true,
   ).unwrap();
   expect(pos).toEqual(defaultPosition('chushogi'));
   expect(makeSfen(pos)).toEqual(initialSfen('chushogi'));
@@ -69,6 +81,7 @@ test('chushogi sfen', () => {
   const pos2 = parseSfen(
     'chushogi',
     'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b 5e 1',
+    true,
   ).unwrap();
   expect(pos2.lastMoveOrDrop).toEqual({ to: parseSquareName('5e') });
   expect(pos2.lastLionCapture).toEqual(parseSquareName('5e'));
@@ -76,6 +89,7 @@ test('chushogi sfen', () => {
   const pos3 = parseSfen(
     'chushogi',
     '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1',
+    true,
   ).unwrap();
   expect(makeSfen(pos3)).toEqual(
     '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1',

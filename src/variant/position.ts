@@ -15,7 +15,7 @@ import type {
   Setup,
   Square,
 } from '../types.js';
-import { defined, isDrop, lionRoles, makePieceName, opposite } from '../util.js';
+import { defined, isDrop, lionRoles, makePieceName, opposite, squareFile } from '../util.js';
 import {
   allRoles,
   fullSquareSet,
@@ -33,6 +33,7 @@ export enum IllegalSetup {
   InvalidPieces = 'ERR_INVALID_PIECE',
   InvalidPiecesHand = 'ERR_INVALID_PIECE_IN_HAND',
   InvalidPiecesPromotionZone = 'ERR_PIECES_MUST_PROMOTE',
+  InvalidPiecesDoublePawns = 'ERR_PIECES_DOUBLE_PAWNS',
   Kings = 'ERR_KINGS',
 }
 
@@ -135,6 +136,18 @@ export abstract class Position {
       return Result.err(new PositionError(IllegalSetup.OppositeCheck));
 
     if (!strict) return Result.ok(undefined);
+
+    // double pawns
+    for (const color of COLORS) {
+      const files: number[] = [];
+      const pawns = this.board.role('pawn').intersect(this.board.color(color));
+      for (const pawn of pawns) {
+        const file = squareFile(pawn);
+        if (files.includes(file))
+          return Result.err(new PositionError(IllegalSetup.InvalidPiecesDoublePawns));
+        files.push(file);
+      }
+    }
 
     if (
       this.board.pieces('sente', 'king').size() >= 2 ||

@@ -1,4 +1,4 @@
-import type { Result } from '@badrap/result';
+import { Result } from '@badrap/result';
 import { attacks, between, ray } from '../attacks.js';
 import { Board } from '../board.js';
 import { Hands } from '../hands.js';
@@ -6,7 +6,7 @@ import { SquareSet } from '../square-set.js';
 import type { Color, Piece, Role, Setup, Square } from '../types.js';
 import { defined, opposite, squareFile } from '../util.js';
 import type { Context, PositionError } from './position.js';
-import { Position } from './position.js';
+import { IllegalSetup, Position } from './position.js';
 import { standardSquareAttacks, standardSquareSnipers } from './shogi.js';
 import { fullSquareSet } from './util.js';
 
@@ -28,6 +28,16 @@ export class Annanshogi extends Position {
     const pos = new this();
     pos.fromSetup(setup);
     return pos.validate(strict).map((_) => pos);
+  }
+
+  validate(strict: boolean): Result<undefined, PositionError> {
+    const validated = super.validate(strict);
+    if (
+      validated.isErr &&
+      [IllegalSetup.InvalidPiecesDoublePawns].includes(validated.error.message as IllegalSetup)
+    )
+      return Result.ok(undefined);
+    else return validated;
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {

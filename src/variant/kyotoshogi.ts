@@ -44,7 +44,9 @@ export class Kyotoshogi extends Position {
     const validated = super.validate(strict);
     if (
       validated.isErr &&
-      (validated.error.message as IllegalSetup) === IllegalSetup.InvalidPiecesPromotionZone
+      [IllegalSetup.InvalidPiecesPromotionZone, IllegalSetup.InvalidPiecesDoublePawns].includes(
+        validated.error.message as IllegalSetup,
+      )
     )
       return Result.ok(undefined);
     else return validated;

@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9",
-    "@trivago/prettier-plugin-sort-imports": "^4",
+    "@trivago/prettier-plugin-sort-imports": "^5",
     "@types/node": "^22",
     "del-cli": "^6",
     "eslint": "^9",

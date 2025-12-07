@@ -25,28 +25,25 @@
       "import": "./dist/*.js"
     }
   },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "dist/*"
-      ]
-    }
+  "engines": {
+    "pnpm": ">=10.16.0"
   },
   "dependencies": {
-    "@badrap/result": "^0.2"
+    "@badrap/result": "^0.3.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9",
-    "@trivago/prettier-plugin-sort-imports": "^5",
-    "@types/node": "^22",
-    "del-cli": "^6",
-    "eslint": "^9",
-    "prettier": "^3",
-    "typescript": "^5",
-    "typescript-eslint": "^8",
-    "vitest": "^3"
+    "@eslint/js": "^9.39.1",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
+    "@types/node": "^22.19.1",
+    "del-cli": "^7.0.0",
+    "eslint": "^9.39.1",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.1",
+    "vitest": "^4.0.0"
   },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "prepare": "$npm_execpath run clean && $npm_execpath run compile",
     "clean": "del dist && del *.tsbuildinfo",
     "compile": "tsc",

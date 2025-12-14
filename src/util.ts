@@ -10,6 +10,7 @@ import type {
   Square,
   SquareName,
 } from './types.js';
+export { Result } from '@badrap/result';
 
 export function defined<A>(v: A | undefined): v is A {
   return v !== undefined;

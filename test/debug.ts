@@ -7,7 +7,7 @@ import type { Position } from '@/variant/position.js';
 import { pieceCanPromote, pieceForcePromote, promotableOnDrop, promote } from '@/variant/util.js';
 
 export function moveDests(moveDests: Map<Square, SquareSet>): string {
-  const lines = [];
+  const lines: string[] = [];
   for (const [from, to] of moveDests) {
     lines.push(`${makeSquareName(from)}: ${Array.from(to, makeSquareName).join(' ')}`);
   }
@@ -15,7 +15,7 @@ export function moveDests(moveDests: Map<Square, SquareSet>): string {
 }
 
 export function dropDests(dropDests: Map<PieceName, SquareSet>): string {
-  const lines = [];
+  const lines: string[] = [];
   for (const [pn, to] of dropDests) {
     lines.push(`${pn}: ${Array.from(to, makeSquareName).join(' ')}`);
   }
@@ -25,7 +25,7 @@ export function dropDests(dropDests: Map<PieceName, SquareSet>): string {
 export function perft(pos: Position, depth: number, log = false): number {
   if (depth < 1) return 1;
 
-  const logs = [];
+  const logs: string[] = [];
   let nodes = 0;
   for (const [from, moveDests] of pos.allMoveDests()) {
     for (const to of moveDests) {

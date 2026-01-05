@@ -11,13 +11,13 @@ function computeRange(square: Square, deltas: number[]): SquareSet {
 }
 
 function tabulateSquares(f: (square: Square) => SquareSet): SquareSet[] {
-  const table = [];
+  const table: SquareSet[] = [];
   for (let square = 0; square < 256; square++) table[square] = f(square);
   return table;
 }
 
 function tabulateRanks(f: (rank: number) => SquareSet): SquareSet[] {
-  const table = [];
+  const table: SquareSet[] = [];
   for (let rank = 0; rank < 16; rank++) table[rank] = f(rank);
   return table;
 }

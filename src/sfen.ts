@@ -152,6 +152,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   sfen: string,
   strict?: boolean,
 ): Result<RulesTypeMap[R], SfenError | PositionError> {
+  if (sfen === 'startpos') sfen = initialSfen(rules);
   const parts = sfen.split(/[\s_]+/);
 
   // Board

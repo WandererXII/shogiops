@@ -1,18 +1,17 @@
+import { expect, test } from 'vitest';
 import { parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 import { Checkshogi } from '@/variant/checkshogi.js';
-import { expect, test } from 'vitest';
 import { perft } from '../debug.js';
 
-// from standard
 test('starting perft', () => {
   const pos = Checkshogi.default();
   expect(perft(pos, 0, false)).toBe(1);
   expect(perft(pos, 1, false)).toBe(30);
   expect(perft(pos, 2, false)).toBe(900);
   expect(perft(pos, 3, false)).toBe(25470);
-  // expect(perft(pos, 4, false)).toBe(719731);
-  //expect(perft(pos, 5, false)).toBe(19861490);
+  expect(perft(pos, 4, false)).toBe(719408);
+  // expect(perft(pos, 5, false)).toBe(19839626);
 });
 
 test('check win', () => {
@@ -40,7 +39,7 @@ test('pawn drop checkmate', () => {
   expect(pos.isCheck()).toBe(false);
   expect(pos.isEnd()).toBe(false);
   const md = parseUsi('P*5b')!;
-  expect(pos.isLegal(md)).toBe(false);
+  expect(pos.isLegal(md)).toBe(true);
   const md2 = parseUsi('L*5b')!;
   expect(pos.isLegal(md2)).toBe(true);
   pos.play(md2);

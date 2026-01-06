@@ -1,6 +1,6 @@
 import type { Result } from '@badrap/result';
 import { Hands } from '../hands.js';
-import type { SquareSet } from '../square-set.js';
+import { SquareSet } from '../square-set.js';
 import type { Color, Outcome, Piece, Setup, Square } from '../types.js';
 import { opposite } from '../util.js';
 import type { Context, PositionError } from './position.js';
@@ -47,6 +47,10 @@ export class Checkshogi extends Position {
 
   dropDests(piece: Piece, ctx?: Context): SquareSet {
     return standardDropDests(this, piece, ctx);
+  }
+
+  isCheckmate(_ctx?: Context): boolean {
+    return false;
   }
 
   isSpecialVariantEnd(ctx?: Context): boolean {

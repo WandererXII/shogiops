@@ -115,7 +115,7 @@ export const standardMoveDests = (pos: Position, square: Square, ctx?: Context):
   const piece = pos.board.get(square);
   if (!piece || piece.color !== ctx.color) return SquareSet.empty();
 
-  let pseudo = attacks(piece, square, pos.board.occupied);
+  let pseudo = attacks(piece, square, pos.board.occupied).intersect(fullSquareSet(pos.rules));
   pseudo = pseudo.diff(pos.board.color(ctx.color));
 
   if (defined(ctx.king)) {
@@ -135,7 +135,7 @@ export const standardMoveDests = (pos: Position, square: Square, ctx?: Context):
       if (ctx.blockers.has(square)) pseudo = pseudo.intersect(ray(square, ctx.king));
     }
   }
-  return pseudo.intersect(fullSquareSet(pos.rules));
+  return pseudo;
 };
 
 export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): SquareSet => {

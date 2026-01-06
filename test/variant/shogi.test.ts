@@ -2,7 +2,6 @@ import { expect, test } from 'vitest';
 import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 import { Shogi } from '@/variant/shogi.js';
-import { defaultPosition } from '@/variant/variant.js';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftStandard.js';
 import { usiFixture } from '../fixtures/usi.js';
@@ -129,8 +128,10 @@ const random: [string, string, number, number][] = [
 ];
 
 test('test promotions', () => {
+  const initial = parseSfen('standard', initialSfen('standard')).unwrap();
   const pos = parseSfen('standard', '4k4/9/7S1/1+PG3NS1/9/9/9/9/4K3L b - 1').unwrap();
-  expect(Shogi.default().isLegal({ from: 20, to: 29, promotion: true })).toBe(false); // promoting outside promotion zone
+
+  expect(initial.isLegal({ from: 20, to: 29, promotion: true })).toBe(false); // promoting outside promotion zone
   expect(pos.isLegal(parseUsi('8d8c+')!)).toBe(false); // promoting tokin
   expect(pos.isLegal(parseUsi('7d7c+')!)).toBe(false); // promoting gold
   expect(pos.isLegal(parseUsi('1i1a')!)).toBe(false); // not promoting lance on last rank
@@ -145,7 +146,7 @@ test('test promotions', () => {
 
 // http://www.talkchess.com/forum3/viewtopic.php?t=60445
 test('starting perft', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   expect(perft(pos, 0)).toBe(1);
   expect(perft(pos, 1)).toBe(30);
   expect(perft(pos, 2)).toBe(900);
@@ -169,7 +170,7 @@ test('capturing', () => {
 });
 
 test('promotion', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   pos.play(parseUsi('1i1h')!);
   expect(makeSfen(pos)).toEqual('lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5RL/LNSGKGSN1 w - 2');
 
@@ -230,7 +231,7 @@ test.each(insufficientMaterial)('insufficient material: %s', (sfen, insufficient
 
 test('prod 500 usi', () => {
   for (const usis of usiFixture) {
-    const pos = defaultPosition('standard');
+    const pos = parseSfen('standard', initialSfen('standard')).unwrap();
     for (const usi of usis.split(' ')) {
       const md = parseUsi(usi)!;
       expect(pos.isLegal(md)).toBe(true);

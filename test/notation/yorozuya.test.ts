@@ -1,11 +1,11 @@
+import { expect, test } from 'vitest';
 import { makeJapaneseSquare } from '@/notation/util.js';
 import { convertJapaneseToYorozuya, makeYorozuyaMoveOrDrop } from '@/notation/yorozuya.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseSquareName, parseUsi } from '@/util.js';
-import { Shogi } from '@/variant/shogi.js';
-import { expect, test } from 'vitest';
 
 test('basic moves', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;
   expect(makeYorozuyaMoveOrDrop(pos, move)).toEqual('午六歩');
   pos.play(move);

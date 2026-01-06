@@ -1,9 +1,8 @@
 import { Result } from '@badrap/result';
 import { attacks, between, ray } from '../attacks.js';
 import { Board } from '../board.js';
-import { Hands } from '../hands.js';
 import { SquareSet } from '../square-set.js';
-import type { Color, Piece, Role, Setup, Square } from '../types.js';
+import type { Color, Piece, Setup, Square } from '../types.js';
 import { defined, opposite, squareFile } from '../util.js';
 import type { Context, PositionError } from './position.js';
 import { IllegalSetup, Position } from './position.js';
@@ -13,15 +12,6 @@ import { fullSquareSet } from './util.js';
 export class Annanshogi extends Position {
   private constructor() {
     super('annanshogi');
-  }
-
-  static default(): Annanshogi {
-    const pos = new this();
-    pos.board = annanBoard();
-    pos.hands = Hands.empty();
-    pos.turn = 'sente';
-    pos.moveNumber = 1;
-    return pos;
   }
 
   static from(setup: Setup, strict: boolean): Result<Annanshogi, PositionError> {
@@ -194,23 +184,4 @@ export const annanAttackBoard = (board: Board): Board => {
     newBoard.set(sq, { role, color: piece.color });
   }
   return newBoard;
-};
-
-const annanBoard = (): Board => {
-  const occupied = new SquareSet([0x8201ff, 0x82017d, 0x820000, 0x82017d, 0x1ff, 0x0, 0x0, 0x0]);
-  const colorMap: [Color, SquareSet][] = [
-    ['sente', new SquareSet([0x0, 0x0, 0x820000, 0x82017d, 0x1ff, 0x0, 0x0, 0x0])],
-    ['gote', new SquareSet([0x8201ff, 0x82017d, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])],
-  ];
-  const roleMap: [Role, SquareSet][] = [
-    ['rook', new SquareSet([0x800000, 0x0, 0x0, 0x20000, 0x0, 0x0, 0x0, 0x0])],
-    ['bishop', new SquareSet([0x20000, 0x0, 0x0, 0x800000, 0x0, 0x0, 0x0, 0x0])],
-    ['gold', new SquareSet([0x28, 0x0, 0x0, 0x0, 0x28, 0x0, 0x0, 0x0])],
-    ['silver', new SquareSet([0x44, 0x0, 0x0, 0x0, 0x44, 0x0, 0x0, 0x0])],
-    ['knight', new SquareSet([0x82, 0x0, 0x0, 0x0, 0x82, 0x0, 0x0, 0x0])],
-    ['lance', new SquareSet([0x101, 0x0, 0x0, 0x0, 0x101, 0x0, 0x0, 0x0])],
-    ['pawn', new SquareSet([0x0, 0x82017d, 0x820000, 0x17d, 0x0, 0x0, 0x0, 0x0])],
-    ['king', new SquareSet([0x10, 0x0, 0x0, 0x0, 0x10, 0x0, 0x0, 0x0])],
-  ];
-  return Board.from(occupied, colorMap, roleMap);
 };

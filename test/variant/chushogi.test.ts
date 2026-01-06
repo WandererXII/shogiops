@@ -244,10 +244,6 @@ const soloPiecePefts: [string, number, number][] = [
   ['12/12/12/12/4B2l4/4S7/5N6/7n4/12/12/12/12 b - 1', 1, 98],
 ];
 
-test('chushogi default', () => {
-  expect(Chushogi.default()).toEqual(parseSfen('chushogi', initialSfen('chushogi')).unwrap());
-});
-
 test.each(chushogiPerfts)('chushogi perft: %s (%s): %s', (sfen, depth, res) => {
   const pos = parseSfen('chushogi', sfen || initialSfen('chushogi')).unwrap();
   expect(perft(pos, depth)).toBe(res);

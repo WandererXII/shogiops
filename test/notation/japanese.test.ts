@@ -1,11 +1,10 @@
-import { makeJapaneseMoveOrDrop } from '@/notation/japanese.js';
-import { parseSfen } from '@/sfen.js';
-import { parseUsi } from '@/util.js';
-import { Shogi } from '@/variant/shogi.js';
 import { expect, test } from 'vitest';
+import { makeJapaneseMoveOrDrop } from '@/notation/japanese.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
+import { parseUsi } from '@/util.js';
 
 test('basic moves', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;
   expect(makeJapaneseMoveOrDrop(pos, move)).toEqual('７六歩');
   pos.play(move);

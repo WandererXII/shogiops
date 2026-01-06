@@ -22,10 +22,6 @@ test('minishogi checkmate', () => {
   expect(pos.outcome()).toEqual({ result: 'checkmate', winner: 'gote' });
 });
 
-test('minishogi default', () => {
-  expect(Minishogi.default()).toEqual(parseSfen('minishogi', initialSfen('minishogi')).unwrap());
-});
-
 test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
     const [sfen, depth, res] = p,

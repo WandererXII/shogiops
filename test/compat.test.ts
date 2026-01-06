@@ -1,12 +1,11 @@
+import { expect, test } from 'vitest';
 import { scalashogiCharPair, shogigroundDropDests, shogigroundMoveDests } from '@/compat.js';
-import { parseSfen } from '@/sfen.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
 import type { Rules } from '@/types.js';
 import { parseUsi } from '@/util.js';
-import { Shogi } from '@/variant/shogi.js';
-import { expect, test } from 'vitest';
 
 test('shogiground dests', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const dests = shogigroundMoveDests(pos);
   expect(dests.get('7g')).toContain('7f');
   expect(dests.get('5i')).toContain('6h');
@@ -14,7 +13,8 @@ test('shogiground dests', () => {
 });
 
 test('shogiground drop dests', () => {
-  const dests1 = shogigroundDropDests(Shogi.default());
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  const dests1 = shogigroundDropDests(pos);
   expect(dests1.get('sente pawn')).toEqual(undefined);
 
   const pos2 = parseSfen('standard', '9/9/5k3/9/9/9/9/4K4/9 b N 1').unwrap();

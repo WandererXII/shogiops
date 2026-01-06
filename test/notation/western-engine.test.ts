@@ -1,10 +1,10 @@
-import { makeWesternEngineMoveOrDrop } from '@/notation/western-engine.js';
-import { parseUsi } from '@/util.js';
-import { Shogi } from '@/variant/shogi.js';
 import { expect, test } from 'vitest';
+import { makeWesternEngineMoveOrDrop } from '@/notation/western-engine.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
+import { parseUsi } from '@/util.js';
 
 test('basic moves', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;
   expect(makeWesternEngineMoveOrDrop(pos, move)).toEqual('P-7f');
   pos.play(move);
@@ -12,7 +12,7 @@ test('basic moves', () => {
 });
 
 test('amb moves', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('6i5h')!;
   expect(makeWesternEngineMoveOrDrop(pos, move)).toEqual('G6i-5h');
 });

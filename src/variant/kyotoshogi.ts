@@ -10,10 +10,8 @@ import {
   rookAttacks,
   silverAttacks,
 } from '../attacks.js';
-import { Board } from '../board.js';
-import { Hands } from '../hands.js';
 import { SquareSet } from '../square-set.js';
-import type { Color, MoveOrDrop, Piece, Role, Setup, Square } from '../types.js';
+import type { Color, MoveOrDrop, Piece, Setup, Square } from '../types.js';
 import { defined, isDrop, opposite } from '../util.js';
 import type { Context, PositionError } from './position.js';
 import { IllegalSetup, Position } from './position.js';
@@ -23,15 +21,6 @@ import { fullSquareSet, handRoles, unpromote } from './util.js';
 export class Kyotoshogi extends Position {
   private constructor() {
     super('kyotoshogi');
-  }
-
-  static default(): Kyotoshogi {
-    const pos = new this();
-    pos.board = kyotoBoard();
-    pos.hands = Hands.empty();
-    pos.turn = 'sente';
-    pos.moveNumber = 1;
-    return pos;
   }
 
   static from(setup: Setup, strict: boolean): Result<Kyotoshogi, PositionError> {
@@ -112,19 +101,3 @@ export class Kyotoshogi extends Position {
     }
   }
 }
-
-const kyotoBoard = (): Board => {
-  const occupied = new SquareSet([0x1f, 0x0, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
-  const colorIter: [Color, SquareSet][] = [
-    ['sente', new SquareSet([0x0, 0x0, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0])],
-    ['gote', new SquareSet([0x1f, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])],
-  ];
-  const roleIter: [Role, SquareSet][] = [
-    ['tokin', new SquareSet([0x1, 0x0, 0x10, 0x0, 0x0, 0x0, 0x0, 0x0])],
-    ['silver', new SquareSet([0x2, 0x0, 0x8, 0x0, 0x0, 0x0, 0x0, 0x0])],
-    ['gold', new SquareSet([0x8, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0])],
-    ['pawn', new SquareSet([0x10, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0])],
-    ['king', new SquareSet([0x4, 0x0, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0])],
-  ];
-  return Board.from(occupied, colorIter, roleIter);
-};

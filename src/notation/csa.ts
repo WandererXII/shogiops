@@ -2,13 +2,14 @@ import { Result } from '@badrap/result';
 import { Board } from '../board.js';
 import type { Hand } from '../hands.js';
 import { Hands } from '../hands.js';
+import { initialSfen, parseSfen } from '../sfen.js';
 import type { Color, MoveOrDrop } from '../types.js';
 import { boolToColor, defined, isDrop, parseCoordinates } from '../util.js';
-import { Shogi, standardBoard } from '../variant/shogi.js';
+import { Shogi } from '../variant/shogi.js';
 import { allRoles, handRoles, promote } from '../variant/util.js';
 import { csaToRole, makeNumberSquare, parseNumberSquare, roleToCsa } from './util.js';
 
-// Olny supports standard shogi no variants
+// Only supports standard shogi no variants
 
 //
 // CSA HEADER
@@ -91,7 +92,7 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
 
 export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
   const splitted = handicap.substring(2).match(/.{4}/g) || [];
-  const intitalBoard = standardBoard();
+  const intitalBoard = parseSfen('standard', initialSfen('standard'), false).unwrap().board;
   for (const s of splitted) {
     const sq = parseNumberSquare(s.substring(0, 2));
     if (defined(sq)) {

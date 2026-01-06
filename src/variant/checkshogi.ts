@@ -1,12 +1,10 @@
 import type { Result } from '@badrap/result';
-import { Hands } from '../hands.js';
 import { SquareSet } from '../square-set.js';
 import type { Color, Outcome, Piece, Setup, Square } from '../types.js';
 import { opposite } from '../util.js';
 import type { Context, PositionError } from './position.js';
 import { Position } from './position.js';
 import {
-  standardBoard,
   standardDropDests,
   standardMoveDests,
   standardSquareAttacks,
@@ -16,15 +14,6 @@ import {
 export class Checkshogi extends Position {
   private constructor() {
     super('checkshogi');
-  }
-
-  static default(): Checkshogi {
-    const pos = new this();
-    pos.board = standardBoard();
-    pos.hands = Hands.empty();
-    pos.turn = 'sente';
-    pos.moveNumber = 1;
-    return pos;
   }
 
   static from(setup: Setup, strict: boolean): Result<Checkshogi, PositionError> {

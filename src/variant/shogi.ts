@@ -13,9 +13,8 @@ import {
   silverAttacks,
 } from '../attacks.js';
 import { Board } from '../board.js';
-import { Hands } from '../hands.js';
 import { SquareSet } from '../square-set.js';
-import type { Color, Piece, Role, Setup, Square } from '../types.js';
+import type { Color, Piece, Setup, Square } from '../types.js';
 import { defined, opposite, squareFile } from '../util.js';
 import type { Context, PositionError } from './position.js';
 import { Position } from './position.js';
@@ -24,15 +23,6 @@ import { dimensions, fullSquareSet } from './util.js';
 export class Shogi extends Position {
   private constructor() {
     super('standard');
-  }
-
-  static default(): Shogi {
-    const pos = new this();
-    pos.board = standardBoard();
-    pos.hands = Hands.empty();
-    pos.turn = 'sente';
-    pos.moveNumber = 1;
-    return pos;
   }
 
   static from(setup: Setup, strict: boolean): Result<Shogi, PositionError> {
@@ -57,25 +47,6 @@ export class Shogi extends Position {
     return standardMoveDests(this, square, ctx);
   }
 }
-
-export const standardBoard = (): Board => {
-  const occupied = new SquareSet([0x8201ff, 0x1ff, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0]);
-  const colorIter: [Color, SquareSet][] = [
-    ['sente', new SquareSet([0x0, 0x0, 0x0, 0x8201ff, 0x1ff, 0x0, 0x0, 0x0])],
-    ['gote', new SquareSet([0x8201ff, 0x1ff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])],
-  ];
-  const roleIter: [Role, SquareSet][] = [
-    ['rook', new SquareSet([0x800000, 0x0, 0x0, 0x20000, 0x0, 0x0, 0x0, 0x0])],
-    ['bishop', new SquareSet([0x20000, 0x0, 0x0, 0x800000, 0x0, 0x0, 0x0, 0x0])],
-    ['gold', new SquareSet([0x28, 0x0, 0x0, 0x0, 0x28, 0x0, 0x0, 0x0])],
-    ['silver', new SquareSet([0x44, 0x0, 0x0, 0x0, 0x44, 0x0, 0x0, 0x0])],
-    ['knight', new SquareSet([0x82, 0x0, 0x0, 0x0, 0x82, 0x0, 0x0, 0x0])],
-    ['lance', new SquareSet([0x101, 0x0, 0x0, 0x0, 0x101, 0x0, 0x0, 0x0])],
-    ['pawn', new SquareSet([0x0, 0x1ff, 0x0, 0x1ff, 0x0, 0x0, 0x0, 0x0])],
-    ['king', new SquareSet([0x10, 0x0, 0x0, 0x0, 0x10, 0x0, 0x0, 0x0])],
-  ];
-  return Board.from(occupied, colorIter, roleIter);
-};
 
 export const standardSquareAttacks = (
   square: Square,

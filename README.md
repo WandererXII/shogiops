@@ -29,10 +29,13 @@ Shogi and operations in TypeScript forked from [chessops](https://github.com/nik
 Test directory has a lot of examples and use-cases.
 
 ```typescript
-import { Shogi } from 'shogiops/shogi';
+import { initialSfen, parseSfen } from 'shogiops/sfen';
+import type { Rules } from 'shogiops/types';
 import { parseUsi } from 'shogiops/util';
 
-const pos = Shogi.default();
+const rules: Rules = 'standard';
+const sfen = initialSfen(rules);
+const pos = parseSfen(rules, sfen).unwrap(); // or handle errors
 const usi = parseUsi('7g7f')!;
 pos.play(usi);
 ```

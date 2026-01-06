@@ -1,11 +1,10 @@
 import { expect, test } from 'vitest';
-import { parseSfen } from '@/sfen.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
-import { Checkshogi } from '@/variant/checkshogi.js';
 import { perft } from '../debug.js';
 
 test('starting perft', () => {
-  const pos = Checkshogi.default();
+  const pos = parseSfen('checkshogi', initialSfen('checkshogi')).unwrap();
   expect(perft(pos, 0)).toBe(1);
   expect(perft(pos, 1)).toBe(30);
   expect(perft(pos, 2)).toBe(900);

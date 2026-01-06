@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import {
   makeCsaHeader,
   makeCsaMoveOrDrop,
@@ -9,8 +10,6 @@ import {
 import { parseNumberSquare } from '@/notation/util.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseSquareName, parseUsi } from '@/util.js';
-import { Shogi } from '@/variant/shogi.js';
-import { expect, test } from 'vitest';
 
 test('parse csa square', () => {
   expect(parseNumberSquare('11')).toEqual(parseSquareName('1a'));
@@ -112,7 +111,7 @@ test('parse CSA header with handicap and CSA board', () => {
 });
 
 test('make CSA moves/drops individually', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   expect(makeCsaMoveOrDrop(pos, parseUsi('7g7f')!)).toEqual('7776FU');
   expect(makeCsaMoveOrDrop(pos, parseUsi('9i9h')!)).toEqual('9998KY');
   expect(makeCsaMoveOrDrop(pos, parseUsi('1a1b')!)).toEqual('1112KY');
@@ -132,7 +131,7 @@ test('make CSA moves/drops individually', () => {
 });
 
 test('parse csa moves/drops one by one', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const line = [
     '7g7f',
     '8c8d',
@@ -167,7 +166,7 @@ test('parse moves/drops', () => {
 });
 
 test('parse csa moves/drops', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const line = [
     '7776FU',
     '8384FU',

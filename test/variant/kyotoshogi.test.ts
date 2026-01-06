@@ -68,10 +68,6 @@ test('drops', () => {
   expect(pos.isLegal(parseUsi('R*3a')!)).toBe(true);
 });
 
-test('kyotoshogi default', () => {
-  expect(Kyotoshogi.default()).toEqual(parseSfen('kyotoshogi', initialSfen('kyotoshogi')).unwrap());
-});
-
 test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
     const [sfen, depth, res] = p,

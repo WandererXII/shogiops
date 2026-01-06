@@ -58,7 +58,6 @@ export abstract class Position {
 
   // When subclassing:
   // - private constructor()
-  // - static default()
   // - static from(
   //     setup: Setup,
   //     strict: boolean

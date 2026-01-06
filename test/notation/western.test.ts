@@ -1,11 +1,10 @@
-import { makeWesternMoveOrDrop } from '@/notation/western.js';
-import { parseUsi } from '@/util.js';
-import { Minishogi } from '@/variant/minishogi.js';
-import { Shogi } from '@/variant/shogi.js';
 import { expect, test } from 'vitest';
+import { makeWesternMoveOrDrop } from '@/notation/western.js';
+import { initialSfen, parseSfen } from '@/sfen.js';
+import { parseUsi } from '@/util.js';
 
 test('basic moves', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;
   expect(makeWesternMoveOrDrop(pos, move)).toEqual('P-76');
   pos.play(move);
@@ -13,13 +12,13 @@ test('basic moves', () => {
 });
 
 test('amb moves', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('6i5h')!;
   expect(makeWesternMoveOrDrop(pos, move)).toEqual('G69-58');
 });
 
 test('minishogi move', () => {
-  const pos = Minishogi.default();
+  const pos = parseSfen('minishogi', initialSfen('minishogi')).unwrap();
   const move = parseUsi('4e4d')!;
   expect(makeWesternMoveOrDrop(pos, move)).toEqual('G-44');
 });

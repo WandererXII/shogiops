@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import {
   makeKifHeader,
   makeKifMoveOrDrop,
@@ -8,9 +9,6 @@ import {
 } from '@/notation/kif.js';
 import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
-import { Chushogi } from '@/variant/chushogi.js';
-import { Shogi } from '@/variant/shogi.js';
-import { expect, test } from 'vitest';
 
 test('make kif header from some random position', () => {
   const pos = parseSfen(
@@ -150,14 +148,15 @@ test('parse kif header with handicap and kif board', () => {
 });
 
 test('parse empty kif header', () => {
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const kifHeader = `先手：
     後手：`,
     kifPos = parseKifHeader(kifHeader).unwrap();
-  expect(kifPos).toEqual(Shogi.default());
+  expect(kifPos).toEqual(pos);
 });
 
 test('make kif moves/drops individually', () => {
-  const pos = Shogi.default();
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   expect(makeKifMoveOrDrop(pos, parseUsi('7g7f')!)).toEqual('７六歩(77)');
   expect(makeKifMoveOrDrop(pos, parseUsi('9i9h')!)).toEqual('９八香(99)');
   expect(makeKifMoveOrDrop(pos, parseUsi('1a1b')!)).toEqual('１二香(11)');
@@ -177,7 +176,7 @@ test('make kif moves/drops individually', () => {
 });
 
 test('parse kif moves/drops one by one', () => {
-  const pos = Shogi.default(),
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap(),
     line = [
       '7g7f',
       '8c8d',
@@ -199,7 +198,7 @@ test('parse kif moves/drops one by one', () => {
 });
 
 test('parse kif moves/drops', () => {
-  const pos = Shogi.default(),
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap(),
     line = [
       ' 1 ７六歩(77)',
       ' 2 ８四歩(83)',
@@ -278,7 +277,7 @@ test('make kif header - chushogi', () => {
 });
 
 test('make chushogi moves', () => {
-  const pos = Chushogi.default();
+  const pos = parseSfen('chushogi', initialSfen('chushogi')).unwrap();
   expect(makeKifMoveOrDrop(pos, parseUsi('7i7h')!)).toEqual('7八歩兵 （←7九）');
   pos.play(parseUsi('7i7h')!);
   expect(makeKifMoveOrDrop(pos, parseUsi('7d7e')!)).toEqual('7五歩兵 （←7四）');

@@ -1,5 +1,5 @@
-import { InvalidSfen, parseSfen } from '@/sfen.js';
 import { expect, test } from 'vitest';
+import { InvalidSfen, parseSfen } from '@/sfen.js';
 
 test('roles outside variant', () => {
   const r1 = parseSfen('minishogi', '2k2/2p2/2l2/2P2/2K2 b - 1', true);

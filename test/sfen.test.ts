@@ -1,33 +1,32 @@
+import { expect, test } from 'vitest';
 import { Board } from '@/board.js';
+import { RULES } from '@/constants.js';
 import { Hands } from '@/hands.js';
 import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseSquareName } from '@/util.js';
 import { IllegalSetup } from '@/variant/position.js';
-import { defaultPosition } from '@/variant/variant.js';
-import { expect, test } from 'vitest';
 
-test('make board sfen', () => {
-  expect(makeBoardSfen('standard', defaultPosition('standard').board)).toEqual(
-    initialSfen('standard').split(' ')[0],
-  );
-  expect(makeBoardSfen('standard', Board.empty())).toEqual('9/9/9/9/9/9/9/9/9');
+test.each(RULES)('rules - parse sfen and back', (rules) => {
+  const pos = parseSfen(rules, initialSfen(rules), false).unwrap();
+  expect(makeSfen(pos)).toBe(initialSfen(rules));
 });
 
-test('make initial sfen', () => {
-  expect(makeSfen(defaultPosition('standard'))).toEqual(initialSfen('standard'));
+test('make board sfen', () => {
+  expect(makeBoardSfen('standard', Board.empty())).toEqual('9/9/9/9/9/9/9/9/9');
 });
 
 test('parse initial sfen', () => {
   const pos = parseSfen('standard', initialSfen('standard'), true).unwrap();
-  expect(pos.board).toEqual(defaultPosition('standard').board);
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
   expect(pos.moveNumber).toEqual(1);
 });
 
 test('partial sfen', () => {
-  const pos = parseSfen('standard', initialSfen('standard').split(' ')[0], true).unwrap();
-  expect(pos.board).toEqual(defaultPosition('standard').board);
+  const partialSfen = initialSfen('standard').split(' ')[0];
+  const pos = parseSfen('standard', partialSfen, true).unwrap();
+  const remadePartialSfen = makeSfen(pos).split(' ')[0];
+  expect(remadePartialSfen).toBe(partialSfen);
   expect(pos.hands).toEqual(Hands.empty());
   expect(pos.turn).toEqual('sente');
   expect(pos.moveNumber).toEqual(1);
@@ -61,44 +60,32 @@ test.each([
 
 test('minishogi sfen', () => {
   const pos = parseSfen('minishogi', 'rbsgk/4p/5/P4/KGSBR b - 1', true).unwrap();
-  expect(pos).toEqual(defaultPosition('minishogi'));
   expect(makeBoardSfen('minishogi', pos.board)).toEqual('rbsgk/4p/5/P4/KGSBR');
-  expect(makeBoardSfen('minishogi', defaultPosition('minishogi').board)).toEqual(
-    'rbsgk/4p/5/P4/KGSBR',
-  );
   expect(makeSfen(pos)).toEqual(initialSfen('minishogi'));
 });
 
 test('chushogi sfen', () => {
   const pos = parseSfen(
     'chushogi',
-    'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b - 1',
-    true,
-  ).unwrap();
-  expect(pos).toEqual(defaultPosition('chushogi'));
-  expect(makeSfen(pos)).toEqual(initialSfen('chushogi'));
-
-  const pos2 = parseSfen(
-    'chushogi',
     'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGKEGSCFL b 5e 1',
     true,
   ).unwrap();
-  expect(pos2.lastMoveOrDrop).toEqual({ to: parseSquareName('5e') });
-  expect(pos2.lastLionCapture).toEqual(parseSquareName('5e'));
+  expect(pos.lastMoveOrDrop).toEqual({ to: parseSquareName('5e') });
+  expect(pos.lastLionCapture).toEqual(parseSquareName('5e'));
 
-  const pos3 = parseSfen(
+  const pos2 = parseSfen(
     'chushogi',
     '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1',
     true,
   ).unwrap();
-  expect(makeSfen(pos3)).toEqual(
+  expect(makeSfen(pos2)).toEqual(
     '+l+f+c+s+g+ek+g+s+c+f+l/+a1+b1+t+x+o+t1+b1+a/+m+v+r+h+dqn+d+h+r+v+m/+p+p+p+p+p+p+p+p+p+p+p+p/3+i4+i3/12/12/3+I4+I3/+P+P+P+P+P+P+P+P+P+P+P+P/+M+V+R+H+DNQ+D+H+R+V+M/+A1+B1+T+O+X+T1+B1+A/+L+F+C+S+GK+E+G+S+C+F+L b - 1',
   );
 
   expect(parseSfen('chushogi', '12/12/7k3p/12/7K4/12/12/9+E2/12/3X8/12/12 b', true).isOk).toBe(
     true,
   );
-  expect(parseSfen('chushogi', '12/12/7k3p/12/7K4/12/12/9K2/12/3X8/12/12 b', true).isOk).toBe(
+  expect(parseSfen('chushogi', '12/12/7k3p/12/7K4/12/12/9K2/12/3X3+E4/12/12 b', true).isOk).toBe(
     false,
   );
 });

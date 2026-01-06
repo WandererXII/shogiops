@@ -26,10 +26,6 @@ test.each(annanPerfts)('annanshogi perft: %s (%s): %s', (sfen, depth, res) => {
   expect(perft(pos, depth)).toBe(res);
 });
 
-test('annanshogi default', () => {
-  expect(Annanshogi.default()).toEqual(parseSfen('annanshogi', initialSfen('annanshogi')).unwrap());
-});
-
 test('pieces in dead zone', () => {
   const posRes = parseSfen(
     'annanshogi',

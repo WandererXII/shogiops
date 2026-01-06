@@ -22,8 +22,13 @@ export function dropDests(dropDests: Map<PieceName, SquareSet>): string {
   return lines.join('\n');
 }
 
-export function perft(pos: Position, depth: number, log = false): number {
+export function perft(
+  pos: Position,
+  depth: number,
+  options: { log?: boolean; ignoreEnd?: boolean } = {},
+): number {
   if (depth < 1) return 1;
+  if (!options.ignoreEnd && pos.isEnd()) return 0;
 
   const logs: string[] = [];
   let nodes = 0;
@@ -40,8 +45,8 @@ export function perft(pos: Position, depth: number, log = false): number {
         const child = pos.clone(),
           move = { from, to, promotion };
         child.play(move);
-        const children = perft(child, depth - 1, false);
-        if (log) logs.push(`${makeUsi(move)}: ${children}`);
+        const children = perft(child, depth - 1, options);
+        if (options.log) logs.push(`${makeUsi(move)}: ${children}`);
         nodes += children;
       }
       const roleWithLionPower: Role[] = ['lion', 'lionpromoted', 'eagle', 'falcon'];
@@ -51,8 +56,8 @@ export function perft(pos: Position, depth: number, log = false): number {
           const child = pos.clone(),
             move: NormalMove = { from, to, midStep: mid };
           child.play(move);
-          const children = perft(child, depth - 1, false);
-          if (log) logs.push(`${makeUsi(move)}: ${children}`);
+          const children = perft(child, depth - 1, options);
+          if (options.log) logs.push(`${makeUsi(move)}: ${children}`);
           nodes += children;
         }
       }
@@ -67,12 +72,12 @@ export function perft(pos: Position, depth: number, log = false): number {
         const child = pos.clone(),
           drop: DropMove = { role: prom ? promote(pos.rules)(piece.role)! : piece.role, to };
         child.play(drop);
-        const children = perft(child, depth - 1, false);
-        if (log) logs.push(`${makeUsi(drop)}: ${children}`);
+        const children = perft(child, depth - 1, options);
+        if (options.log) logs.push(`${makeUsi(drop)}: ${children}`);
         nodes += children;
       }
     }
   }
-  if (log) console.log(logs.join('\n'));
+  if (options.log) console.log(logs.join('\n'));
   return nodes;
 }

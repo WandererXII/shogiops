@@ -1,8 +1,8 @@
+import { expect, test } from 'vitest';
 import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 import { Shogi } from '@/variant/shogi.js';
 import { defaultPosition } from '@/variant/variant.js';
-import { expect, test } from 'vitest';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftStandard.js';
 import { usiFixture } from '../fixtures/usi.js';
@@ -146,19 +146,19 @@ test('test promotions', () => {
 // http://www.talkchess.com/forum3/viewtopic.php?t=60445
 test('starting perft', () => {
   const pos = Shogi.default();
-  expect(perft(pos, 0, false)).toBe(1);
-  expect(perft(pos, 1, false)).toBe(30);
-  expect(perft(pos, 2, false)).toBe(900);
-  expect(perft(pos, 3, false)).toBe(25470);
-  expect(perft(pos, 4, false)).toBe(719731);
-  //expect(perft(pos, 5, false)).toBe(19861490);
+  expect(perft(pos, 0)).toBe(1);
+  expect(perft(pos, 1)).toBe(30);
+  expect(perft(pos, 2)).toBe(900);
+  expect(perft(pos, 3)).toBe(25470);
+  expect(perft(pos, 4)).toBe(719731);
+  //expect(perft(pos, 5)).toBe(19861490);
 });
 
 test('blockers perft', () => {
   const posLance = parseSfen('standard', '4k4/4g4/9/4L4/9/9/9/4K4/9 w - 1').unwrap();
   const posRook = parseSfen('standard', '4k4/4g4/9/4R4/9/9/9/4K4/9 w - 1').unwrap();
-  expect(perft(posLance, 1, false)).toBe(5);
-  expect(perft(posRook, 1, false)).toBe(5);
+  expect(perft(posLance, 1)).toBe(5);
+  expect(perft(posRook, 1)).toBe(5);
 });
 
 test('capturing', () => {
@@ -194,8 +194,8 @@ test('promotion', () => {
 
 test.each(random)('random perft: %s: %s', (_, sfen, d1, d2) => {
   const pos = parseSfen('standard', sfen).unwrap();
-  expect(perft(pos, 1, false)).toBe(d1);
-  expect(perft(pos, 2, false)).toBe(d2);
+  expect(perft(pos, 1)).toBe(d1);
+  expect(perft(pos, 2)).toBe(d2);
 });
 
 test('pawn checkmate legality', () => {
@@ -243,6 +243,6 @@ test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
     const [sfen, depth, res] = p,
       pos = parseSfen('standard', sfen || initialSfen('standard')).unwrap();
-    expect(perft(pos, depth, false)).toBe(res);
+    expect(perft(pos, depth)).toBe(res);
   });
 });

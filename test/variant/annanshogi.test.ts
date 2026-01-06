@@ -1,9 +1,9 @@
+import { expect, test } from 'vitest';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { SquareSet } from '@/square-set.js';
 import { parseSquareName, parseUsi } from '@/util.js';
 import { Annanshogi } from '@/variant/annanshogi.js';
 import { fullSquareSet } from '@/variant/util.js';
-import { expect, test } from 'vitest';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftAnnan.js';
 
@@ -23,7 +23,7 @@ const annanPerfts: [string, number, number][] = [
 
 test.each(annanPerfts)('annanshogi perft: %s (%s): %s', (sfen, depth, res) => {
   const pos = parseSfen('annanshogi', sfen || initialSfen('annanshogi')).unwrap();
-  expect(perft(pos, depth, false)).toBe(res);
+  expect(perft(pos, depth)).toBe(res);
 });
 
 test('annanshogi default', () => {
@@ -46,7 +46,7 @@ test('only friednly pieces give you moves', () => {
     'annanshogi',
     '4k3S/r1l1gs3/n+N1s5/L+P4G1+B/1Pp1p1Rb1/4PNpN1/3+pPGPP1/6G1P/1p1K2S1+l w',
   ).unwrap();
-  expect(perft(pos2, 1, false)).toBe(35);
+  expect(perft(pos2, 1)).toBe(35);
 });
 
 test('do not allow capturing move givers that prevent check', () => {
@@ -133,22 +133,22 @@ test('capture attacker move giver', () => {
   expect(pos.moveDests(parseSquareName('2d')).has(parseSquareName('4f'))).toBe(true);
   const posS = parseSfen('annanshogi', '5k3/9/9/5l3/5p3/9/2B6/9/5K3 b - 1').unwrap();
   expect(posS.isLegal(parseUsi('7g4d')!)).toBe(true);
-  expect(perft(posS, 1, false)).toBe(5);
+  expect(perft(posS, 1)).toBe(5);
   // 2 checkers
   const pos2 = parseSfen(
     'annanshogi',
     'P1G+N3s1/lp7/2+N+Pp+P1+L+P/1sB1kP3/N1pl1s3/g6p1/+p1B2+p+p+l+p/1+s+r+n4R/1g1pK1+p2 b G3P 167',
   ).unwrap();
-  expect(perft(pos2, 1, false)).toBe(2);
+  expect(perft(pos2, 1)).toBe(2);
 
   expect(pos2.isLegal(parseUsi('1h6h')!)).toBe(true);
   expect(pos2.isLegal(parseUsi('7g6h')!)).toBe(true);
 
   const pos3 = parseSfen('annanshogi', '8k/9/3l5/9/9/9/9/2G+n2+p2/3pK4 b - 1').unwrap();
-  expect(perft(pos3, 1, false)).toBe(1);
+  expect(perft(pos3, 1)).toBe(1);
 
   const pos4 = parseSfen('annanshogi', '8k/9/3ll4/9/9/9/4+R4/2G+p2+p2/3pK4 b').unwrap();
-  expect(perft(pos4, 1, false)).toBe(1);
+  expect(perft(pos4, 1)).toBe(1);
 
   const pos5 = parseSfen('annanshogi', '9/9/2B3B2/9/4k4/9/2B3B2/9/8K w').unwrap();
   expect(pos5.isLegal(parseUsi('5e5d')!)).toBe(true);
@@ -168,17 +168,17 @@ test('capture attacker move giver - with king', () => {
 test('do not allow discovering check by capturing move giver', () => {
   const pos = parseSfen('annanshogi', '3k5/9/9/3p5/3bG4/9/9/6K2/9 b').unwrap();
   expect(pos.moveDests(parseSquareName('5e')).has(parseSquareName('6d'))).toBe(false);
-  expect(perft(pos, 1, false)).toBe(13);
+  expect(perft(pos, 1)).toBe(13);
 
   const pos2 = parseSfen('annanshogi', '6k2/p8/9/3Bs4/3R5/9/9/6K2/9 w').unwrap();
   expect(pos2.moveDests(parseSquareName('5d')).has(parseSquareName('6e'))).toBe(false);
-  expect(perft(pos2, 1, false)).toBe(10);
+  expect(perft(pos2, 1)).toBe(10);
 });
 
 test('allow moving/capturing square behind attacker with king', () => {
   const pos = parseSfen('annanshogi', '5K3/9/9/9/3B5/4k4/9/9/9 w - 1').unwrap();
   expect(pos.moveDests(parseSquareName('5f')).has(parseSquareName('6f'))).toBe(true);
-  expect(perft(pos, 1, false)).toBe(7);
+  expect(perft(pos, 1)).toBe(7);
   const pos2 = parseSfen('annanshogi', '5K3/9/9/9/3B5/3Bk4/9/9/9 w - 1').unwrap();
   expect(pos2.moveDests(parseSquareName('5f')).has(parseSquareName('6f'))).toBe(true);
 });
@@ -196,6 +196,6 @@ test('randomly generated perfts - for consistency', () => {
     const [sfen, depth, res] = p,
       pos = parseSfen('annanshogi', sfen || initialSfen('annanshogi')).unwrap();
     expect(pos.isEnd()).toBe(false);
-    expect(perft(pos, depth, false)).toBe(res);
+    expect(perft(pos, depth)).toBe(res);
   });
 });

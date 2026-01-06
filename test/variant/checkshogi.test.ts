@@ -6,12 +6,12 @@ import { perft } from '../debug.js';
 
 test('starting perft', () => {
   const pos = Checkshogi.default();
-  expect(perft(pos, 0, false)).toBe(1);
-  expect(perft(pos, 1, false)).toBe(30);
-  expect(perft(pos, 2, false)).toBe(900);
-  expect(perft(pos, 3, false)).toBe(25470);
-  expect(perft(pos, 4, false)).toBe(719408);
-  // expect(perft(pos, 5, false)).toBe(19839626);
+  expect(perft(pos, 0)).toBe(1);
+  expect(perft(pos, 1)).toBe(30);
+  expect(perft(pos, 2)).toBe(900);
+  expect(perft(pos, 3)).toBe(25470);
+  expect(perft(pos, 4)).toBe(719408);
+  // expect(perft(pos, 5)).toBe(19839626);
 });
 
 test('check win', () => {

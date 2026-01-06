@@ -1,8 +1,8 @@
+import { expect, test } from 'vitest';
 import { shogigroundSecondLionStep } from '@/compat.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { opposite, parseSquareName, parseUsi } from '@/util.js';
 import { Chushogi } from '@/variant/chushogi.js';
-import { expect, test } from 'vitest';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftChushogi.js';
 
@@ -231,14 +231,17 @@ test('bare king', () => {
 const chushogiPerfts: [string, number, number][] = [
   ['', 1, 36],
   ['', 2, 1296],
+  ['11k/12/12/12/12/4r7/12/12/9n2/4+o7/12/6B4K b 8j', 1, 7],
+  ['11k/12/12/12/12/4r7/12/12/9n2/4+o7/12/6B4K b -', 1, 8],
+];
+
+const soloPiecePefts: [string, number, number][] = [
   ['12/12/12/12/12/12/5N6/12/12/12/12/12 b', 1, 24 + 8 * 8], // solo lion
   ['12/12/12/12/12/12/5+O6/12/12/12/12/12 b', 1, 24 + 8 * 8], // solo +lion
   ['12/12/12/12/12/12/5+H6/12/12/12/12/12 b', 1, 41], // solo falcon
   ['12/12/12/12/12/12/5+D6/12/12/12/12/12 b', 1, 40], // solo eagle
   ['12/12/12/12/7g4/6n5/5N6/12/12/12/12/12 b - 1', 1, 24 + 8 * 8],
   ['12/12/12/12/4B2l4/4S7/5N6/7n4/12/12/12/12 b - 1', 1, 98],
-  ['11k/12/12/12/12/4r7/12/12/9n2/4+o7/12/6B4K b 8j', 1, 7],
-  ['11k/12/12/12/12/4r7/12/12/9n2/4+o7/12/6B4K b -', 1, 8],
 ];
 
 test('chushogi default', () => {
@@ -247,7 +250,12 @@ test('chushogi default', () => {
 
 test.each(chushogiPerfts)('chushogi perft: %s (%s): %s', (sfen, depth, res) => {
   const pos = parseSfen('chushogi', sfen || initialSfen('chushogi')).unwrap();
-  expect(perft(pos, depth, false)).toBe(res);
+  expect(perft(pos, depth)).toBe(res);
+});
+
+test.each(soloPiecePefts)('chushogi solo piece perft: %s (%s): %s', (sfen, depth, res) => {
+  const pos = parseSfen('chushogi', sfen || initialSfen('chushogi')).unwrap();
+  expect(perft(pos, depth, { ignoreEnd: true })).toBe(res);
 });
 
 test('randomly generated perfts - for consistency', () => {
@@ -255,6 +263,6 @@ test('randomly generated perfts - for consistency', () => {
     const [sfen, depth, res] = p,
       pos = parseSfen('chushogi', sfen || initialSfen('chushogi')).unwrap();
     expect(pos.isEnd()).toBe(false);
-    expect(perft(pos, depth, false)).toBe(res);
+    expect(perft(pos, depth)).toBe(res);
   });
 });

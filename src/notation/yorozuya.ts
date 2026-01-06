@@ -23,9 +23,9 @@ export function convertJapaneseToYorozuya(jp: string): string {
       // matches full width numbers
       .replace(/[\d\uFF10-\uFF19]+/g, (match) => {
         const normalized = match.replace(/[\uFF10-\uFF19]/g, (char) =>
-            String.fromCharCode(char.charCodeAt(0) - 0xff10 + 48),
-          ),
-          index = parseInt(normalized, 10) - 1;
+          String.fromCharCode(char.charCodeAt(0) - 0xff10 + 48),
+        );
+        const index = Number.parseInt(normalized, 10) - 1;
 
         return DIZHI[index] || match;
       })

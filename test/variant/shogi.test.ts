@@ -1,7 +1,6 @@
 import { expect, test } from 'vitest';
 import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
-import { Shogi } from '@/variant/shogi.js';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftStandard.js';
 import { usiFixture } from '../fixtures/usi.js';
@@ -242,8 +241,8 @@ test('prod 500 usi', () => {
 
 test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
-    const [sfen, depth, res] = p,
-      pos = parseSfen('standard', sfen || initialSfen('standard')).unwrap();
+    const [sfen, depth, res] = p;
+    const pos = parseSfen('standard', sfen || initialSfen('standard')).unwrap();
     expect(perft(pos, depth)).toBe(res);
   });
 });

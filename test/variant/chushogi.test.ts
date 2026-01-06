@@ -2,7 +2,6 @@ import { expect, test } from 'vitest';
 import { shogigroundSecondLionStep } from '@/compat.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { opposite, parseSquareName, parseUsi } from '@/util.js';
-import { Chushogi } from '@/variant/chushogi.js';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftChushogi.js';
 
@@ -100,9 +99,9 @@ test('lion moves', () => {
   pos4.play(parseUsi('6h7g')!);
   expect(pos4.isLegal(parseUsi('2d3e')!)).toBe(true);
 
-  const pos5 = parseSfen('chushogi', '12/12/12/12/12/12/12/12/4+ho3n2/4N7/12/6B5 w').unwrap(),
-    pos5Alt = pos5.clone(),
-    pos5Alt2 = pos5.clone();
+  const pos5 = parseSfen('chushogi', '12/12/12/12/12/12/12/12/4+ho3n2/4N7/12/6B5 w').unwrap();
+  const pos5Alt = pos5.clone();
+  const pos5Alt2 = pos5.clone();
   pos5.play(parseUsi('8i8j8i')!);
   pos5Alt.play(parseUsi('8i8j')!);
   pos5Alt2.play(parseUsi('7i8j+')!);
@@ -256,8 +255,8 @@ test.each(soloPiecePefts)('chushogi solo piece perft: %s (%s): %s', (sfen, depth
 
 test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
-    const [sfen, depth, res] = p,
-      pos = parseSfen('chushogi', sfen || initialSfen('chushogi')).unwrap();
+    const [sfen, depth, res] = p;
+    const pos = parseSfen('chushogi', sfen || initialSfen('chushogi')).unwrap();
     expect(pos.isEnd()).toBe(false);
     expect(perft(pos, depth)).toBe(res);
   });

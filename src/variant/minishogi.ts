@@ -20,14 +20,14 @@ export class Minishogi extends Position {
   }
 
   static from(setup: Setup, strict: boolean): Result<Minishogi, PositionError> {
-    const pos = new this();
+    const pos = new Minishogi();
     pos.fromSetup(setup);
     return pos.validate(strict).map((_) => pos);
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
-    const defender = opposite(attacker),
-      board = this.board;
+    const defender = opposite(attacker);
+    const board = this.board;
     return board.color(attacker).intersect(
       rookAttacks(square, occupied)
         .intersect(board.roles('rook', 'dragon'))

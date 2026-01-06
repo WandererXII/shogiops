@@ -26,33 +26,33 @@ export function makeJapaneseMoveOrDrop(
   } else {
     const piece = pos.board.get(md.from);
     if (piece) {
-      const roleStr = roleToKanji(piece.role),
-        ambPieces = aimingAt(
-          pos,
-          pos.board
-            .roles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
-            .intersect(pos.board.color(piece.color)),
-          md.to,
-        ).without(md.from),
-        ambStr = ambPieces.isEmpty()
-          ? ''
-          : disambiguate(pos.rules, piece, md.from, md.to, ambPieces);
+      const roleStr = roleToKanji(piece.role);
+      const ambPieces = aimingAt(
+        pos,
+        pos.board
+          .roles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
+          .intersect(pos.board.color(piece.color)),
+        md.to,
+      ).without(md.from);
+      const ambStr = ambPieces.isEmpty()
+        ? ''
+        : disambiguate(pos.rules, piece, md.from, md.to, ambPieces);
 
       if (defined(md.midStep)) {
-        const midCapture = pos.board.get(md.midStep),
-          igui = !!midCapture && md.to === md.from;
+        const midCapture = pos.board.get(md.midStep);
+        const igui = !!midCapture && md.to === md.from;
         if (igui) return `${makeJapaneseSquare(md.midStep)}居喰い`;
         else if (md.to === md.from) return 'じっと';
         else
           return `${makeJapaneseSquare(md.midStep)}・${makeJapaneseSquare(md.to)}${roleStr}${ambStr}`;
       } else {
         const destStr =
-            (lastDest ?? pos.lastMoveOrDrop?.to) === md.to ? '同　' : makeJapaneseSquare(md.to),
-          promStr = md.promotion
-            ? '成'
-            : pieceCanPromote(pos.rules)(piece, md.from, md.to, pos.board.get(md.to))
-              ? '不成'
-              : '';
+          (lastDest ?? pos.lastMoveOrDrop?.to) === md.to ? '同　' : makeJapaneseSquare(md.to);
+        const promStr = md.promotion
+          ? '成'
+          : pieceCanPromote(pos.rules)(piece, md.from, md.to, pos.board.get(md.to))
+            ? '不成'
+            : '';
         return `${destStr}${roleStr}${ambStr}${promStr}`;
       }
     } else return undefined;
@@ -76,14 +76,14 @@ function disambiguate(
   dest: Square,
   others: SquareSet,
 ): string {
-  const myRank = squareRank(orig),
-    myFile = squareFile(orig);
+  const myRank = squareRank(orig);
+  const myFile = squareFile(orig);
 
-  const destRank = squareRank(dest),
-    destFile = squareFile(dest);
+  const destRank = squareRank(dest);
+  const destFile = squareFile(dest);
 
-  const movingUp = myRank > destRank,
-    movingDown = myRank < destRank;
+  const movingUp = myRank > destRank;
+  const movingDown = myRank < destRank;
 
   const jumpsButShouldnt =
     rules === 'annanshogi' &&
@@ -118,9 +118,9 @@ function disambiguate(
   )
     return verticalDisambiguation(rules, piece, movingUp, movingDown, jumpsButShouldnt);
 
-  const othersFiles = [...others].map(squareFile),
-    rightest = othersFiles.reduce((prev, cur) => (prev < cur ? prev : cur)),
-    leftest = othersFiles.reduce((prev, cur) => (prev > cur ? prev : cur));
+  const othersFiles = [...others].map(squareFile);
+  const rightest = othersFiles.reduce((prev, cur) => (prev < cur ? prev : cur));
+  const leftest = othersFiles.reduce((prev, cur) => (prev > cur ? prev : cur));
 
   // is this piece positioned most on one side or in the middle
   if (

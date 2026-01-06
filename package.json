@@ -49,9 +49,8 @@
     "compile": "tsc",
     "type-check": "tsc --noEmit",
     "test": "vitest --config test/vitest.config.ts",
-    "lint": "eslint --cache",
-    "format": "biome check",
-    "format:write": "biome check --write ."
+    "check": "biome check && eslint --cache",
+    "check:write": "biome check --write ."
   },
   "files": [
     "dist",

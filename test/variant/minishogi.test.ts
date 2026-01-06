@@ -1,6 +1,5 @@
 import { expect, test } from 'vitest';
 import { initialSfen, parseSfen } from '@/sfen.js';
-import { Minishogi } from '@/variant/minishogi.js';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftMinishogi.js';
 
@@ -24,8 +23,8 @@ test('minishogi checkmate', () => {
 
 test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
-    const [sfen, depth, res] = p,
-      pos = parseSfen('minishogi', sfen || initialSfen('minishogi')).unwrap();
+    const [sfen, depth, res] = p;
+    const pos = parseSfen('minishogi', sfen || initialSfen('minishogi')).unwrap();
     expect(perft(pos, depth)).toBe(res);
   });
 });

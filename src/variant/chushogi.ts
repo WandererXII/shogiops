@@ -1,4 +1,4 @@
-import { Result } from '@badrap/result';
+import type { Result } from '@badrap/result';
 import {
   attacks,
   bishopAttacks,
@@ -29,10 +29,10 @@ import {
   whiteHorseAttacks,
 } from '../attacks.js';
 import { SquareSet } from '../square-set.js';
-import type { Color, MoveOrDrop, Outcome, Piece, Role, Setup, Square } from '../types.js';
+import type { Color, MoveOrDrop, Outcome, Piece, Setup, Square } from '../types.js';
 import { defined, isMove, lionRoles, opposite, squareDist } from '../util.js';
 import type { Context } from './position.js';
-import { Position, PositionError } from './position.js';
+import { Position, type PositionError } from './position.js';
 import { dimensions, fullSquareSet } from './util.js';
 
 export class Chushogi extends Position {
@@ -41,7 +41,7 @@ export class Chushogi extends Position {
   }
 
   static from(setup: Setup, strict: boolean): Result<Chushogi, PositionError> {
-    const pos = new this();
+    const pos = new Chushogi();
     pos.fromSetup(setup);
     return pos.validate(strict).map((_) => pos);
   }
@@ -54,8 +54,8 @@ export class Chushogi extends Position {
   };
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
-    const defender = opposite(attacker),
-      board = this.board;
+    const defender = opposite(attacker);
+    const board = this.board;
     return board.color(attacker).intersect(
       lanceAttacks(square, defender, occupied)
         .intersect(board.role('lance'))
@@ -138,8 +138,8 @@ export class Chushogi extends Position {
 
     let pseudo = attacks(piece, square, this.board.occupied).diff(this.board.color(ctx.color));
 
-    const oppColor = opposite(ctx.color),
-      oppLions = this.board.color(oppColor).intersect(this.board.roles('lion', 'lionpromoted'));
+    const oppColor = opposite(ctx.color);
+    const oppLions = this.board.color(oppColor).intersect(this.board.roles('lion', 'lionpromoted'));
 
     // considers only the first step destinations, for second step - secondLionStepDests
     if (lionRoles.includes(piece.role)) {
@@ -173,18 +173,18 @@ export class Chushogi extends Position {
   }
 
   isDraw(_ctx?: Context): boolean {
-    const oneWayRoles = this.board.roles('pawn', 'lance'),
-      occ = this.board.occupied.diff(
-        oneWayRoles
-          .intersect(this.board.color('sente').intersect(SquareSet.fromRank(0)))
-          .union(
-            oneWayRoles.intersect(
-              this.board
-                .color('gote')
-                .intersect(SquareSet.fromRank(dimensions(this.rules).ranks - 1)),
-            ),
+    const oneWayRoles = this.board.roles('pawn', 'lance');
+    const occ = this.board.occupied.diff(
+      oneWayRoles
+        .intersect(this.board.color('sente').intersect(SquareSet.fromRank(0)))
+        .union(
+          oneWayRoles.intersect(
+            this.board
+              .color('gote')
+              .intersect(SquareSet.fromRank(dimensions(this.rules).ranks - 1)),
           ),
-      );
+        ),
+    );
     return (
       occ.size() === 2 &&
       this.kingsOf('sente').isSingleSquare() &&
@@ -197,34 +197,32 @@ export class Chushogi extends Position {
   isBareKing(ctx?: Context): boolean {
     if (ctx) {
       // was our king bared
-      const color = ctx.color,
-        theirColor = opposite(color),
-        ourKing = this.kingsOf(color).singleSquare(),
-        ourPieces = this.board
-          .color(color)
-          .diff(
-            this.board
-              .roles('pawn', 'lance')
-              .intersect(
-                SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1),
-              ),
-          ),
-        theirKing = this.kingsOf(theirColor).singleSquare(),
-        theirPieces = this.board
-          .color(theirColor)
-          .diff(
-            this.board
-              .roles('pawn', 'gobetween')
-              .union(
-                this.board
-                  .role('lance')
-                  .intersect(
-                    SquareSet.fromRank(
-                      theirColor === 'sente' ? 0 : dimensions(this.rules).ranks - 1,
-                    ),
-                  ),
-              ),
-          );
+      const color = ctx.color;
+      const theirColor = opposite(color);
+      const ourKing = this.kingsOf(color).singleSquare();
+      const ourPieces = this.board
+        .color(color)
+        .diff(
+          this.board
+            .roles('pawn', 'lance')
+            .intersect(
+              SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1),
+            ),
+        );
+      const theirKing = this.kingsOf(theirColor).singleSquare();
+      const theirPieces = this.board
+        .color(theirColor)
+        .diff(
+          this.board
+            .roles('pawn', 'gobetween')
+            .union(
+              this.board
+                .role('lance')
+                .intersect(
+                  SquareSet.fromRank(theirColor === 'sente' ? 0 : dimensions(this.rules).ranks - 1),
+                ),
+            ),
+        );
 
       return (
         ourPieces.size() === 1 &&
@@ -294,13 +292,13 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
     let pseudoDests = kingAttacks(midSq)
       .diff(before.board.color(before.turn).without(initialSq))
       .intersect(fullSquareSet(before.rules));
-    const oppColor = opposite(before.turn),
-      oppLions = before.board
-        .color(oppColor)
-        .intersect(before.board.roles('lion', 'lionpromoted'))
-        .intersect(pseudoDests),
-      capture = before.board.get(midSq),
-      clearOccupied = before.board.occupied.withoutMany(initialSq, midSq);
+    const oppColor = opposite(before.turn);
+    const oppLions = before.board
+      .color(oppColor)
+      .intersect(before.board.roles('lion', 'lionpromoted'))
+      .intersect(pseudoDests);
+    const capture = before.board.get(midSq);
+    const clearOccupied = before.board.occupied.withoutMany(initialSq, midSq);
 
     // can't capture a non-adjacent lion protected by an enemy piece,
     // unless we captured something valuable first (not a pawn or go-between)
@@ -337,11 +335,11 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
 }
 
 function removeLions(pos: Chushogi, dests: SquareSet): SquareSet {
-  const oppColor = opposite(pos.turn),
-    oppLions = pos.board
-      .color(oppColor)
-      .intersect(pos.board.roles('lion', 'lionpromoted'))
-      .intersect(dests);
+  const oppColor = opposite(pos.turn);
+  const oppLions = pos.board
+    .color(oppColor)
+    .intersect(pos.board.roles('lion', 'lionpromoted'))
+    .intersect(dests);
   for (const lion of oppLions) {
     if (lion !== pos.lastLionCapture) dests = dests.without(lion);
   }

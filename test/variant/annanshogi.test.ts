@@ -2,7 +2,6 @@ import { expect, test } from 'vitest';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { SquareSet } from '@/square-set.js';
 import { parseSquareName, parseUsi } from '@/util.js';
-import { Annanshogi } from '@/variant/annanshogi.js';
 import { fullSquareSet } from '@/variant/util.js';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftAnnan.js';
@@ -54,8 +53,8 @@ test('do not allow capturing move givers that prevent check', () => {
 });
 
 test('checkmate', () => {
-  const pos = parseSfen('annanshogi', '4k4/4+R4/9/4L4/9/+B8/9/7GS/7GK w - 1').unwrap(),
-    pos2 = parseSfen('annanshogi', '4k4/9/9/4P4/4L4/4N4/4GP3/3P1L3/3L1S3 w - 1').unwrap();
+  const pos = parseSfen('annanshogi', '4k4/4+R4/9/4L4/9/+B8/9/7GS/7GK w - 1').unwrap();
+  const pos2 = parseSfen('annanshogi', '4k4/9/9/4P4/4L4/4N4/4GP3/3P1L3/3L1S3 w - 1').unwrap();
 
   expect(pos.outcome()).toEqual({ result: 'checkmate', winner: 'sente' });
   expect(pos2.outcome()).toEqual({ result: 'checkmate', winner: 'sente' });
@@ -189,8 +188,8 @@ test('proper parse', () => {
 
 test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
-    const [sfen, depth, res] = p,
-      pos = parseSfen('annanshogi', sfen || initialSfen('annanshogi')).unwrap();
+    const [sfen, depth, res] = p;
+    const pos = parseSfen('annanshogi', sfen || initialSfen('annanshogi')).unwrap();
     expect(pos.isEnd()).toBe(false);
     expect(perft(pos, depth)).toBe(res);
   });

@@ -19,8 +19,8 @@ export function squareSetToSquareNames(sqs: SquareSet): SquareName[] {
 }
 
 export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[]> {
-  const result: Map<SquareName, SquareName[]> = new Map(),
-    ctx = pos.ctx();
+  const result: Map<SquareName, SquareName[]> = new Map();
+  const ctx = pos.ctx();
   for (const [from, squares] of pos.allMoveDests(ctx)) {
     if (squares.nonEmpty()) {
       const d = squareSetToSquareNames(squares);
@@ -31,8 +31,8 @@ export function shogigroundMoveDests(pos: Position): Map<SquareName, SquareName[
 }
 
 export function shogigroundDropDests(pos: Position): Map<PieceName, SquareName[]> {
-  const result: Map<PieceName, SquareName[]> = new Map(),
-    ctx = pos.ctx();
+  const result: Map<PieceName, SquareName[]> = new Map();
+  const ctx = pos.ctx();
   for (const [pieceName, squares] of pos.allDropDests(ctx)) {
     if (squares.nonEmpty()) {
       const d = squareSetToSquareNames(squares);
@@ -48,8 +48,8 @@ export function shogigroundSecondLionStep(
   initialSq: SquareName,
   midSq: SquareName,
 ): Map<SquareName, SquareName[]> {
-  const result: Map<SquareName, SquareName[]> = new Map(),
-    squares = secondLionStepDests(before, parseSquareName(initialSq), parseSquareName(midSq));
+  const result: Map<SquareName, SquareName[]> = new Map();
+  const squares = secondLionStepDests(before, parseSquareName(initialSq), parseSquareName(midSq));
   if (squares.nonEmpty()) {
     const d = squareSetToSquareNames(squares);
     result.set(makeSquareName(parseSquareName(midSq)), d);
@@ -83,11 +83,9 @@ export function scalashogiCharPair(md: MoveOrDrop, rules: Rules): string {
   }
   function lionMoveToChar(orig: Square, dest: Square, ms: Square, rules: Rules): number {
     const toMidStep =
-        (squareFile(orig) - squareFile(ms) + 1 + 3 * (squareRank(orig) - squareRank(ms) + 1) + 4) %
-        9,
-      toDest =
-        (squareFile(ms) - squareFile(dest) + 1 + 3 * (squareRank(ms) - squareRank(dest) + 1) + 4) %
-        9;
+      (squareFile(orig) - squareFile(ms) + 1 + 3 * (squareRank(orig) - squareRank(ms) + 1) + 4) % 9;
+    const toDest =
+      (squareFile(ms) - squareFile(dest) + 1 + 3 * (squareRank(ms) - squareRank(dest) + 1) + 4) % 9;
     return charOffset + fullSquareSet(rules).size() + toMidStep + 8 * toDest;
   }
 
@@ -99,10 +97,10 @@ export function scalashogiCharPair(md: MoveOrDrop, rules: Rules): string {
         ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'].indexOf(md.role),
     );
   else {
-    const from = squareToCharCode(md.from),
-      to = defined(md.midStep)
-        ? lionMoveToChar(md.from, md.to, md.midStep, rules)
-        : squareToCharCode(md.to);
+    const from = squareToCharCode(md.from);
+    const to = defined(md.midStep)
+      ? lionMoveToChar(md.from, md.to, md.midStep, rules)
+      : squareToCharCode(md.to);
     if (md.promotion) return String.fromCharCode(to, from);
     else return String.fromCharCode(from, to);
   }

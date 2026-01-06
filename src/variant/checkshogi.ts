@@ -1,5 +1,5 @@
 import type { Result } from '@badrap/result';
-import { SquareSet } from '../square-set.js';
+import type { SquareSet } from '../square-set.js';
 import type { Color, Outcome, Piece, Setup, Square } from '../types.js';
 import { opposite } from '../util.js';
 import type { Context, PositionError } from './position.js';
@@ -17,7 +17,7 @@ export class Checkshogi extends Position {
   }
 
   static from(setup: Setup, strict: boolean): Result<Checkshogi, PositionError> {
-    const pos = new this();
+    const pos = new Checkshogi();
     pos.fromSetup(setup);
     return pos.validate(strict).map((_) => pos);
   }

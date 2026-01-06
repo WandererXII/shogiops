@@ -556,23 +556,23 @@ export function filesByRules(rules: Rules): string {
 }
 
 export function pieceToBoardKanji(piece: Piece): string {
-  if (piece.color === 'gote') return 'v' + roleToBoardKanji(piece.role);
+  if (piece.color === 'gote') return `v${roleToBoardKanji(piece.role)}`;
   else return roleToBoardKanji(piece.role);
 }
 
 export function makeNumberSquare(sq: Square): string {
-  const file = squareFile(sq) + 1,
-    rank = squareRank(sq) + 1,
-    fileStr = file >= 10 ? String.fromCharCode(file + 87) : file.toString(),
-    rankStr = rank >= 10 ? String.fromCharCode(rank + 87) : rank.toString();
+  const file = squareFile(sq) + 1;
+  const rank = squareRank(sq) + 1;
+  const fileStr = file >= 10 ? String.fromCharCode(file + 87) : file.toString();
+  const rankStr = rank >= 10 ? String.fromCharCode(rank + 87) : rank.toString();
   return fileStr + rankStr;
 }
 
 // only for single digit boards - something like 111 would be amiguous
 export function parseNumberSquare(str: string): Square | undefined {
   if (str.length !== 2) return;
-  const file = str.charCodeAt(0) - '1'.charCodeAt(0),
-    rank = str.charCodeAt(1) - '1'.charCodeAt(0);
+  const file = str.charCodeAt(0) - '1'.charCodeAt(0);
+  const rank = str.charCodeAt(1) - '1'.charCodeAt(0);
   if (file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
   return file + 16 * rank;
 }
@@ -593,19 +593,20 @@ export function makeJapaneseSquareHalf(sq: Square): string {
 
 export function parseJapaneseSquare(str: string): Square | undefined {
   if (str.length < 2 || str.length > 4) return;
-  const fileOffset = str.length === 2 || (str.length === 3 && str[1] === '十') ? 1 : 2,
-    file =
-      parseInt(
-        str
-          .slice(0, fileOffset)
-          .split('')
-          .map((c) =>
-            c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c,
-          )
-          .join(''),
-      ) - 1,
-    rank = kanjiToNumber(str.slice(fileOffset)) - 1;
-  if (isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
+  const fileOffset = str.length === 2 || (str.length === 3 && str[1] === '十') ? 1 : 2;
+  const file =
+    Number.parseInt(
+      str
+        .slice(0, fileOffset)
+        .split('')
+        .map((c) =>
+          c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c,
+        )
+        .join(''),
+      10,
+    ) - 1;
+  const rank = kanjiToNumber(str.slice(fileOffset)) - 1;
+  if (Number.isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
   return file + 16 * rank;
 }
 
@@ -666,7 +667,7 @@ export function fromKanjiDigit(str: string): number {
 // max 99
 export function numberToKanji(n: number): string {
   n = Math.max(0, Math.min(n, 99));
-  const res = n >= 20 ? toKanjiDigit(Math.floor(n / 10).toString()) + '十' : n >= 10 ? '十' : '';
+  const res = n >= 20 ? `${toKanjiDigit(Math.floor(n / 10).toString())}十` : n >= 10 ? '十' : '';
   return res + toKanjiDigit(Math.floor(n % 10).toString());
 }
 

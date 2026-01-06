@@ -1,3 +1,4 @@
+// biome-ignore format: Perfts
 export const perfts: [string, number, number][] = [
   ['2sg1/3kp/1RpB1/K1SR1/1G3 b B 15', 1, 35],
   ['r2k1/b1sg1/S4/K4/3+p1 b RBPg 33', 1, 54],

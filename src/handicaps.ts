@@ -408,8 +408,8 @@ export const handicaps: Handicap[] = [
 ];
 
 function compareSfens(a: string, b: string): boolean {
-  const aSplit = a.split(' '),
-    bSplit = b.split(' ');
+  const aSplit = a.split(' ');
+  const bSplit = b.split(' ');
 
   return (
     aSplit.length >= 2 &&

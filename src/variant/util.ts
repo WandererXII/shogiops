@@ -34,8 +34,8 @@ export function pieceForcePromote(rules: Rules): (piece: Piece, sq: Square) => b
       return (piece: Piece) => promotableRoles(rules).includes(piece.role);
     default:
       return (piece: Piece, sq: Square) => {
-        const dims = dimensions(rules),
-          rank = squareRank(sq);
+        const dims = dimensions(rules);
+        const rank = squareRank(sq);
         if (piece.role === 'lance' || piece.role === 'pawn')
           return rank === (piece.color === 'sente' ? 0 : dims.ranks - 1);
         else if (piece.role === 'knight')

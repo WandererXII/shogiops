@@ -15,9 +15,16 @@
     "lineWidth": 100
   },
   "linter": {
-    "enabled": false,
+    "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "style": {
+        "useSingleVarDeclarator": "error",
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noGlobalIsNan": "off"
+      }
     }
   },
   "javascript": {

@@ -40,7 +40,7 @@ export function makeCsaHeader(pos: Shogi): string {
 export function makeCsaBoard(board: Board): string {
   let csaBoard = '';
   for (let rank = 0; rank < 9; rank++) {
-    csaBoard += 'P' + (rank + 1);
+    csaBoard += `P${rank + 1}`;
     for (let file = 8; file >= 0; file--) {
       const square = parseCoordinates(file, rank)!;
       const piece = board.get(square);
@@ -63,7 +63,7 @@ export function makeCsaHand(hand: Hand, prefix: string): string {
       .map((role) => {
         const r = roleToCsa(role);
         const n = hand.get(role);
-        return ('00' + r).repeat(Math.min(n, 18));
+        return `00${r}`.repeat(Math.min(n, 18));
       })
       .filter((p) => p.length > 0)
       .join('')
@@ -209,7 +209,7 @@ export function parseCsaMovesOrDrops(pos: Shogi, csaMds: string[]): MoveOrDrop[]
 // Making CSA formatted moves/drops
 export function makeCsaMoveOrDrop(pos: Shogi, md: MoveOrDrop): string | undefined {
   if (isDrop(md)) {
-    return '00' + makeNumberSquare(md.to) + roleToCsa(md.role);
+    return `00${makeNumberSquare(md.to)}${roleToCsa(md.role)}`;
   } else {
     const role = pos.board.getRole(md.from);
     if (!role) return undefined;

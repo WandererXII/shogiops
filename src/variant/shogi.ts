@@ -12,7 +12,7 @@ import {
   rookAttacks,
   silverAttacks,
 } from '../attacks.js';
-import { Board } from '../board.js';
+import type { Board } from '../board.js';
 import { SquareSet } from '../square-set.js';
 import type { Color, Piece, Setup, Square } from '../types.js';
 import { defined, opposite, squareFile } from '../util.js';
@@ -26,7 +26,7 @@ export class Shogi extends Position {
   }
 
   static from(setup: Setup, strict: boolean): Result<Shogi, PositionError> {
-    const pos = new this();
+    const pos = new Shogi();
     pos.fromSetup(setup);
     return pos.validate(strict).map((_) => pos);
   }
@@ -137,17 +137,17 @@ export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): S
       mask = mask.diff(file);
     }
     // Checking for a pawn checkmate
-    const kingSquare = pos.kingsOf(opposite(ctx.color)).singleSquare(),
-      kingFront = defined(kingSquare)
-        ? ctx.color === 'sente'
-          ? kingSquare + 16
-          : kingSquare - 16
-        : undefined;
+    const kingSquare = pos.kingsOf(opposite(ctx.color)).singleSquare();
+    const kingFront = defined(kingSquare)
+      ? ctx.color === 'sente'
+        ? kingSquare + 16
+        : kingSquare - 16
+      : undefined;
     if (defined(kingFront) && mask.has(kingFront)) {
       const child = pos.clone();
       child.play({ role: 'pawn', to: kingFront });
-      const childCtx = child.ctx(),
-        checkmateOrStalemate = child.isCheckmate(childCtx) || child.isStalemate(childCtx);
+      const childCtx = child.ctx();
+      const checkmateOrStalemate = child.isCheckmate(childCtx) || child.isStalemate(childCtx);
       if (checkmateOrStalemate) mask = mask.without(kingFront);
     }
   }

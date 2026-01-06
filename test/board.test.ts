@@ -1,6 +1,6 @@
+import { expect, test } from 'vitest';
 import { Board } from '@/board.js';
 import type { Piece } from '@/types.js';
-import { expect, test } from 'vitest';
 
 test('set and get', () => {
   const board = Board.empty();

@@ -34,16 +34,16 @@ export function perft(
   let nodes = 0;
   for (const [from, moveDests] of pos.allMoveDests()) {
     for (const to of moveDests) {
-      const promotions: boolean[] = [],
-        piece = pos.board.get(from)!;
+      const promotions: boolean[] = [];
+      const piece = pos.board.get(from)!;
       if (pieceCanPromote(pos.rules)(piece, from, to, pos.board.get(to))) {
         promotions.push(true);
         if (!pieceForcePromote(pos.rules)(piece, to)) promotions.push(false);
       } else promotions.push(false);
 
       for (const promotion of promotions) {
-        const child = pos.clone(),
-          move = { from, to, promotion };
+        const child = pos.clone();
+        const move = { from, to, promotion };
         child.play(move);
         const children = perft(child, depth - 1, options);
         if (options.log) logs.push(`${makeUsi(move)}: ${children}`);
@@ -53,8 +53,8 @@ export function perft(
       if (roleWithLionPower.includes(piece.role)) {
         const secondMoveDests = secondLionStepDests(pos as Chushogi, from, to);
         for (const mid of secondMoveDests) {
-          const child = pos.clone(),
-            move: NormalMove = { from, to, midStep: mid };
+          const child = pos.clone();
+          const move: NormalMove = { from, to, midStep: mid };
           child.play(move);
           const children = perft(child, depth - 1, options);
           if (options.log) logs.push(`${makeUsi(move)}: ${children}`);
@@ -64,13 +64,13 @@ export function perft(
     }
   }
   for (const [pieceName, dropDestsOfRole] of pos.allDropDests()) {
-    const promotions: boolean[] = [false],
-      piece = parsePieceName(pieceName);
+    const promotions: boolean[] = [false];
+    const piece = parsePieceName(pieceName);
     if (promotableOnDrop(pos.rules)(piece)) promotions.push(true);
     for (const prom of promotions) {
       for (const to of dropDestsOfRole) {
-        const child = pos.clone(),
-          drop: DropMove = { role: prom ? promote(pos.rules)(piece.role)! : piece.role, to };
+        const child = pos.clone();
+        const drop: DropMove = { role: prom ? promote(pos.rules)(piece.role)! : piece.role, to };
         child.play(drop);
         const children = perft(child, depth - 1, options);
         if (options.log) logs.push(`${makeUsi(drop)}: ${children}`);

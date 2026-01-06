@@ -1,4 +1,4 @@
-import { Result } from '@badrap/result';
+import type { Result } from '@badrap/result';
 import { attacks, between, ray } from '../attacks.js';
 import { Board } from '../board.js';
 import { SquareSet } from '../square-set.js';
@@ -15,7 +15,7 @@ export class Annanshogi extends Position {
   }
 
   static from(setup: Setup, strict: boolean): Result<Annanshogi, PositionError> {
-    const pos = new this();
+    const pos = new Annanshogi();
     pos.fromSetup(setup);
     return pos.validate(strict).map((_) => pos);
   }
@@ -78,10 +78,10 @@ export class Annanshogi extends Position {
         );
         if (ctx.checkers.nonEmpty()) {
           if (ctx.checkers.size() > 2) return SquareSet.empty();
-          const singularChecker = ctx.checkers.singleSquare(),
-            moveGivers = (
-              ctx.color === 'sente' ? ctx.checkers.shr256(16) : ctx.checkers.shl256(16)
-            ).intersect(pseudo);
+          const singularChecker = ctx.checkers.singleSquare();
+          const moveGivers = (
+            ctx.color === 'sente' ? ctx.checkers.shr256(16) : ctx.checkers.shl256(16)
+          ).intersect(pseudo);
 
           if (defined(singularChecker))
             pseudo = pseudo.intersect(between(singularChecker, ctx.king).with(singularChecker));
@@ -151,17 +151,17 @@ export class Annanshogi extends Position {
         mask = mask.diff(file);
       }
       // Checking for a pawn checkmate
-      const kingSquare = this.kingsOf(opposite(ctx.color)).singleSquare(),
-        kingFront = defined(kingSquare)
-          ? ctx.color === 'sente'
-            ? kingSquare + 16
-            : kingSquare - 16
-          : undefined;
+      const kingSquare = this.kingsOf(opposite(ctx.color)).singleSquare();
+      const kingFront = defined(kingSquare)
+        ? ctx.color === 'sente'
+          ? kingSquare + 16
+          : kingSquare - 16
+        : undefined;
       if (defined(kingFront) && mask.has(kingFront)) {
         const child = this.clone();
         child.play({ role: 'pawn', to: kingFront });
-        const childCtx = child.ctx(),
-          checkmateOrStalemate = child.isCheckmate(childCtx) || child.isStalemate(childCtx);
+        const childCtx = child.ctx();
+        const checkmateOrStalemate = child.isCheckmate(childCtx) || child.isStalemate(childCtx);
         if (checkmateOrStalemate) mask = mask.without(kingFront);
       }
     }
@@ -178,8 +178,8 @@ export const directlyBehind = (color: Color, square: Square): Square => {
 export const annanAttackBoard = (board: Board): Board => {
   const newBoard = Board.empty();
   for (const [sq, piece] of board) {
-    const pieceBehind = board.get(directlyBehind(piece.color, sq)),
-      role = pieceBehind?.color === piece.color ? pieceBehind.role : piece.role;
+    const pieceBehind = board.get(directlyBehind(piece.color, sq));
+    const role = pieceBehind?.color === piece.color ? pieceBehind.role : piece.role;
     newBoard.set(sq, { role, color: piece.color });
   }
   return newBoard;

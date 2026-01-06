@@ -3,10 +3,10 @@ import type { Color, Piece, Square } from './types.js';
 import { opposite, squareFile, squareRank } from './util.js';
 
 function computeRange(square: Square, deltas: number[]): SquareSet {
-  const file = squareFile(square),
-    dests: Square[] = deltas
-      .map((delta) => square + delta)
-      .filter((sq) => Math.abs(file - squareFile(sq)) <= 2);
+  const file = squareFile(square);
+  const dests: Square[] = deltas
+    .map((delta) => square + delta)
+    .filter((sq) => Math.abs(file - squareFile(sq)) <= 2);
   return SquareSet.fromSquares(...dests);
 }
 
@@ -32,23 +32,23 @@ const RANK_RANGE = tabulateSquares((sq) => SquareSet.fromRank(squareRank(sq)).wi
 
 const DIAG_RANGE = tabulateSquares((sq) => {
   const diag = new SquareSet([
-      0x20001, 0x80004, 0x200010, 0x800040, 0x2000100, 0x8000400, 0x20001000, 0x80004000,
-    ]),
-    shift = 16 * (squareRank(sq) - squareFile(sq));
+    0x20001, 0x80004, 0x200010, 0x800040, 0x2000100, 0x8000400, 0x20001000, 0x80004000,
+  ]);
+  const shift = 16 * (squareRank(sq) - squareFile(sq));
   return (shift >= 0 ? diag.shl256(shift) : diag.shr256(-shift)).without(sq);
 });
 
 const ANTI_DIAG_RANGE = tabulateSquares((sq) => {
   const diag = new SquareSet([
-      0x40008000, 0x10002000, 0x4000800, 0x1000200, 0x400080, 0x100020, 0x40008, 0x10002,
-    ]),
-    shift = 16 * (squareRank(sq) + squareFile(sq) - 15);
+    0x40008000, 0x10002000, 0x4000800, 0x1000200, 0x400080, 0x100020, 0x40008, 0x10002,
+  ]);
+  const shift = 16 * (squareRank(sq) + squareFile(sq) - 15);
   return (shift >= 0 ? diag.shl256(shift) : diag.shr256(-shift)).without(sq);
 });
 
 function hyperbola(bit: SquareSet, range: SquareSet, occupied: SquareSet): SquareSet {
-  let forward = occupied.intersect(range),
-    reverse = forward.rowSwap256(); // Assumes no more than 1 bit per rank
+  let forward = occupied.intersect(range);
+  let reverse = forward.rowSwap256(); // Assumes no more than 1 bit per rank
 
   forward = forward.minus256(bit);
   reverse = reverse.minus256(bit.rowSwap256());
@@ -61,8 +61,8 @@ function fileAttacks(square: Square, occupied: SquareSet): SquareSet {
 
 function rankAttacks(square: Square, occupied: SquareSet): SquareSet {
   const range = RANK_RANGE[square];
-  let forward = occupied.intersect(range),
-    reverse = forward.rbit256();
+  let forward = occupied.intersect(range);
+  let reverse = forward.rbit256();
   forward = forward.minus256(SquareSet.fromSquare(square));
   reverse = reverse.minus256(SquareSet.fromSquare(255 - square));
 

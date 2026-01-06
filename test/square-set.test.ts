@@ -1,6 +1,6 @@
+import { expect, test } from 'vitest';
 import type { BitRows } from '@/square-set.js';
 import { SquareSet } from '@/square-set.js';
-import { expect, test } from 'vitest';
 
 test('full set has all', () => {
   for (let square = 0; square < 256; square++) {
@@ -346,7 +346,7 @@ test('rbit256', () => {
       [...random1]
         .reverse()
         .map((n) => n.toString(2).padStart(32, '0').split('').reverse().join(''))
-        .map((s) => parseInt(s, 2)) as BitRows,
+        .map((s) => Number.parseInt(s, 2)) as BitRows,
     ),
   );
   const random2 = [
@@ -357,7 +357,7 @@ test('rbit256', () => {
       [...random2]
         .reverse()
         .map((n) => n.toString(2).padStart(32, '0').split('').reverse().join(''))
-        .map((s) => parseInt(s, 2)) as BitRows,
+        .map((s) => Number.parseInt(s, 2)) as BitRows,
     ),
   );
 });

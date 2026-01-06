@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest';
 import {
   makePieceName,
   makeUsi,
@@ -7,7 +8,6 @@ import {
   squareFile,
   squareRank,
 } from '@/util.js';
-import { expect, test } from 'vitest';
 import { usiFixture } from './fixtures/usi.js';
 
 test('square coordinates', () => {

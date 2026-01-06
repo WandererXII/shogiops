@@ -371,8 +371,8 @@ export abstract class Position {
       this.board.set(md.to, { role: md.role, color: turn });
       this.hands[turn].drop(this.unpromoteForHand(md.role) || md.role);
     } else {
-      const piece = this.board.take(md.from),
-        role = piece?.role;
+      const piece = this.board.take(md.from);
+      const role = piece?.role;
       if (!role) return;
 
       if (
@@ -382,8 +382,8 @@ export abstract class Position {
       )
         piece.role = promote(this.rules)(role) || role;
 
-      const capture = this.board.set(md.to, piece),
-        midCapture = defined(md.midStep) ? this.board.take(md.midStep) : undefined;
+      const capture = this.board.set(md.to, piece);
+      const midCapture = defined(md.midStep) ? this.board.take(md.midStep) : undefined;
 
       // process midCapture (if exists) before final destination capture
       if (defined(midCapture)) {

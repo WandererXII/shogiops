@@ -76,7 +76,7 @@ export function forsythToPiece(rules: Rules): (s: string) => Piece | undefined {
 }
 
 function parseSmallUint(str: string): number | undefined {
-  return /^\d{1,4}$/.test(str) ? parseInt(str, 10) : undefined;
+  return /^\d{1,4}$/.test(str) ? Number.parseInt(str, 10) : undefined;
 }
 
 function parseColorLetter(str: string): Color | undefined {
@@ -93,9 +93,9 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
   if (dims.files !== ruleDims.files || dims.ranks !== ruleDims.ranks)
     return Result.err(new SfenError(InvalidSfen.BoardDims));
   const board = Board.empty();
-  let empty = 0,
-    rank = 0,
-    file = dims.files - 1;
+  let empty = 0;
+  let rank = 0;
+  let file = dims.files - 1;
   for (let i = 0; i < boardPart.length; i++) {
     let c = boardPart[i];
     if (c === '/' && file < 0) {

@@ -1,4 +1,4 @@
-// prettier-ignore
+// biome-ignore format: Perfts
 export const perfts: [string, number, number][] = [
   ['lfcsg2gso1l/a1bdtet2fc1/2r2q1k1r1a/mv1x+P1+Pp1bvm/3p3d2pp/1Q4h1p2h/P1piD5PP/5B2iPV1/2HP1ONPP3/MCVTED1GBT1M/A1S4XH1RA/LF1RGK2SCFL w - 142', 1, 113],
   ['lt5s1v1l/a1v1q3s2a/f2gge2kcf+A/2bc+H+Pt2+Po1/mpS1P3bOV1/1VD9/5E6/4+iB1PP1M+L/1+p6R3/A1C1K2R3S/L2XGBG2F2/2F2TT1HD2 b - 369', 1, 171],

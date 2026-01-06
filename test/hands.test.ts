@@ -1,5 +1,5 @@
-import { Hands } from '@/hands.js';
 import { expect, test } from 'vitest';
+import { Hands } from '@/hands.js';
 
 test('set and get', () => {
   const hands = Hands.empty();

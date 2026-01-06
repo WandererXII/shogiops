@@ -1,4 +1,4 @@
-import { Result } from '@badrap/result';
+import type { Result } from '@badrap/result';
 import {
   between,
   bishopAttacks,
@@ -24,7 +24,7 @@ export class Kyotoshogi extends Position {
   }
 
   static from(setup: Setup, strict: boolean): Result<Kyotoshogi, PositionError> {
-    const pos = new this();
+    const pos = new Kyotoshogi();
     pos.fromSetup(setup);
     return pos.validate(strict).map((_) => pos);
   }
@@ -37,8 +37,8 @@ export class Kyotoshogi extends Position {
   };
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
-    const defender = opposite(attacker),
-      board = this.board;
+    const defender = opposite(attacker);
+    const board = this.board;
     return board.color(attacker).intersect(
       rookAttacks(square, occupied)
         .intersect(board.role('rook'))

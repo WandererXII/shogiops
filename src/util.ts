@@ -10,6 +10,7 @@ import type {
   Square,
   SquareName,
 } from './types.js';
+
 export { Result } from '@badrap/result';
 
 export function defined<A>(v: A | undefined): v is A {
@@ -29,10 +30,10 @@ export function squareFile(square: Square): number {
 }
 
 export function squareDist(a: Square, b: Square): number {
-  const x1 = squareFile(a),
-    x2 = squareFile(b);
-  const y1 = squareRank(a),
-    y2 = squareRank(b);
+  const x1 = squareFile(a);
+  const x2 = squareFile(b);
+  const y1 = squareRank(a);
+  const y2 = squareRank(b);
   return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
 }
 
@@ -41,9 +42,9 @@ export function makePieceName(piece: Piece): PieceName {
 }
 
 export function parsePieceName(pieceName: PieceName): Piece {
-  const splitted = pieceName.split(' '),
-    color = splitted[0] as Color,
-    role = splitted[1] as Role;
+  const splitted = pieceName.split(' ');
+  const color = splitted[0] as Color;
+  const role = splitted[1] as Role;
   return { color, role };
 }
 
@@ -56,8 +57,8 @@ export function parseSquareName(str: SquareName): Square;
 export function parseSquareName(str: string): Square | undefined;
 export function parseSquareName(str: string): Square | undefined {
   if (str.length !== 2 && str.length !== 3) return;
-  const file = parseInt(str.slice(0, -1)) - 1,
-    rank = str.slice(-1).charCodeAt(0) - 'a'.charCodeAt(0);
+  const file = Number.parseInt(str.slice(0, -1), 10) - 1;
+  const rank = str.slice(-1).charCodeAt(0) - 'a'.charCodeAt(0);
   if (isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
   return file + 16 * rank;
 }
@@ -106,16 +107,16 @@ export const usiMoveRegex: RegExp = /^(\d\d?[a-p])(\d\d?[a-p])?(\d\d?[a-p])(\+|=
 export function parseUsi(str: string): MoveOrDrop | undefined {
   const dropMatch = str.match(usiDropRegex);
   if (dropMatch) {
-    const role = parseUsiDropRole(dropMatch[1]),
-      to = parseSquareName(dropMatch[2]);
+    const role = parseUsiDropRole(dropMatch[1]);
+    const to = parseSquareName(dropMatch[2]);
     if (defined(role) && defined(to)) return { role, to };
   }
   const moveMatch = str.match(usiMoveRegex);
   if (moveMatch) {
-    const from = parseSquareName(moveMatch[1]),
-      midStep = moveMatch[2] ? parseSquareName(moveMatch[2]) : undefined,
-      to = parseSquareName(moveMatch[3]),
-      promotion = moveMatch[4] === '+' ? true : false;
+    const from = parseSquareName(moveMatch[1]);
+    const midStep = moveMatch[2] ? parseSquareName(moveMatch[2]) : undefined;
+    const to = parseSquareName(moveMatch[3]);
+    const promotion = moveMatch[4] === '+';
     if (defined(from) && defined(to)) return { from, to, promotion, midStep };
   }
   return;

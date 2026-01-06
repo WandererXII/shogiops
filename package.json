@@ -32,12 +32,12 @@
     "@badrap/result": "^0.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.11",
     "@eslint/js": "^9.39.2",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/node": "^22.19.2",
     "del-cli": "^7.0.0",
     "eslint": "^9.39.2",
-    "prettier": "^3.7.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.49.0",
     "vitest": "^4.0.15"
@@ -50,8 +50,8 @@
     "type-check": "tsc --noEmit",
     "test": "vitest --config test/vitest.config.ts",
     "lint": "eslint --cache",
-    "format": "prettier --cache --check .",
-    "format:write": "prettier --cache --write ."
+    "format": "biome check",
+    "format:write": "biome check --write ."
   },
   "files": [
     "dist",

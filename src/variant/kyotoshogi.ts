@@ -14,7 +14,7 @@ import { SquareSet } from '../square-set.js';
 import type { Color, MoveOrDrop, Piece, Setup, Square } from '../types.js';
 import { defined, isDrop, opposite } from '../util.js';
 import type { Context, PositionError } from './position.js';
-import { IllegalSetup, Position } from './position.js';
+import { Position } from './position.js';
 import { standardMoveDests } from './shogi.js';
 import { fullSquareSet, handRoles, unpromote } from './util.js';
 
@@ -29,16 +29,12 @@ export class Kyotoshogi extends Position {
     return pos.validate(strict).map((_) => pos);
   }
 
-  validate(strict: boolean): Result<undefined, PositionError> {
-    const validated = super.validate(strict);
-    const acceptableErrors: string[] = [
-      IllegalSetup.InvalidPiecesPromotionZone,
-      IllegalSetup.InvalidPiecesDoublePawns,
-    ];
-    if (validated.isErr && acceptableErrors.includes(validated.error.message))
-      return Result.ok(undefined);
-    else return validated;
-  }
+  validation = {
+    doublePawn: false,
+    oppositeCheck: true,
+    unpromotedForcedPromotion: false,
+    maxNumberOfRoyalPieces: 1,
+  };
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     const defender = opposite(attacker),

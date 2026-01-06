@@ -112,6 +112,18 @@ export abstract class Position {
     return pos;
   }
 
+  validation: {
+    doublePawn: boolean;
+    oppositeCheck: boolean;
+    unpromotedForcedPromotion: boolean;
+    maxNumberOfRoyalPieces: number;
+  } = {
+    doublePawn: true,
+    oppositeCheck: true,
+    unpromotedForcedPromotion: true,
+    maxNumberOfRoyalPieces: 1,
+  };
+
   validate(strict: boolean): Result<undefined, PositionError> {
     if (!this.board.occupied.intersect(fullSquareSet(this.rules)).equals(this.board.occupied))
       return Result.err(new PositionError(IllegalSetup.PiecesOutsideBoard));
@@ -127,39 +139,46 @@ export abstract class Position {
       if (!allRoles(this.rules).includes(role))
         return Result.err(new PositionError(IllegalSetup.InvalidPieces));
 
-    const otherKing = this.kingsOf(opposite(this.turn)).singleSquare();
-    if (
-      defined(otherKing) &&
-      this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()
-    )
-      return Result.err(new PositionError(IllegalSetup.OppositeCheck));
+    if (this.validation.oppositeCheck) {
+      const otherKing = this.kingsOf(opposite(this.turn)).singleSquare();
+      if (
+        defined(otherKing) &&
+        this.squareAttackers(otherKing, this.turn, this.board.occupied).nonEmpty()
+      )
+        return Result.err(new PositionError(IllegalSetup.OppositeCheck));
+    }
 
     if (!strict) return Result.ok(undefined);
 
-    // double pawns
-    for (const color of COLORS) {
-      const files: number[] = [];
-      const pawns = this.board.role('pawn').intersect(this.board.color(color));
-      for (const pawn of pawns) {
-        const file = squareFile(pawn);
-        if (files.includes(file))
-          return Result.err(new PositionError(IllegalSetup.InvalidPiecesDoublePawns));
-        files.push(file);
+    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
+
+    if (this.validation.doublePawn) {
+      for (const color of COLORS) {
+        const files: number[] = [];
+        const pawns = this.board.role('pawn').intersect(this.board.color(color));
+        for (const pawn of pawns) {
+          const file = squareFile(pawn);
+          if (files.includes(file))
+            return Result.err(new PositionError(IllegalSetup.InvalidPiecesDoublePawns));
+          files.push(file);
+        }
       }
     }
 
     if (
-      this.board.pieces('sente', 'king').size() >= 2 ||
-      this.board.pieces('gote', 'king').size() >= 2
+      this.kingsOf('sente').size() > this.validation.maxNumberOfRoyalPieces ||
+      this.kingsOf('gote').size() > this.validation.maxNumberOfRoyalPieces
     )
       return Result.err(new PositionError(IllegalSetup.Kings));
 
-    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.board.role('king').isEmpty()) return Result.err(new PositionError(IllegalSetup.Kings));
+    if (this.kingsOf('sente').isEmpty() && this.kingsOf('gote').isEmpty())
+      return Result.err(new PositionError(IllegalSetup.Kings));
 
-    for (const [sq, piece] of this.board)
-      if (pieceForcePromote(this.rules)(piece, sq))
-        return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
+    if (this.validation.unpromotedForcedPromotion) {
+      for (const [sq, piece] of this.board)
+        if (pieceForcePromote(this.rules)(piece, sq))
+          return Result.err(new PositionError(IllegalSetup.InvalidPiecesPromotionZone));
+    }
 
     return Result.ok(undefined);
   }

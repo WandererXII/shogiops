@@ -32,8 +32,8 @@ import { SquareSet } from '../square-set.js';
 import type { Color, MoveOrDrop, Outcome, Piece, Role, Setup, Square } from '../types.js';
 import { defined, isMove, lionRoles, opposite, squareDist } from '../util.js';
 import type { Context } from './position.js';
-import { IllegalSetup, Position, PositionError } from './position.js';
-import { allRoles, dimensions, fullSquareSet } from './util.js';
+import { Position, PositionError } from './position.js';
+import { dimensions, fullSquareSet } from './util.js';
 
 export class Chushogi extends Position {
   private constructor() {
@@ -46,33 +46,12 @@ export class Chushogi extends Position {
     return pos.validate(strict).map((_) => pos);
   }
 
-  validate(strict: boolean): Result<undefined, PositionError> {
-    if (!this.board.occupied.intersect(fullSquareSet(this.rules)).equals(this.board.occupied))
-      return Result.err(new PositionError(IllegalSetup.PiecesOutsideBoard));
-
-    if (this.hands.count() > 0)
-      return Result.err(new PositionError(IllegalSetup.InvalidPiecesHand));
-
-    for (const role of this.board.presentRoles())
-      if (!allRoles(this.rules).includes(role))
-        return Result.err(new PositionError(IllegalSetup.InvalidPieces));
-
-    if (!strict) return Result.ok(undefined);
-
-    if (
-      this.board.pieces('sente', 'king').size() >= 2 ||
-      this.board.pieces('gote', 'king').size() >= 2 ||
-      this.board.pieces('sente', 'prince').size() >= 2 ||
-      this.board.pieces('gote', 'prince').size() >= 2
-    )
-      return Result.err(new PositionError(IllegalSetup.Kings));
-
-    if (this.board.occupied.isEmpty()) return Result.err(new PositionError(IllegalSetup.Empty));
-    if (this.kingsOf('sente').isEmpty() || this.kingsOf('gote').isEmpty())
-      return Result.err(new PositionError(IllegalSetup.Kings));
-
-    return Result.ok(undefined);
-  }
+  validation = {
+    doublePawn: false,
+    oppositeCheck: false,
+    unpromotedForcedPromotion: false,
+    maxNumberOfRoyalPieces: 2,
+  };
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     const defender = opposite(attacker),

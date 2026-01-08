@@ -11,11 +11,11 @@ export function makeKitaoKawasakiMoveOrDrop(
   lastDest?: Square,
 ): string | undefined {
   if (isDrop(md)) {
-    return `${roleToKanji(md.role)}*${makeNumberSquare(md.to)}`;
+    return `${roleToKanji(pos.rules)(md.role)}*${makeNumberSquare(md.to)}`;
   } else {
     const piece = pos.board.get(md.from);
     if (piece) {
-      const roleStr = roleToKanji(piece.role).replace('成', '+');
+      const roleStr = roleToKanji(pos.rules)(piece.role).replace('成', '+');
       const ambStr = aimingAt(
         pos,
         pos.board

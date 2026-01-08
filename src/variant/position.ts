@@ -246,11 +246,15 @@ export abstract class Position {
     return COLORS.every((color) => this.board.color(color).size() + this.hands[color].count() < 2);
   }
 
-  isBareKing(_ctx?: Context): boolean {
+  isBareKing(_color?: Color): boolean {
     return false;
   }
 
   isWithoutKings(_ctx?: Context): boolean {
+    return false;
+  }
+
+  isTryRule(_color?: Color): boolean {
     return false;
   }
 
@@ -264,7 +268,8 @@ export abstract class Position {
       this.isCheckmate(ctx) ||
       this.isStalemate(ctx) ||
       this.isDraw(ctx) ||
-      this.isBareKing(ctx) ||
+      this.isBareKing() ||
+      this.isTryRule() ||
       this.isWithoutKings(ctx) ||
       this.isSpecialVariantEnd(ctx)
     );

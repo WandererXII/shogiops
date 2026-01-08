@@ -29,6 +29,8 @@ export function initialSfen(rules: Rules): string {
       return 'lnsgkgsnl/1r5b1/p1ppppp1p/1p5p1/9/1P5P1/P1PPPPP1P/1B5R1/LNSGKGSNL b - 1';
     case 'kyotoshogi':
       return 'pgkst/5/5/5/TSKGP b - 1';
+    case 'dobutsu':
+      return 'rkb/1p1/1P1/BKR b - 1';
     default:
       return 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1';
   }
@@ -42,6 +44,8 @@ export function roleToForsyth(rules: Rules): (role: Role) => string | undefined 
       return minishogiRoleToForsyth;
     case 'kyotoshogi':
       return kyotoshogiRoleToForsyth;
+    case 'dobutsu':
+      return dobutsuRoleToForsyth;
     default:
       return standardRoleToForsyth;
   }
@@ -55,6 +59,8 @@ export function forsythToRole(rules: Rules): (str: string) => Role | undefined {
       return minishogiForsythToRole;
     case 'kyotoshogi':
       return kyotoshogiForsythToRole;
+    case 'dobutsu':
+      return dobutsuForsythToRole;
     default:
       return standardForsythToRole;
   }
@@ -86,12 +92,10 @@ function parseColorLetter(str: string): Color | undefined {
 }
 
 export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, SfenError> {
-  const ranks = boardPart.split('/');
-  // we assume the board is square, since that's good enough for all current variants...
-  const dims = { files: ranks.length, ranks: ranks.length },
-    ruleDims = dimensions(rules);
-  if (dims.files !== ruleDims.files || dims.ranks !== ruleDims.ranks)
+  const dims = dimensions(rules);
+  if (dims.ranks !== boardPart.split('/').length)
     return Result.err(new SfenError(InvalidSfen.BoardDims));
+
   const board = Board.empty();
   let empty = 0;
   let rank = 0;
@@ -103,7 +107,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
       file = dims.files - 1;
       rank++;
     } else {
-      const step = parseInt(c, 10);
+      const step = Number.parseInt(c, 10);
       if (!isNaN(step)) {
         file = file + empty - (empty * 10 + step);
         empty = empty * 10 + step;
@@ -111,8 +115,8 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
         if (file < 0 || file >= dims.files || rank < 0 || rank >= dims.ranks)
           return Result.err(new SfenError(InvalidSfen.BoardDims));
         if (c === '+' && i + 1 < boardPart.length) c += boardPart[++i];
-        const square = parseCoordinates(file, rank)!,
-          piece = forsythToPiece(rules)(c);
+        const square = parseCoordinates(file, rank)!;
+        const piece = forsythToPiece(rules)(c);
         if (!piece) return Result.err(new SfenError(InvalidSfen.BoardPiece));
         board.set(square, piece);
         empty = 0;
@@ -131,9 +135,9 @@ export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenE
   for (let i = 0; i < handsPart.length; i++) {
     if (handsPart[i] === '-') break;
     // max 99
-    let count = parseInt(handsPart[i]);
+    let count = Number.parseInt(handsPart[i], 10);
     if (!isNaN(count)) {
-      const secondNum = parseInt(handsPart[++i]);
+      const secondNum = Number.parseInt(handsPart[++i], 10);
       if (!isNaN(secondNum)) {
         count = count * 10 + secondNum;
         i++;
@@ -156,19 +160,19 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   const parts = sfen.split(/[\s_]+/);
 
   // Board
-  const boardPart = parts.shift()!,
-    board: Result<Board, SfenError> = parseBoardSfen(rules, boardPart);
+  const boardPart = parts.shift()!;
+  const board: Result<Board, SfenError> = parseBoardSfen(rules, boardPart);
 
   // Turn
-  const turnPart = parts.shift(),
-    turn = defined(turnPart) ? parseColorLetter(turnPart) : 'sente';
+  const turnPart = parts.shift();
+  const turn = defined(turnPart) ? parseColorLetter(turnPart) : 'sente';
   if (!defined(turn)) return Result.err(new SfenError(InvalidSfen.Turn));
 
   // Hands
   const handsPart = parts.shift();
-  let hands = Result.ok(Hands.empty()),
-    lastMoveOrDrop: MoveOrDrop | { to: Square } | undefined,
-    lastLionCapture: Square | undefined;
+  let hands = Result.ok(Hands.empty());
+  let lastMoveOrDrop: MoveOrDrop | { to: Square } | undefined;
+  let lastLionCapture: Square | undefined;
   if (rules === 'chushogi') {
     const destSquare = defined(handsPart) ? parseSquareName(handsPart) : undefined;
     if (defined(destSquare)) {
@@ -178,8 +182,8 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   } else if (defined(handsPart)) hands = parseHands(rules, handsPart);
 
   // Move number
-  const moveNumberPart = parts.shift(),
-    moveNumber = defined(moveNumberPart) && moveNumberPart ? parseSmallUint(moveNumberPart) : 1;
+  const moveNumberPart = parts.shift();
+  const moveNumber = defined(moveNumberPart) && moveNumberPart ? parseSmallUint(moveNumberPart) : 1;
   if (!defined(moveNumber)) return Result.err(new SfenError(InvalidSfen.MoveNumber));
 
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
@@ -204,12 +208,12 @@ export function parseSfen<R extends keyof RulesTypeMap>(
 
 export function makeBoardSfen(rules: Rules, board: Board): string {
   const dims = dimensions(rules);
-  let sfen = '',
-    empty = 0;
+  let sfen = '';
+  let empty = 0;
   for (let rank = 0; rank < dims.ranks; rank++) {
     for (let file = dims.files - 1; file >= 0; file--) {
-      const square = parseCoordinates(file, rank)!,
-        piece = board.get(square);
+      const square = parseCoordinates(file, rank)!;
+      const piece = board.get(square);
       if (!piece) empty++;
       else {
         if (empty > 0) {
@@ -234,8 +238,8 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
 export function makeHandSfen(rules: Rules, hand: Hand): string {
   return handRoles(rules)
     .map((role) => {
-      const r = roleToForsyth(rules)(role)!,
-        n = hand.get(role);
+      const r = roleToForsyth(rules)(role)!;
+      const n = hand.get(role);
       return n > 1 ? n + r : n === 1 ? r : '';
     })
     .join('');
@@ -600,6 +604,40 @@ function kyotoshogiForsythToRole(ch: string): Role | undefined {
       return 'tokin';
     case 'l':
       return 'lance';
+    default:
+      return;
+  }
+}
+
+function dobutsuRoleToForsyth(role: Role): string | undefined {
+  switch (role) {
+    case 'king':
+      return 'k';
+    case 'pawn':
+      return 'p';
+    case 'rook':
+      return 'r';
+    case 'bishop':
+      return 'b';
+    case 'tokin':
+      return '+p';
+    default:
+      return;
+  }
+}
+
+function dobutsuForsythToRole(ch: string): Role | undefined {
+  switch (ch.toLowerCase()) {
+    case 'k':
+      return 'king';
+    case 'p':
+      return 'pawn';
+    case 'r':
+      return 'rook';
+    case 'b':
+      return 'bishop';
+    case '+p':
+      return 'tokin';
     default:
       return;
   }

@@ -92,6 +92,7 @@ export const RESULTS = [
   'draw',
   'bareking',
   'kingslost',
+  'tryRule',
   'specialVariantEnd',
 ] as const;
 
@@ -102,4 +103,5 @@ export const RULES = [
   'annanshogi',
   'kyotoshogi',
   'checkshogi',
+  'dobutsu',
 ] as const;

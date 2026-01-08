@@ -3,6 +3,7 @@ import type { Setup } from '../types.js';
 import { Annanshogi } from './annanshogi.js';
 import { Checkshogi } from './checkshogi.js';
 import { Chushogi } from './chushogi.js';
+import { Dobutsu } from './dobutsu.js';
 import { Kyotoshogi } from './kyotoshogi.js';
 import { Minishogi } from './minishogi.js';
 import type { PositionError } from './position.js';
@@ -15,23 +16,7 @@ export interface RulesTypeMap {
   annanshogi: Annanshogi;
   kyotoshogi: Kyotoshogi;
   checkshogi: Checkshogi;
-}
-
-export function defaultPosition<R extends keyof RulesTypeMap>(rules: R): RulesTypeMap[R] {
-  switch (rules) {
-    case 'chushogi':
-      return Chushogi.default();
-    case 'minishogi':
-      return Minishogi.default();
-    case 'annanshogi':
-      return Annanshogi.default();
-    case 'kyotoshogi':
-      return Kyotoshogi.default();
-    case 'checkshogi':
-      return Checkshogi.default();
-    default:
-      return Shogi.default();
-  }
+  dobutsu: Dobutsu;
 }
 
 export function initializePosition<R extends keyof RulesTypeMap>(
@@ -50,6 +35,8 @@ export function initializePosition<R extends keyof RulesTypeMap>(
       return Kyotoshogi.from(setup, strict);
     case 'checkshogi':
       return Checkshogi.from(setup, strict);
+    case 'dobutsu':
+      return Dobutsu.from(setup, strict);
     default:
       return Shogi.from(setup, strict);
   }

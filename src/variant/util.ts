@@ -116,6 +116,8 @@ export function allRoles(rules: Rules): Role[] {
       ];
     case 'kyotoshogi':
       return ['rook', 'pawn', 'silver', 'bishop', 'gold', 'knight', 'lance', 'tokin', 'king'];
+    case 'dobutsu':
+      return ['king', 'rook', 'bishop', 'pawn', 'tokin'];
     default:
       return [
         'rook',
@@ -145,6 +147,8 @@ export function handRoles(rules: Rules): Role[] {
       return ['rook', 'bishop', 'gold', 'silver', 'pawn'];
     case 'kyotoshogi':
       return ['tokin', 'gold', 'silver', 'pawn'];
+    case 'dobutsu':
+      return ['rook', 'bishop', 'pawn'];
     default:
       return ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'];
   }
@@ -177,6 +181,8 @@ export function promotableRoles(rules: Rules): Role[] {
       return ['pawn', 'silver', 'bishop', 'rook'];
     case 'kyotoshogi':
       return ['rook', 'pawn', 'silver', 'bishop', 'gold', 'knight', 'lance', 'tokin'];
+    case 'dobutsu':
+      return ['pawn'];
     default:
       return ['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'];
   }
@@ -191,6 +197,8 @@ export function fullSquareSet(rules: Rules): SquareSet {
     case 'minishogi':
     case 'kyotoshogi':
       return new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    case 'dobutsu':
+      return new SquareSet([0x70007, 0x70007, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
     default:
       return new SquareSet([0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff01ff, 0x1ff, 0x0, 0x0, 0x0]);
   }
@@ -232,6 +240,11 @@ export function promotionZone(rules: Rules): (color: Color) => SquareSet {
           : new SquareSet([0x0, 0x0, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
     case 'kyotoshogi':
       return () => new SquareSet([0x1f001f, 0x1f001f, 0x1f, 0x0, 0x0, 0x0, 0x0, 0x0]);
+    case 'dobutsu':
+      return (color: Color) =>
+        color === 'sente'
+          ? new SquareSet([0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])
+          : new SquareSet([0x0, 0x70000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
     default:
       return (color: Color) =>
         color === 'sente'
@@ -247,6 +260,8 @@ export function dimensions(rules: Rules): Dimensions {
     case 'minishogi':
     case 'kyotoshogi':
       return { files: 5, ranks: 5 };
+    case 'dobutsu':
+      return { files: 3, ranks: 4 };
     default:
       return { files: 9, ranks: 9 };
   }

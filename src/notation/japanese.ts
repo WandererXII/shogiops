@@ -22,11 +22,11 @@ export function makeJapaneseMoveOrDrop(
     ).isEmpty()
       ? ''
       : '打';
-    return `${makeJapaneseSquare(md.to)}${roleToKanji(md.role)}${ambStr}`;
+    return `${makeJapaneseSquare(md.to)}${roleToKanji(pos.rules)(md.role)}${ambStr}`;
   } else {
     const piece = pos.board.get(md.from);
     if (piece) {
-      const roleStr = roleToKanji(piece.role);
+      const roleStr = roleToKanji(pos.rules)(piece.role);
       const ambPieces = aimingAt(
         pos,
         pos.board

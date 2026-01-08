@@ -77,7 +77,7 @@ export function makeKifBoard(rules: Rules, board: Board): string {
         kifBoard += '|';
       }
       if (!piece) kifBoard += emptySquare;
-      else kifBoard += pieceToBoardKanji(piece).padStart(space);
+      else kifBoard += pieceToBoardKanji(rules)(piece).padStart(space);
 
       if (file === 0) kifBoard += `|${numberToKanji(rank + 1)}\n`;
     }
@@ -90,7 +90,7 @@ export function makeKifHand(rules: Rules, hand: Hand): string {
   if (hand.isEmpty()) return 'なし';
   return handRoles(rules)
     .map((role) => {
-      const r = roleToKanji(role);
+      const r = roleToKanji(rules)(role);
       const n = hand.get(role);
       return n > 1 ? r + numberToKanji(n) : n === 1 ? r : '';
     })
@@ -373,7 +373,7 @@ export function makeKifMoveOrDrop(
 ): string | undefined {
   const ms = pos.rules === 'chushogi' ? makeJapaneseSquareHalf : makeJapaneseSquare;
   if (isDrop(md)) {
-    return `${ms(md.to) + roleToKanji(md.role)}打`;
+    return `${ms(md.to) + roleToKanji(pos.rules)(md.role)}打`;
   } else {
     const sameSquareSymbol = pos.rules === 'chushogi' ? '仝' : '同　';
     const sameDest = (lastDest ?? pos.lastMoveOrDrop?.to) === md.to;
@@ -386,11 +386,11 @@ export function makeKifMoveOrDrop(
         const isIgui = md.to === md.from && pos.board.has(md.midStep);
         const isJitto = md.to === md.from && !isIgui;
         const midDestStr = sameDest ? sameSquareSymbol : ms(md.midStep);
-        const move1 = `一歩目 ${midDestStr}${roleToFullKanji(role)} （←${ms(md.from)}）`;
+        const move1 = `一歩目 ${midDestStr}${roleToFullKanji(pos.rules)(role)} （←${ms(md.from)}）`;
         const move2 =
           '二歩目 ' +
           moveDestStr +
-          roleToFullKanji(role) +
+          roleToFullKanji(pos.rules)(role) +
           (isIgui ? '（居食い）' : isJitto ? '(じっと)' : '') +
           ' （←' +
           ms(md.midStep) +
@@ -398,7 +398,8 @@ export function makeKifMoveOrDrop(
 
         return `${move1}\n${move2}`;
       }
-      return `${moveDestStr + roleToFullKanji(role) + promStr} （←${ms(md.from)}）`;
-    } else return `${moveDestStr + roleToKanji(role) + promStr}(${makeNumberSquare(md.from)})`;
+      return `${moveDestStr + roleToFullKanji(pos.rules)(role) + promStr} （←${ms(md.from)}）`;
+    } else
+      return `${moveDestStr + roleToKanji(pos.rules)(role) + promStr}(${makeNumberSquare(md.from)})`;
   }
 }

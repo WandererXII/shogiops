@@ -1,0 +1,98 @@
+import { expect, test } from 'vitest';
+import { initialSfen, parseSfen } from '@/sfen.js';
+import { parseUsi } from '@/util.js';
+import { perft } from '../debug.js';
+
+// from fairy, different implementation...
+const dobutsuPerfts: [string, number, number][] = [
+  ['', 1, 4],
+  // ['', 2, 13],
+  // ['', 3, 67],
+  // ['', 4, 398],
+  // ['', 5, 2179],
+  // ['', 6, 12636],
+  // ['', 7, 80828],
+  // ['', 8, 503419],
+];
+
+test.each(dobutsuPerfts)('dobutsu perft: %s (%s): %s', (sfen, depth, res) => {
+  const pos = parseSfen('dobutsu', sfen || initialSfen('dobutsu')).unwrap();
+  expect(perft(pos, depth)).toBe(res);
+});
+
+test('pieces in hand', () => {
+  const pos = parseSfen('dobutsu', '3/1k1/3/1K1 b Pp 1').unwrap();
+  expect(pos.hands.count()).toBe(2);
+});
+
+test('moving into check and being captured', () => {
+  const pos = parseSfen('dobutsu', '3/1k1/3/1K1 b - 1').unwrap();
+  expect(perft(pos, 1)).toBe(5);
+  expect(pos.isLegal(parseUsi('2d2c')!)).toBe(true);
+
+  pos.play(parseUsi('2d2c')!);
+  expect(perft(pos, 1)).toBe(8);
+  expect(pos.isLegal(parseUsi('2b2c')!)).toBe(true);
+  const posMiss = pos.clone();
+  pos.play(parseUsi('2b2c')!);
+  posMiss.play(parseUsi('2b1b')!);
+  expect(pos.isEnd()).toBe(true);
+  expect(pos.outcome()?.result).toBe('kingslost');
+  expect(pos.outcome()?.winner).toBe('gote');
+  expect(posMiss.isEnd()).toBe(false);
+  expect(perft(posMiss, 1)).toBe(8);
+});
+
+test('try rule', () => {
+  const pos = parseSfen('dobutsu', 'k2/2K/3/3 b - 1').unwrap();
+  expect(perft(pos, 1)).toBe(5);
+  expect(pos.isLegal(parseUsi('1b1a')!)).toBe(true);
+  pos.play(parseUsi('1b1a')!);
+  expect(pos.isEnd()).toBe(true);
+  expect(pos.outcome()?.result).toBe('tryRule');
+  expect(pos.outcome()?.winner).toBe('sente');
+});
+
+test('try rule - in check', () => {
+  const pos = parseSfen('dobutsu', '1r1/bpK/k2/3 b -').unwrap();
+  expect(perft(pos, 1)).toBe(5);
+  expect(pos.isLegal(parseUsi('1b1a')!)).toBe(true);
+  pos.play(parseUsi('1b1a')!);
+  expect(pos.isEnd()).toBe(false);
+
+  // opponent safe try rule
+  const pos1 = pos.clone();
+  expect(pos1.isLegal(parseUsi('3c3d')!)).toBe(true);
+  pos1.play(parseUsi('3c3d')!);
+  expect(pos1.isEnd()).toBe(true);
+  expect(pos1.outcome()?.result).toBe('tryRule');
+  expect(pos1.outcome()?.winner).toBe('gote');
+
+  // random unrelated move
+  const pos2 = pos.clone();
+  expect(pos2.isLegal(parseUsi('2b2c')!)).toBe(true);
+  pos2.play(parseUsi('2b2c')!);
+  expect(pos2.isEnd()).toBe(false);
+
+  // clearing check
+  const pos3 = pos.clone();
+  expect(pos3.isLegal(parseUsi('2a3a')!)).toBe(true);
+  pos3.play(parseUsi('2a3a')!);
+  expect(pos3.isEnd()).toBe(true);
+  expect(pos3.outcome()?.result).toBe('tryRule');
+  expect(pos3.outcome()?.winner).toBe('sente');
+});
+
+test('force promoting', () => {
+  const pos = parseSfen('dobutsu', '3/BRP/2k/K2 b P').unwrap();
+  expect(pos.isLegal(parseUsi('1b1a')!)).toBe(false);
+  expect(pos.isLegal(parseUsi('1b1a+')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('3b2a+')!)).toBe(false);
+});
+
+test('drops', () => {
+  const pos = parseSfen('dobutsu', 'rkr/b1b/1P1/BKR b P').unwrap();
+  expect(pos.isLegal(parseUsi('P*2b')!)).toBe(true);
+  pos.play(parseUsi('P*2b')!);
+  expect(pos.isEnd()).toBe(false);
+});

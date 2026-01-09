@@ -163,107 +163,29 @@ export class Chushogi extends Position {
     return SquareSet.empty();
   }
 
-  isCheckmate(_ctx?: Context): boolean {
-    return false;
-  }
-
-  isStalemate(ctx?: Context): boolean {
-    ctx = ctx || this.ctx();
-    return !this.hasDests(ctx);
-  }
-
-  isDraw(_ctx?: Context): boolean {
-    const oneWayRoles = this.board.roles('pawn', 'lance');
-    const occ = this.board.occupied.diff(
-      oneWayRoles
-        .intersect(this.board.color('sente').intersect(SquareSet.fromRank(0)))
-        .union(
-          oneWayRoles.intersect(
-            this.board
-              .color('gote')
-              .intersect(SquareSet.fromRank(dimensions(this.rules).ranks - 1)),
-          ),
-        ),
-    );
-    return (
-      occ.size() === 2 &&
-      this.kingsOf('sente').isSingleSquare() &&
-      !this.isCheck('sente') &&
-      this.kingsOf('gote').isSingleSquare() &&
-      !this.isCheck('gote')
-    );
-  }
-
-  isBareKing(ctx?: Context): boolean {
-    if (ctx) {
-      // was our king bared
-      const color = ctx.color;
-      const theirColor = opposite(color);
-      const ourKing = this.kingsOf(color).singleSquare();
-      const ourPieces = this.board
-        .color(color)
-        .diff(
-          this.board
-            .roles('pawn', 'lance')
-            .intersect(
-              SquareSet.fromRank(color === 'sente' ? 0 : dimensions(this.rules).ranks - 1),
-            ),
-        );
-      const theirKing = this.kingsOf(theirColor).singleSquare();
-      const theirPieces = this.board
-        .color(theirColor)
-        .diff(
-          this.board
-            .roles('pawn', 'gobetween')
-            .union(
-              this.board
-                .role('lance')
-                .intersect(
-                  SquareSet.fromRank(theirColor === 'sente' ? 0 : dimensions(this.rules).ranks - 1),
-                ),
-            ),
-        );
-
-      return (
-        ourPieces.size() === 1 &&
-        defined(ourKing) &&
-        theirPieces.size() > 1 &&
-        defined(theirKing) &&
-        !this.isCheck(theirColor) &&
-        (theirPieces.size() > 2 || kingAttacks(ourKing).intersect(theirPieces).isEmpty())
-      );
-    } else
-      return this.isBareKing(this.ctx(this.turn)) || this.isBareKing(this.ctx(opposite(this.turn)));
-  }
-
-  isWithoutKings(ctx?: Context): boolean {
-    const color = ctx?.color || this.turn;
-    return this.kingsOf(color).isEmpty();
-  }
-
   outcome(ctx?: Context): Outcome | undefined {
     ctx = ctx || this.ctx();
-    if (this.isWithoutKings(ctx))
+    if (this.kingsOf(ctx.color).isEmpty())
       return {
-        result: 'kingslost',
+        result: 'kingsLost',
         winner: opposite(ctx.color),
       };
-    else if (this.isStalemate(ctx)) {
+    else if (!this.hasDests(ctx)) {
       return {
         result: 'stalemate',
         winner: opposite(ctx.color),
       };
-    } else if (this.isBareKing(ctx)) {
+    } else if (isBareKing(this, 'sente')) {
       return {
-        result: 'bareking',
-        winner: opposite(ctx.color),
+        result: 'bareKing',
+        winner: 'gote',
       };
-    } else if (this.isBareKing(this.ctx(opposite(ctx.color)))) {
+    } else if (isBareKing(this, 'gote')) {
       return {
-        result: 'bareking',
-        winner: ctx.color,
+        result: 'bareKing',
+        winner: 'sente',
       };
-    } else if (this.isDraw(ctx)) {
+    } else if (isDraw(this)) {
       return {
         result: 'draw',
         winner: undefined,
@@ -344,4 +266,60 @@ function removeLions(pos: Chushogi, dests: SquareSet): SquareSet {
     if (lion !== pos.lastLionCapture) dests = dests.without(lion);
   }
   return dests;
+}
+
+function isBareKing(pos: Chushogi, color: Color): boolean {
+  // was our king bared
+  const theirColor = opposite(color);
+  const ourKing = pos.kingsOf(color).singleSquare();
+  const ourPieces = pos.board
+    .color(color)
+    .diff(
+      pos.board
+        .roles('pawn', 'lance')
+        .intersect(SquareSet.fromRank(color === 'sente' ? 0 : dimensions(pos.rules).ranks - 1)),
+    );
+  const theirKing = pos.kingsOf(theirColor).singleSquare();
+  const theirPieces = pos.board
+    .color(theirColor)
+    .diff(
+      pos.board
+        .roles('pawn', 'gobetween')
+        .union(
+          pos.board
+            .role('lance')
+            .intersect(
+              SquareSet.fromRank(theirColor === 'sente' ? 0 : dimensions(pos.rules).ranks - 1),
+            ),
+        ),
+    );
+
+  return (
+    ourPieces.size() === 1 &&
+    defined(ourKing) &&
+    theirPieces.size() > 1 &&
+    defined(theirKing) &&
+    !pos.isCheck(theirColor) &&
+    (theirPieces.size() > 2 || kingAttacks(ourKing).intersect(theirPieces).isEmpty())
+  );
+}
+
+function isDraw(pos: Chushogi): boolean {
+  const oneWayRoles = pos.board.roles('pawn', 'lance');
+  const occ = pos.board.occupied.diff(
+    oneWayRoles
+      .intersect(pos.board.color('sente').intersect(SquareSet.fromRank(0)))
+      .union(
+        oneWayRoles.intersect(
+          pos.board.color('gote').intersect(SquareSet.fromRank(dimensions(pos.rules).ranks - 1)),
+        ),
+      ),
+  );
+  return (
+    occ.size() === 2 &&
+    pos.kingsOf('sente').isSingleSquare() &&
+    !pos.isCheck('sente') &&
+    pos.kingsOf('gote').isSingleSquare() &&
+    !pos.isCheck('gote')
+  );
 }

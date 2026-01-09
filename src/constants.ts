@@ -90,10 +90,10 @@ export const RESULTS = [
   'checkmate',
   'stalemate',
   'draw',
-  'bareking',
-  'kingslost',
+  'bareKing',
+  'kingsLost',
   'tryRule',
-  'specialVariantEnd',
+  'check',
 ] as const;
 
 export const RULES = [

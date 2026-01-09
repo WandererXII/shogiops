@@ -20,7 +20,7 @@ test('check win', () => {
   pos.play(parseUsi('3f2e')!);
   expect(pos.isCheck()).toBe(true);
   expect(pos.isEnd()).toBe(true);
-  expect(pos.outcome()?.result).toBe('specialVariantEnd');
+  expect(pos.outcome()?.result).toBe('check');
   expect(pos.outcome()?.winner).toBe('sente');
 
   const pos2 = parseSfen('checkshogi', '9/3gk4/9/2b6/9/6B2/9/4KG3/9 w - 1', false).unwrap();
@@ -29,7 +29,7 @@ test('check win', () => {
   pos2.play(parseUsi('7d8e')!);
   expect(pos2.isCheck()).toBe(true);
   expect(pos2.isEnd()).toBe(true);
-  expect(pos2.outcome()?.result).toBe('specialVariantEnd');
+  expect(pos2.outcome()?.result).toBe('check');
   expect(pos2.outcome()?.winner).toBe('gote');
 });
 
@@ -44,7 +44,7 @@ test('pawn drop checkmate', () => {
   pos.play(md2);
   expect(pos.isCheck()).toBe(true);
   expect(pos.isEnd()).toBe(true);
-  expect(pos.outcome()?.result).toBe('specialVariantEnd');
+  expect(pos.outcome()?.result).toBe('check');
   expect(pos.outcome()?.winner).toBe('sente');
 });
 
@@ -57,6 +57,6 @@ test('pawn drop check', () => {
   pos.play(md);
   expect(pos.isCheck()).toBe(true);
   expect(pos.isEnd()).toBe(true);
-  expect(pos.outcome()?.result).toBe('specialVariantEnd');
+  expect(pos.outcome()?.result).toBe('check');
   expect(pos.outcome()?.winner).toBe('sente');
 });

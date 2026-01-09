@@ -29,7 +29,7 @@ test('pawn checkmate', () => {
   const pos = parseSfen('kyotoshogi', 'kl3/1n3/G4/5/TSK1P b P').unwrap();
   expect(pos.isLegal(parseUsi('P*5b')!)).toBe(true);
   pos.play(parseUsi('P*5b')!);
-  expect(pos.isCheckmate()).toBe(true);
+  expect(pos.outcome()?.result).toBe('checkmate');
 });
 
 test('last rank', () => {

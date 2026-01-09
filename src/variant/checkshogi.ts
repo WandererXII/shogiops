@@ -38,33 +38,13 @@ export class Checkshogi extends Position {
     return standardDropDests(this, piece, ctx);
   }
 
-  isCheckmate(_ctx?: Context): boolean {
-    return false;
-  }
-
-  isSpecialVariantEnd(ctx?: Context): boolean {
-    ctx = ctx || this.ctx();
-    return ctx.checkers.nonEmpty();
-  }
-
   outcome(ctx?: Context): Outcome | undefined {
     ctx = ctx || this.ctx();
-
-    if (this.isSpecialVariantEnd(ctx))
+    if (ctx.checkers.nonEmpty()) {
       return {
-        result: 'specialVariantEnd',
+        result: 'check',
         winner: opposite(ctx.color),
       };
-    else if (this.isStalemate(ctx)) {
-      return {
-        result: 'stalemate',
-        winner: opposite(ctx.color),
-      };
-    } else if (this.isDraw(ctx)) {
-      return {
-        result: 'draw',
-        winner: undefined,
-      };
-    } else return;
+    } else return super.outcome(ctx);
   }
 }

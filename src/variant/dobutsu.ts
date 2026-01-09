@@ -65,51 +65,34 @@ export class Dobutsu extends Position {
     return this.board.occupied.complement().intersect(fullSquareSet(this.rules));
   }
 
-  isCheckmate(_ctx?: Context): boolean {
-    return false;
-  }
-
-  isDraw(_ctx?: Context): boolean {
-    return false;
-  }
-
-  // try rule
-  isTryRule(color?: Color): boolean {
-    if (color) {
-      const king = this.board.roles('king').intersect(this.board.color(color)).singleSquare();
-
-      return defined(king) && promotionZone(this.rules)(color).has(king) && !this.isCheck(color);
-    } else return this.isTryRule('sente') || this.isTryRule('gote');
-  }
-
-  isWithoutKings(ctx?: Context): boolean {
-    const color = ctx?.color || this.turn;
-    return this.kingsOf(color).isEmpty();
-  }
-
   outcome(ctx?: Context): Outcome | undefined {
     ctx = ctx || this.ctx();
 
-    if (this.isWithoutKings(ctx))
+    if (this.kingsOf(ctx.color).isEmpty()) {
       return {
-        result: 'kingslost',
+        result: 'kingsLost',
         winner: opposite(ctx.color),
       };
+    }
 
-    const senteTryRule = this.isTryRule('sente');
-    const goteTryRule = this.isTryRule('gote');
-    if (senteTryRule && !goteTryRule)
+    const isTryRule = (color: Color): boolean => {
+      const king = this.kingsOf(color).singleSquare();
+      return defined(king) && promotionZone(this.rules)(color).has(king) && !this.isCheck(color);
+    };
+
+    const senteTryRule = isTryRule('sente');
+    const goteTryRule = isTryRule('gote');
+    if (senteTryRule && !goteTryRule) {
       return {
         result: 'tryRule',
         winner: 'sente',
       };
-    else if (goteTryRule && !senteTryRule)
+    } else if (goteTryRule && !senteTryRule) {
       return {
         result: 'tryRule',
         winner: 'gote',
       };
-
-    if (this.isStalemate(ctx)) {
+    } else if (!this.hasDests()) {
       return {
         result: 'stalemate',
         winner: opposite(ctx.color),

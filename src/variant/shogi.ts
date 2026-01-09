@@ -146,9 +146,7 @@ export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): S
     if (defined(kingFront) && mask.has(kingFront)) {
       const child = pos.clone();
       child.play({ role: 'pawn', to: kingFront });
-      const childCtx = child.ctx();
-      const checkmateOrStalemate = child.isCheckmate(childCtx) || child.isStalemate(childCtx);
-      if (checkmateOrStalemate) mask = mask.without(kingFront);
+      if (child.outcome()?.result === 'checkmate') mask = mask.without(kingFront);
     }
   }
 

@@ -149,7 +149,7 @@ test('parse csa moves/drops one by one', () => {
     expect(parseCsaMoveOrDrop(pos, makeCsaMoveOrDrop(pos, m)!)).toEqual(m);
     pos.play(m);
   }
-  expect(pos.isCheckmate()).toBe(true);
+  expect(pos.outcome()?.result).toBe('checkmate');
 });
 
 test('parse moves/drops', () => {
@@ -181,7 +181,7 @@ test('parse csa moves/drops', () => {
     '5573UM',
   ];
   for (const m of parseCsaMovesOrDrops(pos, line)) pos.play(m);
-  expect(pos.isCheckmate()).toBe(true);
+  expect(pos.outcome()?.result).toBe('checkmate');
 });
 
 test('parse tags', () => {

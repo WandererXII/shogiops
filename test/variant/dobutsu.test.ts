@@ -37,7 +37,7 @@ test('moving into check and being captured', () => {
   pos.play(parseUsi('2b2c')!);
   posMiss.play(parseUsi('2b1b')!);
   expect(pos.isEnd()).toBe(true);
-  expect(pos.outcome()?.result).toBe('kingslost');
+  expect(pos.outcome()?.result).toBe('kingsLost');
   expect(pos.outcome()?.winner).toBe('gote');
   expect(posMiss.isEnd()).toBe(false);
   expect(perft(posMiss, 1)).toBe(8);

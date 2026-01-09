@@ -225,7 +225,7 @@ const insufficientMaterial: [string, boolean][] = [
 
 test.each(insufficientMaterial)('insufficient material: %s', (sfen, insufficient) => {
   const pos = parseSfen('standard', sfen).unwrap();
-  expect(pos.isDraw()).toBe(insufficient);
+  expect(pos.outcome()?.result === 'draw').toBe(insufficient);
 });
 
 test('prod 500 usi', () => {

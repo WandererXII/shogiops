@@ -186,45 +186,40 @@ test('falcon/eagle second move', () => {
 
 test('bare king', () => {
   const pos = parseSfen('chushogi', '12/12/12/12/6k5/4g7/4G7/6K5/12/12/12/12 b - 1').unwrap();
-  expect(pos.isBareKing()).toBe(false);
+  expect(pos.outcome()).toBeUndefined();
   pos.play(parseUsi('8g8f')!);
-  expect(pos.isBareKing()).toBe(true);
+  expect(pos.outcome()?.result).toBe('bareKing');
   expect(pos.outcome()?.winner).toBe('sente');
 
   const pos2 = parseSfen('chushogi', '12/12/12/12/3I2k5/12/12/5+pK5/12/12/12/12 b - 1').unwrap();
-  expect(pos2.isBareKing()).toBe(false);
+  expect(pos2.outcome()).toBeUndefined();
   pos2.play(parseUsi('6h7h')!);
-  expect(pos2.isBareKing()).toBe(false);
+  expect(pos2.outcome()).toBeUndefined();
   pos2.play(parseUsi('6e7d')!);
-  expect(pos2.isBareKing()).toBe(false);
+  expect(pos2.outcome()).toBeUndefined();
   pos2.play(parseUsi('9e9d+')!);
-  expect(pos2.isBareKing()).toBe(true);
+  expect(pos2.outcome()?.result).toBe('bareKing');
 
   const pos3 = parseSfen(
     'chushogi',
     '1P3PP3P1/12/12/12/6k5/12/12/6K5/12/12/12/l10l b - 1',
   ).unwrap();
-  expect(pos3.isBareKing()).toBe(false);
-  expect(pos3.isDraw()).toBe(true);
+  expect(pos3.outcome()?.result).toBe('draw');
 
   const pos4 = parseSfen('chushogi', '12/12/12/12/6k5/5g6/4G7/6K5/12/12/12/12 b - 1').unwrap();
-  expect(pos4.isBareKing()).toBe(false);
-  expect(pos4.isDraw()).toBe(false);
+  expect(pos4.outcome()).toBeUndefined();
   pos4.play(parseUsi('8g7f')!);
-  expect(pos4.isBareKing()).toBe(false);
-  expect(pos4.isDraw()).toBe(false);
+  expect(pos4.outcome()).toBeUndefined();
   const pos4alt = pos4.clone();
   pos4.play(parseUsi('6e7f')!);
   pos4alt.play(parseUsi('6e6d')!);
-  expect(pos4.isBareKing()).toBe(false);
-  expect(pos4.isDraw()).toBe(true);
-  expect(pos4alt.isBareKing()).toBe(true);
-  expect(pos4alt.isDraw()).toBe(false);
+  expect(pos4.outcome()?.result).toBe('draw');
+  expect(pos4alt.outcome()?.result).toBe('bareKing');
 
   const pos5 = parseSfen('chushogi', '12/12/12/12/6k5/5K6/12/4G7/12/12/12/12 w - 1').unwrap();
-  expect(pos5.isBareKing()).toBe(false);
+  expect(pos5.outcome()).toBeUndefined();
   pos5.turn = opposite(pos5.turn);
-  expect(pos5.isBareKing()).toBe(false);
+  expect(pos5.outcome()).toBeUndefined();
 });
 
 const chushogiPerfts: [string, number, number][] = [

@@ -232,63 +232,21 @@ export abstract class Position {
     return checks;
   }
 
-  isCheckmate(ctx?: Context): boolean {
-    ctx = ctx || this.ctx();
-    return ctx.checkers.nonEmpty() && !this.hasDests(ctx);
-  }
-
-  isStalemate(ctx?: Context): boolean {
-    ctx = ctx || this.ctx();
-    return ctx.checkers.isEmpty() && !this.hasDests(ctx);
-  }
-
-  isDraw(_ctx?: Context): boolean {
-    return COLORS.every((color) => this.board.color(color).size() + this.hands[color].count() < 2);
-  }
-
-  isBareKing(_color?: Color): boolean {
-    return false;
-  }
-
-  isWithoutKings(_ctx?: Context): boolean {
-    return false;
-  }
-
-  isTryRule(_color?: Color): boolean {
-    return false;
-  }
-
-  isSpecialVariantEnd(_ctx?: Context): boolean {
-    return false;
-  }
-
   isEnd(ctx?: Context): boolean {
-    ctx = ctx || this.ctx();
-    return (
-      this.isCheckmate(ctx) ||
-      this.isStalemate(ctx) ||
-      this.isDraw(ctx) ||
-      this.isBareKing() ||
-      this.isTryRule() ||
-      this.isWithoutKings(ctx) ||
-      this.isSpecialVariantEnd(ctx)
-    );
+    return !!this.outcome(ctx);
   }
 
   outcome(ctx?: Context): Outcome | undefined {
     ctx = ctx || this.ctx();
 
-    if (this.isCheckmate(ctx))
+    if (!this.hasDests(ctx)) {
       return {
-        result: 'checkmate',
+        result: ctx.checkers.nonEmpty() ? 'checkmate' : 'stalemate',
         winner: opposite(ctx.color),
       };
-    else if (this.isStalemate(ctx)) {
-      return {
-        result: 'stalemate',
-        winner: opposite(ctx.color),
-      };
-    } else if (this.isDraw(ctx)) {
+    } else if (
+      COLORS.every((color) => this.board.color(color).size() + this.hands[color].count() < 2)
+    ) {
       return {
         result: 'draw',
         winner: undefined,

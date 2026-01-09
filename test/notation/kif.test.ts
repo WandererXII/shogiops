@@ -194,7 +194,7 @@ test('parse kif moves/drops one by one', () => {
     expect(parseKifMoveOrDrop(makeKifMoveOrDrop(pos, m)!, pos.lastMoveOrDrop?.to)).toEqual(m);
     pos.play(m);
   }
-  expect(pos.isCheckmate()).toBe(true);
+  expect(pos.outcome()?.result).toBe('checkmate');
 });
 
 test('parse kif moves/drops', () => {
@@ -213,7 +213,7 @@ test('parse kif moves/drops', () => {
     '11 ７三角成(55)',
   ];
   for (const m of parseKifMovesOrDrops(line)) pos.play(m);
-  expect(pos.isCheckmate()).toBe(true);
+  expect(pos.outcome()?.result).toBe('checkmate');
 });
 
 test('parse tags', () => {

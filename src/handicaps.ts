@@ -32,6 +32,11 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     englishName: 'Right Lance',
   },
   {
+    sfen: '1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '兩香落ち',
+    englishName: 'Both Lance',
+  },
+  {
     sfen: 'lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
     japaneseName: '角落ち',
     englishName: 'Bishop',
@@ -52,9 +57,19 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     englishName: '2-piece',
   },
   {
+    sfen: '1nsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '三枚落ち',
+    englishName: '3-piece',
+  },
+  {
     sfen: '1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
     japaneseName: '四枚落ち',
     englishName: '4-piece',
+  },
+  {
+    sfen: '2sgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '五枚落ち',
+    englishName: '5-piece',
   },
   {
     sfen: '2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
@@ -62,9 +77,19 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     englishName: '6-piece',
   },
   {
+    sfen: '3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '七枚落ち',
+    englishName: '7-piece',
+  },
+  {
     sfen: '3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
     japaneseName: '八枚落ち',
     englishName: '8-piece',
+  },
+  {
+    sfen: '4kg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '九枚落ち',
+    englishName: '9-piece',
   },
   {
     sfen: '4k4/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
@@ -97,9 +122,19 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     englishName: 'Dragonfly',
   },
   {
+    sfen: 'lnsgkgsnl/1r5b1/p1ppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '太閤落ち',
+    englishName: 'Taiko',
+  },
+  {
     sfen: 'lnsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w L 1',
     japaneseName: '香得',
     englishName: 'Lance Gained',
+  },
+  {
+    sfen: '1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 2L 1',
+    japaneseName: '兩香得',
+    englishName: 'Two Lance Gained',
   },
   {
     sfen: 'lnsgkgsnl/1r7/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w B 1',
@@ -122,9 +157,19 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     englishName: '2-piece Gained',
   },
   {
+    sfen: '1nsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBL 1',
+    japaneseName: '三枚得',
+    englishName: '3-piece Gained',
+  },
+  {
     sfen: '1nsgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2L 1',
     japaneseName: '四枚得',
     englishName: '4-piece Gained',
+  },
+  {
+    sfen: '2sgkgsn1/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBN2L 1',
+    japaneseName: '五枚得',
+    englishName: '5-piece Gained',
   },
   {
     sfen: '2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2N2L 1',
@@ -132,9 +177,19 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     englishName: '6-piece Gained',
   },
   {
+    sfen: '3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBS2N2L 1',
+    japaneseName: '七枚得',
+    englishName: '7-piece Gained',
+  },
+  {
     sfen: '3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RB2S2N2L 1',
     japaneseName: '八枚得',
     englishName: '8-piece Gained',
+  },
+  {
+    sfen: '4kg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w RBG2S2N2L 1',
+    japaneseName: '九枚得',
+    englishName: '9-piece Gained',
   },
 ];
 

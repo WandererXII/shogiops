@@ -1,9 +1,5 @@
 # Changelog for shogiops
 
-## v0.20.1
-
-- Add more handicaps
-
 ## v0.20.0
 
 - Switched to pnpm.
@@ -12,6 +8,7 @@
 - Individual result methods (`isCheckmate`, `isDraw`, ...) were removed. Now use `outcome()?.result`. This was done to have one source of truth for the outcome of the game, and not duplicate logic. Also previously two or more result methods could techincally be true, but result can be only one, `outcome` solves that.
 - Allow pawn drop checkmate in checkshogi.
 - Exporting `Result` from `badrap/@result` in `util`.
+- Add more handicaps
 
 ## v0.19.0
 

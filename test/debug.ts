@@ -45,7 +45,7 @@ export function perft(
         const child = pos.clone();
         const move = { from, to, promotion };
         child.play(move);
-        const children = perft(child, depth - 1, options);
+        const children = perft(child, depth - 1, { ignoreEnd: options.ignoreEnd });
         if (options.log) logs.push(`${makeUsi(move)}: ${children}`);
         nodes += children;
       }
@@ -56,7 +56,7 @@ export function perft(
           const child = pos.clone();
           const move: NormalMove = { from, to, midStep: mid };
           child.play(move);
-          const children = perft(child, depth - 1, options);
+          const children = perft(child, depth - 1, { ignoreEnd: options.ignoreEnd });
           if (options.log) logs.push(`${makeUsi(move)}: ${children}`);
           nodes += children;
         }
@@ -72,7 +72,7 @@ export function perft(
         const child = pos.clone();
         const drop: DropMove = { role: prom ? promote(pos.rules)(piece.role)! : piece.role, to };
         child.play(drop);
-        const children = perft(child, depth - 1, options);
+        const children = perft(child, depth - 1, { ignoreEnd: options.ignoreEnd });
         if (options.log) logs.push(`${makeUsi(drop)}: ${children}`);
         nodes += children;
       }

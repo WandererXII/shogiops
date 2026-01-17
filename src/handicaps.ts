@@ -392,6 +392,13 @@ export const handicaps: Handicap[] = [
       ...h,
     } as Handicap;
   }),
+  // dobutsu
+  {
+    rules: 'dobutsu',
+    sfen: 'rkb/3/1P1/BKR w - 1',
+    japaneseName: 'ひよこ落ち',
+    englishName: 'Chick',
+  },
 ];
 
 function compareSfens(a: string, b: string): boolean {

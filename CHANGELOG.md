@@ -1,5 +1,9 @@
 # Changelog for shogiops
 
+## v0.20.1
+
+- Add more handicaps
+
 ## v0.20.0
 
 - Switched to pnpm.

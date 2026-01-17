@@ -1,7 +1,7 @@
 # shogiops
 
 [![lishogi.org](https://img.shields.io/badge/☗_lishogi.org-Play_shogi-black)](https://lishogi.org)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/WandererXII/shogiops/test.yml?label=test)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/WandererXII/shogiops/ci.yml?label=CI)
 [![npm](https://img.shields.io/npm/v/shogiops?logo=npm)](https://www.npmjs.com/package/shogiops)
 
 Shogi and operations in TypeScript forked from [chessops](https://github.com/niklasf/chessops), rewritten for shogi.

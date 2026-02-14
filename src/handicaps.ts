@@ -33,7 +33,7 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
   },
   {
     sfen: '1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
-    japaneseName: '兩香落ち',
+    japaneseName: '両香落ち',
     englishName: 'Both Lance',
   },
   {
@@ -123,7 +123,7 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
   },
   {
     sfen: 'lnsgkgsnl/1r5b1/p1ppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
-    japaneseName: '太閤落ち',
+    japaneseName: '太閤将棋',
     englishName: 'Taiko',
   },
   {
@@ -133,7 +133,7 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
   },
   {
     sfen: '1nsgkgsn1/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w 2L 1',
-    japaneseName: '兩香得',
+    japaneseName: '両香得',
     englishName: 'Two Lance Gained',
   },
   {

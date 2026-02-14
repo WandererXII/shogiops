@@ -41,8 +41,7 @@
     "vitest": "^4.0.18"
   },
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "prepare": "$npm_execpath run clean && $npm_execpath run compile",
+    "prepublishOnly": "$npm_execpath run clean && $npm_execpath run compile",
     "clean": "del dist && del *.tsbuildinfo",
     "compile": "tsc",
     "type-check": "tsgo --noEmit && tsc --noEmit",

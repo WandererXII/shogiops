@@ -256,3 +256,10 @@ test('randomly generated perfts - for consistency', () => {
     expect(perft(pos, depth)).toBe(res);
   });
 });
+
+test('valid in opposite check', () => {
+  const posB = parseSfen('chushogi', '12/12/12/12/12/6k5/5K6/12/12/12/12/12 b - 1').unwrap();
+  const posW = parseSfen('chushogi', '12/12/12/12/12/6k5/5K6/12/12/12/12/12 w - 1').unwrap();
+  expect(posB.validate(true).isOk).toBe(true);
+  expect(posW.validate(true).isOk).toBe(true);
+});

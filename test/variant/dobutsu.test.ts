@@ -94,3 +94,10 @@ test('drops', () => {
   pos.play(parseUsi('P*2b')!);
   expect(pos.isEnd()).toBe(false);
 });
+
+test('valid in opposite check', () => {
+  const posB = parseSfen('dobutsu', 'r2/2k/PKb/B2 b Pr').unwrap();
+  const posW = parseSfen('dobutsu', 'r2/2k/PKb/B2 w Pr').unwrap();
+  expect(posB.validate(true).isOk).toBe(true);
+  expect(posW.validate(true).isOk).toBe(true);
+});

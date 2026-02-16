@@ -5,7 +5,7 @@ import { Hands } from './hands.js';
 import type { Color, MoveOrDrop, Piece, Role, Rules, Square } from './types.js';
 import { defined, makeSquareName, parseCoordinates, parseSquareName, toBW } from './util.js';
 import type { Position, PositionError } from './variant/position.js';
-import { dimensions, handRoles } from './variant/util.js';
+import { dimensions, handRoles, unpromote } from './variant/util.js';
 import type { RulesTypeMap } from './variant/variant.js';
 import { initializePosition } from './variant/variant.js';
 
@@ -145,6 +145,8 @@ export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenE
     } else count = 1;
     const piece = forsythToPiece(rules)(handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
+    if (rules === 'kyotoshogi' && !handRoles(rules).includes(piece.role))
+      piece.role = unpromote(rules)(piece.role) || piece.role;
     count += hands[piece.color].get(piece.role);
     hands[piece.color].set(piece.role, count);
   }
@@ -591,16 +593,20 @@ function kyotoshogiForsythToRole(ch: string): Role | undefined {
     case 'p':
       return 'pawn';
     case 'r':
+    case '+p':
       return 'rook';
     case 's':
       return 'silver';
     case 'b':
+    case '+s':
       return 'bishop';
     case 'g':
+    case '+n':
       return 'gold';
     case 'n':
       return 'knight';
     case 't':
+    case '+l':
       return 'tokin';
     case 'l':
       return 'lance';
@@ -629,14 +635,19 @@ function dobutsuRoleToForsyth(role: Role): string | undefined {
 function dobutsuForsythToRole(ch: string): Role | undefined {
   switch (ch.toLowerCase()) {
     case 'k':
+    case 'l': // lion
       return 'king';
     case 'p':
+    case 'c': // chick
       return 'pawn';
     case 'r':
+    case 'g': // giraffe
       return 'rook';
     case 'b':
+    case 'e': // elephant
       return 'bishop';
     case '+p':
+    case '+c':
       return 'tokin';
     default:
       return;

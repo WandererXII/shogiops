@@ -89,3 +89,17 @@ test('chushogi sfen', () => {
     false,
   );
 });
+
+test('kyotoshogi fariy-stockfish', () => {
+  const pos1 = parseSfen('kyotoshogi', 'p+nks+l/5/5/5/+LSK+NP b -', true);
+  expect(pos1.isOk).toBe(true);
+  const pos2Fairy = parseSfen('kyotoshogi', '+L1L2/+S1S1k/5/+N1N1K/+P1P2 b PNLS', true).unwrap();
+  const pos2Lishogi = parseSfen('kyotoshogi', 'T1L2/B1S1k/5/G1N1K/R1P2 b TGSP 1', true).unwrap();
+  expect(makeSfen(pos2Fairy)).toEqual(makeSfen(pos2Lishogi));
+});
+
+test('dobutsu fariy-stockfish', () => {
+  const posFairy = parseSfen('dobutsu', 'gle/1c1/1C+C/ELG b CEG 1', true).unwrap();
+  const posLishogi = parseSfen('dobutsu', 'rkb/1p1/1P+P/BKR b RBP 1', true).unwrap();
+  expect(makeSfen(posFairy)).toEqual(makeSfen(posLishogi));
+});

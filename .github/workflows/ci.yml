@@ -5,6 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
       - name: Get PNPM version from package.json
         id: pnpm-version
         shell: bash
@@ -12,10 +16,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: ${{ steps.pnpm-version.outputs.pnpm_version }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: package.json
-          cache: 'pnpm'
       - run: pnpm install
       - run: pnpm run type-check
       - run: pnpm run check

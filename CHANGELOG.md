@@ -1,5 +1,16 @@
 # Changelog for shogiops
 
+## v0.21.0
+
+- `promote` and `unpromote` from 'variant/util' now correctly promotes roles only from said variant.
+- Added `parseFairyUsi` to parse usi from Fairy-Stockfish engine - relevant only in some variants (kyotoshogi, dobutsu) where our implementations differ.
+- `parseSfen` now also parses sfen strings in format produced by Fairy-Stockfish engine - relevant only in some variants (kyotoshogi, dobutsu) where our implementations differ.
+- Removed lifecycle scripts, that triggered pnpm.
+
+## v0.20.1
+
+- Handicap name fixes.
+
 ## v0.20.0
 
 - Switched to pnpm.

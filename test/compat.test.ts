@@ -1,8 +1,14 @@
 import { expect, test } from 'vitest';
-import { scalashogiCharPair, shogigroundDropDests, shogigroundMoveDests } from '@/compat.js';
+import {
+  parseFairyUsi,
+  scalashogiCharPair,
+  shogigroundDropDests,
+  shogigroundMoveDests,
+} from '@/compat.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import type { Rules } from '@/types.js';
-import { parseUsi } from '@/util.js';
+import { makeUsi, parseUsi } from '@/util.js';
+import { usiFixture } from './fixtures/usi.js';
 
 test('shogiground dests', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
@@ -997,4 +1003,32 @@ test('scalashogiCharPair - lion moves', () => {
   expect(convStr('5e6f5g', 'chushogi')).toBe(`Wç`);
   expect(convStr('5e6f6g', 'chushogi')).toBe(`Wß`);
   expect(convStr('5e6f7g', 'chushogi')).toBe(`W×`);
+});
+
+test('parseFairyUsi - usi prod 500', () => {
+  for (const usis of usiFixture) {
+    for (const usi of usis.split(' ')) {
+      expect(parseFairyUsi(usi, 'standard')).toBeDefined();
+    }
+  }
+});
+
+test('parseFairyUsi - kyotoshogi', () => {
+  expect(makeUsi(parseFairyUsi('P*2b', 'kyotoshogi')!)).toBe('P*2b');
+  expect(makeUsi(parseFairyUsi('+P*2b', 'kyotoshogi')!)).toBe('R*2b');
+  expect(makeUsi(parseFairyUsi('L*3d', 'kyotoshogi')!)).toBe('L*3d');
+  expect(makeUsi(parseFairyUsi('+L*3d', 'kyotoshogi')!)).toBe('T*3d');
+  expect(makeUsi(parseFairyUsi('N*1a', 'kyotoshogi')!)).toBe('N*1a');
+  expect(makeUsi(parseFairyUsi('+N*1a', 'kyotoshogi')!)).toBe('G*1a');
+  expect(makeUsi(parseFairyUsi('S*1a', 'kyotoshogi')!)).toBe('S*1a');
+  expect(makeUsi(parseFairyUsi('+S*1a', 'kyotoshogi')!)).toBe('B*1a');
+  expect(makeUsi(parseFairyUsi('1a1b', 'kyotoshogi')!)).toBe('1a1b');
+  expect(makeUsi(parseFairyUsi('1a1b+', 'kyotoshogi')!)).toBe('1a1b+');
+  expect(makeUsi(parseFairyUsi('1a1b-', 'kyotoshogi')!)).toBe('1a1b+');
+});
+
+test('parseFairyUsi - dobutsu', () => {
+  expect(makeUsi(parseFairyUsi('C*2b', 'dobutsu')!)).toBe('P*2b');
+  expect(makeUsi(parseFairyUsi('G*3d', 'dobutsu')!)).toBe('R*3d');
+  expect(makeUsi(parseFairyUsi('E*1a', 'dobutsu')!)).toBe('B*1a');
 });

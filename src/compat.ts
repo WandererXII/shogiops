@@ -1,5 +1,5 @@
 import type { SquareSet } from './square-set.js';
-import type { MoveOrDrop, PieceName, Rules, Square, SquareName } from './types.js';
+import type { DropMove, MoveOrDrop, PieceName, Rules, Square, SquareName } from './types.js';
 import {
   defined,
   isDrop,
@@ -12,7 +12,7 @@ import {
 import type { Chushogi } from './variant/chushogi.js';
 import { secondLionStepDests } from './variant/chushogi.js';
 import type { Position } from './variant/position.js';
-import { dimensions, fullSquareSet } from './variant/util.js';
+import { dimensions, fullSquareSet, promote } from './variant/util.js';
 
 export function squareSetToSquareNames(sqs: SquareSet): SquareName[] {
   return Array.from(sqs, (s) => makeSquareName(s));
@@ -104,4 +104,37 @@ export function scalashogiCharPair(md: MoveOrDrop, rules: Rules): string {
     if (md.promotion) return String.fromCharCode(to, from);
     else return String.fromCharCode(from, to);
   }
+}
+
+export function parseFairyUsi(usi: string, rules: Rules): MoveOrDrop | undefined {
+  // drops: +N*3b == G*3b
+  // moves: 1a1b- == 1a1b+
+  if (rules === 'kyotoshogi') {
+    if (usi[0] === '+') {
+      const dropUnpromoted = parseUsi(usi.slice(1)) as DropMove | undefined;
+      if (dropUnpromoted) {
+        const promotedRole = promote('kyotoshogi')(dropUnpromoted.role);
+        if (promotedRole) return { role: promotedRole, to: dropUnpromoted.to };
+      }
+    } else if (usi.includes('-')) return parseUsi(`${usi.slice(0, -1)}+`);
+  }
+  // drops: C*2b == P*2b
+  else if (rules === 'dobutsu') {
+    const roles: Record<string, string> = {
+      g: 'r',
+      G: 'R',
+      l: 'k',
+      L: 'K',
+      e: 'b',
+      E: 'B',
+      c: 'p',
+      C: 'P',
+    };
+    if (usi[1] === '*') {
+      const role = usi[0];
+      return parseUsi(`${roles[role] || role}${usi.slice(1)}`);
+    }
+  }
+
+  return parseUsi(usi);
 }

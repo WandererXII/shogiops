@@ -208,8 +208,12 @@ export function promote(rules: Rules): (role: Role) => Role | undefined {
   switch (rules) {
     case 'chushogi':
       return chuushogiPromote;
+    case 'minishogi':
+      return minishogiPromote;
     case 'kyotoshogi':
-      return kyotoPromote;
+      return kyotoshogiPromote;
+    case 'dobutsu':
+      return dobutsuPromote;
     default:
       return standardPromote;
   }
@@ -219,8 +223,12 @@ export function unpromote(rules: Rules): (role: Role) => Role | undefined {
   switch (rules) {
     case 'chushogi':
       return chuushogiUnpromote;
+    case 'minishogi':
+      return minishogiUnpromote;
     case 'kyotoshogi':
-      return kyotoPromote;
+      return kyotoshogiPromote;
+    case 'dobutsu':
+      return dobutsuUnpromote;
     default:
       return standardUnpromote;
   }
@@ -294,6 +302,36 @@ function standardUnpromote(role: Role): Role | undefined {
       return 'lance';
     case 'promotedknight':
       return 'knight';
+    case 'promotedsilver':
+      return 'silver';
+    case 'horse':
+      return 'bishop';
+    case 'dragon':
+      return 'rook';
+    default:
+      return;
+  }
+}
+
+function minishogiPromote(role: Role): Role | undefined {
+  switch (role) {
+    case 'pawn':
+      return 'tokin';
+    case 'silver':
+      return 'promotedsilver';
+    case 'bishop':
+      return 'horse';
+    case 'rook':
+      return 'dragon';
+    default:
+      return;
+  }
+}
+
+function minishogiUnpromote(role: Role): Role | undefined {
+  switch (role) {
+    case 'tokin':
+      return 'pawn';
     case 'promotedsilver':
       return 'silver';
     case 'horse':
@@ -391,7 +429,7 @@ function chuushogiUnpromote(role: Role): Role | undefined {
   }
 }
 
-function kyotoPromote(role: Role): Role | undefined {
+function kyotoshogiPromote(role: Role): Role | undefined {
   switch (role) {
     case 'rook':
       return 'pawn';
@@ -409,6 +447,24 @@ function kyotoPromote(role: Role): Role | undefined {
       return 'lance';
     case 'lance':
       return 'tokin';
+    default:
+      return;
+  }
+}
+
+function dobutsuPromote(role: Role): Role | undefined {
+  switch (role) {
+    case 'pawn':
+      return 'tokin';
+    default:
+      return;
+  }
+}
+
+function dobutsuUnpromote(role: Role): Role | undefined {
+  switch (role) {
+    case 'tokin':
+      return 'pawn';
     default:
       return;
   }

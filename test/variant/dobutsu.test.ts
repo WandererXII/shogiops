@@ -81,6 +81,16 @@ test('try rule - in check', () => {
   expect(pos3.outcome()?.winner).toBe('sente');
 });
 
+test('try rule - draw', () => {
+  const pos = parseSfen('dobutsu', '1K1/1r1/1R1/1k1 w BPbp 40').unwrap();
+  expect(pos.validate(true).isOk).toBe(true);
+  expect(pos.isLegal(parseUsi('2b2c')!)).toBe(true);
+  pos.play(parseUsi('2b2c')!);
+  expect(pos.isEnd()).toBe(true);
+  expect(pos.outcome()?.result).toBe('draw');
+  expect(pos.outcome()?.winner).toBeUndefined();
+});
+
 test('force promoting', () => {
   const pos = parseSfen('dobutsu', '3/BRP/2k/K2 b P').unwrap();
   expect(pos.isLegal(parseUsi('1b1a')!)).toBe(false);

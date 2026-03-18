@@ -82,12 +82,18 @@ export class Dobutsu extends Position {
 
     const senteTryRule = isTryRule('sente');
     const goteTryRule = isTryRule('gote');
-    if (senteTryRule && !goteTryRule) {
+    if (senteTryRule && goteTryRule) {
+      return {
+        result: 'draw',
+        winner: undefined,
+      };
+    }
+    if (senteTryRule) {
       return {
         result: 'tryRule',
         winner: 'sente',
       };
-    } else if (goteTryRule && !senteTryRule) {
+    } else if (goteTryRule) {
       return {
         result: 'tryRule',
         winner: 'gote',

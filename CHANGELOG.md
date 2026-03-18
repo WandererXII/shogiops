@@ -1,5 +1,9 @@
 # Changelog for shogiops
 
+## v0.21.1
+
+- Try rule in dobutsu shogi reached by both players is now considered a draw.
+
 ## v0.21.0
 
 - `promote` and `unpromote` from 'variant/util' now correctly promotes roles only from said variant.

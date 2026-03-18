@@ -101,3 +101,11 @@ test('valid in opposite check', () => {
   expect(posB.validate(true).isOk).toBe(true);
   expect(posW.validate(true).isOk).toBe(true);
 });
+
+test('double pawn', () => {
+  const pos = parseSfen('dobutsu', 'rkb/2P/2P/BKR b - 1').unwrap();
+  expect(pos.validate(true).isOk).toBe(true);
+
+  const posPre = parseSfen('dobutsu', 'rkb/3/2P/BKR b P 1').unwrap();
+  expect(posPre.isLegal(parseUsi('P*1b')!)).toBe(true);
+});

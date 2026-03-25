@@ -10,7 +10,6 @@ import type {
   Outcome,
   Piece,
   PieceName,
-  Role,
   Rules,
   Setup,
   Square,
@@ -23,7 +22,7 @@ import {
   pieceCanPromote,
   pieceForcePromote,
   promote,
-  unpromote,
+  unpromoteForHand,
 } from './util.js';
 
 export const IllegalSetup = {
@@ -308,15 +307,8 @@ export abstract class Position {
     }
   }
 
-  private unpromoteForHand(role: Role): Role | undefined {
-    if (handRoles(this.rules).includes(role)) return role;
-    const unpromotedRole = unpromote(this.rules)(role);
-    if (unpromotedRole && handRoles(this.rules).includes(unpromotedRole)) return unpromotedRole;
-    return;
-  }
-
   private storeCapture(capture: Piece): void {
-    const unpromotedRole = this.unpromoteForHand(capture.role);
+    const unpromotedRole = unpromoteForHand(this.rules)(capture.role);
     if (unpromotedRole && handRoles(this.rules).includes(unpromotedRole))
       this.hands[opposite(capture.color)].capture(unpromotedRole);
   }
@@ -332,7 +324,7 @@ export abstract class Position {
 
     if (isDrop(md)) {
       this.board.set(md.to, { role: md.role, color: turn });
-      this.hands[turn].drop(this.unpromoteForHand(md.role) || md.role);
+      this.hands[turn].drop(unpromoteForHand(this.rules)(md.role) || md.role);
     } else {
       const piece = this.board.take(md.from);
       const role = piece?.role;

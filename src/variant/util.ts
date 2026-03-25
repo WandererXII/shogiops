@@ -234,6 +234,15 @@ export function unpromote(rules: Rules): (role: Role) => Role | undefined {
   }
 }
 
+export function unpromoteForHand(rules: Rules): (role: Role) => Role | undefined {
+  return (role) => {
+    if (handRoles(rules).includes(role)) return role;
+    const unpromotedRole = unpromote(rules)(role);
+    if (unpromotedRole && handRoles(rules).includes(unpromotedRole)) return unpromotedRole;
+    return;
+  };
+}
+
 export function promotionZone(rules: Rules): (color: Color) => SquareSet {
   switch (rules) {
     case 'chushogi':

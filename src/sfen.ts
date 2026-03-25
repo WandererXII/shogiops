@@ -164,6 +164,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   // Board
   const boardPart = parts.shift()!;
   const board: Result<Board, SfenError> = parseBoardSfen(rules, boardPart);
+  if (board.isErr) return Result.err(board.error);
 
   // Turn
   const turnPart = parts.shift();
@@ -181,7 +182,10 @@ export function parseSfen<R extends keyof RulesTypeMap>(
       lastMoveOrDrop = { to: destSquare };
       lastLionCapture = destSquare;
     }
-  } else if (defined(handsPart)) hands = parseHands(rules, handsPart);
+  } else if (defined(handsPart)) {
+    hands = parseHands(rules, handsPart);
+  }
+  if (hands.isErr) return Result.err(hands.error);
 
   // Move number
   const moveNumberPart = parts.shift();
@@ -190,21 +194,17 @@ export function parseSfen<R extends keyof RulesTypeMap>(
 
   if (parts.length > 0) return Result.err(new SfenError(InvalidSfen.Sfen));
 
-  return board.chain((board) =>
-    hands.chain((hands) =>
-      initializePosition(
-        rules,
-        {
-          board,
-          hands,
-          turn,
-          moveNumber: Math.max(1, moveNumber),
-          lastMoveOrDrop,
-          lastLionCapture,
-        },
-        !!strict,
-      ),
-    ),
+  return initializePosition(
+    rules,
+    {
+      board: board.value,
+      hands: hands.value,
+      turn,
+      moveNumber: Math.max(1, moveNumber),
+      lastMoveOrDrop,
+      lastLionCapture,
+    },
+    !!strict,
   );
 }
 

@@ -407,6 +407,7 @@ function compareSfens(a: string, b: string): boolean {
 
   return (
     aSplit.length >= 2 &&
+    bSplit.length >= 2 &&
     aSplit[0] === bSplit[0] &&
     aSplit[1] === bSplit[1] &&
     (aSplit[2] === bSplit[2] || (aSplit[2] ?? '-') === (bSplit[2] ?? '-'))

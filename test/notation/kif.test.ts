@@ -6,7 +6,7 @@ import {
   parseKifMoveOrDrop,
   parseKifMovesOrDrops,
   parseTags,
-} from '@/notation/kif.js';
+} from '@/notation/game/kif.js';
 import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 

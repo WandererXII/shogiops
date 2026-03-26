@@ -1,13 +1,13 @@
 import type { Result } from '@badrap/result';
 import type { Setup } from '../types.js';
-import { Annanshogi } from './annanshogi.js';
-import { Checkshogi } from './checkshogi.js';
-import { Chushogi } from './chushogi.js';
-import { Dobutsu } from './dobutsu.js';
-import { Kyotoshogi } from './kyotoshogi.js';
-import { Minishogi } from './minishogi.js';
 import type { PositionError } from './position.js';
-import { Shogi } from './shogi.js';
+import { Annanshogi } from './rules/annanshogi.js';
+import { Checkshogi } from './rules/checkshogi.js';
+import { Chushogi } from './rules/chushogi.js';
+import { Dobutsu } from './rules/dobutsu.js';
+import { Kyotoshogi } from './rules/kyotoshogi.js';
+import { Minishogi } from './rules/minishogi.js';
+import { Shogi } from './rules/shogi.js';
 
 export interface RulesTypeMap {
   standard: Shogi;

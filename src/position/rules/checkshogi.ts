@@ -1,9 +1,9 @@
 import type { Result } from '@badrap/result';
-import type { SquareSet } from '../square-set.js';
-import type { Color, Outcome, Piece, Setup, Square } from '../types.js';
-import { opposite } from '../util.js';
-import type { Context, PositionError } from './position.js';
-import { Position } from './position.js';
+import type { SquareSet } from '../../square-set.js';
+import type { Color, Outcome, Piece, Setup, Square } from '../../types.js';
+import { opposite } from '../../util.js';
+import type { Context, PositionError } from '../position.js';
+import { Position } from '../position.js';
 import {
   standardDropDests,
   standardMoveDests,

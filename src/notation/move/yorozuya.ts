@@ -1,6 +1,6 @@
-import type { MoveOrDrop, Square } from '../types.js';
-import { defined } from '../util.js';
-import type { Position } from '../variant/position.js';
+import type { Position } from '../../position/position.js';
+import type { MoveOrDrop, Square } from '../../types.js';
+import { defined } from '../../util.js';
 import { makeJapaneseMoveOrDrop } from './japanese.js';
 
 const DIZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];

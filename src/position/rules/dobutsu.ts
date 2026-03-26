@@ -1,11 +1,11 @@
 import type { Result } from '@badrap/result';
-import { attacks, goldAttacks, kingAttacks, pawnAttacks } from '../attacks.js';
-import { SquareSet } from '../square-set.js';
-import type { Color, Outcome, Piece, Setup, Square } from '../types.js';
-import { defined, opposite } from '../util.js';
-import type { Context, PositionError } from './position.js';
-import { Position } from './position.js';
-import { fullSquareSet, promotionZone } from './util.js';
+import { attacks, goldAttacks, kingAttacks, pawnAttacks } from '../../attacks.js';
+import { SquareSet } from '../../square-set.js';
+import type { Color, Outcome, Piece, Setup, Square } from '../../types.js';
+import { defined, opposite } from '../../util.js';
+import type { Context, PositionError } from '../position.js';
+import { Position } from '../position.js';
+import { fullSquareSet, promotionZone } from '../util.js';
 
 export class Dobutsu extends Position {
   private constructor() {

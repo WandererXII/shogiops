@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { makeWesternMoveOrDrop } from '@/notation/western.js';
+import { makeWesternMoveOrDrop } from '@/notation/move/western.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 

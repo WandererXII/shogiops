@@ -27,13 +27,13 @@ import {
   verticalMoverAttacks,
   whaleAttacks,
   whiteHorseAttacks,
-} from '../attacks.js';
-import { SquareSet } from '../square-set.js';
-import type { Color, MoveOrDrop, Outcome, Piece, Setup, Square } from '../types.js';
-import { defined, isMove, lionRoles, opposite, squareDist } from '../util.js';
-import type { Context } from './position.js';
-import { Position, type PositionError } from './position.js';
-import { dimensions, fullSquareSet } from './util.js';
+} from '../../attacks.js';
+import { SquareSet } from '../../square-set.js';
+import type { Color, MoveOrDrop, Outcome, Piece, Setup, Square } from '../../types.js';
+import { defined, isMove, lionRoles, opposite, squareDist } from '../../util.js';
+import type { Context } from '../position.js';
+import { Position, type PositionError } from '../position.js';
+import { dimensions, fullSquareSet } from '../util.js';
 
 export class Chushogi extends Position {
   private constructor() {

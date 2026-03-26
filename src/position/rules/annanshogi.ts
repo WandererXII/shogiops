@@ -1,13 +1,13 @@
 import type { Result } from '@badrap/result';
-import { attacks, between, ray } from '../attacks.js';
-import { Board } from '../board.js';
-import { SquareSet } from '../square-set.js';
-import type { Color, Piece, Setup, Square } from '../types.js';
-import { defined, opposite, squareFile } from '../util.js';
-import type { Context, PositionError } from './position.js';
-import { Position } from './position.js';
+import { attacks, between, ray } from '../../attacks.js';
+import { Board } from '../../board.js';
+import { SquareSet } from '../../square-set.js';
+import type { Color, Piece, Setup, Square } from '../../types.js';
+import { defined, opposite, squareFile } from '../../util.js';
+import type { Context, PositionError } from '../position.js';
+import { Position } from '../position.js';
+import { fullSquareSet } from '../util.js';
 import { standardSquareAttacks, standardSquareSnipers } from './shogi.js';
-import { fullSquareSet } from './util.js';
 
 export class Annanshogi extends Position {
   private constructor() {

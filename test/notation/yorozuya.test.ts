@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
+import { convertJapaneseToYorozuya, makeYorozuyaMoveOrDrop } from '@/notation/move/yorozuya.js';
 import { makeJapaneseSquare } from '@/notation/util.js';
-import { convertJapaneseToYorozuya, makeYorozuyaMoveOrDrop } from '@/notation/yorozuya.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseSquareName, parseUsi } from '@/util.js';
 

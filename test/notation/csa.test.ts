@@ -6,7 +6,7 @@ import {
   parseCsaMoveOrDrop,
   parseCsaMovesOrDrops,
   parseTags,
-} from '@/notation/csa.js';
+} from '@/notation/game/csa.js';
 import { parseNumberSquare } from '@/notation/util.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseSquareName, parseUsi } from '@/util.js';

@@ -1,15 +1,15 @@
 import { Result } from '@badrap/result';
-import { Board } from '../board.js';
-import type { Hand } from '../hands.js';
-import { Hands } from '../hands.js';
-import { initialSfen, parseSfen } from '../sfen.js';
-import type { Color, MoveOrDrop } from '../types.js';
-import { boolToColor, defined, isDrop, parseCoordinates } from '../util.js';
-import { Shogi } from '../variant/shogi.js';
-import { allRoles, handRoles, promote } from '../variant/util.js';
-import { csaToRole, makeNumberSquare, parseNumberSquare, roleToCsa } from './util.js';
+import { Board } from '../../board.js';
+import type { Hand } from '../../hands.js';
+import { Hands } from '../../hands.js';
+import { Shogi } from '../../position/rules/shogi.js';
+import { allRoles, handRoles, promote } from '../../position/util.js';
+import { initialSfen, parseSfen } from '../../sfen.js';
+import type { Color, MoveOrDrop } from '../../types.js';
+import { boolToColor, defined, isDrop, parseCoordinates } from '../../util.js';
+import { csaToRole, makeNumberSquare, parseNumberSquare, roleToCsa } from '../util.js';
 
-// Only supports standard shogi no variants
+// Only supports standard shogi
 
 //
 // CSA HEADER

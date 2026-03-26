@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { makeJapaneseMoveOrDrop } from '@/notation/japanese.js';
+import { makeJapaneseMoveOrDrop } from '@/notation/move/japanese.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 

@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { makeKitaoKawasakiMoveOrDrop } from '@/notation/kitao-kawasaki.js';
+import { makeKitaoKawasakiMoveOrDrop } from '@/notation/move/kitao-kawasaki.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { parseUsi } from '@/util.js';
 

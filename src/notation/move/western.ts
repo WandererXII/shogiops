@@ -1,8 +1,8 @@
-import type { MoveOrDrop } from '../types.js';
-import { defined, isDrop } from '../util.js';
-import type { Position } from '../variant/position.js';
-import { pieceCanPromote } from '../variant/util.js';
-import { aimingAt, makeNumberSquare, roleToWestern } from './util.js';
+import type { Position } from '../../position/position.js';
+import { pieceCanPromote } from '../../position/util.js';
+import type { MoveOrDrop } from '../../types.js';
+import { defined, isDrop } from '../../util.js';
+import { aimingAt, makeNumberSquare, roleToWestern } from '../util.js';
 
 // P-76
 export function makeWesternMoveOrDrop(pos: Position, md: MoveOrDrop): string | undefined {

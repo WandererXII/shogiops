@@ -9,14 +9,14 @@ import {
   pawnAttacks,
   rookAttacks,
   silverAttacks,
-} from '../attacks.js';
-import { SquareSet } from '../square-set.js';
-import type { Color, MoveOrDrop, Piece, Setup, Square } from '../types.js';
-import { defined, isDrop, opposite } from '../util.js';
-import type { Context, PositionError } from './position.js';
-import { Position } from './position.js';
+} from '../../attacks.js';
+import { SquareSet } from '../../square-set.js';
+import type { Color, MoveOrDrop, Piece, Setup, Square } from '../../types.js';
+import { defined, isDrop, opposite } from '../../util.js';
+import type { Context, PositionError } from '../position.js';
+import { Position } from '../position.js';
+import { fullSquareSet, handRoles, unpromote } from '../util.js';
 import { standardMoveDests } from './shogi.js';
-import { fullSquareSet, handRoles, unpromote } from './util.js';
 
 export class Kyotoshogi extends Position {
   private constructor() {

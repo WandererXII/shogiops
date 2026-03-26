@@ -1,10 +1,10 @@
-import { kingAttacks } from '../attacks.js';
-import { SquareSet } from '../square-set.js';
-import type { MoveOrDrop, Piece, Role, Rules, Square } from '../types.js';
-import { defined, isDrop, squareDist, squareFile, squareRank } from '../util.js';
-import type { Position } from '../variant/position.js';
-import { pieceCanPromote } from '../variant/util.js';
-import { aimingAt, makeJapaneseSquare, roleKanjiDuplicates, roleToKanji } from './util.js';
+import { kingAttacks } from '../../attacks.js';
+import type { Position } from '../../position/position.js';
+import { pieceCanPromote } from '../../position/util.js';
+import { SquareSet } from '../../square-set.js';
+import type { MoveOrDrop, Piece, Role, Rules, Square } from '../../types.js';
+import { defined, isDrop, squareDist, squareFile, squareRank } from '../../util.js';
+import { aimingAt, makeJapaneseSquare, roleKanjiDuplicates, roleToKanji } from '../util.js';
 
 // ７六歩
 export function makeJapaneseMoveOrDrop(

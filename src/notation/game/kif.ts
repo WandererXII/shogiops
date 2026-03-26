@@ -1,13 +1,13 @@
 import { Result } from '@badrap/result';
-import { Board } from '../board.js';
-import { findHandicap, isHandicap } from '../handicaps.js';
-import { Hand, Hands } from '../hands.js';
-import { initialSfen, makeSfen, parseSfen } from '../sfen.js';
-import type { Color, MoveOrDrop, Rules, Square } from '../types.js';
-import { boolToColor, defined, isDrop, isMove, parseCoordinates } from '../util.js';
-import type { Position } from '../variant/position.js';
-import { allRoles, dimensions, handRoles, promote } from '../variant/util.js';
-import { initializePosition } from '../variant/variant.js';
+import { Board } from '../../board.js';
+import { findHandicap, isHandicap } from '../../handicaps.js';
+import { Hand, Hands } from '../../hands.js';
+import type { Position } from '../../position/position.js';
+import { initializePosition } from '../../position/setup.js';
+import { allRoles, dimensions, handRoles, promote } from '../../position/util.js';
+import { initialSfen, makeSfen, parseSfen } from '../../sfen.js';
+import type { Color, MoveOrDrop, Rules, Square } from '../../types.js';
+import { boolToColor, defined, isDrop, isMove, parseCoordinates } from '../../util.js';
 import {
   filesByRules,
   kanjiToNumber,
@@ -21,7 +21,7 @@ import {
   pieceToBoardKanji,
   roleToFullKanji,
   roleToKanji,
-} from './util.js';
+} from '../util.js';
 
 //
 // KIF HEADER
@@ -132,7 +132,7 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
         : undefined;
 
       const hSfen = handicap?.sfen;
-      const rules = detectVariant(hSfen?.split('/').length, handicapTag);
+      const rules = detectRules(hSfen?.split('/').length, handicapTag);
       return parseSfen(rules, hSfen ?? initialSfen(rules));
     },
   );
@@ -141,8 +141,7 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
 function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {
   const lines = normalizedKifLines(kif);
   const handicapTag = lines.find((l) => l.startsWith('手合割：'));
-  const rules =
-    rulesOpt || detectVariant(lines.filter((l) => l.startsWith('|')).length, handicapTag);
+  const rules = rulesOpt || detectRules(lines.filter((l) => l.startsWith('|')).length, handicapTag);
   const goteHandStr = lines.find(
     (l) => l.startsWith('後手の持駒：') || l.startsWith('上手の持駒：'),
   );
@@ -180,7 +179,7 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
   );
 }
 
-function detectVariant(lines: number | undefined, tag: string | undefined): Rules {
+function detectRules(lines: number | undefined, tag: string | undefined): Rules {
   if (lines === 12) return 'chushogi';
   else if (
     (!defined(lines) || lines === 0 || lines === 5) &&

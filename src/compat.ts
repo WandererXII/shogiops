@@ -1,3 +1,7 @@
+import type { Position } from './position/position.js';
+import type { Chushogi } from './position/rules/chushogi.js';
+import { secondLionStepDests } from './position/rules/chushogi.js';
+import { dimensions, fullSquareSet, promote } from './position/util.js';
 import type { SquareSet } from './square-set.js';
 import type { DropMove, MoveOrDrop, PieceName, Rules, Square, SquareName } from './types.js';
 import {
@@ -9,10 +13,6 @@ import {
   squareFile,
   squareRank,
 } from './util.js';
-import type { Chushogi } from './variant/chushogi.js';
-import { secondLionStepDests } from './variant/chushogi.js';
-import type { Position } from './variant/position.js';
-import { dimensions, fullSquareSet, promote } from './variant/util.js';
 
 export function squareSetToSquareNames(sqs: SquareSet): SquareName[] {
   return Array.from(sqs, (s) => makeSquareName(s));

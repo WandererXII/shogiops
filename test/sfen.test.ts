@@ -2,9 +2,9 @@ import { expect, test } from 'vitest';
 import { Board } from '@/board.js';
 import { RULES } from '@/constants.js';
 import { Hands } from '@/hands.js';
+import { IllegalSetup } from '@/position/position.js';
 import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '@/sfen.js';
 import { parseSquareName } from '@/util.js';
-import { IllegalSetup } from '@/variant/position.js';
 
 test.each(RULES)('rules - parse sfen and back', (rules) => {
   const pos = parseSfen(rules, initialSfen(rules), false).unwrap();

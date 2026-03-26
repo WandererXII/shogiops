@@ -6,12 +6,12 @@ import {
   pawnAttacks,
   rookAttacks,
   silverAttacks,
-} from '../attacks.js';
-import { SquareSet } from '../square-set.js';
-import type { Color, Piece, Setup, Square } from '../types.js';
-import { opposite } from '../util.js';
-import type { Context, PositionError } from './position.js';
-import { Position } from './position.js';
+} from '../../attacks.js';
+import { SquareSet } from '../../square-set.js';
+import type { Color, Piece, Setup, Square } from '../../types.js';
+import { opposite } from '../../util.js';
+import type { Context, PositionError } from '../position.js';
+import { Position } from '../position.js';
 import { standardDropDests, standardMoveDests } from './shogi.js';
 
 export class Minishogi extends Position {

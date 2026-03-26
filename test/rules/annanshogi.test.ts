@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest';
+import { fullSquareSet } from '@/position/util.js';
 import { initialSfen, parseSfen } from '@/sfen.js';
 import { SquareSet } from '@/square-set.js';
 import { parseSquareName, parseUsi } from '@/util.js';
-import { fullSquareSet } from '@/variant/util.js';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftAnnan.js';
 

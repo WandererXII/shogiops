@@ -11,14 +11,14 @@ import {
   ray,
   rookAttacks,
   silverAttacks,
-} from '../attacks.js';
-import type { Board } from '../board.js';
-import { SquareSet } from '../square-set.js';
-import type { Color, Piece, Setup, Square } from '../types.js';
-import { defined, opposite, squareFile } from '../util.js';
-import type { Context, PositionError } from './position.js';
-import { Position } from './position.js';
-import { dimensions, fullSquareSet } from './util.js';
+} from '../../attacks.js';
+import type { Board } from '../../board.js';
+import { SquareSet } from '../../square-set.js';
+import type { Color, Piece, Setup, Square } from '../../types.js';
+import { defined, opposite, squareFile } from '../../util.js';
+import type { Context, PositionError } from '../position.js';
+import { Position } from '../position.js';
+import { dimensions, fullSquareSet } from '../util.js';
 
 export class Shogi extends Position {
   private constructor() {

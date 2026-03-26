@@ -77,7 +77,7 @@ export function isMove(v: MoveOrDrop): v is NormalMove {
 
 export const lionRoles: Role[] = ['lion', 'lionpromoted'];
 
-// other roles can't be dropped with any current variant
+// other roles can't be dropped with any current ruleset
 function parseUsiDropRole(ch: string): Role | undefined {
   switch (ch.toUpperCase()) {
     case 'P':

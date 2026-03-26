@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { initialSfen, parseSfen } from '@/sfen.js';
+import { InvalidSfen, initialSfen, parseSfen } from '@/sfen.js';
 import { perft } from '../debug.js';
 import { perfts } from '../fixtures/perftMinishogi.js';
 
@@ -14,6 +14,16 @@ const minishogiPerfts: [string, number, number][] = [
 test.each(minishogiPerfts)('minishogi perft: %s (%s): %s', (sfen, depth, res) => {
   const pos = parseSfen('minishogi', sfen || initialSfen('minishogi')).unwrap();
   expect(perft(pos, depth)).toBe(res);
+});
+
+test('roles outside minishogi', () => {
+  const r1 = parseSfen('minishogi', '2k2/2p2/2l2/2P2/2K2 b - 1', true);
+  expect(
+    r1.unwrap(
+      (_) => undefined,
+      (err) => err.message,
+    ),
+  ).toEqual(InvalidSfen.BoardPiece);
 });
 
 test('minishogi checkmate', () => {

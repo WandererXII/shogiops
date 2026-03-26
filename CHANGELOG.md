@@ -1,5 +1,12 @@
 # Changelog for shogiops
 
+## v0.22.0
+
+- `variant` subfolder renamed to `position`.
+- Individual variants extending `Position` moved to `position/rules`.
+- Renamed `variant.ts` inside `position` to `setup.ts`.
+- Functions in `notation` were moved to `notation/move` and `notation/game`.
+
 ## v0.21.1
 
 - Try rule in dobutsu shogi reached by both players is now considered a draw.

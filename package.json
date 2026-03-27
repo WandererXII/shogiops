@@ -47,7 +47,8 @@
     "build": "tsc -p tsconfig.build.json",
     "type-check": "tsgo --noEmit && tsc --noEmit",
     "check": "biome check && oxlint --type-aware",
-    "test": "node --import tsx --test 'test/**/*.test.ts'"
+    "test": "node --import tsx --test 'test/**/*.test.ts'",
+    "test-only": "node --import tsx --test"
   },
   "files": [
     "dist",

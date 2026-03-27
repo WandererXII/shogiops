@@ -58,9 +58,9 @@ export function perft(
       const roleWithLionPower: Role[] = ['lion', 'lionpromoted', 'eagle', 'falcon'];
       if (roleWithLionPower.includes(piece.role)) {
         const secondMoveDests = secondLionStepDests(pos as Chushogi, from, to);
-        for (const mid of secondMoveDests) {
+        for (const secondTo of secondMoveDests) {
           const child = pos.clone();
-          const move: NormalMove = { from, to, midStep: mid };
+          const move: NormalMove = { from, to: secondTo, midStep: to };
           child.play(move);
           const children = perft(child, depth - 1, { ignoreEnd: options.ignoreEnd });
           if (options.log) logs.push(`${makeUsi(move)}: ${children}`);

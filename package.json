@@ -36,10 +36,10 @@
     "@types/node": "^22.19.15",
     "@typescript/native-preview": "7.0.0-dev.20260317.1",
     "del-cli": "^7.0.0",
-    "oxlint": "^1.56.0",
+    "oxlint": "^1.57.0",
     "oxlint-tsgolint": "^0.12.2",
     "tsx": "^4.21.0",
-    "vitest": "^4.1.0"
+    "typescript": "^6.0.2"
   },
   "scripts": {
     "prepublishOnly": "$npm_execpath run clean && $npm_execpath run build",

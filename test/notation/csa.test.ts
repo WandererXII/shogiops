@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { test } from 'node:test';
 import {
   makeCsaHeader,
   makeCsaMoveOrDrop,
@@ -6,10 +6,11 @@ import {
   parseCsaMoveOrDrop,
   parseCsaMovesOrDrops,
   parseTags,
-} from '@/notation/game/csa.js';
-import { parseNumberSquare } from '@/notation/util.js';
-import { initialSfen, parseSfen } from '@/sfen.js';
-import { parseSquareName, parseUsi } from '@/util.js';
+} from '../../src/notation/game/csa.js';
+import { parseNumberSquare } from '../../src/notation/util.js';
+import { initialSfen, parseSfen } from '../../src/sfen.js';
+import { parseSquareName, parseUsi } from '../../src/util.js';
+import { expect } from '../debug.js';
 
 test('parse csa square', () => {
   expect(parseNumberSquare('11')).toEqual(parseSquareName('1a'));
@@ -149,7 +150,7 @@ test('parse csa moves/drops one by one', () => {
     expect(parseCsaMoveOrDrop(pos, makeCsaMoveOrDrop(pos, m)!)).toEqual(m);
     pos.play(m);
   }
-  expect(pos.outcome()?.result).toBe('checkmate');
+  expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
 test('parse moves/drops', () => {
@@ -181,7 +182,7 @@ test('parse csa moves/drops', () => {
     '5573UM',
   ];
   for (const m of parseCsaMovesOrDrops(pos, line)) pos.play(m);
-  expect(pos.outcome()?.result).toBe('checkmate');
+  expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
 test('parse tags', () => {

@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { test } from 'node:test';
 import {
   makePieceName,
   makeUsi,
@@ -7,27 +7,28 @@ import {
   parseUsi,
   squareFile,
   squareRank,
-} from '@/util.js';
+} from '../src/util.js';
+import { expect } from './debug.js';
 import { usiFixture } from './fixtures/usi.js';
 
 test('square coordinates', () => {
-  expect(squareFile(0)).toBe(0);
-  expect(squareFile(1)).toBe(1);
-  expect(squareFile(15)).toBe(15);
-  expect(squareFile(16)).toBe(0);
-  expect(squareFile(31)).toBe(15);
-  expect(squareFile(32)).toBe(0);
-  expect(squareFile(240)).toBe(0);
-  expect(squareFile(255)).toBe(15);
+  expect(squareFile(0)).toEqual(0);
+  expect(squareFile(1)).toEqual(1);
+  expect(squareFile(15)).toEqual(15);
+  expect(squareFile(16)).toEqual(0);
+  expect(squareFile(31)).toEqual(15);
+  expect(squareFile(32)).toEqual(0);
+  expect(squareFile(240)).toEqual(0);
+  expect(squareFile(255)).toEqual(15);
 
-  expect(squareRank(0)).toBe(0);
-  expect(squareRank(1)).toBe(0);
-  expect(squareRank(15)).toBe(0);
-  expect(squareRank(16)).toBe(1);
-  expect(squareRank(31)).toBe(1);
-  expect(squareRank(32)).toBe(2);
-  expect(squareRank(239)).toBe(14);
-  expect(squareRank(255)).toBe(15);
+  expect(squareRank(0)).toEqual(0);
+  expect(squareRank(1)).toEqual(0);
+  expect(squareRank(15)).toEqual(0);
+  expect(squareRank(16)).toEqual(1);
+  expect(squareRank(31)).toEqual(1);
+  expect(squareRank(32)).toEqual(2);
+  expect(squareRank(239)).toEqual(14);
+  expect(squareRank(255)).toEqual(15);
 });
 
 test('parse squares', () => {
@@ -42,21 +43,20 @@ test('parse squares', () => {
 });
 
 test('parse usi', () => {
-  expect(parseUsi('1a9a')).toEqual({ from: 0, to: 8, promotion: false });
-  expect(parseUsi('2h2c+')).toEqual({ from: 113, to: 33, promotion: true });
-  // Is it even valid usi with '=' at the end?
-  expect(parseUsi('2h2c=')).toEqual({ from: 113, to: 33, promotion: false });
-  expect(parseUsi('2h2c')).toEqual({ from: 113, to: 33, promotion: false });
+  expect(parseUsi('1a9a')).toEqual({ from: 0, midStep: undefined, to: 8, promotion: false });
+  expect(parseUsi('2h2c+')).toEqual({ from: 113, midStep: undefined, to: 33, promotion: true });
+  expect(parseUsi('2h2c=')).toEqual({ from: 113, midStep: undefined, to: 33, promotion: false });
+  expect(parseUsi('2h2c')).toEqual({ from: 113, midStep: undefined, to: 33, promotion: false });
   expect(parseUsi('P*1g')).toEqual({ role: 'pawn', to: 96 });
-  expect(parseUsi('Z*1g')).toBeUndefined();
+  expect(parseUsi('Z*1g')).toEqual(undefined);
   expect(parseUsi('P*16a')).toEqual({ role: 'pawn', to: 15 });
   expect(parseUsi('P*16p')).toEqual({ role: 'pawn', to: 255 });
-  expect(parseUsi('1a16p')).toEqual({ from: 0, to: 255, promotion: false });
-  expect(parseUsi('1a16p+')).toEqual({ from: 0, to: 255, promotion: true });
-  expect(parseUsi('16o16p')).toEqual({ from: 239, to: 255, promotion: false });
-  expect(parseUsi('16o16p+')).toEqual({ from: 239, to: 255, promotion: true });
-  expect(parseUsi('16p1a')).toEqual({ from: 255, to: 0, promotion: false });
-  expect(parseUsi('16p1a+')).toEqual({ from: 255, to: 0, promotion: true });
+  expect(parseUsi('1a16p')).toEqual({ from: 0, midStep: undefined, to: 255, promotion: false });
+  expect(parseUsi('1a16p+')).toEqual({ from: 0, midStep: undefined, to: 255, promotion: true });
+  expect(parseUsi('16o16p')).toEqual({ from: 239, midStep: undefined, to: 255, promotion: false });
+  expect(parseUsi('16o16p+')).toEqual({ from: 239, midStep: undefined, to: 255, promotion: true });
+  expect(parseUsi('16p1a')).toEqual({ from: 255, midStep: undefined, to: 0, promotion: false });
+  expect(parseUsi('16p1a+')).toEqual({ from: 255, midStep: undefined, to: 0, promotion: true });
   // with midstep
   expect(parseUsi('1a1a1a')).toEqual({ from: 0, to: 0, midStep: 0, promotion: false });
   expect(parseUsi('1a1a1a=')).toEqual({ from: 0, to: 0, midStep: 0, promotion: false });
@@ -67,19 +67,19 @@ test('parse usi', () => {
 });
 
 test('make usi', () => {
-  expect(makeUsi({ role: 'rook', to: 1 })).toBe('R*2a');
-  expect(makeUsi({ from: 1, to: 2 })).toBe('2a3a');
-  expect(makeUsi({ from: 2, to: 3 })).toBe('3a4a');
-  expect(makeUsi({ from: 15, to: 16 })).toBe('16a1b');
-  expect(makeUsi({ from: 0, to: 240 })).toBe('1a1p');
-  expect(makeUsi({ from: 0, to: 254 })).toBe('1a15p');
-  expect(makeUsi({ from: 0, to: 255 })).toBe('1a16p');
-  expect(makeUsi({ from: 0, to: 0, promotion: true })).toBe('1a1a+');
-  expect(makeUsi({ from: 0, to: 0, promotion: false })).toBe('1a1a');
-  expect(makeUsi({ from: 0, to: 0, promotion: undefined })).toBe('1a1a');
+  expect(makeUsi({ role: 'rook', to: 1 })).toEqual('R*2a');
+  expect(makeUsi({ from: 1, to: 2 })).toEqual('2a3a');
+  expect(makeUsi({ from: 2, to: 3 })).toEqual('3a4a');
+  expect(makeUsi({ from: 15, to: 16 })).toEqual('16a1b');
+  expect(makeUsi({ from: 0, to: 240 })).toEqual('1a1p');
+  expect(makeUsi({ from: 0, to: 254 })).toEqual('1a15p');
+  expect(makeUsi({ from: 0, to: 255 })).toEqual('1a16p');
+  expect(makeUsi({ from: 0, to: 0, promotion: true })).toEqual('1a1a+');
+  expect(makeUsi({ from: 0, to: 0, promotion: false })).toEqual('1a1a');
+  expect(makeUsi({ from: 0, to: 0, promotion: undefined })).toEqual('1a1a');
   // with midstep
-  expect(makeUsi({ from: 0, to: 0, midStep: 255 })).toBe('1a16p1a');
-  expect(makeUsi({ from: 0, to: 0, midStep: 255, promotion: true })).toBe('1a16p1a+');
+  expect(makeUsi({ from: 0, to: 0, midStep: 255 })).toEqual('1a16p1a');
+  expect(makeUsi({ from: 0, to: 0, midStep: 255, promotion: true })).toEqual('1a16p1a+');
 });
 
 test('piece name', () => {
@@ -91,7 +91,7 @@ test('piece name', () => {
 test('usi prod 500', () => {
   for (const usis of usiFixture) {
     for (const usi of usis.split(' ')) {
-      expect(parseUsi(usi)).toBeDefined();
+      expect(!!parseUsi(usi)).toEqual(true);
     }
   }
 });

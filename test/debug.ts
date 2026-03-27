@@ -1,10 +1,16 @@
-import type { Position } from '@/position/position.js';
-import type { Chushogi } from '@/position/rules/chushogi.js';
-import { secondLionStepDests } from '@/position/rules/chushogi.js';
-import { pieceCanPromote, pieceForcePromote, promotableOnDrop, promote } from '@/position/util.js';
-import type { SquareSet } from '@/square-set.js';
-import type { DropMove, NormalMove, PieceName, Role, Square } from '@/types.js';
-import { makeSquareName, makeUsi, parsePieceName } from '@/util.js';
+import assert from 'node:assert/strict';
+import type { Position } from '../src/position/position.js';
+import type { Chushogi } from '../src/position/rules/chushogi.js';
+import { secondLionStepDests } from '../src/position/rules/chushogi.js';
+import {
+  pieceCanPromote,
+  pieceForcePromote,
+  promotableOnDrop,
+  promote,
+} from '../src/position/util.js';
+import type { SquareSet } from '../src/square-set.js';
+import type { DropMove, NormalMove, PieceName, Role, Square } from '../src/types.js';
+import { makeSquareName, makeUsi, parsePieceName } from '../src/util.js';
 
 export function moveDests(moveDests: Map<Square, SquareSet>): string {
   const lines: string[] = [];
@@ -80,4 +86,12 @@ export function perft(
   }
   if (options.log) console.log(logs.join('\n'));
   return nodes;
+}
+
+export function expect(actual: unknown) {
+  return {
+    toEqual(expected: unknown): void {
+      assert.deepStrictEqual(actual, expected);
+    },
+  };
 }

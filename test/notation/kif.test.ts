@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { test } from 'node:test';
 import {
   makeKifHeader,
   makeKifMoveOrDrop,
@@ -6,9 +6,10 @@ import {
   parseKifMoveOrDrop,
   parseKifMovesOrDrops,
   parseTags,
-} from '@/notation/game/kif.js';
-import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
-import { parseUsi } from '@/util.js';
+} from '../../src/notation/game/kif.js';
+import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
+import { parseUsi } from '../../src/util.js';
+import { expect } from '../debug.js';
 
 test('make kif header from some random position', () => {
   const pos = parseSfen(
@@ -194,7 +195,7 @@ test('parse kif moves/drops one by one', () => {
     expect(parseKifMoveOrDrop(makeKifMoveOrDrop(pos, m)!, pos.lastMoveOrDrop?.to)).toEqual(m);
     pos.play(m);
   }
-  expect(pos.outcome()?.result).toBe('checkmate');
+  expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
 test('parse kif moves/drops', () => {
@@ -213,7 +214,7 @@ test('parse kif moves/drops', () => {
     '11 ７三角成(55)',
   ];
   for (const m of parseKifMovesOrDrops(line)) pos.play(m);
-  expect(pos.outcome()?.result).toBe('checkmate');
+  expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
 test('parse tags', () => {

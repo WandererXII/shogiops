@@ -1,7 +1,7 @@
-import { expect, test } from 'vitest';
-import { initialSfen, makeSfen, parseSfen } from '@/sfen.js';
-import { parseUsi } from '@/util.js';
-import { perft } from '../debug.js';
+import { test } from 'node:test';
+import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
+import { parseUsi } from '../../src/util.js';
+import { expect, perft } from '../debug.js';
 import { perfts } from '../fixtures/perftStandard.js';
 import { usiFixture } from '../fixtures/usi.js';
 
@@ -130,42 +130,42 @@ test('test promotions', () => {
   const initial = parseSfen('standard', initialSfen('standard')).unwrap();
   const pos = parseSfen('standard', '4k4/9/7S1/1+PG3NS1/9/9/9/9/4K3L b - 1').unwrap();
 
-  expect(initial.isLegal({ from: 20, to: 29, promotion: true })).toBe(false); // promoting outside promotion zone
-  expect(pos.isLegal(parseUsi('8d8c+')!)).toBe(false); // promoting tokin
-  expect(pos.isLegal(parseUsi('7d7c+')!)).toBe(false); // promoting gold
-  expect(pos.isLegal(parseUsi('1i1a')!)).toBe(false); // not promoting lance on last rank
-  expect(pos.isLegal(parseUsi('1i1a+')!)).toBe(true);
-  expect(pos.isLegal(parseUsi('3d2b')!)).toBe(false); // not promoting knight on second last rank
-  expect(pos.isLegal(parseUsi('3d2b+')!)).toBe(true);
-  expect(pos.isLegal(parseUsi('2c1d+')!)).toBe(true); // promoting while leaving the promotion zone
-  expect(pos.isLegal(parseUsi('2c1d')!)).toBe(true);
-  expect(pos.isLegal(parseUsi('2d1c+')!)).toBe(true); // promoting while entering the promotion zone
-  expect(pos.isLegal(parseUsi('2d1c')!)).toBe(true);
+  expect(initial.isLegal({ from: 20, to: 29, promotion: true })).toEqual(false); // promoting outside promotion zone
+  expect(pos.isLegal(parseUsi('8d8c+')!)).toEqual(false); // promoting tokin
+  expect(pos.isLegal(parseUsi('7d7c+')!)).toEqual(false); // promoting gold
+  expect(pos.isLegal(parseUsi('1i1a')!)).toEqual(false); // not promoting lance on last rank
+  expect(pos.isLegal(parseUsi('1i1a+')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('3d2b')!)).toEqual(false); // not promoting knight on second last rank
+  expect(pos.isLegal(parseUsi('3d2b+')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('2c1d+')!)).toEqual(true); // promoting while leaving the promotion zone
+  expect(pos.isLegal(parseUsi('2c1d')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('2d1c+')!)).toEqual(true); // promoting while entering the promotion zone
+  expect(pos.isLegal(parseUsi('2d1c')!)).toEqual(true);
 });
 
 // http://www.talkchess.com/forum3/viewtopic.php?t=60445
 test('starting perft', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
-  expect(perft(pos, 0)).toBe(1);
-  expect(perft(pos, 1)).toBe(30);
-  expect(perft(pos, 2)).toBe(900);
-  expect(perft(pos, 3)).toBe(25470);
-  expect(perft(pos, 4)).toBe(719731);
-  //expect(perft(pos, 5)).toBe(19861490);
+  expect(perft(pos, 0)).toEqual(1);
+  expect(perft(pos, 1)).toEqual(30);
+  expect(perft(pos, 2)).toEqual(900);
+  expect(perft(pos, 3)).toEqual(25470);
+  expect(perft(pos, 4)).toEqual(719731);
+  //expect(perft(pos, 5)).toEqual(19861490);
 });
 
 test('blockers perft', () => {
   const posLance = parseSfen('standard', '4k4/4g4/9/4L4/9/9/9/4K4/9 w - 1').unwrap();
   const posRook = parseSfen('standard', '4k4/4g4/9/4R4/9/9/9/4K4/9 w - 1').unwrap();
-  expect(perft(posLance, 1)).toBe(5);
-  expect(perft(posRook, 1)).toBe(5);
+  expect(perft(posLance, 1)).toEqual(5);
+  expect(perft(posRook, 1)).toEqual(5);
 });
 
 test('capturing', () => {
   const pos = parseSfen('standard', '4k4/9/3g5/3K5/9/9/9/9/9 b - 1').unwrap();
   pos.play(parseUsi('6d6c')!);
   pos.play(parseUsi('5a4a')!);
-  expect(pos.isLegal(parseUsi('G*5e')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('G*5e')!)).toEqual(true);
 });
 
 test('promotion', () => {
@@ -192,29 +192,31 @@ test('promotion', () => {
   );
 });
 
-test.each(random)('random perft: %s: %s', (_, sfen, d1, d2) => {
-  const pos = parseSfen('standard', sfen).unwrap();
-  expect(perft(pos, 1)).toBe(d1);
-  expect(perft(pos, 2)).toBe(d2);
+test('random perft', () => {
+  random.forEach(([_, sfen, d1, d2]) => {
+    const pos = parseSfen('standard', sfen).unwrap();
+    expect(perft(pos, 1)).toEqual(d1);
+    expect(perft(pos, 2)).toEqual(d2);
+  });
 });
 
 test('pawn checkmate legality', () => {
   const pos = parseSfen('standard', '3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1').unwrap();
-  expect(pos.isLegal(parseUsi('L*5b')!)).toBe(true);
-  expect(pos.isLegal(parseUsi('P*5b')!)).toBe(false);
+  expect(pos.isLegal(parseUsi('L*5b')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('P*5b')!)).toEqual(false);
 
   // Single king
   const skPos = parseSfen('standard', '3rkr3/9/8p/4N4/1B7/9/1SG6/2S6/9 b LPp 1').unwrap();
-  expect(skPos.isLegal(parseUsi('L*5b')!)).toBe(true);
-  expect(skPos.isLegal(parseUsi('P*5b')!)).toBe(false);
+  expect(skPos.isLegal(parseUsi('L*5b')!)).toEqual(true);
+  expect(skPos.isLegal(parseUsi('P*5b')!)).toEqual(false);
 });
 
 test('mulitple checkers', () => {
   const pos = parseSfen('standard', '9/9/2B3B2/9/4k4/9/2B3B2/9/8K w').unwrap();
-  expect(pos.isLegal(parseUsi('5e5d')!)).toBe(true);
-  expect(pos.isLegal(parseUsi('5e5f')!)).toBe(true);
-  expect(pos.isLegal(parseUsi('5e4e')!)).toBe(true);
-  expect(pos.isLegal(parseUsi('5e6e')!)).toBe(true);
+  expect(pos.isLegal(parseUsi('5e5d')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('5e5f')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('5e4e')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('5e6e')!)).toEqual(true);
 });
 
 const insufficientMaterial: [string, boolean][] = [
@@ -223,9 +225,11 @@ const insufficientMaterial: [string, boolean][] = [
   ['9/4k4/9/9/9/9/2G6/4K4/9 b - 1', false],
 ];
 
-test.each(insufficientMaterial)('insufficient material: %s', (sfen, insufficient) => {
-  const pos = parseSfen('standard', sfen).unwrap();
-  expect(pos.outcome()?.result === 'draw').toBe(insufficient);
+test('insufficient material', () => {
+  insufficientMaterial.forEach(([sfen, insufficient]) => {
+    const pos = parseSfen('standard', sfen).unwrap();
+    expect(pos.outcome()?.result === 'draw').toEqual(insufficient);
+  });
 });
 
 test('prod 500 usi', () => {
@@ -233,7 +237,7 @@ test('prod 500 usi', () => {
     const pos = parseSfen('standard', initialSfen('standard')).unwrap();
     for (const usi of usis.split(' ')) {
       const md = parseUsi(usi)!;
-      expect(pos.isLegal(md)).toBe(true);
+      expect(pos.isLegal(md)).toEqual(true);
       pos.play(md);
     }
   }
@@ -243,6 +247,6 @@ test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
     const [sfen, depth, res] = p;
     const pos = parseSfen('standard', sfen || initialSfen('standard')).unwrap();
-    expect(perft(pos, depth)).toBe(res);
+    expect(perft(pos, depth)).toEqual(res);
   });
 });

@@ -6,21 +6,20 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
+    "types": ["node"],
     "target": "ES2017",
     "lib": ["ES2017"],
     "module": "node16",
     "moduleResolution": "node16",
     "esModuleInterop": true,
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "declarationDir": "./dist",
+    "outDir": "dist",
+    "declarationDir": "dist",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "isolatedDeclarations": true,
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "incremental": true
+    "verbatimModuleSyntax": true
   },
-  "include": ["./src"]
+  "include": ["src", "test", "scripts"]
 }

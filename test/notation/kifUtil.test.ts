@@ -1,12 +1,13 @@
-import { expect, test } from 'vitest';
+import { test } from 'node:test';
 import {
   kanjiToNumber,
   makeJapaneseSquare,
   makeNumberSquare,
   numberToKanji,
   parseJapaneseSquare,
-} from '@/notation/util.js';
-import { parseSquareName } from '@/util.js';
+} from '../../src/notation/util.js';
+import { parseSquareName } from '../../src/util.js';
+import { expect } from '../debug.js';
 
 test('parse kif square', () => {
   expect(parseJapaneseSquare('１一')).toEqual(parseSquareName('1a'));

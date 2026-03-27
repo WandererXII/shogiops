@@ -32,7 +32,8 @@
     "@badrap/result": "^0.3.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.7",
+    "@biomejs/biome": "^2.4.9",
+    "@types/node": "^22.19.15",
     "@typescript/native-preview": "7.0.0-dev.20260317.1",
     "del-cli": "^7.0.0",
     "oxlint": "^1.56.0",
@@ -41,12 +42,12 @@
     "vitest": "^4.1.0"
   },
   "scripts": {
-    "prepublishOnly": "$npm_execpath run clean && $npm_execpath run compile",
+    "prepublishOnly": "$npm_execpath run clean && $npm_execpath run build",
     "clean": "del dist && del *.tsbuildinfo",
-    "compile": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "type-check": "tsgo --noEmit && tsc --noEmit",
     "check": "biome check && oxlint --type-aware",
-    "test": "vitest --config test/vitest.config.ts"
+    "test": "node --import tsx --test 'test/**/*.test.ts'"
   },
   "files": [
     "dist",

@@ -1,7 +1,8 @@
-import { expect, test } from 'vitest';
-import { makeWesternEngineMoveOrDrop } from '@/notation/move/western-engine.js';
-import { initialSfen, parseSfen } from '@/sfen.js';
-import { parseUsi } from '@/util.js';
+import { test } from 'node:test';
+import { makeWesternEngineMoveOrDrop } from '../../src/notation/move/western-engine.js';
+import { initialSfen, parseSfen } from '../../src/sfen.js';
+import { parseUsi } from '../../src/util.js';
+import { expect } from '../debug.js';
 
 test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();

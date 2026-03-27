@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { test } from 'node:test';
 import {
   attacks,
   between,
@@ -12,8 +12,9 @@ import {
   ray,
   rookAttacks,
   silverAttacks,
-} from '@/attacks.js';
-import { SquareSet } from '@/square-set.js';
+} from '../src/attacks.js';
+import { SquareSet } from '../src/square-set.js';
+import { expect } from './debug.js';
 
 test('ray', () => {
   expect(ray(0, 240)).toEqual(SquareSet.fromFile(0));

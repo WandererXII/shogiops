@@ -1,8 +1,12 @@
-import { expect, test } from 'vitest';
-import { convertJapaneseToYorozuya, makeYorozuyaMoveOrDrop } from '@/notation/move/yorozuya.js';
-import { makeJapaneseSquare } from '@/notation/util.js';
-import { initialSfen, parseSfen } from '@/sfen.js';
-import { parseSquareName, parseUsi } from '@/util.js';
+import { test } from 'node:test';
+import {
+  convertJapaneseToYorozuya,
+  makeYorozuyaMoveOrDrop,
+} from '../../src/notation/move/yorozuya.js';
+import { makeJapaneseSquare } from '../../src/notation/util.js';
+import { initialSfen, parseSfen } from '../../src/sfen.js';
+import { parseSquareName, parseUsi } from '../../src/util.js';
+import { expect } from '../debug.js';
 
 test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();

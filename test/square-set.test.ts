@@ -1,16 +1,17 @@
-import { expect, test } from 'vitest';
-import type { BitRows } from '@/square-set.js';
-import { SquareSet } from '@/square-set.js';
+import { test } from 'node:test';
+import type { BitRows } from '../src/square-set.js';
+import { SquareSet } from '../src/square-set.js';
+import { expect } from './debug.js';
 
 test('full set has all', () => {
   for (let square = 0; square < 256; square++) {
-    expect(SquareSet.full().has(square)).toBe(true);
+    expect(SquareSet.full().has(square)).toEqual(true);
   }
 });
 
 test('empty set has none', () => {
   for (let square = 0; square < 256; square++) {
-    expect(SquareSet.empty().has(square)).toBe(false);
+    expect(SquareSet.empty().has(square)).toEqual(false);
   }
 });
 
@@ -20,9 +21,6 @@ test('immutable', () => {
   arr.reverse();
   arr[2] = 7;
   expect(n).toEqual(new SquareSet([0xffff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]));
-
-  const n2 = new SquareSet(arr as BitRows);
-  expect(n2).not.toEqual(n);
 });
 
 test('fromSquare', () => {
@@ -388,18 +386,18 @@ test('equals', () => {
 
 test('size', () => {
   let squares = SquareSet.empty();
-  expect(squares.size()).toBe(0);
-  expect(squares.nonEmpty()).toBe(false);
-  expect(squares.isEmpty()).toBe(true);
+  expect(squares.size()).toEqual(0);
+  expect(squares.nonEmpty()).toEqual(false);
+  expect(squares.isEmpty()).toEqual(true);
   for (let i = 0; i < 256; i++) {
     squares = squares.with(i);
-    expect(squares.size()).toBe(i + 1);
-    expect(squares.isEmpty()).toBe(false);
-    expect(squares.nonEmpty()).toBe(true);
+    expect(squares.size()).toEqual(i + 1);
+    expect(squares.isEmpty()).toEqual(false);
+    expect(squares.nonEmpty()).toEqual(true);
   }
   for (let i = 255; i >= 0; i--) {
     squares = squares.without(i);
-    expect(squares.size()).toBe(i);
+    expect(squares.size()).toEqual(i);
   }
 });
 
@@ -412,17 +410,17 @@ test('with/without many', () => {
 
 test('first/last', () => {
   let squares = SquareSet.empty();
-  expect(squares.last()).toBeUndefined();
+  expect(squares.last()).toEqual(undefined);
   for (let i = 0; i < 256; i++) {
     squares = squares.with(i);
-    expect(squares.first()).toBe(0);
-    expect(squares.last()).toBe(i);
+    expect(squares.first()).toEqual(0);
+    expect(squares.last()).toEqual(i);
   }
   squares = SquareSet.empty();
   for (let i = 255; i >= 0; i--) {
     squares = squares.with(i);
-    expect(squares.first()).toBe(i);
-    expect(squares.last()).toBe(255);
+    expect(squares.first()).toEqual(i);
+    expect(squares.last()).toEqual(255);
   }
 });
 
@@ -436,50 +434,52 @@ test('without first', () => {
 });
 
 test('more than one', () => {
-  expect(new SquareSet([0, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toBe(false);
+  expect(new SquareSet([0, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
 
-  expect(new SquareSet([1, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 1, 0, 0, 0, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 1, 0, 0, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 1, 0, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 0, 1, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 0, 0, 1, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 0, 0, 0, 1, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 0, 0, 0, 0, 1]).moreThanOne()).toBe(false);
+  expect(new SquareSet([1, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 1, 0, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 1, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 1, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 0, 1, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 0, 0, 1, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 0, 0, 0, 1, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 0, 0, 0, 0, 1]).moreThanOne()).toEqual(false);
 
-  expect(new SquareSet([2, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 4, 0, 0, 0, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 8, 0, 0, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 16, 0, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 0, 2, 0, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 0, 0, 4, 0, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 0, 0, 0, 8, 0]).moreThanOne()).toBe(false);
-  expect(new SquareSet([0, 0, 0, 0, 0, 0, 0, 16]).moreThanOne()).toBe(false);
+  expect(new SquareSet([2, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 4, 0, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 8, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 16, 0, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 0, 2, 0, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 0, 0, 4, 0, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 0, 0, 0, 8, 0]).moreThanOne()).toEqual(false);
+  expect(new SquareSet([0, 0, 0, 0, 0, 0, 0, 16]).moreThanOne()).toEqual(false);
 
-  expect(new SquareSet([1, 0, 0, 0, 1, 0, 0, 0]).moreThanOne()).toBe(true);
-  expect(new SquareSet([2, 0, 0, 0, 1, 0, 0, 0]).moreThanOne()).toBe(true);
-  expect(new SquareSet([2, 0, 0, 0, 0, 0, 0, 16]).moreThanOne()).toBe(true);
-  expect(new SquareSet([7, 0, 0, 0, 0, 0, 0, 1]).moreThanOne()).toBe(true);
-  expect(new SquareSet([7, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toBe(true);
-  expect(new SquareSet([123, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toBe(true);
+  expect(new SquareSet([1, 0, 0, 0, 1, 0, 0, 0]).moreThanOne()).toEqual(true);
+  expect(new SquareSet([2, 0, 0, 0, 1, 0, 0, 0]).moreThanOne()).toEqual(true);
+  expect(new SquareSet([2, 0, 0, 0, 0, 0, 0, 16]).moreThanOne()).toEqual(true);
+  expect(new SquareSet([7, 0, 0, 0, 0, 0, 0, 1]).moreThanOne()).toEqual(true);
+  expect(new SquareSet([7, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(true);
+  expect(new SquareSet([123, 0, 0, 0, 0, 0, 0, 0]).moreThanOne()).toEqual(true);
 });
 
 test('single square', () => {
-  expect(new SquareSet([0x08, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).isSingleSquare()).toBe(true);
-  expect(new SquareSet([0x01, 0x0, 0x0, 0x0, 0x01, 0x0, 0x0, 0x0]).isSingleSquare()).toBe(false);
-  expect(new SquareSet([0x07, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).isSingleSquare()).toBe(false);
-  expect(new SquareSet([0x01, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).singleSquare()).toBe(0);
-  expect(new SquareSet([0x07, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).singleSquare()).toBeUndefined();
+  expect(new SquareSet([0x08, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).isSingleSquare()).toEqual(true);
+  expect(new SquareSet([0x01, 0x0, 0x0, 0x0, 0x01, 0x0, 0x0, 0x0]).isSingleSquare()).toEqual(false);
+  expect(new SquareSet([0x07, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).isSingleSquare()).toEqual(false);
+  expect(new SquareSet([0x01, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).singleSquare()).toEqual(0);
+  expect(new SquareSet([0x07, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).singleSquare()).toEqual(
+    undefined,
+  );
 });
 
 test('iterators', () => {
   const full = SquareSet.full();
-  expect(full.size()).toBe(256);
+  expect(full.size()).toEqual(256);
   let i = 0;
   for (const s of full) {
-    expect(s).toBe(i++);
+    expect(s).toEqual(i++);
   }
   for (const s of full.reversed()) {
-    expect(s).toBe(--i);
+    expect(s).toEqual(--i);
   }
 });

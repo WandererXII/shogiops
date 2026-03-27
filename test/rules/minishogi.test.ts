@@ -1,6 +1,6 @@
-import { expect, test } from 'vitest';
-import { InvalidSfen, initialSfen, parseSfen } from '@/sfen.js';
-import { perft } from '../debug.js';
+import { test } from 'node:test';
+import { InvalidSfen, initialSfen, parseSfen } from '../../src/sfen.js';
+import { expect, perft } from '../debug.js';
 import { perfts } from '../fixtures/perftMinishogi.js';
 
 const minishogiPerfts: [string, number, number][] = [
@@ -11,9 +11,11 @@ const minishogiPerfts: [string, number, number][] = [
   ['', 5, 533203],
 ];
 
-test.each(minishogiPerfts)('minishogi perft: %s (%s): %s', (sfen, depth, res) => {
-  const pos = parseSfen('minishogi', sfen || initialSfen('minishogi')).unwrap();
-  expect(perft(pos, depth)).toBe(res);
+test('minishogi perft', () => {
+  minishogiPerfts.forEach(([sfen, depth, res]) => {
+    const pos = parseSfen('minishogi', sfen || initialSfen('minishogi')).unwrap();
+    expect(perft(pos, depth)).toEqual(res);
+  });
 });
 
 test('roles outside minishogi', () => {
@@ -35,6 +37,6 @@ test('randomly generated perfts - for consistency', () => {
   perfts.forEach((p) => {
     const [sfen, depth, res] = p;
     const pos = parseSfen('minishogi', sfen || initialSfen('minishogi')).unwrap();
-    expect(perft(pos, depth)).toBe(res);
+    expect(perft(pos, depth)).toEqual(res);
   });
 });

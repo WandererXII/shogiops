@@ -297,6 +297,7 @@ function parseChushogiMove(
 
     return {
       from: parseJapaneseSquare(match[4])!,
+      midStep: undefined,
       to: dest,
       promotion: match[3] === '成',
     };
@@ -322,6 +323,7 @@ export function parseKifMoveOrDrop(
 
     return {
       from: parseNumberSquare(match[4])!,
+      midStep: undefined,
       to: dest,
       promotion: match[3] === '成',
     };

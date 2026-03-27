@@ -189,6 +189,7 @@ export function parseCsaMoveOrDrop(pos: Shogi, csaMd: string): MoveOrDrop | unde
   const orig = parseNumberSquare(match[1])!;
   return {
     from: orig,
+    midStep: undefined,
     to: parseNumberSquare(match[2])!,
     promotion: pos.board.get(orig)?.role !== role,
   };

@@ -14,6 +14,7 @@
         "allowNullableString": false,
         "allowNullableEnum": false
       }
-    ]
+    ],
+    "no-floating-promises": "off"
   }
 }

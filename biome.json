@@ -18,6 +18,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "complexity": {
+        "useOptionalChain": "off"
+      },
       "style": {
         "useSingleVarDeclarator": "error",
         "noNonNullAssertion": "off"

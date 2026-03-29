@@ -12,8 +12,7 @@ test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;
   expect(makeYorozuyaMoveOrDrop(pos, move)).toEqual('午六歩');
-  pos.play(move);
-  expect(makeYorozuyaMoveOrDrop(pos, parseUsi('3c3d')!)).toEqual('寅四歩');
+  expect(makeYorozuyaMoveOrDrop(pos.play(move), parseUsi('3c3d')!)).toEqual('寅四歩');
 });
 
 test('jp conversion', () => {

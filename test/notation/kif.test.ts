@@ -163,21 +163,20 @@ test('make kif moves/drops individually', () => {
   expect(makeKifMoveOrDrop(pos, parseUsi('1a1b')!)).toEqual('１二香(11)');
   expect(makeKifMoveOrDrop(pos, parseUsi('5i5h')!)).toEqual('５八玉(59)');
 
-  const pos2 = parseSfen(
+  let pos2 = parseSfen(
     'standard',
     'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10',
   ).unwrap();
   const line = ['R*5b', '6i7h', '5e5h+'].map((m) => parseUsi(m)!);
   expect(makeKifMoveOrDrop(pos2, line[0])).toEqual('５二飛打');
-  pos2.play(line.shift()!);
+  pos2 = pos2.play(line.shift()!);
   expect(makeKifMoveOrDrop(pos2, line[0])).toEqual('７八金(69)');
-  pos2.play(line.shift()!);
+  pos2 = pos2.play(line.shift()!);
   expect(makeKifMoveOrDrop(pos2, line[0])).toEqual('５八飛成(55)');
-  pos2.play(line.shift()!);
 });
 
 test('parse kif moves/drops one by one', () => {
-  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  let pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const line = [
     '7g7f',
     '8c8d',
@@ -193,13 +192,13 @@ test('parse kif moves/drops one by one', () => {
   ].map((m) => parseUsi(m)!);
   for (const m of line) {
     expect(parseKifMoveOrDrop(makeKifMoveOrDrop(pos, m)!, pos.lastMoveOrDrop?.to)).toEqual(m);
-    pos.play(m);
+    pos = pos.play(m);
   }
   expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
 test('parse kif moves/drops', () => {
-  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  let pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const line = [
     ' 1 ７六歩(77)',
     ' 2 ８四歩(83)',
@@ -213,7 +212,9 @@ test('parse kif moves/drops', () => {
     '10 ８五歩(84)',
     '11 ７三角成(55)',
   ];
-  for (const m of parseKifMovesOrDrops(line)) pos.play(m);
+  for (const m of parseKifMovesOrDrops(line)) {
+    pos = pos.play(m);
+  }
   expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
@@ -278,11 +279,11 @@ test('make kif header - chushogi', () => {
 });
 
 test('make chushogi moves', () => {
-  const pos = parseSfen('chushogi', initialSfen('chushogi')).unwrap();
+  let pos = parseSfen('chushogi', initialSfen('chushogi')).unwrap();
   expect(makeKifMoveOrDrop(pos, parseUsi('7i7h')!)).toEqual('7八歩兵 （←7九）');
-  pos.play(parseUsi('7i7h')!);
+  pos = pos.play(parseUsi('7i7h')!);
   expect(makeKifMoveOrDrop(pos, parseUsi('7d7e')!)).toEqual('7五歩兵 （←7四）');
-  pos.play(parseUsi('7d7e')!);
+  pos = pos.play(parseUsi('7d7e')!);
   expect(makeKifMoveOrDrop(pos, parseUsi('7j7i6h')!)).toEqual(`一歩目 7九獅子 （←7十）
 二歩目 6八獅子 （←7九）`);
 });

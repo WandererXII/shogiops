@@ -8,8 +8,7 @@ test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;
   expect(makeKitaoKawasakiMoveOrDrop(pos, move)).toEqual('歩-76');
-  pos.play(move);
-  expect(makeKitaoKawasakiMoveOrDrop(pos, parseUsi('3c3d')!)).toEqual('歩-34');
+  expect(makeKitaoKawasakiMoveOrDrop(pos.play(move), parseUsi('3c3d')!)).toEqual('歩-34');
 });
 
 test('amb moves', () => {

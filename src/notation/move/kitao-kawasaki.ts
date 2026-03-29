@@ -13,24 +13,24 @@ export function makeKitaoKawasakiMoveOrDrop(
   if (isDrop(md)) {
     return `${roleToKanji(pos.rules)(md.role)}*${makeNumberSquare(md.to)}`;
   } else {
-    const piece = pos.board.get(md.from);
+    const piece = pos.board.pieceAt(md.from);
     if (piece) {
       const roleStr = roleToKanji(pos.rules)(piece.role).replace('成', '+');
       const ambStr = aimingAt(
         pos,
         pos.board
-          .roles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
-          .intersect(pos.board.color(piece.color)),
+          .byRoles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
+          .intersect(pos.board.byColor(piece.color)),
         md.to,
       )
         .without(md.from)
         .isEmpty()
         ? ''
         : `(${makeNumberSquare(md.from)})`;
-      const toCapture = pos.board.get(md.to);
+      const toCapture = pos.board.pieceAt(md.to);
       const actionStr = toCapture ? 'x' : '-';
       if (defined(md.midStep)) {
-        const midCapture = pos.board.get(md.midStep);
+        const midCapture = pos.board.pieceAt(md.midStep);
         const igui = !!midCapture && md.to === md.from;
         if (igui) return `${roleStr}${ambStr}x!${makeNumberSquare(md.midStep)}`;
         else if (md.to === md.from) return `--`;

@@ -132,7 +132,7 @@ test('make CSA moves/drops individually', () => {
 });
 
 test('parse csa moves/drops one by one', () => {
-  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  let pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const line = [
     '7g7f',
     '8c8d',
@@ -148,26 +148,26 @@ test('parse csa moves/drops one by one', () => {
   ].map((m) => parseUsi(m)!);
   for (const m of line) {
     expect(parseCsaMoveOrDrop(pos, makeCsaMoveOrDrop(pos, m)!)).toEqual(m);
-    pos.play(m);
+    pos = pos.play(m);
   }
   expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
 test('parse moves/drops', () => {
-  const pos = parseSfen(
+  let pos = parseSfen(
     'standard',
     'lnsgkgsnl/7b1/pppp1pppp/9/4r4/9/PPPP1PPPP/1B2G4/LNSGK1SNL w Prp 10',
   ).unwrap();
   const line = ['R*5b', '6i7h', '5e5h+'].map((m) => parseUsi(m)!);
   expect(parseCsaMoveOrDrop(pos, '0052HI')).toEqual(parseUsi('R*5b'));
-  pos.play(line.shift()!);
+  pos = pos.play(line.shift()!);
   expect(parseCsaMoveOrDrop(pos, '6978KI')).toEqual(parseUsi('6i7h'));
-  pos.play(line.shift()!);
+  pos = pos.play(line.shift()!);
   expect(parseCsaMoveOrDrop(pos, '5558RY')).toEqual(parseUsi('5e5h+'));
 });
 
 test('parse csa moves/drops', () => {
-  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  let pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const line = [
     '7776FU',
     '8384FU',
@@ -181,7 +181,9 @@ test('parse csa moves/drops', () => {
     '8485FU',
     '5573UM',
   ];
-  for (const m of parseCsaMovesOrDrops(pos, line)) pos.play(m);
+  for (const m of parseCsaMovesOrDrops(pos, line)) {
+    pos = pos.play(m);
+  }
   expect(pos.outcome()?.result).toEqual('checkmate');
 });
 

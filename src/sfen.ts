@@ -96,7 +96,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
   if (dims.ranks !== boardPart.split('/').length)
     return Result.err(new SfenError(InvalidSfen.BoardDims));
 
-  const board = Board.empty();
+  let board = Board.empty();
   let empty = 0;
   let rank = 0;
   let file = dims.files - 1;
@@ -118,7 +118,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
         const square = parseCoordinates(file, rank)!;
         const piece = forsythToPiece(rules)(c);
         if (!piece) return Result.err(new SfenError(InvalidSfen.BoardPiece));
-        board.set(square, piece);
+        board = board.withPieceAt(square, piece);
         empty = 0;
         file--;
       }
@@ -131,7 +131,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
 }
 
 export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenError> {
-  const hands = Hands.empty();
+  let hands = Hands.empty();
   for (let i = 0; i < handsPart.length; i++) {
     if (handsPart[i] === '-') break;
     // max 99
@@ -143,12 +143,12 @@ export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenE
         i++;
       }
     } else count = 1;
-    const piece = forsythToPiece(rules)(handsPart[i]);
+    let piece: Piece | undefined = forsythToPiece(rules)(handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
     if (rules === 'kyotoshogi' && !handRoles(rules).includes(piece.role))
-      piece.role = unpromote(rules)(piece.role) || piece.role;
-    count += hands[piece.color].get(piece.role);
-    hands[piece.color].set(piece.role, count);
+      piece = { color: piece.color, role: unpromote(rules)(piece.role) || piece.role };
+    count += hands.get(piece);
+    hands = hands.with(piece, count);
   }
   return Result.ok(hands);
 }
@@ -215,7 +215,7 @@ export function makeBoardSfen(rules: Rules, board: Board): string {
   for (let rank = 0; rank < dims.ranks; rank++) {
     for (let file = dims.files - 1; file >= 0; file--) {
       const square = parseCoordinates(file, rank)!;
-      const piece = board.get(square);
+      const piece = board.pieceAt(square);
       if (!piece) empty++;
       else {
         if (empty > 0) {

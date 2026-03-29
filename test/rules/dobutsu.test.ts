@@ -27,68 +27,67 @@ test('pieces in hand', () => {
 });
 
 test('moving into check and being captured', () => {
-  const pos = parseSfen('dobutsu', '3/1k1/3/1K1 b - 1').unwrap();
+  let pos = parseSfen('dobutsu', '3/1k1/3/1K1 b - 1').unwrap();
   expect(perft(pos, 1)).toEqual(5);
   expect(pos.isLegal(parseUsi('2d2c')!)).toEqual(true);
 
-  pos.play(parseUsi('2d2c')!);
+  pos = pos.play(parseUsi('2d2c')!);
   expect(perft(pos, 1)).toEqual(8);
   expect(pos.isLegal(parseUsi('2b2c')!)).toEqual(true);
-  const posMiss = pos.clone();
-  pos.play(parseUsi('2b2c')!);
-  posMiss.play(parseUsi('2b1b')!);
-  expect(pos.isEnd()).toEqual(true);
-  expect(pos.outcome()?.result).toEqual('kingsLost');
-  expect(pos.outcome()?.winner).toEqual('gote');
+
+  const pos1 = pos.play(parseUsi('2b2c')!);
+  const posMiss = pos.play(parseUsi('2b1b')!);
+  expect(pos1.isEnd()).toEqual(true);
+  expect(pos1.outcome()?.result).toEqual('kingsLost');
+  expect(pos1.outcome()?.winner).toEqual('gote');
   expect(posMiss.isEnd()).toEqual(false);
   expect(perft(posMiss, 1)).toEqual(8);
 });
 
 test('try rule', () => {
-  const pos = parseSfen('dobutsu', 'k2/2K/3/3 b - 1').unwrap();
+  let pos = parseSfen('dobutsu', 'k2/2K/3/3 b - 1').unwrap();
   expect(perft(pos, 1)).toEqual(5);
   expect(pos.isLegal(parseUsi('1b1a')!)).toEqual(true);
-  pos.play(parseUsi('1b1a')!);
+
+  pos = pos.play(parseUsi('1b1a')!);
   expect(pos.isEnd()).toEqual(true);
   expect(pos.outcome()?.result).toEqual('tryRule');
   expect(pos.outcome()?.winner).toEqual('sente');
 });
 
 test('try rule - in check', () => {
-  const pos = parseSfen('dobutsu', '1r1/bpK/k2/3 b -').unwrap();
+  let pos = parseSfen('dobutsu', '1r1/bpK/k2/3 b -').unwrap();
   expect(perft(pos, 1)).toEqual(5);
   expect(pos.isLegal(parseUsi('1b1a')!)).toEqual(true);
-  pos.play(parseUsi('1b1a')!);
+  pos = pos.play(parseUsi('1b1a')!);
   expect(pos.isEnd()).toEqual(false);
 
   // opponent safe try rule
-  const pos1 = pos.clone();
-  expect(pos1.isLegal(parseUsi('3c3d')!)).toEqual(true);
-  pos1.play(parseUsi('3c3d')!);
+  expect(pos.isLegal(parseUsi('3c3d')!)).toEqual(true);
+  const pos1 = pos.play(parseUsi('3c3d')!);
   expect(pos1.isEnd()).toEqual(true);
   expect(pos1.outcome()?.result).toEqual('tryRule');
   expect(pos1.outcome()?.winner).toEqual('gote');
 
   // random unrelated move
-  const pos2 = pos.clone();
-  expect(pos2.isLegal(parseUsi('2b2c')!)).toEqual(true);
-  pos2.play(parseUsi('2b2c')!);
+  expect(pos.isLegal(parseUsi('2b2c')!)).toEqual(true);
+  const pos2 = pos.play(parseUsi('2b2c')!);
   expect(pos2.isEnd()).toEqual(false);
 
   // clearing check
-  const pos3 = pos.clone();
-  expect(pos3.isLegal(parseUsi('2a3a')!)).toEqual(true);
-  pos3.play(parseUsi('2a3a')!);
+  expect(pos.isLegal(parseUsi('2a3a')!)).toEqual(true);
+  const pos3 = pos.play(parseUsi('2a3a')!);
   expect(pos3.isEnd()).toEqual(true);
   expect(pos3.outcome()?.result).toEqual('tryRule');
   expect(pos3.outcome()?.winner).toEqual('sente');
 });
 
 test('try rule - draw', () => {
-  const pos = parseSfen('dobutsu', '1K1/1r1/1R1/1k1 w BPbp 40').unwrap();
+  let pos = parseSfen('dobutsu', '1K1/1r1/1R1/1k1 w BPbp 40').unwrap();
   expect(pos.validate(true).isOk).toEqual(true);
   expect(pos.isLegal(parseUsi('2b2c')!)).toEqual(true);
-  pos.play(parseUsi('2b2c')!);
+
+  pos = pos.play(parseUsi('2b2c')!);
   expect(pos.isEnd()).toEqual(true);
   expect(pos.outcome()?.result).toEqual('draw');
   expect(pos.outcome()?.winner).toEqual(undefined);
@@ -102,9 +101,9 @@ test('force promoting', () => {
 });
 
 test('drops', () => {
-  const pos = parseSfen('dobutsu', 'rkr/b1b/1P1/BKR b P').unwrap();
+  let pos = parseSfen('dobutsu', 'rkr/b1b/1P1/BKR b P').unwrap();
   expect(pos.isLegal(parseUsi('P*2b')!)).toEqual(true);
-  pos.play(parseUsi('P*2b')!);
+  pos = pos.play(parseUsi('P*2b')!);
   expect(pos.isEnd()).toEqual(false);
 });
 

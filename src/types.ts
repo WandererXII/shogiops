@@ -1,7 +1,6 @@
 import type { Board } from './board.js';
 import type { COLORS, FILE_NAMES, RANK_NAMES, RESULTS, ROLES, RULES } from './constants.js';
 import type { Hands } from './hands.js';
-import type { SquareSet } from './square-set.js';
 
 export type FileName = (typeof FILE_NAMES)[number];
 
@@ -14,33 +13,29 @@ export type SquareName = `${FileName}${RankName}`;
 export type Color = (typeof COLORS)[number];
 
 export interface Dimensions {
-  ranks: number;
-  files: number;
+  readonly ranks: number;
+  readonly files: number;
 }
 
 export type Role = (typeof ROLES)[number];
 
-export type RoleMap = Map<Role, SquareSet>;
-export type ColorMap = Map<Color, SquareSet>;
-export type HandMap = Map<Role, number>;
-
 export interface Piece {
-  role: Role;
-  color: Color;
+  readonly role: Role;
+  readonly color: Color;
 }
 
 export type PieceName = `${Color} ${Role}`;
 
 export interface NormalMove {
-  from: Square;
-  to: Square;
-  promotion?: boolean;
-  midStep?: Square;
+  readonly from: Square;
+  readonly to: Square;
+  readonly promotion?: boolean;
+  readonly midStep?: Square;
 }
 
 export interface DropMove {
-  role: Role;
-  to: Square;
+  readonly role: Role;
+  readonly to: Square;
 }
 
 export type MoveOrDrop = NormalMove | DropMove;
@@ -63,13 +58,13 @@ export type Result = (typeof RESULTS)[number];
 export type Rules = (typeof RULES)[number];
 
 export interface Outcome {
-  result: Result;
-  winner: Color | undefined;
+  readonly result: Result;
+  readonly winner: Color | undefined;
 }
 
 export interface Handicap {
-  rules: Rules;
-  sfen: string;
-  japaneseName: string;
-  englishName: string;
+  readonly rules: Rules;
+  readonly sfen: string;
+  readonly japaneseName: string;
+  readonly englishName: string;
 }

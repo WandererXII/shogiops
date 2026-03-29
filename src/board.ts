@@ -1,98 +1,106 @@
 import { ROLES } from './constants.js';
 import { SquareSet } from './square-set.js';
-import type { Color, ColorMap, Piece, Role, RoleMap, Square } from './types.js';
+import type { Color, Piece, Role, Square } from './types.js';
 
 export class Board implements Iterable<[Square, Piece]> {
   private constructor(
-    public occupied: SquareSet,
-    private colorMap: ColorMap,
-    private roleMap: RoleMap,
+    public readonly occupied: SquareSet,
+    public readonly sente: SquareSet,
+    public readonly gote: SquareSet,
+    private readonly roleMap: ReadonlyMap<Role, SquareSet>,
   ) {}
 
   static empty(): Board {
-    return new Board(SquareSet.empty(), new Map(), new Map());
+    return new Board(SquareSet.empty(), SquareSet.empty(), SquareSet.empty(), new Map());
   }
 
   static from(
     occupied: SquareSet,
-    colorsIter: Iterable<[Color, SquareSet]>,
+    sente: SquareSet,
+    gote: SquareSet,
     rolesIter: Iterable<[Role, SquareSet]>,
   ): Board {
-    return new Board(occupied, new Map(colorsIter), new Map(rolesIter));
+    return new Board(occupied, sente, gote, new Map(rolesIter));
   }
 
-  clone(): Board {
-    return Board.from(this.occupied, this.colorMap, this.roleMap);
-  }
-
-  role(role: Role): SquareSet {
+  byRole(role: Role): SquareSet {
     return this.roleMap.get(role) || SquareSet.empty();
   }
-  roles(role: Role, ...roles: Role[]): SquareSet {
-    return roles.reduce((acc, r) => acc.union(this.role(r)), this.role(role));
-  }
-  color(color: Color): SquareSet {
-    return this.colorMap.get(color) || SquareSet.empty();
+
+  byRoles(role: Role, ...roles: Role[]): SquareSet {
+    return roles.reduce((acc, r) => acc.union(this.byRole(r)), this.byRole(role));
   }
 
-  equals(other: Board): boolean {
-    if (!this.color('gote').equals(other.color('gote'))) return false;
-    return ROLES.every((role) => this.role(role).equals(other.role(role)));
+  byColor(color: Color): SquareSet {
+    return color === 'gote' ? this.gote : this.sente;
   }
 
-  getColor(square: Square): Color | undefined {
-    if (this.color('sente').has(square)) return 'sente';
-    if (this.color('gote').has(square)) return 'gote';
+  byPiece(color: Color, role: Role): SquareSet {
+    return this.byColor(color).intersect(this.byRole(role));
+  }
+
+  colorAt(square: Square): Color | undefined {
+    if (this.sente.has(square)) return 'sente';
+    if (this.gote.has(square)) return 'gote';
     return;
   }
 
-  getRole(square: Square): Role | undefined {
+  roleAt(square: Square): Role | undefined {
     for (const [role, sqs] of this.roleMap) if (sqs.has(square)) return role;
     return;
   }
 
-  get(square: Square): Piece | undefined {
-    const color = this.getColor(square);
+  pieceAt(square: Square): Piece | undefined {
+    const color = this.colorAt(square);
     if (!color) return;
-    const role = this.getRole(square)!;
+    const role = this.roleAt(square)!;
     return { color, role };
   }
 
-  take(square: Square): Piece | undefined {
-    const piece = this.get(square);
-    if (piece) {
-      this.occupied = this.occupied.without(square);
-      this.colorMap.set(piece.color, this.color(piece.color).without(square));
-      this.roleMap.set(piece.role, this.role(piece.role).without(square));
-    }
-    return piece;
+  withoutPieceAt(square: Square): Board {
+    const piece = this.pieceAt(square);
+    if (!piece) return this;
+
+    const newRoleMap = new Map(this.roleMap);
+
+    return new Board(
+      this.occupied.without(square),
+      this.sente.without(square),
+      this.gote.without(square),
+      newRoleMap.set(piece.role, this.byRole(piece.role).without(square)),
+    );
   }
 
-  set(square: Square, piece: Piece): Piece | undefined {
-    const old = this.take(square);
-    this.occupied = this.occupied.with(square);
-    this.colorMap.set(piece.color, this.color(piece.color).with(square));
-    this.roleMap.set(piece.role, this.role(piece.role).with(square));
-    return old;
+  withPieceAt(square: Square, piece: Piece): Board {
+    const boardRemoved = this.withoutPieceAt(square);
+    const newRoleMap = new Map(boardRemoved.roleMap);
+
+    return new Board(
+      boardRemoved.occupied.with(square),
+      piece.color === 'sente' ? boardRemoved.sente.with(square) : boardRemoved.sente,
+      piece.color === 'gote' ? boardRemoved.gote.with(square) : boardRemoved.gote,
+      newRoleMap.set(piece.role, boardRemoved.byRole(piece.role).with(square)),
+    );
   }
 
-  has(square: Square): boolean {
+  hasPieceAt(square: Square): boolean {
     return this.occupied.has(square);
   }
 
   *[Symbol.iterator](): Iterator<[Square, Piece]> {
     for (const square of this.occupied) {
-      yield [square, this.get(square)!];
+      yield [square, this.pieceAt(square)!];
     }
+  }
+
+  equals(other: Board): boolean {
+    if (!this.byColor('gote').equals(other.byColor('gote'))) return false;
+    return ROLES.every((role) => this.byRole(role).equals(other.byRole(role)));
   }
 
   presentRoles(): Role[] {
     return Array.from(this.roleMap)
       .filter(([_, sqs]) => sqs.nonEmpty())
       .map(([r]) => r);
-  }
-
-  pieces(color: Color, role: Role): SquareSet {
-    return this.color(color).intersect(this.role(role));
   }
 }

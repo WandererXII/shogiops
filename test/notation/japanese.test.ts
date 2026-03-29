@@ -8,15 +8,14 @@ test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;
   expect(makeJapaneseMoveOrDrop(pos, move)).toEqual('７六歩');
-  pos.play(move);
-  expect(makeJapaneseMoveOrDrop(pos, parseUsi('3c3d')!)).toEqual('３四歩');
+  expect(makeJapaneseMoveOrDrop(pos.play(move), parseUsi('3c3d')!)).toEqual('３四歩');
 });
 
 test('corect drop amb resolution', () => {
-  const pos = parseSfen('standard', 'k7K/9/9/9/9/9/S8/8g/9 b SPg 1').unwrap();
+  let pos = parseSfen('standard', 'k7K/9/9/9/9/9/S8/8g/9 b SPg 1').unwrap();
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('S*9f')!)).toEqual('９六銀打');
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('S*5e')!)).toEqual('５五銀');
-  pos.play(parseUsi('S*9f')!);
+  pos = pos.play(parseUsi('S*9f')!);
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('G*1g')!)).toEqual('１七金打');
   expect(makeJapaneseMoveOrDrop(pos, parseUsi('G*5e')!)).toEqual('５五金');
 });

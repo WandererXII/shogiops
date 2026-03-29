@@ -15,38 +15,37 @@ import { Position } from '../position.js';
 import { standardDropDests, standardMoveDests } from './shogi.js';
 
 export class Minishogi extends Position {
-  private constructor() {
-    super('minishogi');
+  private constructor(setup: Setup) {
+    super('minishogi', setup);
   }
 
   static from(setup: Setup, strict: boolean): Result<Minishogi, PositionError> {
-    const pos = new Minishogi();
-    pos.fromSetup(setup);
+    const pos = new Minishogi(setup);
     return pos.validate(strict).map((_) => pos);
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     const defender = opposite(attacker);
     const board = this.board;
-    return board.color(attacker).intersect(
+    return board.byColor(attacker).intersect(
       rookAttacks(square, occupied)
-        .intersect(board.roles('rook', 'dragon'))
-        .union(bishopAttacks(square, occupied).intersect(board.roles('bishop', 'horse')))
+        .intersect(board.byRoles('rook', 'dragon'))
+        .union(bishopAttacks(square, occupied).intersect(board.byRoles('bishop', 'horse')))
         .union(
-          goldAttacks(square, defender).intersect(board.roles('gold', 'tokin', 'promotedsilver')),
+          goldAttacks(square, defender).intersect(board.byRoles('gold', 'tokin', 'promotedsilver')),
         )
-        .union(silverAttacks(square, defender).intersect(board.role('silver')))
-        .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-        .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse'))),
+        .union(silverAttacks(square, defender).intersect(board.byRole('silver')))
+        .union(pawnAttacks(square, defender).intersect(board.byRole('pawn')))
+        .union(kingAttacks(square).intersect(board.byRoles('king', 'dragon', 'horse'))),
     );
   }
 
   squareSnipers(square: number, attacker: Color): SquareSet {
     const empty = SquareSet.empty();
     return rookAttacks(square, empty)
-      .intersect(this.board.roles('rook', 'dragon'))
-      .union(bishopAttacks(square, empty).intersect(this.board.roles('bishop', 'horse')))
-      .intersect(this.board.color(attacker));
+      .intersect(this.board.byRoles('rook', 'dragon'))
+      .union(bishopAttacks(square, empty).intersect(this.board.byRoles('bishop', 'horse')))
+      .intersect(this.board.byColor(attacker));
   }
 
   moveDests(square: Square, ctx?: Context): SquareSet {

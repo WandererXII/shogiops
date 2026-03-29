@@ -10,13 +10,12 @@ import { fullSquareSet } from '../util.js';
 import { standardSquareAttacks, standardSquareSnipers } from './shogi.js';
 
 export class Annanshogi extends Position {
-  private constructor() {
-    super('annanshogi');
+  private constructor(setup: Setup) {
+    super('annanshogi', setup);
   }
 
   static from(setup: Setup, strict: boolean): Result<Annanshogi, PositionError> {
-    const pos = new Annanshogi();
-    pos.fromSetup(setup);
+    const pos = new Annanshogi(setup);
     return pos.validate(strict).map((_) => pos);
   }
 
@@ -37,28 +36,26 @@ export class Annanshogi extends Position {
 
   moveDests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
-    const realPiece = this.board.get(square);
+    const realPiece = this.board.pieceAt(square);
     if (!realPiece || realPiece.color !== ctx.color) return SquareSet.empty();
-    const pieceBehind = this.board.get(directlyBehind(realPiece.color, square));
+    const pieceBehind = this.board.pieceAt(directlyBehind(realPiece.color, square));
 
     let pseudo = attacks(
       pieceBehind?.color === realPiece.color ? pieceBehind : realPiece,
       square,
       this.board.occupied,
     );
-    pseudo = pseudo.diff(this.board.color(ctx.color));
+    pseudo = pseudo.diff(this.board.byColor(ctx.color));
 
     if (defined(ctx.king)) {
       if (realPiece.role === 'king') {
         const occ = this.board.occupied.without(square);
         for (const to of pseudo) {
-          const boardClone = this.board.clone();
-          boardClone.take(to);
           if (
             standardSquareAttacks(
               to,
               opposite(ctx.color),
-              annanAttackBoard(boardClone),
+              annanAttackBoard(this.board.withoutPieceAt(to)),
               occ,
             ).nonEmpty()
           )
@@ -88,15 +85,15 @@ export class Annanshogi extends Position {
           else pseudo = SquareSet.empty();
 
           for (const moveGiver of moveGivers) {
-            const boardClone = this.board.clone();
-            boardClone.take(square);
-            boardClone.set(moveGiver, realPiece);
+            const boardUpdated = this.board
+              .withoutPieceAt(square)
+              .withPieceAt(moveGiver, realPiece);
             if (
               standardSquareAttacks(
                 ctx.king,
                 opposite(ctx.color),
-                annanAttackBoard(boardClone),
-                boardClone.occupied,
+                annanAttackBoard(boardUpdated),
+                boardUpdated.occupied,
               ).isEmpty()
             ) {
               pseudo = pseudo.with(moveGiver);
@@ -107,15 +104,12 @@ export class Annanshogi extends Position {
           let rayed = pseudo.intersect(ray(square, ctx.king));
           const occ = this.board.occupied.without(square);
           for (const to of pseudo.diff(rayed)) {
-            if (this.board.getColor(to) !== ctx.color) {
-              const boardClone = this.board.clone();
-              boardClone.take(square);
-              boardClone.set(to, realPiece);
+            if (this.board.colorAt(to) !== ctx.color) {
               if (
                 standardSquareAttacks(
                   ctx.king,
                   opposite(ctx.color),
-                  annanAttackBoard(boardClone),
+                  annanAttackBoard(this.board.withoutPieceAt(square).withPieceAt(to, realPiece)),
                   occ,
                 ).isEmpty()
               ) {
@@ -145,7 +139,7 @@ export class Annanshogi extends Position {
 
     if (role === 'pawn') {
       // Checking for double pawns
-      const pawns = this.board.role('pawn').intersect(this.board.color(ctx.color));
+      const pawns = this.board.byRole('pawn').intersect(this.board.byColor(ctx.color));
       for (const pawn of pawns) {
         const file = SquareSet.fromFile(squareFile(pawn));
         mask = mask.diff(file);
@@ -158,8 +152,7 @@ export class Annanshogi extends Position {
           : kingSquare - 16
         : undefined;
       if (defined(kingFront) && mask.has(kingFront)) {
-        const child = this.clone();
-        child.play({ role: 'pawn', to: kingFront });
+        const child = this.play({ role: 'pawn', to: kingFront });
         const childResult = child.outcome()?.result;
         if (childResult && ['checkmate', 'stalemate'].includes(childResult))
           mask = mask.without(kingFront);
@@ -176,11 +169,11 @@ export const directlyBehind = (color: Color, square: Square): Square => {
 
 // Changes the pieces in front of other friendly piece to said pieces
 export const annanAttackBoard = (board: Board): Board => {
-  const newBoard = Board.empty();
+  let newBoard = Board.empty();
   for (const [sq, piece] of board) {
-    const pieceBehind = board.get(directlyBehind(piece.color, sq));
+    const pieceBehind = board.pieceAt(directlyBehind(piece.color, sq));
     const role = pieceBehind?.color === piece.color ? pieceBehind.role : piece.role;
-    newBoard.set(sq, { role, color: piece.color });
+    newBoard = newBoard.withPieceAt(sq, { role, color: piece.color });
   }
   return newBoard;
 };

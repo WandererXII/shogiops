@@ -17,13 +17,13 @@ function getRandomMove(pos: Position): NormalMove | undefined {
   const moveDests = pos.allMoveDests();
   const origs = Array.from(moveDests.keys()).filter((sq) => moveDests.get(sq)?.nonEmpty());
   const randomOrig = origs[Math.floor(Math.random() * origs.length)];
-  const piece = pos.board.get(randomOrig);
+  const piece = pos.board.pieceAt(randomOrig);
   const rDests = moveDests.get(randomOrig);
 
   if (rDests) {
     const dests = Array.from(rDests);
     const randomDest = dests[Math.floor(Math.random() * dests.length)];
-    const capture = pos.board.get(randomDest);
+    const capture = pos.board.pieceAt(randomDest);
 
     if (randomDest !== undefined)
       return {
@@ -60,7 +60,7 @@ function main() {
 
   const existing = new Set();
   for (let j = 0; j < 300; j++) {
-    let pos = parseSfen(targetVariant, initialSfen(targetVariant)).unwrap();
+    let pos: Position = parseSfen(targetVariant, initialSfen(targetVariant)).unwrap();
 
     const dims = dimensions(targetVariant);
     const chosen = Math.floor(
@@ -68,12 +68,12 @@ function main() {
     );
 
     for (let i = 0; i <= chosen; i++) {
-      const clone = pos.clone();
-
       const move = getRandomMoveOrDrop(pos);
-      if (move) clone.play(move);
 
-      const chosenNow = !move || clone.isEnd() || i === chosen;
+      let playedPos: Position = pos;
+      if (move) playedPos = pos.play(move);
+
+      const chosenNow = !move || playedPos?.isEnd() || i === chosen;
 
       if (chosenNow) {
         const sfen = makeSfen(pos);
@@ -86,7 +86,7 @@ function main() {
           break;
         }
       } else {
-        pos = clone;
+        pos = playedPos;
       }
     }
   }

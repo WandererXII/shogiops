@@ -28,9 +28,9 @@ test('kyotoshogi checkmate', () => {
 });
 
 test('pawn checkmate', () => {
-  const pos = parseSfen('kyotoshogi', 'kl3/1n3/G4/5/TSK1P b P').unwrap();
+  let pos = parseSfen('kyotoshogi', 'kl3/1n3/G4/5/TSK1P b P').unwrap();
   expect(pos.isLegal(parseUsi('P*5b')!)).toEqual(true);
-  pos.play(parseUsi('P*5b')!);
+  pos = pos.play(parseUsi('P*5b')!);
   expect(pos.outcome()?.result).toEqual('checkmate');
 });
 

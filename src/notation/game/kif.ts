@@ -72,7 +72,7 @@ export function makeKifBoard(rules: Rules, board: Board): string {
   for (let rank = 0; rank < dims.ranks; rank++) {
     for (let file = offset; file >= 0; file--) {
       const square = parseCoordinates(file, rank)!;
-      const piece = board.get(square);
+      const piece = board.pieceAt(square);
       if (file === offset) {
         kifBoard += '|';
       }
@@ -153,29 +153,29 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
     : 'sente';
 
   const board: Result<Board, KifError> = parseKifBoard(rules, kif);
+  if (board.isErr) return Result.err(board.error);
 
   const goteHand = defined(goteHandStr)
     ? parseKifHand(rules, goteHandStr.split('：')[1])
     : Result.ok(Hand.empty());
+  if (goteHand.isErr) return Result.err(goteHand.error);
+
   const senteHand = defined(senteHandStr)
     ? parseKifHand(rules, senteHandStr.split('：')[1])
     : Result.ok(Hand.empty());
+  if (senteHand.isErr) return Result.err(senteHand.error);
 
-  return board.chain((board) =>
-    goteHand.chain((gHand) =>
-      senteHand.chain((sHand) =>
-        initializePosition(
-          rules,
-          {
-            board,
-            hands: Hands.from(sHand, gHand),
-            turn,
-            moveNumber: 1,
-          },
-          false,
-        ),
-      ),
-    ),
+  return initializePosition(
+    rules,
+    {
+      board: board.value,
+      hands: Hands.from(senteHand.value, goteHand.value),
+      turn,
+      moveNumber: 1,
+      lastLionCapture: undefined,
+      lastMoveOrDrop: undefined,
+    },
+    false,
   );
 }
 
@@ -196,7 +196,7 @@ function detectRules(lines: number | undefined, tag: string | undefined): Rules 
 export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, KifError> {
   const lines = normalizedKifLines(kifBoard).filter((l) => l.startsWith('|'));
   if (lines.length === 0) return Result.err(new KifError(InvalidKif.Board));
-  const board = Board.empty();
+  let board = Board.empty();
 
   const offset = lines.length - 1;
   let file = offset;
@@ -228,7 +228,7 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
               role: (prom && promote(rules)(role)) || role,
               color: boolToColor(!gote),
             };
-            board.set(square, piece);
+            board = board.withPieceAt(square, piece);
             prom = false;
             gote = false;
             file--;
@@ -242,7 +242,7 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
 }
 
 export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifError> {
-  const hand = Hand.empty();
+  let hand = Hand.empty();
   const pieces = handPart.replace(/　/g, ' ').trim().split(' ');
 
   if (handPart.includes('なし')) return Result.ok(hand);
@@ -259,7 +259,7 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
       )
         countStr += piece[i++];
       const count = Math.max(kanjiToNumber(countStr), 1) + hand.get(role);
-      hand.set(role, count);
+      hand = hand.with(role, count);
     }
   }
   return Result.ok(hand);
@@ -380,11 +380,11 @@ export function makeKifMoveOrDrop(
     const sameDest = (lastDest ?? pos.lastMoveOrDrop?.to) === md.to;
     const moveDestStr = sameDest ? sameSquareSymbol : ms(md.to);
     const promStr = md.promotion ? '成' : '';
-    const role = pos.board.getRole(md.from);
+    const role = pos.board.roleAt(md.from);
     if (!role) return undefined;
     if (pos.rules === 'chushogi') {
       if (defined(md.midStep)) {
-        const isIgui = md.to === md.from && pos.board.has(md.midStep);
+        const isIgui = md.to === md.from && pos.board.hasPieceAt(md.midStep);
         const isJitto = md.to === md.from && !isIgui;
         const midDestStr = sameDest ? sameSquareSymbol : ms(md.midStep);
         const move1 = `一歩目 ${midDestStr}${roleToFullKanji(pos.rules)(role)} （←${ms(md.from)}）`;

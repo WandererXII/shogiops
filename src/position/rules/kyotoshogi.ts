@@ -19,13 +19,12 @@ import { fullSquareSet, handRoles, unpromote } from '../util.js';
 import { standardMoveDests } from './shogi.js';
 
 export class Kyotoshogi extends Position {
-  private constructor() {
-    super('kyotoshogi');
+  private constructor(setup: Setup) {
+    super('kyotoshogi', setup);
   }
 
   static from(setup: Setup, strict: boolean): Result<Kyotoshogi, PositionError> {
-    const pos = new Kyotoshogi();
-    pos.fromSetup(setup);
+    const pos = new Kyotoshogi(setup);
     return pos.validate(strict).map((_) => pos);
   }
 
@@ -39,26 +38,26 @@ export class Kyotoshogi extends Position {
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {
     const defender = opposite(attacker);
     const board = this.board;
-    return board.color(attacker).intersect(
+    return board.byColor(attacker).intersect(
       rookAttacks(square, occupied)
-        .intersect(board.role('rook'))
-        .union(bishopAttacks(square, occupied).intersect(board.role('bishop')))
-        .union(lanceAttacks(square, defender, occupied).intersect(board.role('lance')))
-        .union(knightAttacks(square, defender).intersect(board.role('knight')))
-        .union(goldAttacks(square, defender).intersect(board.roles('gold', 'tokin')))
-        .union(silverAttacks(square, defender).intersect(board.role('silver')))
-        .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-        .union(kingAttacks(square).intersect(board.role('king'))),
+        .intersect(board.byRole('rook'))
+        .union(bishopAttacks(square, occupied).intersect(board.byRole('bishop')))
+        .union(lanceAttacks(square, defender, occupied).intersect(board.byRole('lance')))
+        .union(knightAttacks(square, defender).intersect(board.byRole('knight')))
+        .union(goldAttacks(square, defender).intersect(board.byRoles('gold', 'tokin')))
+        .union(silverAttacks(square, defender).intersect(board.byRole('silver')))
+        .union(pawnAttacks(square, defender).intersect(board.byRole('pawn')))
+        .union(kingAttacks(square).intersect(board.byRole('king'))),
     );
   }
 
   squareSnipers(square: number, attacker: Color): SquareSet {
     const empty = SquareSet.empty();
     return rookAttacks(square, empty)
-      .intersect(this.board.role('rook'))
-      .union(bishopAttacks(square, empty).intersect(this.board.role('bishop')))
-      .union(lanceAttacks(square, opposite(attacker), empty).intersect(this.board.role('lance')))
-      .intersect(this.board.color(attacker));
+      .intersect(this.board.byRole('rook'))
+      .union(bishopAttacks(square, empty).intersect(this.board.byRole('bishop')))
+      .union(lanceAttacks(square, opposite(attacker), empty).intersect(this.board.byRole('lance')))
+      .intersect(this.board.byColor(attacker));
   }
 
   moveDests(square: Square, ctx?: Context): SquareSet {

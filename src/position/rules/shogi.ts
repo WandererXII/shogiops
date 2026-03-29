@@ -21,13 +21,12 @@ import { Position } from '../position.js';
 import { dimensions, fullSquareSet } from '../util.js';
 
 export class Shogi extends Position {
-  private constructor() {
-    super('standard');
+  protected constructor(setup: Setup) {
+    super('standard', setup);
   }
 
   static from(setup: Setup, strict: boolean): Result<Shogi, PositionError> {
-    const pos = new Shogi();
-    pos.fromSetup(setup);
+    const pos = new Shogi(setup);
     return pos.validate(strict).map((_) => pos);
   }
 
@@ -55,39 +54,39 @@ export const standardSquareAttacks = (
   occupied: SquareSet,
 ): SquareSet => {
   const defender = opposite(attacker);
-  return board.color(attacker).intersect(
+  return board.byColor(attacker).intersect(
     rookAttacks(square, occupied)
-      .intersect(board.roles('rook', 'dragon'))
-      .union(bishopAttacks(square, occupied).intersect(board.roles('bishop', 'horse')))
-      .union(lanceAttacks(square, defender, occupied).intersect(board.role('lance')))
-      .union(knightAttacks(square, defender).intersect(board.role('knight')))
-      .union(silverAttacks(square, defender).intersect(board.role('silver')))
+      .intersect(board.byRoles('rook', 'dragon'))
+      .union(bishopAttacks(square, occupied).intersect(board.byRoles('bishop', 'horse')))
+      .union(lanceAttacks(square, defender, occupied).intersect(board.byRole('lance')))
+      .union(knightAttacks(square, defender).intersect(board.byRole('knight')))
+      .union(silverAttacks(square, defender).intersect(board.byRole('silver')))
       .union(
         goldAttacks(square, defender).intersect(
-          board.roles('gold', 'tokin', 'promotedlance', 'promotedknight', 'promotedsilver'),
+          board.byRoles('gold', 'tokin', 'promotedlance', 'promotedknight', 'promotedsilver'),
         ),
       )
-      .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-      .union(kingAttacks(square).intersect(board.roles('king', 'dragon', 'horse'))),
+      .union(pawnAttacks(square, defender).intersect(board.byRole('pawn')))
+      .union(kingAttacks(square).intersect(board.byRoles('king', 'dragon', 'horse'))),
   );
 };
 
 export const standardSquareSnipers = (square: number, attacker: Color, board: Board): SquareSet => {
   const empty = SquareSet.empty();
   return rookAttacks(square, empty)
-    .intersect(board.roles('rook', 'dragon'))
-    .union(bishopAttacks(square, empty).intersect(board.roles('bishop', 'horse')))
-    .union(lanceAttacks(square, opposite(attacker), empty).intersect(board.role('lance')))
-    .intersect(board.color(attacker));
+    .intersect(board.byRoles('rook', 'dragon'))
+    .union(bishopAttacks(square, empty).intersect(board.byRoles('bishop', 'horse')))
+    .union(lanceAttacks(square, opposite(attacker), empty).intersect(board.byRole('lance')))
+    .intersect(board.byColor(attacker));
 };
 
 export const standardMoveDests = (pos: Position, square: Square, ctx?: Context): SquareSet => {
   ctx = ctx || pos.ctx();
-  const piece = pos.board.get(square);
+  const piece = pos.board.pieceAt(square);
   if (!piece || piece.color !== ctx.color) return SquareSet.empty();
 
   let pseudo = attacks(piece, square, pos.board.occupied).intersect(fullSquareSet(pos.rules));
-  pseudo = pseudo.diff(pos.board.color(ctx.color));
+  pseudo = pseudo.diff(pos.board.byColor(ctx.color));
 
   if (defined(ctx.king)) {
     if (piece.role === 'king') {
@@ -131,7 +130,7 @@ export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): S
 
   if (role === 'pawn') {
     // Checking for double pawns
-    const pawns = pos.board.role('pawn').intersect(pos.board.color(ctx.color));
+    const pawns = pos.board.byRole('pawn').intersect(pos.board.byColor(ctx.color));
     for (const pawn of pawns) {
       const file = SquareSet.fromFile(squareFile(pawn));
       mask = mask.diff(file);
@@ -144,8 +143,7 @@ export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): S
         : kingSquare - 16
       : undefined;
     if (defined(kingFront) && mask.has(kingFront)) {
-      const child = pos.clone();
-      child.play({ role: 'pawn', to: kingFront });
+      const child = pos.play({ role: 'pawn', to: kingFront });
       if (child.outcome()?.result === 'checkmate') mask = mask.without(kingFront);
     }
   }

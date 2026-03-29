@@ -162,31 +162,31 @@ test('blockers perft', () => {
 });
 
 test('capturing', () => {
-  const pos = parseSfen('standard', '4k4/9/3g5/3K5/9/9/9/9/9 b - 1').unwrap();
-  pos.play(parseUsi('6d6c')!);
-  pos.play(parseUsi('5a4a')!);
+  let pos = parseSfen('standard', '4k4/9/3g5/3K5/9/9/9/9/9 b - 1').unwrap();
+  pos = pos.play(parseUsi('6d6c')!);
+  pos = pos.play(parseUsi('5a4a')!);
   expect(pos.isLegal(parseUsi('G*5e')!)).toEqual(true);
 });
 
 test('promotion', () => {
-  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
-  pos.play(parseUsi('1i1h')!);
+  let pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  pos = pos.play(parseUsi('1i1h')!);
   expect(makeSfen(pos)).toEqual('lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5RL/LNSGKGSN1 w - 2');
 
-  const pos2 = parseSfen(
+  let pos2 = parseSfen(
     'standard',
     'lnsgkgsn1/1r5b1/pppppp1p1/6p2/8L/9/PPPPPPPP1/1B5R1/LNSGKGSN1 b LPp 9',
   ).unwrap();
-  pos2.play(parseUsi('1e1a')!);
+  pos2 = pos2.play(parseUsi('1e1a')!);
   expect(makeSfen(pos2)).toEqual(
     'lnsgkgsn+L/1r5b1/pppppp1p1/6p2/9/9/PPPPPPPP1/1B5R1/LNSGKGSN1 w LPp 10',
   );
 
-  const pos3 = parseSfen(
+  let pos3 = parseSfen(
     'standard',
     'lnsgkgsn1/1r5b1/pppppp1p1/6p2/8L/9/PPPPPPPP1/1B5R1/LNSGKGSN1 b LPp 9',
   ).unwrap();
-  pos3.play(parseUsi('1e1a+')!);
+  pos3 = pos3.play(parseUsi('1e1a+')!);
   expect(makeSfen(pos3)).toEqual(
     'lnsgkgsn+L/1r5b1/pppppp1p1/6p2/9/9/PPPPPPPP1/1B5R1/LNSGKGSN1 w LPp 10',
   );
@@ -234,11 +234,11 @@ test('insufficient material', () => {
 
 test('prod 500 usi', () => {
   for (const usis of usiFixture) {
-    const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+    let pos = parseSfen('standard', initialSfen('standard')).unwrap();
     for (const usi of usis.split(' ')) {
       const md = parseUsi(usi)!;
       expect(pos.isLegal(md)).toEqual(true);
-      pos.play(md);
+      pos = pos.play(md);
     }
   }
 });

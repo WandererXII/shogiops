@@ -2,6 +2,9 @@
 
 ## v0.22.0
 
+- shogiops is now immutable. This includes `Position`, `Board`, `Hands` and `Hand`. Instances of these classes cannot be modified in place now. For example instead of doing `pos.play(move);`, `play` now returns new `Position` instance. So you should do `const posAfterMove = pos.play(move);`. 
+- Method names in `Board`, `Hands` and `Hand` were changed.
+- Many types like `Piece`, `Outcome`, `NormalMove` and `DropMove` had their fields marked as `readonly`.
 - `variant` subfolder renamed to `position`.
 - Individual variants extending `Position` moved to `position/rules`.
 - Renamed `variant.ts` inside `position` to `setup.ts`.

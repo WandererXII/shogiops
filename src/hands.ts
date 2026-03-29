@@ -1,9 +1,9 @@
 import { ROLES } from './constants.js';
-import type { Color, HandMap, Role } from './types.js';
+import type { Color, Piece, Role } from './types.js';
 
 // Hand alone can store any role
 export class Hand {
-  private constructor(private handMap: HandMap) {}
+  private constructor(private readonly handMap: ReadonlyMap<Role, number>) {}
 
   static empty(): Hand {
     return new Hand(new Map());
@@ -13,13 +13,9 @@ export class Hand {
     return new Hand(new Map(iter));
   }
 
-  clone(): Hand {
-    return Hand.from(this.handMap);
-  }
-
   combine(other: Hand): Hand {
-    const h = Hand.empty();
-    for (const role of ROLES) h.set(role, this.get(role) + other.get(role));
+    let h = Hand.empty();
+    for (const role of ROLES) h = h.with(role, this.get(role) + other.get(role));
     return h;
   }
 
@@ -27,16 +23,17 @@ export class Hand {
     return this.handMap.get(role) ?? 0;
   }
 
-  set(role: Role, cnt: number): void {
-    this.handMap.set(role, cnt);
+  with(role: Role, cnt: number): Hand {
+    const newHandMap = new Map(this.handMap);
+    return new Hand(newHandMap.set(role, Math.max(cnt, 0)));
   }
 
-  drop(role: Role): void {
-    this.set(role, this.get(role) - 1);
+  decrement(role: Role): Hand {
+    return this.with(role, this.get(role) - 1);
   }
 
-  capture(role: Role): void {
-    this.set(role, this.get(role) + 1);
+  increment(role: Role): Hand {
+    return this.with(role, this.get(role) + 1);
   }
 
   equals(other: Hand): boolean {
@@ -64,8 +61,8 @@ export class Hand {
 
 export class Hands {
   private constructor(
-    private sente: Hand,
-    private gote: Hand,
+    private readonly sente: Hand,
+    private readonly gote: Hand,
   ) {}
 
   static empty(): Hands {
@@ -76,10 +73,6 @@ export class Hands {
     return new Hands(sente, gote);
   }
 
-  clone(): Hands {
-    return new Hands(this.sente.clone(), this.gote.clone());
-  }
-
   combine(other: Hands): Hands {
     return new Hands(this.sente.combine(other.sente), this.gote.combine(other.gote));
   }
@@ -87,6 +80,25 @@ export class Hands {
   color(color: Color): Hand {
     if (color === 'sente') return this.sente;
     else return this.gote;
+  }
+
+  get(piece: Piece): number {
+    return piece.color === 'sente' ? this.sente.get(piece.role) : this.gote.get(piece.role);
+  }
+
+  with(piece: Piece, cnt: number): Hands {
+    return new Hands(
+      piece.color === 'sente' ? this.sente.with(piece.role, cnt) : this.sente,
+      piece.color === 'gote' ? this.gote.with(piece.role, cnt) : this.gote,
+    );
+  }
+
+  decrement(piece: Piece): Hands {
+    return this.with(piece, this.get(piece) - 1);
+  }
+
+  increment(piece: Piece): Hands {
+    return this.with(piece, this.get(piece) + 1);
   }
 
   equals(other: Hands): boolean {

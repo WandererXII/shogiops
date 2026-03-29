@@ -12,13 +12,12 @@ import {
 } from './shogi.js';
 
 export class Checkshogi extends Position {
-  private constructor() {
-    super('checkshogi');
+  private constructor(setup: Setup) {
+    super('checkshogi', setup);
   }
 
   static from(setup: Setup, strict: boolean): Result<Checkshogi, PositionError> {
-    const pos = new Checkshogi();
-    pos.fromSetup(setup);
+    const pos = new Checkshogi(setup);
     return pos.validate(strict).map((_) => pos);
   }
 

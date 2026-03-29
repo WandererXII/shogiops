@@ -9,18 +9,18 @@ export function makeWesternMoveOrDrop(pos: Position, md: MoveOrDrop): string | u
   if (isDrop(md)) {
     return `${roleToWestern(pos.rules)(md.role)}*${makeNumberSquare(md.to)}`;
   } else {
-    const piece = pos.board.get(md.from);
+    const piece = pos.board.pieceAt(md.from);
     if (piece) {
       const roleStr = roleToWestern(pos.rules)(piece.role);
-      const disambStr = aimingAt(pos, pos.board.pieces(piece.color, piece.role), md.to)
+      const disambStr = aimingAt(pos, pos.board.byPiece(piece.color, piece.role), md.to)
         .without(md.from)
         .isEmpty()
         ? ''
         : makeNumberSquare(md.from);
-      const toCapture = pos.board.get(md.to);
+      const toCapture = pos.board.pieceAt(md.to);
       const toStr = `${toCapture ? 'x' : '-'}${makeNumberSquare(md.to)}`;
       if (defined(md.midStep)) {
-        const midCapture = pos.board.get(md.midStep);
+        const midCapture = pos.board.pieceAt(md.midStep);
         const igui = !!midCapture && md.to === md.from;
         if (igui) return `${roleStr}${disambStr}x!${makeNumberSquare(md.midStep)}`;
         else if (md.to === md.from) return `--`;

@@ -14,19 +14,19 @@ test('starting perft', () => {
 });
 
 test('check win', () => {
-  const pos = parseSfen('checkshogi', '9/3gk4/9/2b6/9/6B2/9/4KG3/9 b - 1', false).unwrap();
+  let pos = parseSfen('checkshogi', '9/3gk4/9/2b6/9/6B2/9/4KG3/9 b - 1', false).unwrap();
   expect(pos.isCheck()).toEqual(false);
   expect(pos.isEnd()).toEqual(false);
-  pos.play(parseUsi('3f2e')!);
+  pos = pos.play(parseUsi('3f2e')!);
   expect(pos.isCheck()).toEqual(true);
   expect(pos.isEnd()).toEqual(true);
   expect(pos.outcome()?.result).toEqual('check');
   expect(pos.outcome()?.winner).toEqual('sente');
 
-  const pos2 = parseSfen('checkshogi', '9/3gk4/9/2b6/9/6B2/9/4KG3/9 w - 1', false).unwrap();
+  let pos2 = parseSfen('checkshogi', '9/3gk4/9/2b6/9/6B2/9/4KG3/9 w - 1', false).unwrap();
   expect(pos2.isCheck()).toEqual(false);
   expect(pos2.isEnd()).toEqual(false);
-  pos2.play(parseUsi('7d8e')!);
+  pos2 = pos2.play(parseUsi('7d8e')!);
   expect(pos2.isCheck()).toEqual(true);
   expect(pos2.isEnd()).toEqual(true);
   expect(pos2.outcome()?.result).toEqual('check');
@@ -34,14 +34,14 @@ test('check win', () => {
 });
 
 test('pawn drop checkmate', () => {
-  const pos = parseSfen('checkshogi', '3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp', false).unwrap();
+  let pos = parseSfen('checkshogi', '3rkr3/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp', false).unwrap();
   expect(pos.isCheck()).toEqual(false);
   expect(pos.isEnd()).toEqual(false);
   const md = parseUsi('P*5b')!;
   expect(pos.isLegal(md)).toEqual(true);
   const md2 = parseUsi('L*5b')!;
   expect(pos.isLegal(md2)).toEqual(true);
-  pos.play(md2);
+  pos = pos.play(md2);
   expect(pos.isCheck()).toEqual(true);
   expect(pos.isEnd()).toEqual(true);
   expect(pos.outcome()?.result).toEqual('check');
@@ -49,12 +49,12 @@ test('pawn drop checkmate', () => {
 });
 
 test('pawn drop check', () => {
-  const pos = parseSfen('checkshogi', '3rk4/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1').unwrap();
+  let pos = parseSfen('checkshogi', '3rk4/9/8p/4N4/1B7/9/1SG6/1KS6/9 b LPp 1').unwrap();
   expect(pos.isCheck()).toEqual(false);
   expect(pos.isEnd()).toEqual(false);
   const md = parseUsi('P*5b')!;
   expect(pos.isLegal(md)).toEqual(true);
-  pos.play(md);
+  pos = pos.play(md);
   expect(pos.isCheck()).toEqual(true);
   expect(pos.isEnd()).toEqual(true);
   expect(pos.outcome()?.result).toEqual('check');

@@ -46,21 +46,37 @@ export interface Context {
 }
 
 export abstract class Position {
-  board: Board;
-  hands: Hands;
-  turn: Color;
-  moveNumber: number;
-  lastMoveOrDrop: MoveOrDrop | { to: Square } | undefined;
-  lastLionCapture: Square | undefined; // by non-lion piece
+  readonly board: Board;
+  readonly hands: Hands;
+  readonly turn: Color;
+  readonly moveNumber: number;
+  readonly lastMoveOrDrop: MoveOrDrop | { to: Square } | undefined;
+  readonly lastLionCapture: Square | undefined;
 
-  protected constructor(readonly rules: Rules) {}
+  protected constructor(
+    readonly rules: Rules,
+    readonly setup: Setup,
+  ) {
+    this.board = setup.board;
+    this.hands = setup.hands;
+    this.turn = setup.turn;
+    this.moveNumber = setup.moveNumber;
+    this.lastMoveOrDrop = setup.lastMoveOrDrop;
+    this.lastLionCapture = setup.lastLionCapture;
+  }
 
-  // When subclassing:
-  // - private constructor()
-  // - static from(
-  //     setup: Setup,
-  //     strict: boolean
-  //   )
+  update(setup: Partial<Setup>): this {
+    const Constructor = this.constructor as new (setup: Setup) => this;
+
+    return new Constructor({
+      board: setup.board ?? this.board,
+      hands: setup.hands ?? this.hands,
+      turn: setup.turn ?? this.turn,
+      moveNumber: setup.moveNumber ?? this.moveNumber,
+      lastMoveOrDrop: 'lastMoveOrDrop' in setup ? setup.lastMoveOrDrop : this.lastMoveOrDrop,
+      lastLionCapture: 'lastLionCapture' in setup ? setup.lastLionCapture : this.lastLionCapture,
+    });
+  }
 
   abstract moveDests(square: Square, ctx?: Context): SquareSet;
   abstract dropDests(piece: Piece, ctx?: Context): SquareSet;
@@ -90,26 +106,6 @@ export abstract class Position {
 
   // Attackers' long-range pieces at least x-raying square - for finding blockers
   protected abstract squareSnipers(square: Square, attacker: Color): SquareSet;
-
-  protected fromSetup(setup: Setup): void {
-    this.board = setup.board.clone();
-    this.hands = setup.hands.clone();
-    this.turn = setup.turn;
-    this.moveNumber = setup.moveNumber;
-    this.lastMoveOrDrop = setup.lastMoveOrDrop;
-    this.lastLionCapture = setup.lastLionCapture;
-  }
-
-  clone(): this {
-    const pos = new (this.constructor as new () => this)();
-    pos.board = this.board.clone();
-    pos.hands = this.hands.clone();
-    pos.turn = this.turn;
-    pos.moveNumber = this.moveNumber;
-    pos.lastMoveOrDrop = this.lastMoveOrDrop;
-    pos.lastLionCapture = this.lastLionCapture;
-    return pos;
-  }
 
   validation: {
     doublePawn: boolean;
@@ -154,7 +150,7 @@ export abstract class Position {
     if (this.validation.doublePawn) {
       for (const color of COLORS) {
         const files: number[] = [];
-        const pawns = this.board.role('pawn').intersect(this.board.color(color));
+        const pawns = this.board.byRole('pawn').intersect(this.board.byColor(color));
         for (const pawn of pawns) {
           const file = squareFile(pawn);
           if (files.includes(file))
@@ -208,7 +204,7 @@ export abstract class Position {
   }
 
   kingsOf(color: Color): SquareSet {
-    return this.board.role('king').intersect(this.board.color(color));
+    return this.board.byRole('king').intersect(this.board.byColor(color));
   }
 
   isCheck(color?: Color): boolean {
@@ -244,7 +240,9 @@ export abstract class Position {
         winner: opposite(ctx.color),
       };
     } else if (
-      COLORS.every((color) => this.board.color(color).size() + this.hands[color].count() < 2)
+      COLORS.every(
+        (color) => this.board.byColor(color).size() + this.hands.color(color).count() < 2,
+      )
     ) {
       return {
         result: 'draw',
@@ -256,7 +254,7 @@ export abstract class Position {
   allMoveDests(ctx?: Context): Map<Square, SquareSet> {
     ctx = ctx || this.ctx();
     const d: Map<Square, SquareSet> = new Map();
-    for (const square of this.board.color(ctx.color)) {
+    for (const square of this.board.byColor(ctx.color)) {
       d.set(square, this.moveDests(square, ctx));
     }
     return d;
@@ -276,7 +274,7 @@ export abstract class Position {
 
   hasDests(ctx?: Context): boolean {
     ctx = ctx || this.ctx();
-    for (const square of this.board.color(ctx.color)) {
+    for (const square of this.board.byColor(ctx.color)) {
       if (this.moveDests(square, ctx).nonEmpty()) return true;
     }
     for (const [role] of this.hands[ctx.color]) {
@@ -292,13 +290,13 @@ export abstract class Position {
       if (!handRoles(this.rules).includes(role) || this.hands[turn].get(role) <= 0) return false;
       return this.dropDests({ color: turn, role }, ctx).has(md.to);
     } else {
-      const piece = this.board.get(md.from);
+      const piece = this.board.pieceAt(md.from);
       if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
 
       // Checking whether we can promote
       if (
         md.promotion &&
-        !pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.get(md.to))
+        !pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.pieceAt(md.to))
       )
         return false;
       if (!md.promotion && pieceForcePromote(this.rules)(piece, md.to)) return false;
@@ -307,58 +305,84 @@ export abstract class Position {
     }
   }
 
-  private storeCapture(capture: Piece): void {
+  private storeCapture(hands: Hands, capture: Piece): Hands {
     const unpromotedRole = unpromoteForHand(this.rules)(capture.role);
-    if (unpromotedRole && handRoles(this.rules).includes(unpromotedRole))
-      this.hands[opposite(capture.color)].capture(unpromotedRole);
+    if (unpromotedRole && handRoles(this.rules).includes(unpromotedRole)) {
+      return hands.increment({ color: opposite(capture.color), role: unpromotedRole });
+    }
+    return hands;
   }
 
   // doesn't care about validity, just tries to play the move/drop
-  play(md: MoveOrDrop): void {
-    const turn = this.turn;
-
-    this.moveNumber += 1;
-    this.turn = opposite(turn);
-    this.lastMoveOrDrop = md;
-    this.lastLionCapture = undefined;
+  // Returns a new instance with the updated state
+  play(md: MoveOrDrop): this {
+    const nextTurn = opposite(this.turn);
+    let nextBoard = this.board;
+    let nextHands = this.hands;
+    let nextLastLionCapture: Square | undefined;
 
     if (isDrop(md)) {
-      this.board.set(md.to, { role: md.role, color: turn });
-      this.hands[turn].drop(unpromoteForHand(this.rules)(md.role) || md.role);
+      nextBoard = nextBoard.withPieceAt(md.to, { role: md.role, color: this.turn });
+      nextHands = nextHands.decrement({
+        color: this.turn,
+        role: unpromoteForHand(this.rules)(md.role) || md.role,
+      });
     } else {
-      const piece = this.board.take(md.from);
+      const piece = nextBoard.pieceAt(md.from);
       const role = piece?.role;
-      if (!role) return;
+      if (!piece || !role) return this;
+
+      const movedPiece = { ...piece };
+
+      nextBoard = nextBoard.withoutPieceAt(md.from);
 
       if (
         (md.promotion &&
-          pieceCanPromote(this.rules)(piece, md.from, md.to, this.board.get(md.to))) ||
+          pieceCanPromote(this.rules)(piece, md.from, md.to, nextBoard.pieceAt(md.to))) ||
         pieceForcePromote(this.rules)(piece, md.to)
-      )
-        piece.role = promote(this.rules)(role) || role;
+      ) {
+        movedPiece.role = promote(this.rules)(role) || role;
+      }
 
-      const capture = this.board.set(md.to, piece);
-      const midCapture = defined(md.midStep) ? this.board.take(md.midStep) : undefined;
+      const capture = nextBoard.pieceAt(md.to);
+      nextBoard = nextBoard.withPieceAt(md.to, movedPiece);
 
-      // process midCapture (if exists) before final destination capture
+      let midCapture: Piece | undefined;
+      if (defined(md.midStep)) {
+        midCapture = nextBoard.pieceAt(md.midStep);
+        nextBoard = nextBoard.withoutPieceAt(md.midStep);
+      }
+
       if (defined(midCapture)) {
         if (
           !lionRoles.includes(role) &&
-          midCapture.color === this.turn &&
+          midCapture.color === nextTurn &&
           lionRoles.includes(midCapture.role)
-        )
-          this.lastLionCapture = md.midStep;
-        this.storeCapture(midCapture);
+        ) {
+          nextLastLionCapture = md.midStep;
+        }
+        nextHands = this.storeCapture(nextHands, midCapture);
       }
+
       if (capture) {
         if (
           !lionRoles.includes(role) &&
-          capture.color === this.turn &&
+          capture.color === nextTurn &&
           lionRoles.includes(capture.role)
-        )
-          this.lastLionCapture = md.to;
-        this.storeCapture(capture);
+        ) {
+          nextLastLionCapture = md.to;
+        }
+        nextHands = this.storeCapture(nextHands, capture);
       }
     }
+
+    return this.update({
+      turn: nextTurn,
+      moveNumber: this.moveNumber + 1,
+      board: nextBoard,
+      hands: nextHands,
+      lastMoveOrDrop: md,
+      lastLionCapture: nextLastLionCapture,
+    });
   }
 }

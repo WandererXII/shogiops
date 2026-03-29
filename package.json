@@ -46,7 +46,7 @@
     "clean": "del dist && del *.tsbuildinfo",
     "build": "tsc -p tsconfig.build.json",
     "type-check": "tsgo --noEmit && tsc --noEmit",
-    "check": "biome check && oxlint --type-aware",
+    "check": "biome check && oxlint",
     "test": "node --import tsx --test 'test/**/*.test.ts'",
     "test-only": "node --import tsx --test"
   },

@@ -4,7 +4,7 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/WandererXII/shogiops/ci.yml?label=CI)
 [![npm](https://img.shields.io/npm/v/shogiops?logo=npm)](https://www.npmjs.com/package/shogiops)
 
-Shogi and operations in TypeScript forked from [chessops](https://github.com/niklasf/chessops), rewritten for shogi.
+Shogi and operations in TypeScript forked from [chessops](https://github.com/niklasf/chessops), rewritten for shogi. Fully immutable.
 
 ## Features
 

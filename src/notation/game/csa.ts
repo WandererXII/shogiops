@@ -43,7 +43,7 @@ export function makeCsaBoard(board: Board): string {
     csaBoard += `P${rank + 1}`;
     for (let file = 8; file >= 0; file--) {
       const square = parseCoordinates(file, rank)!;
-      const piece = board.get(square);
+      const piece = board.pieceAt(square);
       if (!piece) csaBoard += ' * ';
       else {
         const colorSign = piece.color === 'gote' ? '-' : '+';
@@ -81,7 +81,17 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
       : parseCsaBoard(lines.filter((l) => /^P\d/.test(l)));
   const turn: Color = lines.some((l) => l === '-') ? 'gote' : 'sente';
   return baseBoard.chain((board) => {
-    return Shogi.from({ board, hands: Hands.empty(), turn, moveNumber: 1 }, true).chain((pos) =>
+    return Shogi.from(
+      {
+        board,
+        hands: Hands.empty(),
+        turn,
+        moveNumber: 1,
+        lastLionCapture: undefined,
+        lastMoveOrDrop: undefined,
+      },
+      true,
+    ).chain((pos) =>
       parseAdditions(
         pos,
         lines.filter((l) => /P[+|-]/.test(l)),
@@ -92,11 +102,11 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
 
 export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
   const splitted = handicap.substring(2).match(/.{4}/g) || [];
-  const intitalBoard = parseSfen('standard', initialSfen('standard'), false).unwrap().board;
+  let intitalBoard = parseSfen('standard', initialSfen('standard'), false).unwrap().board;
   for (const s of splitted) {
     const sq = parseNumberSquare(s.substring(0, 2));
     if (defined(sq)) {
-      intitalBoard.take(sq);
+      intitalBoard = intitalBoard.withoutPieceAt(sq);
     } else {
       return Result.err(new CsaError(InvalidCsa.Handicap));
     }
@@ -106,7 +116,7 @@ export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
 
 function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   if (csaBoard.length !== 9) return Result.err(new CsaError(InvalidCsa.Board));
-  const board = Board.empty();
+  let board = Board.empty();
   let rank = 0;
 
   for (const r of csaBoard.map((r) => r.substring(2))) {
@@ -119,7 +129,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
         const role = csaToRole(s.substring(1));
         if (defined(role) && allRoles('standard').includes(role)) {
           const piece = { role: role, color: boolToColor(!s.startsWith('-')) };
-          board.set(square, piece);
+          board = board.withPieceAt(square, piece);
           file--;
         }
       }
@@ -141,9 +151,14 @@ function parseAdditions(initialPos: Shogi, additions: string[]): Result<Shogi, C
         if (!defined(sq)) {
           if (!handRoles('standard').includes(role))
             return Result.err(new CsaError(InvalidCsa.Hands));
-          initialPos.hands[color].capture(role);
+
+          initialPos = initialPos.update({
+            hands: initialPos.hands.increment({ color, role }),
+          });
         } else {
-          initialPos.board.set(sq, { role: role, color: color });
+          initialPos = initialPos.update({
+            board: initialPos.board.withPieceAt(sq, { role: role, color: color }),
+          });
         }
       } else return Result.err(new CsaError(InvalidCsa.AdditionalInfo));
     }
@@ -191,17 +206,16 @@ export function parseCsaMoveOrDrop(pos: Shogi, csaMd: string): MoveOrDrop | unde
     from: orig,
     midStep: undefined,
     to: parseNumberSquare(match[2])!,
-    promotion: pos.board.get(orig)?.role !== role,
+    promotion: pos.board.pieceAt(orig)?.role !== role,
   };
 }
 
 export function parseCsaMovesOrDrops(pos: Shogi, csaMds: string[]): MoveOrDrop[] {
-  pos = pos.clone();
   const mds: MoveOrDrop[] = [];
   for (const m of csaMds) {
     const md = parseCsaMoveOrDrop(pos, m);
     if (!md) return mds;
-    pos.play(md);
+    pos = pos.play(md);
     mds.push(md);
   }
   return mds;
@@ -212,7 +226,7 @@ export function makeCsaMoveOrDrop(pos: Shogi, md: MoveOrDrop): string | undefine
   if (isDrop(md)) {
     return `00${makeNumberSquare(md.to)}${roleToCsa(md.role)}`;
   } else {
-    const role = pos.board.getRole(md.from);
+    const role = pos.board.roleAt(md.from);
     if (!role) return undefined;
     return (
       makeNumberSquare(md.from) +

@@ -8,13 +8,12 @@ import { Position } from '../position.js';
 import { fullSquareSet, promotionZone } from '../util.js';
 
 export class Dobutsu extends Position {
-  private constructor() {
-    super('dobutsu');
+  private constructor(setup: Setup) {
+    super('dobutsu', setup);
   }
 
   static from(setup: Setup, strict: boolean): Result<Dobutsu, PositionError> {
-    const pos = new Dobutsu();
-    pos.fromSetup(setup);
+    const pos = new Dobutsu(setup);
     return pos.validate(strict).map((_) => pos);
   }
 
@@ -28,17 +27,17 @@ export class Dobutsu extends Position {
   squareAttackers(square: Square, attacker: Color, _occupied: SquareSet): SquareSet {
     const defender = opposite(attacker);
     const board = this.board;
-    return board.color(attacker).intersect(
+    return board.byColor(attacker).intersect(
       limitedAttacks({ role: 'rook', color: attacker }, square)
-        .intersect(board.roles('rook'))
+        .intersect(board.byRoles('rook'))
         .union(
           limitedAttacks({ role: 'bishop', color: attacker }, square).intersect(
-            board.roles('bishop'),
+            board.byRoles('bishop'),
           ),
         )
-        .union(goldAttacks(square, defender).intersect(board.roles('tokin')))
-        .union(pawnAttacks(square, defender).intersect(board.role('pawn')))
-        .union(kingAttacks(square).intersect(board.roles('king'))),
+        .union(goldAttacks(square, defender).intersect(board.byRoles('tokin')))
+        .union(pawnAttacks(square, defender).intersect(board.byRole('pawn')))
+        .union(kingAttacks(square).intersect(board.byRoles('king'))),
     );
   }
 
@@ -49,11 +48,11 @@ export class Dobutsu extends Position {
   moveDests(square: Square, ctx?: Context): SquareSet {
     ctx = ctx || this.ctx();
 
-    const piece = this.board.get(square);
+    const piece = this.board.pieceAt(square);
     if (!piece || piece.color !== ctx.color) return SquareSet.empty();
 
     let pseudo = limitedAttacks(piece, square).intersect(fullSquareSet(this.rules));
-    pseudo = pseudo.diff(this.board.color(ctx.color));
+    pseudo = pseudo.diff(this.board.byColor(ctx.color));
 
     return pseudo.intersect(fullSquareSet(this.rules));
   }

@@ -8,8 +8,7 @@ test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;
   expect(makeWesternEngineMoveOrDrop(pos, move)).toEqual('P-7f');
-  pos.play(move);
-  expect(makeWesternEngineMoveOrDrop(pos, parseUsi('3c3d')!)).toEqual('P-3d');
+  expect(makeWesternEngineMoveOrDrop(pos.play(move), parseUsi('3c3d')!)).toEqual('P-3d');
 });
 
 test('amb moves', () => {

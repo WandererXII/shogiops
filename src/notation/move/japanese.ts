@@ -16,22 +16,22 @@ export function makeJapaneseMoveOrDrop(
     const ambStr = aimingAt(
       pos,
       pos.board
-        .roles(md.role, ...roleKanjiDuplicates(pos.rules)(md.role))
-        .intersect(pos.board.color(pos.turn)),
+        .byRoles(md.role, ...roleKanjiDuplicates(pos.rules)(md.role))
+        .intersect(pos.board.byColor(pos.turn)),
       md.to,
     ).isEmpty()
       ? ''
       : '打';
     return `${makeJapaneseSquare(md.to)}${roleToKanji(pos.rules)(md.role)}${ambStr}`;
   } else {
-    const piece = pos.board.get(md.from);
+    const piece = pos.board.pieceAt(md.from);
     if (piece) {
       const roleStr = roleToKanji(pos.rules)(piece.role);
       const ambPieces = aimingAt(
         pos,
         pos.board
-          .roles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
-          .intersect(pos.board.color(piece.color)),
+          .byRoles(piece.role, ...roleKanjiDuplicates(pos.rules)(piece.role))
+          .intersect(pos.board.byColor(piece.color)),
         md.to,
       ).without(md.from);
       const ambStr = ambPieces.isEmpty()
@@ -39,7 +39,7 @@ export function makeJapaneseMoveOrDrop(
         : disambiguate(pos.rules, piece, md.from, md.to, ambPieces);
 
       if (defined(md.midStep)) {
-        const midCapture = pos.board.get(md.midStep);
+        const midCapture = pos.board.pieceAt(md.midStep);
         const igui = !!midCapture && md.to === md.from;
         if (igui) return `${makeJapaneseSquare(md.midStep)}居喰い`;
         else if (md.to === md.from) return 'じっと';
@@ -50,7 +50,7 @@ export function makeJapaneseMoveOrDrop(
           (lastDest ?? pos.lastMoveOrDrop?.to) === md.to ? '同　' : makeJapaneseSquare(md.to);
         const promStr = md.promotion
           ? '成'
-          : pieceCanPromote(pos.rules)(piece, md.from, md.to, pos.board.get(md.to))
+          : pieceCanPromote(pos.rules)(piece, md.from, md.to, pos.board.pieceAt(md.to))
             ? '不成'
             : '';
         return `${destStr}${roleStr}${ambStr}${promStr}`;

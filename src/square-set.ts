@@ -247,7 +247,7 @@ export class SquareSet implements Iterable<Square> {
     for (let i = 0; i < 8; i++) {
       const otherWithC = other.dRows[i] + c;
       newRows[i] -= otherWithC;
-      c = ((newRows[i] & otherWithC & 1) + (otherWithC >>> 1) + (newRows[i] >>> 1)) >>> 31;
+      c = newRows[i] < 0 ? 1 : 0;
     }
     return new SquareSet(newRows);
   }

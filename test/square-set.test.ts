@@ -378,6 +378,24 @@ test('minus256', () => {
   expect(t1.minus256(t2)).toEqual(res2);
 });
 
+test('minus256 propagates borrows through all-ones words', () => {
+  expect(
+    new SquareSet([0, 0, 1, 0, 0, 0, 0, 0]).minus256(
+      new SquareSet([1, 0xffffffff, 0, 0, 0, 0, 0, 0]),
+    ),
+  ).toEqual(new SquareSet([0xffffffff, 0, 0, 0, 0, 0, 0, 0]));
+
+  expect(
+    new SquareSet([0, 0x80000000, 0, 1, 0, 0, 0, 0]).minus256(
+      new SquareSet([1, 0xffffffff, 0xffffffff, 0, 0, 0, 0, 0]),
+    ),
+  ).toEqual(new SquareSet([0xffffffff, 0x80000000, 0, 0, 0, 0, 0, 0]));
+
+  expect(SquareSet.empty().minus256(SquareSet.full())).toEqual(
+    new SquareSet([1, 0, 0, 0, 0, 0, 0, 0]),
+  );
+});
+
 test('equals', () => {
   expect(new SquareSet([3017171219, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])).toEqual(
     new SquareSet([-1277796077, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]),

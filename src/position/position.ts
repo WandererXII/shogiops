@@ -290,6 +290,7 @@ export abstract class Position {
       if (!handRoles(this.rules).includes(role) || this.hands[turn].get(role) <= 0) return false;
       return this.dropDests({ color: turn, role }, ctx).has(md.to);
     } else {
+      if (defined(md.midStep)) return false;
       const piece = this.board.pieceAt(md.from);
       if (!piece || !allRoles(this.rules).includes(piece.role)) return false;
 

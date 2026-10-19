@@ -126,6 +126,16 @@ const random: [string, string, number, number][] = [
   ['gentest-21', '7lk/9/8S/9/9/9/9/7L1/8K b P', 85, 639],
 ];
 
+test('reject intermediate steps', () => {
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+
+  expect(pos.isLegal(parseUsi('7g7f')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('7g5a7f')!)).toEqual(false);
+  expect(pos.isLegal(parseUsi('7g1a7f')!)).toEqual(false); // square zero
+  expect(pos.isLegal(parseUsi('7g5e7f')!)).toEqual(false); // empty intermediate square
+  expect(pos.isLegal(parseUsi('7g7f7f')!)).toEqual(false); // intermediate step equals destination
+});
+
 test('test promotions', () => {
   const initial = parseSfen('standard', initialSfen('standard')).unwrap();
   const pos = parseSfen('standard', '4k4/9/7S1/1+PG3NS1/9/9/9/9/4K3L b - 1').unwrap();

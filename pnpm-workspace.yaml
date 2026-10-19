@@ -1,2 +1,4 @@
 savePrefix: ''
 minimumReleaseAge: 1440
+allowBuilds:
+  esbuild: true

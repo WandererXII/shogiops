@@ -62,17 +62,18 @@ export class Annanshogi extends Position {
             pseudo = pseudo.without(to);
         }
       } else {
-        const stdAttackers = standardSquareAttacks(
-          ctx.king,
-          opposite(ctx.color),
-          this.board,
-          this.board.occupied,
-        );
-        pseudo = pseudo.diff(
-          (ctx.color === 'sente' ? stdAttackers.shr256(16) : stdAttackers.shl256(16)).intersect(
-            this.board.occupied,
-          ),
-        );
+        for (const to of pseudo.intersect(this.board.byColor(opposite(ctx.color)))) {
+          const boardUpdated = this.board.withoutPieceAt(square).withPieceAt(to, realPiece);
+          if (
+            standardSquareAttacks(
+              ctx.king,
+              opposite(ctx.color),
+              annanAttackBoard(boardUpdated),
+              boardUpdated.occupied,
+            ).nonEmpty()
+          )
+            pseudo = pseudo.without(to);
+        }
         if (ctx.checkers.nonEmpty()) {
           if (ctx.checkers.size() > 2) return SquareSet.empty();
           const singularChecker = ctx.checkers.singleSquare();

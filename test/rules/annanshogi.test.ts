@@ -18,6 +18,7 @@ const annanPerfts: [string, number, number][] = [
   ['1n2g1g2/l2k1p3/p1p1psb1l/r4Ppp1/1p6p/P2p1PPpP/L3+n1S1L/1BKN2GS1/r1G4N1 b 2Psp 83', 1, 7],
   ['Pn2g4/+S2ps3l/4p1p1+P/sPpg1Pk2/lS1rr2pp/p2GnnPP1/LB+p4+nL/2B2K2+p/1p1GP2+p1 b - 129', 1, 46],
   ['9/1k7/9/4b4/4p4/5N3/6K2/9/9 b - 1', 1, 6],
+  ['9/9/9/9/9/9/8k/5b3/2K1Br3 b - 1', 1, 9],
 ];
 
 test('annanshogi perft', () => {
@@ -174,6 +175,28 @@ test('do not allow discovering check by capturing move giver', () => {
   const pos2 = parseSfen('annanshogi', '6k2/p8/9/3Bs4/3R5/9/9/6K2/9 w').unwrap();
   expect(pos2.moveDests(parseSquareName('5d')).has(parseSquareName('6e'))).toEqual(false);
   expect(perft(pos2, 1)).toEqual(10);
+});
+
+test('do not allow capturing move givers while vacating an attack line', () => {
+  const cases = [
+    ['9/9/9/9/9/9/8k/5b3/2K1Br3 b - 1', '5i4h'],
+    ['3Rb1k2/3B5/K8/9/9/9/9/9/9 w - 1', '5a6b'],
+  ];
+  for (const [sfen, usi] of cases) {
+    const pos = parseSfen('annanshogi', sfen).unwrap();
+    const move = parseUsi(usi)!;
+    expect(pos.isCheck()).toEqual(false);
+    expect(pos.play(move).isCheck(pos.turn)).toEqual(true);
+    expect(pos.isLegal(move)).toEqual(false);
+    expect(
+      pos.moveDests(parseSquareName(usi.slice(0, 2))!).has(parseSquareName(usi.slice(2, 4))!),
+    ).toEqual(false);
+  }
+
+  const blocked = parseSfen('annanshogi', '9/9/9/9/9/9/8k/5b3/2KPBr3 b - 1').unwrap();
+  const capture = parseUsi('5i4h')!;
+  expect(blocked.isLegal(capture)).toEqual(true);
+  expect(blocked.play(capture).isCheck(blocked.turn)).toEqual(false);
 });
 
 test('allow moving/capturing square behind attacker with king', () => {

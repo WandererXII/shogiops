@@ -302,7 +302,16 @@ test('parse chushogi moves', () => {
 
 test('chushogi kif default', () => {
   const defaultPos = parseSfen('chushogi', initialSfen('chushogi')).unwrap();
-  expect(makeKifHeader(defaultPos)).toEqual(`手合割：`);
+  const header = makeKifHeader(defaultPos);
+  expect(header).toEqual(`手合割：中将棋`);
+  expect(parseKifHeader(header).unwrap()).toEqual(defaultPos);
+});
+
+test('dobutsu kif default', () => {
+  const defaultPos = parseSfen('dobutsu', initialSfen('dobutsu')).unwrap();
+  const header = makeKifHeader(defaultPos);
+  expect(header).toEqual(`手合割：どうぶつしょうぎ`);
+  expect(parseKifHeader(header).unwrap()).toEqual(defaultPos);
 });
 
 test('parse kif header and board with annanshogi handicap name', () => {

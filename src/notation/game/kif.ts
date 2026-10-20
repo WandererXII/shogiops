@@ -108,7 +108,9 @@ function defaultHandicap(rules: Rules): string {
     case 'minishogi':
       return '5五将棋';
     case 'chushogi':
-      return '';
+      return '中将棋';
+    case 'dobutsu':
+      return 'どうぶつしょうぎ';
     case 'annanshogi':
       return '安南将棋';
     case 'kyotoshogi':
@@ -180,7 +182,8 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
 }
 
 function detectRules(lines: number | undefined, tag: string | undefined): Rules {
-  if (lines === 12) return 'chushogi';
+  if (lines === 12 || (defined(tag) && tag.startsWith('手合割：中将棋'))) return 'chushogi';
+  else if (defined(tag) && tag.startsWith('手合割：どうぶつしょうぎ')) return 'dobutsu';
   else if (
     (!defined(lines) || lines === 0 || lines === 5) &&
     defined(tag) &&

@@ -5,7 +5,7 @@ import { Hands } from '../../hands.js';
 import { Shogi } from '../../position/rules/shogi.js';
 import { allRoles, handRoles, promote } from '../../position/util.js';
 import { initialSfen, parseSfen } from '../../sfen.js';
-import type { Color, MoveOrDrop } from '../../types.js';
+import type { Color, MoveOrDrop, Setup } from '../../types.js';
 import { boolToColor, defined, isDrop, parseCoordinates } from '../../util.js';
 import { csaToRole, makeNumberSquare, parseNumberSquare, roleToCsa } from '../util.js';
 
@@ -81,7 +81,7 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
       : parseCsaBoard(lines.filter((l) => /^P\d/.test(l)));
   const turn: Color = lines.some((l) => l === '-') ? 'gote' : 'sente';
   return baseBoard.chain((board) => {
-    return Shogi.from(
+    return parseAdditions(
       {
         board,
         hands: Hands.empty(),
@@ -90,13 +90,8 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
         lastLionCapture: undefined,
         lastMoveOrDrop: undefined,
       },
-      true,
-    ).chain((pos) =>
-      parseAdditions(
-        pos,
-        lines.filter((l) => /P[+|-]/.test(l)),
-      ),
-    );
+      lines.filter((l) => /P[+|-]/.test(l)),
+    ).chain((setup) => Shogi.from(setup, true));
   });
 }
 
@@ -115,7 +110,8 @@ export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
 }
 
 function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
-  if (csaBoard.length !== 9) return Result.err(new CsaError(InvalidCsa.Board));
+  if (csaBoard.length !== 0 && csaBoard.length !== 9)
+    return Result.err(new CsaError(InvalidCsa.Board));
   let board = Board.empty();
   let rank = 0;
 
@@ -140,7 +136,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   return Result.ok(board);
 }
 
-function parseAdditions(initialPos: Shogi, additions: string[]): Result<Shogi, CsaError> {
+function parseAdditions(initialPos: Setup, additions: string[]): Result<Setup, CsaError> {
   for (const line of additions) {
     const color: Color = line[1] === '+' ? 'sente' : 'gote';
     for (const sp of line.substring(2).match(/.{4}/g) || []) {
@@ -152,13 +148,15 @@ function parseAdditions(initialPos: Shogi, additions: string[]): Result<Shogi, C
           if (!handRoles('standard').includes(role))
             return Result.err(new CsaError(InvalidCsa.Hands));
 
-          initialPos = initialPos.update({
+          initialPos = {
+            ...initialPos,
             hands: initialPos.hands.increment({ color, role }),
-          });
+          };
         } else {
-          initialPos = initialPos.update({
+          initialPos = {
+            ...initialPos,
             board: initialPos.board.withPieceAt(sq, { role: role, color: color }),
-          });
+          };
         }
       } else return Result.err(new CsaError(InvalidCsa.AdditionalInfo));
     }

@@ -8,6 +8,7 @@ import {
   parseTags,
 } from '../../src/notation/game/csa.js';
 import { parseNumberSquare } from '../../src/notation/util.js';
+import { IllegalSetup } from '../../src/position/position.js';
 import { initialSfen, parseSfen } from '../../src/sfen.js';
 import { parseSquareName, parseUsi } from '../../src/util.js';
 import { expect } from '../debug.js';
@@ -86,6 +87,29 @@ test('parse CSA header with handicap', () => {
   -`;
   const csaPos = parseCsaHeader(csaHeader).unwrap();
   expect(csaPos).toEqual(pos);
+});
+
+for (const emptyRows of [false, true]) {
+  test(`parse CSA piece-by-piece setup ${emptyRows ? 'with empty rows' : 'without board rows'}`, () => {
+    const rows = emptyRows
+      ? Array.from({ length: 9 }, (_, rank) => `P${rank + 1}${' * '.repeat(9)}\n`).join('')
+      : '';
+    const csaHeader = `${rows}P+59OU55TO00KI00FU
+P-51OU22KA00GI
+-`;
+    const pos = parseSfen('standard', '4k4/7b1/9/9/4+P4/9/9/9/4K4 w GPs 1', true).unwrap();
+    expect(parseCsaHeader(csaHeader).unwrap()).toEqual(pos);
+  });
+}
+
+test('validate CSA position after applying piece placements', () => {
+  for (const csaHeader of ['P+59OU57FU56FU\nP-51OU\n+', 'PI\nP+56FU\n+']) {
+    const pos = parseCsaHeader(csaHeader);
+    expect(pos.isErr).toEqual(true);
+    expect(pos.isErr ? pos.error.message : undefined).toEqual(
+      IllegalSetup.InvalidPiecesDoublePawns,
+    );
+  }
 });
 
 test('parse CSA header with handicap and CSA board', () => {

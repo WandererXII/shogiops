@@ -356,8 +356,8 @@ export function parseKifMovesOrDrops(
     const m = kifMds[i];
     let md: MoveOrDrop | undefined;
     if (isLionDouble(m) && isLionDouble(kifMds[i + 1])) {
-      const firstMove = parseChushogiMove(m);
-      const secondMove = parseChushogiMove(kifMds[++i]);
+      const firstMove = parseChushogiMove(m, lastDest);
+      const secondMove = parseChushogiMove(kifMds[++i], lastDest);
       if (firstMove && secondMove && isMove(firstMove) && isMove(secondMove)) {
         md = { from: firstMove.from, to: secondMove.to, midStep: firstMove.to, promotion: false };
       }
@@ -389,7 +389,8 @@ export function makeKifMoveOrDrop(
       if (defined(md.midStep)) {
         const isIgui = md.to === md.from && pos.board.hasPieceAt(md.midStep);
         const isJitto = md.to === md.from && !isIgui;
-        const midDestStr = sameDest ? sameSquareSymbol : ms(md.midStep);
+        const midDestStr =
+          (lastDest ?? pos.lastMoveOrDrop?.to) === md.midStep ? sameSquareSymbol : ms(md.midStep);
         const move1 = `一歩目 ${midDestStr}${roleToFullKanji(pos.rules)(role)} （←${ms(md.from)}）`;
         const move2 =
           '二歩目 ' +

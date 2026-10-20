@@ -300,6 +300,37 @@ test('parse chushogi moves', () => {
   expect(parseKifMoveOrDrop('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });
 
+test('chushogi two-step moves reuse the previous destination', () => {
+  for (const [previousUsi, expectedKif] of [
+    ['5a5c', '一歩目 5四獅子 （←5五）\n二歩目 仝獅子 （←5四）'],
+    ['5a5d', '一歩目 仝獅子 （←5五）\n二歩目 5三獅子 （←5四）'],
+    ['5a6a', '一歩目 5四獅子 （←5五）\n二歩目 5三獅子 （←5四）'],
+  ]) {
+    const initialPos = parseSfen(
+      'chushogi',
+      'k6r4/12/12/12/7N4/12/12/12/12/12/12/11K w - 1',
+    ).unwrap();
+    const previous = parseUsi(previousUsi)!;
+    expect(initialPos.isLegal(previous)).toEqual(true);
+    const pos = initialPos.play(previous);
+    const move = parseUsi('5e5d5c')!;
+    expect(pos.isLegal(move)).toEqual(true);
+    const following = parseUsi('12a12b')!;
+    expect(pos.play(move).isLegal(following)).toEqual(true);
+
+    expect(makeKifMoveOrDrop(pos, move)).toEqual(expectedKif);
+    expect(makeKifMoveOrDrop(initialPos, move, previous.to)).toEqual(expectedKif);
+    expect(parseKifMovesOrDrops(expectedKif.split('\n'), previous.to)).toEqual([move]);
+    expect(
+      parseKifMovesOrDrops([
+        makeKifMoveOrDrop(initialPos, previous)!,
+        ...expectedKif.split('\n'),
+        '12二玉 （←12一）',
+      ]),
+    ).toEqual([previous, move, following]);
+  }
+});
+
 test('chushogi kif default', () => {
   const defaultPos = parseSfen('chushogi', initialSfen('chushogi')).unwrap();
   const header = makeKifHeader(defaultPos);

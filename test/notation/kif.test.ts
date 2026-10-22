@@ -2,19 +2,55 @@ import { test } from 'node:test';
 import { findHandicap } from '../../src/handicaps.js';
 import { Hand } from '../../src/hands.js';
 import {
+  InvalidKif,
+  makeKifBoard,
   makeKifHand,
   makeKifHeader,
   makeKifMoveOrDrop,
+  parseKifBoard,
   parseKifHand,
   parseKifHeader,
   parseKifMoveOrDrop,
   parseKifMovesOrDrops,
   parseTags,
 } from '../../src/notation/game/kif.js';
+import { dimensions } from '../../src/position/util.js';
 import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
 import type { Rules } from '../../src/types.js';
 import { parseUsi } from '../../src/util.js';
 import { expect } from '../debug.js';
+
+for (const rules of [
+  'standard',
+  'minishogi',
+  'kyotoshogi',
+  'dobutsu',
+  'chushogi',
+  'annanshogi',
+  'checkshogi',
+] as const) {
+  test(`${rules} kif board requires complete dimensions`, () => {
+    const pos = parseSfen(rules, initialSfen(rules)).unwrap();
+    const diagram = makeKifBoard(rules, pos.board);
+    expect(parseKifBoard(rules, diagram).unwrap()).toEqual(pos.board);
+
+    const rows = diagram.split('\n').filter((line) => line.startsWith('|'));
+    const { files } = dimensions(rules);
+    const malformedBoards = [
+      '',
+      rows.filter((_, rank) => rank !== 3).join('\n'),
+      [...rows, rows[3]].join('\n'),
+      ...[files - 1, files + 1].map((width) =>
+        rows.map((row, rank) => (rank === 3 ? `|${' ・'.repeat(width)}|四` : row)).join('\n'),
+      ),
+    ];
+    for (const malformed of malformedBoards) {
+      const result = parseKifBoard(rules, malformed);
+      expect(result.isErr).toEqual(true);
+      if (result.isErr) expect(result.error.message).toEqual(InvalidKif.Board);
+    }
+  });
+}
 
 test('dobutsu kif hands round-trip', () => {
   for (const count of [1, 2]) {

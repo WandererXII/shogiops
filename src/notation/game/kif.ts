@@ -198,10 +198,11 @@ function detectRules(lines: number | undefined, tag: string | undefined): Rules 
 
 export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, KifError> {
   const lines = normalizedKifLines(kifBoard).filter((l) => l.startsWith('|'));
-  if (lines.length === 0) return Result.err(new KifError(InvalidKif.Board));
+  const dims = dimensions(rules);
+  if (lines.length !== dims.ranks) return Result.err(new KifError(InvalidKif.Board));
   let board = Board.empty();
 
-  const offset = dimensions(rules).files - 1;
+  const offset = dims.files - 1;
   let file = offset;
   let rank = 0;
 
@@ -239,6 +240,7 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
         }
       }
     }
+    if (file !== -1) return Result.err(new KifError(InvalidKif.Board));
     rank++;
   }
   return Result.ok(board);

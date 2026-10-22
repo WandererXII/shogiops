@@ -8,6 +8,7 @@ import {
   parseTags,
 } from '../../src/notation/game/kif.js';
 import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
+import type { Rules } from '../../src/types.js';
 import { parseUsi } from '../../src/util.js';
 import { expect } from '../debug.js';
 
@@ -216,6 +217,49 @@ test('parse kif moves/drops', () => {
     pos = pos.play(m);
   }
   expect(pos.outcome()?.result).toEqual('checkmate');
+});
+
+const variantMoveCases: [Rules, string, string, string][] = [
+  ['dobutsu', 'k2/3/1P1/2K b - 1', '2c2b', '２二ひよこ(23)'],
+  ['dobutsu', 'k2/3/1B1/2K b - 1', '2c3b', '３二ぞう(23)'],
+  ['dobutsu', 'k2/3/1R1/2K b - 1', '2c2b', '２二きりん(23)'],
+  ['dobutsu', 'k2/3/1+P1/2K b - 1', '2c2b', '２二にわとり(23)'],
+  ['dobutsu', 'k2/3/3/2K b - 1', '1d1c', '１三ライオン(14)'],
+  ['dobutsu', 'k2/1P1/3/2K b - 1', '2b2a+', '２一ひよこ成(22)'],
+  ['dobutsu', 'k2/3/3/2K b PBR 1', 'P*2b', '２二ひよこ打'],
+  ['dobutsu', 'k2/3/3/2K b PBR 1', 'B*2b', '２二ぞう打'],
+  ['dobutsu', 'k2/3/3/2K b PBR 1', 'R*2b', '２二きりん打'],
+  ['kyotoshogi', 'k4/5/5/5/4K b T 1', 'T*2b', '２二と打'],
+  ['chushogi', 'k11/12/12/8+G3/12/12/12/12/12/12/12/11K b - 1', '4d4a', '4一金飛車 （←4四）'],
+];
+
+for (const [rules, sfen, usi, kif] of variantMoveCases) {
+  test(`round-trip ${rules} KIF ${kif}`, () => {
+    const pos = parseSfen(rules, sfen).unwrap();
+    const move = parseUsi(usi)!;
+    expect(pos.isLegal(move)).toEqual(true);
+    expect(makeKifMoveOrDrop(pos, move)).toEqual(kif);
+    expect(parseKifMoveOrDrop(kif)).toEqual(move);
+  });
+}
+
+test('variant KIF sequences continue after exported moves and drops', () => {
+  const cases: [Rules, string, string[]][] = [
+    ['dobutsu', initialSfen('dobutsu'), ['2c2b', '2a2b']],
+    ['kyotoshogi', 'k4/5/5/5/4K b T 1', ['T*2b', '5a4a']],
+    ['chushogi', 'k11/12/12/8+G3/12/12/12/12/12/12/12/11K b - 1', ['4d4a', '12a12b']],
+  ];
+  for (const [rules, sfen, usis] of cases) {
+    let pos = parseSfen(rules, sfen).unwrap();
+    const moves = usis.map((usi) => parseUsi(usi)!);
+    const lines = moves.map((move) => {
+      expect(pos.isLegal(move)).toEqual(true);
+      const kif = makeKifMoveOrDrop(pos, move)!;
+      pos = pos.play(move);
+      return kif;
+    });
+    expect(parseKifMovesOrDrops(lines)).toEqual(moves);
+  }
 });
 
 test('parse tags', () => {

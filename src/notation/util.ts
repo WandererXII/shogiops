@@ -397,6 +397,7 @@ export function kanjiToRole(str: string): Role[] {
     case '歩':
     case '歩兵':
     case 'ひ':
+    case 'ひよこ':
       return ['pawn'];
     case '香':
     case '香車':
@@ -415,10 +416,12 @@ export function kanjiToRole(str: string): Role[] {
     case '角':
     case '角行':
     case 'ぞ':
+    case 'ぞう':
       return ['bishop'];
     case '飛':
     case '飛車':
     case 'き':
+    case 'きりん':
       return ['rook'];
     case 'と':
     case 'と金':

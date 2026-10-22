@@ -288,7 +288,7 @@ export function normalizedKifLines(kif: string): string[] {
 //
 
 export const chushogiKifMoveRegex: RegExp =
-  /((?:(?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,2})((?:（居食い）)|不成|成)?\s?[（|(|←]*((?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
+  /((?:(?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,3}?)((?:（居食い）)|不成|成)?\s?[（|(|←]*((?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
 function parseChushogiMove(
   kifMd: string,
   lastDest: Square | undefined = undefined,
@@ -309,9 +309,9 @@ function parseChushogiMove(
 }
 
 export const kifMoveRegex: RegExp =
-  /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(玉|飛|龍|角|馬|金|銀|成銀|桂|成桂|香|成香|歩|と)(不成|成)?\(([1-9][1-9])\)/;
+  /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(玉|飛|龍|角|馬|金|銀|成銀|桂|成桂|香|成香|歩|と|ひよこ|ぞう|きりん|にわとり|ライオン)(不成|成)?\(([1-9][1-9])\)/;
 export const kifDropRegex: RegExp =
-  /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(飛|角|金|銀|桂|香|歩)打/;
+  /((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(飛|角|金|銀|桂|香|歩|と|ひよこ|ぞう|きりん)打/;
 
 // Parsing kif moves/drops
 export function parseKifMoveOrDrop(

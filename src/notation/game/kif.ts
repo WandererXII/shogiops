@@ -134,7 +134,7 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
         : undefined;
 
       const hSfen = handicap?.sfen;
-      const rules = detectRules(hSfen?.split('/').length, handicapTag);
+      const rules = handicap?.rules ?? detectRules(hSfen?.split('/').length, handicapTag);
       return parseSfen(rules, hSfen ?? initialSfen(rules));
     },
   );

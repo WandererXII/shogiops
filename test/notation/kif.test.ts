@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { findHandicap } from '../../src/handicaps.js';
 import { Hand } from '../../src/hands.js';
 import {
   makeKifHand,
@@ -139,6 +140,19 @@ test('parse kif header with handicap', () => {
   const kifPos = parseKifHeader(kifHeader).unwrap();
   expect(kifPos).toEqual(pos);
 });
+
+for (const [japaneseName, rules] of [
+  ['と落ち', 'kyotoshogi'],
+  ['銀落ち', 'kyotoshogi'],
+  ['ひよこ落ち', 'dobutsu'],
+] as const) {
+  test(`parse kif header with ${japaneseName} handicap preserves ${rules} rules`, () => {
+    const handicap = findHandicap({ japaneseName, rules })!;
+    const pos = parseKifHeader(`手合割：${japaneseName}`).unwrap();
+    expect(pos.rules).toEqual(rules);
+    expect(makeSfen(pos)).toEqual(handicap.sfen);
+  });
+}
 
 test('parse kif header with handicap and kif board', () => {
   // board takes precedence

@@ -468,6 +468,30 @@ test('parse chushogi moves', () => {
   expect(parseKifMoveOrDrop('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });
 
+for (const [kif, usi] of [
+  ['１０五獅子 （←９六）', '9f10e'],
+  ['９六獅子 （←１０五）', '10e9f'],
+  ['１０六獅子 （←１０五）', '10e10f'],
+]) {
+  test(`parse chushogi full-width file ten: ${kif}`, () => {
+    const expected = parseUsi(usi)!;
+    const ascii = kif.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
+    expect(parseKifMoveOrDrop(ascii)).toEqual(expected);
+    expect(parseKifMoveOrDrop(kif)).toEqual(expected);
+  });
+}
+
+test('chushogi full-width file ten does not truncate following moves', () => {
+  expect(
+    parseKifMovesOrDrops([
+      '７八歩兵 （←７九）',
+      '１０五獅子 （←９六）',
+      '９六獅子 （←１０五）',
+      '１２二玉 （←１２一）',
+    ]),
+  ).toEqual(['7i7h', '9f10e', '10e9f', '12a12b'].map((usi) => parseUsi(usi)!));
+});
+
 test('chushogi passing moves round-trip without truncating following moves', () => {
   const initialPos = parseSfen(
     'chushogi',

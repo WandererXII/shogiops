@@ -1,7 +1,10 @@
 import { test } from 'node:test';
+import { Hand } from '../../src/hands.js';
 import {
+  makeKifHand,
   makeKifHeader,
   makeKifMoveOrDrop,
+  parseKifHand,
   parseKifHeader,
   parseKifMoveOrDrop,
   parseKifMovesOrDrops,
@@ -11,6 +14,20 @@ import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
 import type { Rules } from '../../src/types.js';
 import { parseUsi } from '../../src/util.js';
 import { expect } from '../debug.js';
+
+test('dobutsu kif hands round-trip', () => {
+  for (const count of [1, 2]) {
+    for (const role of ['pawn', 'bishop', 'rook'] as const) {
+      const hand = Hand.empty().with(role, count);
+      const exported = makeKifHand('dobutsu', hand);
+      expect(parseKifHand('dobutsu', exported).unwrap().equals(hand)).toEqual(true);
+    }
+    const hand = Hand.empty().with('pawn', count).with('bishop', count).with('rook', count);
+    expect(parseKifHand('dobutsu', makeKifHand('dobutsu', hand)).unwrap().equals(hand)).toEqual(
+      true,
+    );
+  }
+});
 
 test('make kif header from some random position', () => {
   const pos = parseSfen(

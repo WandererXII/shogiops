@@ -251,7 +251,9 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
   if (handPart.includes('なし')) return Result.ok(hand);
   for (const piece of pieces) {
     for (let i = 0; i < piece.length; i++) {
-      const roles = kanjiToRole(piece[i++]);
+      const name = piece.slice(i).match(/^(ひよこ|ぞう|きりん)/)?.[0] ?? piece[i];
+      i += name.length;
+      const roles = kanjiToRole(name);
       const role = roles.find((r) => allRoles(rules).includes(r));
       if (!role || !handRoles(rules).includes(role))
         return Result.err(new KifError(InvalidKif.Hands));

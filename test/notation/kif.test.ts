@@ -389,6 +389,19 @@ test('dobutsu kif default', () => {
   expect(parseKifHeader(header).unwrap()).toEqual(defaultPos);
 });
 
+test('custom dobutsu kif header preserves board, hands, and turn', () => {
+  const initialPos = parseSfen('dobutsu', initialSfen('dobutsu')).unwrap();
+  const move = parseUsi('1d1c')!;
+  expect(initialPos.isLegal(move)).toEqual(true);
+  const pos = initialPos.play(move);
+  const parsed = parseKifHeader(makeKifHeader(pos)).unwrap();
+
+  expect(parsed.rules).toEqual(pos.rules);
+  expect(parsed.board).toEqual(pos.board);
+  expect(parsed.hands).toEqual(pos.hands);
+  expect(parsed.turn).toEqual(pos.turn);
+});
+
 test('parse kif header and board with annanshogi handicap name', () => {
   // board takes precedence
   const pos = parseSfen(

@@ -201,7 +201,7 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
   if (lines.length === 0) return Result.err(new KifError(InvalidKif.Board));
   let board = Board.empty();
 
-  const offset = lines.length - 1;
+  const offset = dimensions(rules).files - 1;
   let file = offset;
   let rank = 0;
 

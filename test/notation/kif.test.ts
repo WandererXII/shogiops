@@ -52,6 +52,30 @@ for (const rules of [
   });
 }
 
+for (const [rules, input, expected] of [
+  ['standard', '飛角', Hand.empty().with('rook', 1).with('bishop', 1)],
+  ['standard', '飛二角三歩十五', Hand.empty().with('rook', 2).with('bishop', 3).with('pawn', 15)],
+  ['standard', '飛飛', Hand.empty().with('rook', 2)],
+  ['dobutsu', 'ひよこぞうきりん', Hand.empty().with('pawn', 1).with('bishop', 1).with('rook', 1)],
+  [
+    'dobutsu',
+    'ひよこ二ぞう二きりん二',
+    Hand.empty().with('pawn', 2).with('bishop', 2).with('rook', 2),
+  ],
+] as const) {
+  test(`parse ${rules} compact kif hand ${input}`, () => {
+    expect(parseKifHand(rules, input).unwrap()).toEqual(expected);
+  });
+}
+
+for (const input of ['飛X', '飛X角', '飛二X', '飛二X角']) {
+  test(`reject invalid characters in kif hand ${input}`, () => {
+    const result = parseKifHand('standard', input);
+    expect(result.isErr).toEqual(true);
+    if (result.isErr) expect(result.error.message).toEqual(InvalidKif.Hands);
+  });
+}
+
 test('dobutsu kif hands round-trip', () => {
   for (const count of [1, 2]) {
     for (const role of ['pawn', 'bishop', 'rook'] as const) {

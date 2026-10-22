@@ -143,7 +143,7 @@ export const standardDropDests = (pos: Position, piece: Piece, ctx?: Context): S
         : kingSquare - 16
       : undefined;
     if (defined(kingFront) && mask.has(kingFront)) {
-      const child = pos.play({ role: 'pawn', to: kingFront });
+      const child = pos.update({ turn: ctx.color }).play({ role: 'pawn', to: kingFront });
       if (child.outcome()?.result === 'checkmate') mask = mask.without(kingFront);
     }
   }

@@ -118,6 +118,22 @@ test('drop', () => {
   expect(pos4.isLegal(parseUsi('6g5f')!)).toEqual(true);
 });
 
+test('reject pawn-drop checkmate with an alternate-color context', () => {
+  const cases = [
+    ['3lkl3/9/4G4/9/9/9/9/9/4K4 b P', 'P*5b'],
+    ['4k4/9/9/9/9/9/4g4/9/3LKL3 w p', 'P*5h'],
+  ];
+  for (const [sfen, usi] of cases) {
+    const pos = parseSfen('annanshogi', sfen).unwrap();
+    const alternate = pos.update({ turn: pos.turn === 'sente' ? 'gote' : 'sente' });
+    const ctx = alternate.ctx(pos.turn);
+    const drop = parseUsi(usi)!;
+    expect(pos.isLegal(drop)).toEqual(false);
+    expect(alternate.isLegal(drop, ctx)).toEqual(false);
+    expect(alternate.isLegal(parseUsi('P*1e')!, ctx)).toEqual(true);
+  }
+});
+
 test('reject pawn-drop checkmate with borrowed movement', () => {
   const cases = [
     ['3lkl3/9/3G1G3/9/4R4/4S4/9/9/K8 b PG', '5d'],
@@ -136,6 +152,8 @@ test('reject pawn-drop checkmate with borrowed movement', () => {
     expect(pos.isLegal(drop)).toEqual(false);
     expect(pos.isLegal({ role: 'gold', to })).toEqual(true);
     expect(pos.isLegal({ role: 'pawn', to: parseSquareName('1d')! })).toEqual(true);
+    const alternate = pos.update({ turn: child.turn });
+    expect(alternate.isLegal(drop, alternate.ctx(pos.turn))).toEqual(false);
   }
 });
 
@@ -153,6 +171,8 @@ test('allow pawn-drop checks with borrowed movement when the king can escape', (
     expect(child.outcome()).toEqual(undefined);
     expect(pos.dropDests({ color: pos.turn, role: 'pawn' }).has(to)).toEqual(true);
     expect(pos.isLegal(drop)).toEqual(true);
+    const alternate = pos.update({ turn: child.turn });
+    expect(alternate.isLegal(drop, alternate.ctx(pos.turn))).toEqual(true);
   }
 });
 

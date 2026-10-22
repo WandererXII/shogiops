@@ -160,7 +160,7 @@ export class Annanshogi extends Position {
             )
           )
             continue;
-          const child = this.play({ role: 'pawn', to });
+          const child = this.update({ turn: ctx.color }).play({ role: 'pawn', to });
           const childResult = child.outcome()?.result;
           if (childResult && ['checkmate', 'stalemate'].includes(childResult))
             mask = mask.without(to);

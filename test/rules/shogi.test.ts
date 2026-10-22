@@ -221,6 +221,22 @@ test('pawn checkmate legality', () => {
   expect(skPos.isLegal(parseUsi('P*5b')!)).toEqual(false);
 });
 
+test('reject pawn-drop checkmate with an alternate-color context', () => {
+  const cases = [
+    ['3lkl3/9/4G4/9/9/9/9/9/4K4 b P', 'P*5b'],
+    ['4k4/9/9/9/9/9/4g4/9/3LKL3 w p', 'P*5h'],
+  ];
+  for (const [sfen, usi] of cases) {
+    const pos = parseSfen('standard', sfen).unwrap();
+    const alternate = pos.update({ turn: pos.turn === 'sente' ? 'gote' : 'sente' });
+    const ctx = alternate.ctx(pos.turn);
+    const drop = parseUsi(usi)!;
+    expect(pos.isLegal(drop)).toEqual(false);
+    expect(alternate.isLegal(drop, ctx)).toEqual(false);
+    expect(alternate.isLegal(parseUsi('P*1e')!, ctx)).toEqual(true);
+  }
+});
+
 test('mulitple checkers', () => {
   const pos = parseSfen('standard', '9/9/2B3B2/9/4k4/9/2B3B2/9/8K w').unwrap();
   expect(pos.isLegal(parseUsi('5e5d')!)).toEqual(true);

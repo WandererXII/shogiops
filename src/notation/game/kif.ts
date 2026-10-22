@@ -125,19 +125,19 @@ function defaultHandicap(rules: Rules): string {
 // Import
 export function parseKifHeader(kif: string): Result<Position, KifError> {
   const lines = normalizedKifLines(kif);
-  return parseKifPositionHeader(kif).unwrap(
-    (pos) => Result.ok(pos),
-    () => {
-      const handicapTag = lines.find((l) => l.startsWith('手合割：'));
-      const handicap = defined(handicapTag)
-        ? findHandicap({ japaneseName: handicapTag.split('：')[1] })
-        : undefined;
-
-      const hSfen = handicap?.sfen;
-      const rules = handicap?.rules ?? detectRules(hSfen?.split('/').length, handicapTag);
-      return parseSfen(rules, hSfen ?? initialSfen(rules));
-    },
+  const hasPositionHeader = lines.some(
+    (l) => l.startsWith('|') || /^\+-+\+$/.test(l) || /^(先手|後手|下手|上手)の持駒：/.test(l),
   );
+  if (hasPositionHeader) return parseKifPositionHeader(kif);
+
+  const handicapTag = lines.find((l) => l.startsWith('手合割：'));
+  const handicap = defined(handicapTag)
+    ? findHandicap({ japaneseName: handicapTag.split('：')[1] })
+    : undefined;
+
+  const hSfen = handicap?.sfen;
+  const rules = handicap?.rules ?? detectRules(hSfen?.split('/').length, handicapTag);
+  return parseSfen(rules, hSfen ?? initialSfen(rules));
 }
 
 function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {

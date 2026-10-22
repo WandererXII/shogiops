@@ -224,6 +224,39 @@ test('parse empty kif header', () => {
   expect(kifPos).toEqual(pos);
 });
 
+test('parse kif header preserves invalid custom hand errors', () => {
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  const board = makeKifBoard('standard', pos.board);
+  for (const color of ['先手', '後手', '下手', '上手']) {
+    for (const handicap of ['', '手合割：飛車落ち\n']) {
+      const result = parseKifHeader(`${handicap}${board}\n${color}の持駒：玉`);
+      expect(result.isErr).toEqual(true);
+      if (result.isErr) expect(result.error.message).toEqual(InvalidKif.Hands);
+    }
+  }
+});
+
+test('parse kif header preserves invalid custom board errors', () => {
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  const rows = makeKifBoard('standard', pos.board)
+    .split('\n')
+    .filter((line) => line.startsWith('|'));
+  const malformedBoards = [
+    rows.slice(1).join('\n'),
+    [...rows, rows[0]].join('\n'),
+    rows.map((row, rank) => (rank === 0 ? '| ・|一' : row)).join('\n'),
+    '+---------------------------+',
+    '先手の持駒：玉',
+  ];
+  for (const board of malformedBoards) {
+    for (const handicap of ['', '手合割：飛車落ち\n']) {
+      const result = parseKifHeader(`${handicap}${board}`);
+      expect(result.isErr).toEqual(true);
+      if (result.isErr) expect(result.error.message).toEqual(InvalidKif.Board);
+    }
+  }
+});
+
 test('make kif moves/drops individually', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   expect(makeKifMoveOrDrop(pos, parseUsi('7g7f')!)).toEqual('７六歩(77)');

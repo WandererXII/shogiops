@@ -42,6 +42,7 @@ test('lion moves', () => {
   expect(pos.isLegal(parseUsi('6f6g6f')!)).toEqual(true);
   // 2 step
   expect(pos.isLegal(parseUsi('6f5e6d')!)).toEqual(true);
+  expect(pos.isLegal(parseUsi('6f5e6d+')!)).toEqual(false);
   expect(pos.isLegal(parseUsi('6f7g8h')!)).toEqual(true);
 
   const pos2 = parseSfen(

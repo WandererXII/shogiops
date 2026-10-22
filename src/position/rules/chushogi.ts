@@ -201,6 +201,7 @@ export class Chushogi extends Position {
       isMove(md) &&
       ((!defined(md.midStep) && super.isLegal(md, ctx)) ||
         (defined(md.midStep) &&
+          !md.promotion &&
           super.isLegal({ from: md.from, to: md.midStep }, ctx) &&
           secondLionStepDests(this, md.from, md.midStep).has(md.to)))
     );

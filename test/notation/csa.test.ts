@@ -90,6 +90,20 @@ test('parse CSA header with handicap', () => {
   expect(csaPos).toEqual(pos);
 });
 
+for (const line of [
+  "'example P+00FU",
+  "'example P-00FU",
+  'N+P+player',
+  'N-P-player',
+  '$EVENT:example P+00FU',
+  '$EVENT:example P-00FU',
+]) {
+  test(`ignore piece placement text in CSA metadata: ${line}`, () => {
+    const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+    expect(parseCsaHeader(`${line}\nPI\n+`).unwrap()).toEqual(pos);
+  });
+}
+
 test('parse CSA board rows by their rank labels', () => {
   const pos = parseSfen('standard', '4k4/9/9/9/9/9/9/9/4K4 b - 1', true).unwrap();
   const rows = makeCsaHeader(pos).split('\n');

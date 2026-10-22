@@ -90,7 +90,7 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
         lastLionCapture: undefined,
         lastMoveOrDrop: undefined,
       },
-      lines.filter((l) => /P[+|-]/.test(l)),
+      lines.filter((l) => /^P[+-]/.test(l)),
     ).chain((setup) => Shogi.from(setup, true));
   });
 }

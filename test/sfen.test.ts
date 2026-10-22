@@ -3,7 +3,14 @@ import { Board } from '../src/board.js';
 import { RULES } from '../src/constants.js';
 import { Hands } from '../src/hands.js';
 import { IllegalSetup } from '../src/position/position.js';
-import { initialSfen, makeBoardSfen, makeSfen, parseSfen } from '../src/sfen.js';
+import {
+  InvalidSfen,
+  initialSfen,
+  makeBoardSfen,
+  makeSfen,
+  parseHands,
+  parseSfen,
+} from '../src/sfen.js';
 import { parseSquareName } from '../src/util.js';
 import { expect } from './debug.js';
 
@@ -44,6 +51,16 @@ test('invalid sfen', () => {
   );
   expect(pos.isErr).toEqual(true);
   expect(pos.isErr ? pos.error.message : undefined).toEqual(IllegalSetup.InvalidPiecesDoublePawns);
+});
+
+test('incomplete sfen hand counts return an error', () => {
+  for (const hand of ['2', '12', 'P2', 'P12']) {
+    const sfen = initialSfen('standard').replace(' - ', ` ${hand} `);
+    for (const result of [parseHands('standard', hand), parseSfen('standard', sfen)]) {
+      expect(result.isErr).toEqual(true);
+      expect(result.isErr ? result.error.message : undefined).toEqual(InvalidSfen.Hands);
+    }
+  }
 });
 
 test('parse and make sfen', () => {

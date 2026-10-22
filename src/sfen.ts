@@ -143,6 +143,7 @@ export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenE
         i++;
       }
     } else count = 1;
+    if (i >= handsPart.length) return Result.err(new SfenError(InvalidSfen.Hands));
     let piece: Piece | undefined = forsythToPiece(rules)(handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
     if (rules === 'kyotoshogi' && !handRoles(rules).includes(piece.role))

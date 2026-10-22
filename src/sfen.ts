@@ -102,7 +102,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
   let file = dims.files - 1;
   for (let i = 0; i < boardPart.length; i++) {
     let c = boardPart[i];
-    if (c === '/' && file < 0) {
+    if (c === '/' && file === -1) {
       empty = 0;
       file = dims.files - 1;
       rank++;

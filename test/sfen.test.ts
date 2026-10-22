@@ -53,6 +53,18 @@ test('invalid sfen', () => {
   expect(pos.isErr ? pos.error.message : undefined).toEqual(IllegalSetup.InvalidPiecesDoublePawns);
 });
 
+test('oversized sfen ranks return a board dimensions error', () => {
+  for (let rank = 0; rank < 9; rank++) {
+    for (const oversizedRank of ['10', '8P1']) {
+      const ranks = ['9', '9', '4k4', '9', '9', '9', '9', '9', '4K4'];
+      ranks[rank] = oversizedRank;
+      const result = parseSfen('standard', `${ranks.join('/')} b - 1`, true);
+      expect(result.isErr).toEqual(true);
+      expect(result.isErr ? result.error.message : undefined).toEqual(InvalidSfen.BoardDims);
+    }
+  }
+});
+
 test('incomplete sfen hand counts return an error', () => {
   for (const hand of ['2', '12', 'P2', 'P12']) {
     const sfen = initialSfen('standard').replace(' - ', ` ${hand} `);

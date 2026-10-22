@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import {
+  InvalidCsa,
   makeCsaHeader,
   makeCsaMoveOrDrop,
   parseCsaHeader,
@@ -101,6 +102,41 @@ P-51OU22KA00GI
     expect(parseCsaHeader(csaHeader).unwrap()).toEqual(pos);
   });
 }
+
+for (const sign of ['+', '-']) {
+  test(`parse CSA all remaining pieces for ${sign}`, () => {
+    const hand = sign === '+' ? '2R2B4G4S4N4L18P' : '2r2b4g4s4n4l18p';
+    const pos = parseSfen('standard', `4k4/9/9/9/9/9/9/9/4K4 b ${hand} 1`, true).unwrap();
+    expect(parseCsaHeader(`P+59OU\nP-51OU\nP${sign}00AL\n+`).unwrap()).toEqual(pos);
+  });
+}
+
+test('CSA all remaining pieces accounts for promoted pieces and both hands', () => {
+  const pos = parseSfen(
+    'standard',
+    '4k4/7+b1/9/9/4+P4/9/9/9/4K4 b RGPrb3g4s4n4l16p 1',
+    true,
+  ).unwrap();
+  expect(parseCsaHeader('P+59OU55TO00HI00KI00FU\nP-51OU22UM00HI00AL\n+').unwrap()).toEqual(pos);
+  // The same accounting applies to a board expressed as nine rows.
+  const rows = makeCsaHeader(pos).split('\n').slice(0, 9).join('\n');
+  expect(parseCsaHeader(`${rows}\nP+00HI00KI00FU\nP-00HI00AL\n+`).unwrap()).toEqual(pos);
+});
+
+test('CSA all remaining pieces with handicap or no remaining pieces', () => {
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  expect(parseCsaHeader('PI\nP+00AL\n+').unwrap()).toEqual(pos);
+  const handicap = parseSfen(
+    'standard',
+    'lnsgkgsnl/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b rb 1',
+  ).unwrap();
+  expect(parseCsaHeader('PI82HI22KA\nP-00AL\n+').unwrap()).toEqual(handicap);
+});
+
+test('CSA AL is only allowed in hand', () => {
+  const result = parseCsaHeader('P+59OU55AL\nP-51OU\n+');
+  expect(result.isErr ? result.error.message : undefined).toEqual(InvalidCsa.AdditionalInfo);
+});
 
 test('validate CSA position after applying piece placements', () => {
   for (const csaHeader of ['P+59OU57FU56FU\nP-51OU\n+', 'PI\nP+56FU\n+']) {

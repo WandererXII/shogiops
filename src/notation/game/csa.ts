@@ -140,6 +140,26 @@ function parseAdditions(initialPos: Setup, additions: string[]): Result<Setup, C
   for (const line of additions) {
     const color: Color = line[1] === '+' ? 'sente' : 'gote';
     for (const sp of line.substring(2).match(/.{4}/g) || []) {
+      if (sp === '00AL') {
+        const intitalBoard = parseSfen('standard', initialSfen('standard'), false).unwrap().board;
+        let hands = initialPos.hands;
+        for (const role of handRoles('standard')) {
+          const total = intitalBoard.byRole(role).size();
+          const promoted = promote('standard')(role);
+          const onBoard = (
+            promoted ? initialPos.board.byRoles(role, promoted) : initialPos.board.byRole(role)
+          ).size();
+          const remaining =
+            total -
+            onBoard -
+            hands.get({ color: 'sente', role }) -
+            hands.get({ color: 'gote', role });
+          if (remaining > 0)
+            hands = hands.with({ color, role }, hands.get({ color, role }) + remaining);
+        }
+        initialPos = { ...initialPos, hands };
+        continue;
+      }
       const sqString = sp.substring(0, 2);
       const sq = parseNumberSquare(sqString);
       const role = csaToRole(sp.substring(2, 4));

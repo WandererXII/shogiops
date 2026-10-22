@@ -28,8 +28,8 @@ export type BitRows = [number, number, number, number, number, number, number, n
 // Assumes POV of sente player - up is smaller rank, down is greater rank, left is smaller file, right is greater file
 // Each element represents two ranks - board size 16x16
 export class SquareSet implements Iterable<Square> {
-  readonly dRows: BitRows;
-  constructor(dRows: BitRows) {
+  readonly dRows: Readonly<BitRows>;
+  constructor(dRows: Readonly<BitRows>) {
     this.dRows = [
       dRows[0] >>> 0,
       dRows[1] >>> 0,

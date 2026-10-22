@@ -2,13 +2,23 @@
 
 ## v0.22.0
 
-- shogiops is now immutable. This includes `Position`, `Board`, `Hands` and `Hand`. Instances of these classes cannot be modified in place now. For example instead of doing `pos.play(move);`, `play` now returns new `Position` instance. So you should do `const posAfterMove = pos.play(move);`. 
-- Method names in `Board`, `Hands` and `Hand` were changed.
-- Many types like `Piece`, `Outcome`, `NormalMove` and `DropMove` had their fields marked as `readonly`.
-- `variant` subfolder renamed to `position`.
-- Individual variants extending `Position` moved to `position/rules`.
-- Renamed `variant.ts` inside `position` to `setup.ts`.
-- Functions in `notation` were moved to `notation/move` and `notation/game`.
+- `Position`, `Board`, `Hands` and `Hand` are now immutable. Use returned instances, e.g. `const next = pos.play(move)`, and `Position.update` to change setup fields. Removed `clone` methods.
+- Renamed `Board` and `Hand` methods to reflect immutable operations; changed `Board.from` arguments and added piece-based accessors to `Hands`.
+- Hand counts are now clamped to zero.
+- Marked data types and `SquareSet.dRows` as readonly.
+- Removed `RoleMap`, `ColorMap` and `HandMap` types.
+- Moved `variant` to `position`, variant classes to `position/rules`, `variant.ts` to `setup.ts`, and notation functions to `notation/move` and `notation/game`.
+- Exported `unpromoteForHand` from `position/util`.
+- Fixed KIF variant/handicap detection, custom positions, board dimensions, hands, dobutsu piece names, kyotoshogi drops and chushogi two-step notation.
+- Fixed CSA board/addition parsing and validation; added support for `00AL` and positions defined entirely through additions.
+- SFEN parsing now rejects malformed ranks and incomplete hand counts.
+- USI parsing now rejects invalid intermediate squares.
+- Move legality checks now reject intermediate steps outside chushogi and promotions on two-step chushogi moves.
+- Fixed pawn drop mate detection and chushogi second-step generation with `ctx.color`; added an optional color argument to `secondLionStepDests`.
+- Fixed annanshogi captures exposing the king and pawn drop mate using borrowed movement.
+- Fixed `SquareSet.minus256` borrow propagation.
+- Fixed handicap matching with incomplete SFEN strings.
+- Switched tests to `node:test` and added perft generation script and dobutsu fixtures.
 
 ## v0.21.1
 

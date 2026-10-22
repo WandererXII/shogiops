@@ -203,22 +203,28 @@ export class Chushogi extends Position {
         (defined(md.midStep) &&
           !md.promotion &&
           super.isLegal({ from: md.from, to: md.midStep }, ctx) &&
-          secondLionStepDests(this, md.from, md.midStep).has(md.to)))
+          secondLionStepDests(this, md.from, md.midStep, ctx?.color).has(md.to)))
     );
   }
 }
 
 // chushogi position before piece is moved from initial square
-export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: Square): SquareSet {
+export function secondLionStepDests(
+  before: Chushogi,
+  initialSq: Square,
+  midSq: Square,
+  color?: Color,
+): SquareSet {
+  color = color || before.turn;
   const piece = before.board.pieceAt(initialSq);
-  if (!piece || piece.color !== before.turn) return SquareSet.empty();
+  if (!piece || piece.color !== color) return SquareSet.empty();
 
   if (lionRoles.includes(piece.role)) {
     if (!kingAttacks(initialSq).has(midSq)) return SquareSet.empty();
     let pseudoDests = kingAttacks(midSq)
-      .diff(before.board.byColor(before.turn).without(initialSq))
+      .diff(before.board.byColor(color).without(initialSq))
       .intersect(fullSquareSet(before.rules));
-    const oppColor = opposite(before.turn);
+    const oppColor = opposite(color);
     const oppLions = before.board
       .byColor(oppColor)
       .intersect(before.board.byRoles('lion', 'lionpromoted'))
@@ -241,27 +247,27 @@ export function secondLionStepDests(before: Chushogi, initialSq: Square, midSq: 
     if (!pawnAttacks(initialSq, piece.color).has(midSq)) return SquareSet.empty();
 
     let pseudoDests = goBetweenAttacks(midSq)
-      .diff(before.board.byColor(before.turn).without(initialSq))
+      .diff(before.board.byColor(color).without(initialSq))
       .intersect(fullSquareSet(before.rules));
 
-    if (defined(before.lastLionCapture)) pseudoDests = removeLions(before, pseudoDests);
+    if (defined(before.lastLionCapture)) pseudoDests = removeLions(before, pseudoDests, color);
 
     return pseudoDests;
   } else if (piece.role === 'eagle') {
     let pseudoDests = eagleLionAttacks(initialSq, piece.color)
-      .diff(before.board.byColor(before.turn))
+      .diff(before.board.byColor(color))
       .with(initialSq);
     if (!pseudoDests.has(midSq) || squareDist(initialSq, midSq) > 1) return SquareSet.empty();
 
     pseudoDests = pseudoDests.intersect(kingAttacks(midSq)).intersect(fullSquareSet(before.rules));
-    if (defined(before.lastLionCapture)) pseudoDests = removeLions(before, pseudoDests);
+    if (defined(before.lastLionCapture)) pseudoDests = removeLions(before, pseudoDests, color);
 
     return pseudoDests;
   } else return SquareSet.empty();
 }
 
-function removeLions(pos: Chushogi, dests: SquareSet): SquareSet {
-  const oppColor = opposite(pos.turn);
+function removeLions(pos: Chushogi, dests: SquareSet, color: Color): SquareSet {
+  const oppColor = opposite(color);
   const oppLions = pos.board
     .byColor(oppColor)
     .intersect(pos.board.byRoles('lion', 'lionpromoted'))

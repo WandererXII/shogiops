@@ -187,6 +187,26 @@ test('falcon/eagle second move', () => {
   expect(dests2 && !dests2.includes('7j') && dests2.length > 0).toEqual(true);
 });
 
+for (const piece of ['N', '+O', '+H', '+D']) {
+  for (const color of ['sente', 'gote'] as const) {
+    test(`two-step ${piece} legality honors ${color} context`, () => {
+      const sente = color === 'sente';
+      const token = sente ? piece : piece.toLowerCase();
+      const pos = parseSfen(
+        'chushogi',
+        `12/12/12/12/7${token}4/12/12/12/12/12/12/12 ${sente ? 'b' : 'w'}`,
+      ).unwrap();
+      const usi = piece === '+D' ? (sente ? '5e6d7c' : '5e6f7g') : sente ? '5e5d5c' : '5e5f5g';
+      const move = parseUsi(usi)!;
+      expect(pos.isLegal(move)).toEqual(true);
+      const alternate = pos.update({ turn: opposite(color) });
+      expect(alternate.isLegal(move)).toEqual(false);
+      expect(alternate.isLegal(move, alternate.ctx(color))).toEqual(true);
+      expect(alternate.turn).toEqual(opposite(color));
+    });
+  }
+}
+
 test('bare king', () => {
   let pos = parseSfen('chushogi', '12/12/12/12/6k5/4g7/4G7/6K5/12/12/12/12 b - 1').unwrap();
   expect(pos.outcome()).toEqual(undefined);

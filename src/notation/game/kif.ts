@@ -290,7 +290,7 @@ export function normalizedKifLines(kif: string): string[] {
 //
 
 export const chushogiKifMoveRegex: RegExp =
-  /((?:(?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,3}?)((?:（居食い）)|不成|成)?\s?[（|(|←]*((?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
+  /((?:(?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,3}?)((?:（居食い）)|\(じっと\)|不成|成)?\s?[（|(|←]*((?:[１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
 function parseChushogiMove(
   kifMd: string,
   lastDest: Square | undefined = undefined,

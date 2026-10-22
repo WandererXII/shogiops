@@ -375,6 +375,32 @@ test('parse chushogi moves', () => {
   expect(parseKifMoveOrDrop('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });
 
+test('chushogi passing moves round-trip without truncating following moves', () => {
+  const initialPos = parseSfen(
+    'chushogi',
+    'k6r4/12/12/12/7N4/12/12/12/12/12/12/11K w - 1',
+  ).unwrap();
+  const previous = parseUsi('5a6a')!;
+  expect(initialPos.isLegal(previous)).toEqual(true);
+  const pos = initialPos.play(previous);
+  const move = parseUsi('5e5d5e')!;
+  expect(pos.isLegal(move)).toEqual(true);
+  const following = parseUsi('12a12b')!;
+  const afterPass = pos.play(move);
+  expect(afterPass.isLegal(following)).toEqual(true);
+
+  const exported = makeKifMoveOrDrop(pos, move)!;
+  expect(exported).toEqual('一歩目 5四獅子 （←5五）\n二歩目 5五獅子(じっと) （←5四）');
+  expect(parseKifMovesOrDrops(exported.split('\n'))).toEqual([move]);
+  expect(
+    parseKifMovesOrDrops([
+      makeKifMoveOrDrop(initialPos, previous)!,
+      ...exported.split('\n'),
+      makeKifMoveOrDrop(afterPass, following)!,
+    ]),
+  ).toEqual([previous, move, following]);
+});
+
 test('chushogi two-step moves reuse the previous destination', () => {
   for (const [previousUsi, expectedKif] of [
     ['5a5c', '一歩目 5四獅子 （←5五）\n二歩目 仝獅子 （←5四）'],

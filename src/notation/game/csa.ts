@@ -113,24 +113,28 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
   if (csaBoard.length !== 0 && csaBoard.length !== 9)
     return Result.err(new CsaError(InvalidCsa.Board));
   let board = Board.empty();
-  let rank = 0;
+  const ranks = new Set<number>();
 
-  for (const r of csaBoard.map((r) => r.substring(2))) {
+  for (const row of csaBoard) {
+    // Line normalization trims the last space of an empty square.
+    const match = row.padEnd(29, ' ').match(/^P([1-9])((?: \* |[+-][a-z]{2}){9})$/i);
+    if (!match) return Result.err(new CsaError(InvalidCsa.Board));
+    const rank = Number(match[1]) - 1;
+    if (ranks.has(rank)) return Result.err(new CsaError(InvalidCsa.Board));
+    ranks.add(rank);
     let file = 8;
-    for (const s of r.match(/.{1,3}/g) || []) {
-      if (s.includes('*')) file--;
-      else {
+    for (const s of match[2].match(/.{3}/g)!) {
+      if (s !== ' * ') {
         const square = parseCoordinates(file, rank);
         if (!defined(square)) return Result.err(new CsaError(InvalidCsa.Board));
         const role = csaToRole(s.substring(1));
-        if (defined(role) && allRoles('standard').includes(role)) {
-          const piece = { role: role, color: boolToColor(!s.startsWith('-')) };
-          board = board.withPieceAt(square, piece);
-          file--;
-        }
+        if (!defined(role) || !allRoles('standard').includes(role))
+          return Result.err(new CsaError(InvalidCsa.Board));
+        const piece = { role: role, color: boolToColor(!s.startsWith('-')) };
+        board = board.withPieceAt(square, piece);
       }
+      file--;
     }
-    rank++;
   }
 
   return Result.ok(board);

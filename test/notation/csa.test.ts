@@ -90,6 +90,33 @@ test('parse CSA header with handicap', () => {
   expect(csaPos).toEqual(pos);
 });
 
+test('parse CSA board rows by their rank labels', () => {
+  const pos = parseSfen('standard', '4k4/9/9/9/9/9/9/9/4K4 b - 1', true).unwrap();
+  const rows = makeCsaHeader(pos).split('\n');
+  [rows[0], rows[8]] = [rows[8], rows[0]];
+  expect(parseCsaHeader(rows.join('\n')).unwrap()).toEqual(pos);
+});
+
+test('reject malformed CSA board rows', () => {
+  const pos = parseSfen('standard', '4k4/9/9/9/9/9/9/9/4K4 b - 1', true).unwrap();
+  const header = makeCsaHeader(pos);
+  const emptyRow = `P2${' * '.repeat(9)}`;
+  for (const row of [
+    `P2+ZZ${' * '.repeat(8)}`,
+    `P2+ZZ+HI${' * '.repeat(7)}`,
+    `P2?HI${' * '.repeat(8)}`,
+    `P2+*X${' * '.repeat(8)}`,
+    `P2${' * '.repeat(8)}`,
+    `P2${' * '.repeat(10)}`,
+    emptyRow.replace('P2', 'P0'),
+    emptyRow.replace('P2', 'P10'),
+    emptyRow.replace('P2', 'P1'),
+  ]) {
+    const result = parseCsaHeader(header.replace(emptyRow, row));
+    expect(result.isErr ? result.error.message : undefined).toEqual(InvalidCsa.Board);
+  }
+});
+
 for (const emptyRows of [false, true]) {
   test(`parse CSA piece-by-piece setup ${emptyRows ? 'with empty rows' : 'without board rows'}`, () => {
     const rows = emptyRows

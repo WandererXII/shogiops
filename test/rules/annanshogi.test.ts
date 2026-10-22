@@ -19,6 +19,8 @@ const annanPerfts: [string, number, number][] = [
   ['Pn2g4/+S2ps3l/4p1p1+P/sPpg1Pk2/lS1rr2pp/p2GnnPP1/LB+p4+nL/2B2K2+p/1p1GP2+p1 b - 129', 1, 46],
   ['9/1k7/9/4b4/4p4/5N3/6K2/9/9 b - 1', 1, 6],
   ['9/9/9/9/9/9/8k/5b3/2K1Br3 b - 1', 1, 9],
+  ['3lkl3/9/3G1G3/9/4R4/4S4/9/9/K8 b P', 1, 95],
+  ['3lkl3/9/3G1G3/9/4R4/4S4/9/9/K8 b P', 2, 400],
 ];
 
 test('annanshogi perft', () => {
@@ -114,6 +116,44 @@ test('drop', () => {
   expect(pos4.isLegal({ role: 'pawn', to: parseSquareName('1a') })).toEqual(true);
   expect(pos4.moveDests(parseSquareName('6g')).size()).toEqual(3);
   expect(pos4.isLegal(parseUsi('6g5f')!)).toEqual(true);
+});
+
+test('reject pawn-drop checkmate with borrowed movement', () => {
+  const cases = [
+    ['3lkl3/9/3G1G3/9/4R4/4S4/9/9/K8 b PG', '5d'],
+    ['8k/9/9/4s4/4r4/9/3g1g3/9/3LKL3 w pg', '5f'],
+  ];
+  for (const [sfen, square] of cases) {
+    const pos = parseSfen('annanshogi', sfen).unwrap();
+    const to = parseSquareName(square)!;
+    const drop = { role: 'pawn' as const, to };
+    const child = pos.play(drop);
+    expect(pos.isCheck('sente')).toEqual(false);
+    expect(pos.isCheck('gote')).toEqual(false);
+    expect(child.ctx().checkers.equals(SquareSet.fromSquare(to))).toEqual(true);
+    expect(child.outcome()).toEqual({ result: 'checkmate', winner: pos.turn });
+    expect(pos.dropDests({ color: pos.turn, role: 'pawn' }).has(to)).toEqual(false);
+    expect(pos.isLegal(drop)).toEqual(false);
+    expect(pos.isLegal({ role: 'gold', to })).toEqual(true);
+    expect(pos.isLegal({ role: 'pawn', to: parseSquareName('1d')! })).toEqual(true);
+  }
+});
+
+test('allow pawn-drop checks with borrowed movement when the king can escape', () => {
+  const cases = [
+    ['4k4/9/3G1G3/9/4R4/4S4/9/9/K8 b P', '5d'],
+    ['8k/9/9/4s4/4r4/9/3g1g3/9/4K4 w p', '5f'],
+  ];
+  for (const [sfen, square] of cases) {
+    const pos = parseSfen('annanshogi', sfen).unwrap();
+    const to = parseSquareName(square)!;
+    const drop = { role: 'pawn' as const, to };
+    const child = pos.play(drop);
+    expect(child.isCheck()).toEqual(true);
+    expect(child.outcome()).toEqual(undefined);
+    expect(pos.dropDests({ color: pos.turn, role: 'pawn' }).has(to)).toEqual(true);
+    expect(pos.isLegal(drop)).toEqual(true);
+  }
 });
 
 test('promotions', () => {

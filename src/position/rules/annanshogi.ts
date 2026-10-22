@@ -147,16 +147,24 @@ export class Annanshogi extends Position {
       }
       // Checking for a pawn checkmate
       const kingSquare = this.kingsOf(opposite(ctx.color)).singleSquare();
-      const kingFront = defined(kingSquare)
-        ? ctx.color === 'sente'
-          ? kingSquare + 16
-          : kingSquare - 16
-        : undefined;
-      if (defined(kingFront) && mask.has(kingFront)) {
-        const child = this.play({ role: 'pawn', to: kingFront });
-        const childResult = child.outcome()?.result;
-        if (childResult && ['checkmate', 'stalemate'].includes(childResult))
-          mask = mask.without(kingFront);
+      if (defined(kingSquare)) {
+        const kingFront = directlyBehind(ctx.color, kingSquare);
+        for (const to of mask.intersect(fullSquareSet(this.rules))) {
+          const pieceBehind = this.board.pieceAt(directlyBehind(ctx.color, to));
+          // The dropped pawn can also check using borrowed movement.
+          if (
+            to !== kingFront &&
+            !(
+              pieceBehind?.color === ctx.color &&
+              attacks(pieceBehind, to, this.board.occupied).has(kingSquare)
+            )
+          )
+            continue;
+          const child = this.play({ role: 'pawn', to });
+          const childResult = child.outcome()?.result;
+          if (childResult && ['checkmate', 'stalemate'].includes(childResult))
+            mask = mask.without(to);
+        }
       }
     }
 

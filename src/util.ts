@@ -115,6 +115,7 @@ export function parseUsi(str: string): MoveOrDrop | undefined {
   if (moveMatch) {
     const from = parseSquareName(moveMatch[1]);
     const midStep = moveMatch[2] ? parseSquareName(moveMatch[2]) : undefined;
+    if (moveMatch[2] && !defined(midStep)) return;
     const to = parseSquareName(moveMatch[3]);
     const promotion = moveMatch[4] === '+';
     if (defined(from) && defined(to)) return { from, to, promotion, midStep };

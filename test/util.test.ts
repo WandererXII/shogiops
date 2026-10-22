@@ -66,6 +66,14 @@ test('parse usi', () => {
   expect(parseUsi('16p16p16p+')).toEqual({ from: 255, to: 255, midStep: 255, promotion: true });
 });
 
+test('reject invalid usi intermediate squares', () => {
+  for (const midStep of ['0a', '17a', '99a']) {
+    for (const suffix of ['', '+', '=', '?']) {
+      expect(parseUsi(`7g${midStep}7f${suffix}`)).toEqual(undefined);
+    }
+  }
+});
+
 test('make usi', () => {
   expect(makeUsi({ role: 'rook', to: 1 })).toEqual('R*2a');
   expect(makeUsi({ from: 1, to: 2 })).toEqual('2a3a');

@@ -5,6 +5,7 @@ import {
   makeNumberSquare,
   numberToKanji,
   parseJapaneseSquare,
+  parseNumberSquare,
 } from '../../src/notation/util.js';
 import { parseSquareName } from '../../src/util.js';
 import { expect } from '../debug.js';
@@ -40,6 +41,41 @@ test('make kif origination square', () => {
 test('all squares', () => {
   for (let i = 0; i < 256; i++) {
     expect(parseJapaneseSquare(makeJapaneseSquare(i))).toEqual(i);
+  }
+});
+
+test('parse number squares with letter coordinates', () => {
+  expect(parseNumberSquare('a1')).toEqual(parseSquareName('10a'));
+  expect(parseNumberSquare('1a')).toEqual(parseSquareName('1j'));
+  expect(parseNumberSquare('gg')).toEqual(parseSquareName('16p'));
+});
+
+test('all number squares round trip', () => {
+  for (let sq = 0; sq < 256; sq++) {
+    expect(parseNumberSquare(makeNumberSquare(sq))).toEqual(sq);
+  }
+});
+
+test('reject invalid number squares', () => {
+  for (const str of [
+    '',
+    '1',
+    '111',
+    '00',
+    '01',
+    '10',
+    ':1',
+    '1:',
+    '@1',
+    '1@',
+    'h1',
+    '1h',
+    'A1',
+    '1A',
+    ' 1',
+    '1 ',
+  ]) {
+    expect(parseNumberSquare(str)).toEqual(undefined);
   }
 });
 

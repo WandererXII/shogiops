@@ -641,12 +641,12 @@ export function makeNumberSquare(sq: Square): string {
   return fileStr + rankStr;
 }
 
-// only for single digit boards - something like 111 would be amiguous
 export function parseNumberSquare(str: string): Square | undefined {
   if (str.length !== 2) return;
-  const file = str.charCodeAt(0) - '1'.charCodeAt(0);
-  const rank = str.charCodeAt(1) - '1'.charCodeAt(0);
-  if (file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
+  const coordinates = '123456789abcdefg';
+  const file = coordinates.indexOf(str[0]);
+  const rank = coordinates.indexOf(str[1]);
+  if (file < 0 || rank < 0) return;
   return file + 16 * rank;
 }
 

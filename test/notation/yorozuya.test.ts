@@ -8,6 +8,16 @@ import { initialSfen, parseSfen } from '../../src/sfen.js';
 import { parseSquareName, parseUsi } from '../../src/util.js';
 import { expect } from '../debug.js';
 
+test('chushogi origin disambiguation survives Yorozuya conversion', () => {
+  const pos = parseSfen(
+    'chushogi',
+    'k11/12/12/9N2/9+O2/12/12/12/12/12/12/11K b - 1',
+    true,
+  ).unwrap();
+  expect(makeYorozuyaMoveOrDrop(pos, parseUsi('3d1c')!)).toEqual('子三獅(寅四)');
+  expect(makeYorozuyaMoveOrDrop(pos, parseUsi('3e1c')!)).toEqual('子三獅(寅五)');
+});
+
 test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;

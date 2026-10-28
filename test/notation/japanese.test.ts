@@ -4,6 +4,30 @@ import { initialSfen, parseSfen } from '../../src/sfen.js';
 import { parseUsi } from '../../src/util.js';
 import { expect } from '../debug.js';
 
+test('chushogi origins distinguish lions with identical direction markers', () => {
+  for (const turn of ['b', 'w']) {
+    const pieces = turn === 'b' ? ['N', '+O'] : ['n', '+o'];
+    const pos = parseSfen(
+      'chushogi',
+      `k11/12/12/9${pieces[0]}2/9${pieces[1]}2/12/12/12/12/12/12/11K ${turn} - 1`,
+      true,
+    ).unwrap();
+    for (const [usi, expected] of [
+      ['3d1c', '１三獅(３四)'],
+      ['3e1c', '１三獅(３五)'],
+      ['3d2d1c', '２四・１三獅(３四)'],
+      ['3e2d1c', '２四・１三獅(３五)'],
+    ]) {
+      const move = parseUsi(usi)!;
+      expect(pos.isLegal(move)).toEqual(true);
+      expect(makeJapaneseMoveOrDrop(pos, move)).toEqual(expected);
+    }
+    // The existing direct/jump distinction already identifies these moves.
+    expect(makeJapaneseMoveOrDrop(pos, parseUsi('3d3c')!)).toEqual('３三獅直');
+    expect(makeJapaneseMoveOrDrop(pos, parseUsi('3e3c')!)).toEqual('３三獅跳');
+  }
+});
+
 test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const move = parseUsi('7g7f')!;

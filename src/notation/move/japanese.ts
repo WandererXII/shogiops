@@ -34,9 +34,26 @@ export function makeJapaneseMoveOrDrop(
           .intersect(pos.board.byColor(piece.color)),
         md.to,
       ).without(md.from);
-      const ambStr = ambPieces.isEmpty()
+      let ambStr = ambPieces.isEmpty()
         ? ''
         : disambiguate(pos.rules, piece, md.from, md.to, ambPieces);
+
+      // Chu shogi's longer moves can share both a file and a direction.
+      // Use the origin if the direction markers still identify another piece.
+      if (
+        pos.rules === 'chushogi' &&
+        [...ambPieces].some(
+          (from) =>
+            disambiguate(
+              pos.rules,
+              pos.board.pieceAt(from)!,
+              from,
+              md.to,
+              ambPieces.with(md.from).without(from),
+            ) === ambStr,
+        )
+      )
+        ambStr = `(${makeJapaneseSquare(md.from)})`;
 
       if (defined(md.midStep)) {
         const midCapture = pos.board.pieceAt(md.midStep);

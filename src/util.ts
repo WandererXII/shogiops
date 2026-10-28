@@ -49,14 +49,24 @@ export function parsePieceName(pieceName: PieceName): Piece {
 }
 
 export function parseCoordinates(file: number, rank: number): Square | undefined {
-  if (file >= 0 && file < 16 && rank >= 0 && rank < 16) return file + rank * 16;
+  if (
+    Number.isInteger(file) &&
+    Number.isInteger(rank) &&
+    file >= 0 &&
+    file < 16 &&
+    rank >= 0 &&
+    rank < 16
+  )
+    return file + rank * 16;
   return;
 }
+
+const squareNameRegex = /^(?:[1-9]|1[0-6])[a-p]$/;
 
 export function parseSquareName(str: SquareName): Square;
 export function parseSquareName(str: string): Square | undefined;
 export function parseSquareName(str: string): Square | undefined {
-  if (str.length !== 2 && str.length !== 3) return;
+  if (!squareNameRegex.test(str)) return;
   const file = Number.parseInt(str.slice(0, -1), 10) - 1;
   const rank = str.slice(-1).charCodeAt(0) - 'a'.charCodeAt(0);
   if (isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;

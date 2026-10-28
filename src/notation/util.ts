@@ -426,6 +426,7 @@ export function kanjiToRole(str: string): Role[] {
     case 'と':
     case 'と金':
     case 'に':
+    case 'にわとり':
       return ['tokin', 'promotedpawn'];
     case '杏':
     case '仝':
@@ -457,6 +458,7 @@ export function kanjiToRole(str: string): Role[] {
     case '王将':
     case '玉将':
     case 'ラ':
+    case 'ライオン':
       return ['king'];
     case '豹':
     case '猛豹':
@@ -665,20 +667,11 @@ export function makeJapaneseSquareHalf(sq: Square): string {
 }
 
 export function parseJapaneseSquare(str: string): Square | undefined {
-  if (str.length < 2 || str.length > 4) return;
-  const fileOffset = str.length === 2 || (str.length === 3 && str[1] === '十') ? 1 : 2;
-  const file =
-    Number.parseInt(
-      str
-        .slice(0, fileOffset)
-        .split('')
-        .map((c) =>
-          c.charCodeAt(0) >= 0xfee0 + 48 ? String.fromCharCode(c.charCodeAt(0) - 0xfee0) : c,
-        )
-        .join(''),
-      10,
-    ) - 1;
-  const rank = kanjiToNumber(str.slice(fileOffset)) - 1;
+  const normalized = str.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
+  const match = normalized.match(/^([1-9]|1[0-6])(十[一二三四五六]?|[一二三四五六七八九])$/);
+  if (!match || match[0] !== normalized) return;
+  const file = Number.parseInt(match[1], 10) - 1;
+  const rank = kanjiToNumber(match[2]) - 1;
   if (Number.isNaN(file) || file < 0 || file >= 16 || rank < 0 || rank >= 16) return;
   return file + 16 * rank;
 }

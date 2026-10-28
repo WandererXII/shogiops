@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import {
   makePieceName,
   makeUsi,
+  parseCoordinates,
   parsePieceName,
   parseSquareName,
   parseUsi,
@@ -10,6 +11,21 @@ import {
 } from '../src/util.js';
 import { expect } from './debug.js';
 import { usiFixture } from './fixtures/usi.js';
+
+test('coordinate parsing requires integers within the board representation', () => {
+  for (const value of [-1, 16, 0.5, 15.9, NaN, Infinity, -Infinity]) {
+    expect(parseCoordinates(value, 0)).toEqual(undefined);
+    expect(parseCoordinates(0, value)).toEqual(undefined);
+  }
+  expect(parseCoordinates(0, 0)).toEqual(0);
+  expect(parseCoordinates(15, 15)).toEqual(255);
+});
+
+test('square names reject malformed files and ranks', () => {
+  for (const name of ['1xa', '+1a', ' 1a', '01a', '0a', '17a', '1q', '1a\n']) {
+    expect(parseSquareName(name)).toEqual(undefined);
+  }
+});
 
 test('square coordinates', () => {
   expect(squareFile(0)).toEqual(0);

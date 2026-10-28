@@ -1,14 +1,41 @@
 import { test } from 'node:test';
 import {
   kanjiToNumber,
+  kanjiToRole,
   makeJapaneseSquare,
   makeNumberSquare,
   numberToKanji,
   parseJapaneseSquare,
   parseNumberSquare,
+  roleToFullKanji,
+  roleToKanji,
 } from '../../src/notation/util.js';
 import { parseSquareName } from '../../src/util.js';
 import { expect } from '../debug.js';
+
+test('Japanese square parsing rejects malformed coordinates', () => {
+  for (const name of [
+    '１x二',
+    '１二三',
+    '１百二',
+    '１二x',
+    '０一',
+    '０１一',
+    '１７一',
+    '１十七',
+    '1一\n',
+  ]) {
+    expect(parseJapaneseSquare(name)).toEqual(undefined);
+  }
+});
+
+test('Dobutsu piece names round trip through kanji parsing', () => {
+  for (const role of ['pawn', 'bishop', 'rook', 'tokin', 'king'] as const) {
+    for (const render of [roleToKanji, roleToFullKanji]) {
+      expect(kanjiToRole(render('dobutsu')(role)).includes(role)).toEqual(true);
+    }
+  }
+});
 
 test('parse kif square', () => {
   expect(parseJapaneseSquare('１一')).toEqual(parseSquareName('1a'));

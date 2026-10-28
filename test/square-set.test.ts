@@ -36,6 +36,33 @@ test('fromSquares', () => {
   expect(SquareSet.fromSquares(...Array(256).keys())).toEqual(SquareSet.full());
 });
 
+test('invalid squares are ignored consistently', () => {
+  const invalid = [NaN, Infinity, -Infinity, -1, 256, 257, 0.5, 31.5, 255.5];
+  const original = SquareSet.fromSquares(0, 31, 255);
+  for (const square of invalid) {
+    expect(SquareSet.fromSquare(square)).toEqual(SquareSet.empty());
+    expect(SquareSet.fromSquares(square)).toEqual(SquareSet.empty());
+    expect(SquareSet.full().has(square)).toEqual(false);
+    expect(original.with(square)).toEqual(original);
+    expect(original.withMany(square)).toEqual(original);
+    expect(original.without(square)).toEqual(original);
+    expect(original.withoutMany(square)).toEqual(original);
+    expect(original.toggle(square)).toEqual(original);
+    expect(original.set(square, true)).toEqual(original);
+    expect(original.set(square, false)).toEqual(original);
+  }
+  expect(SquareSet.fromSquares(...invalid, 42)).toEqual(SquareSet.fromSquare(42));
+  expect(original.withMany(...invalid, 42)).toEqual(original.with(42));
+  expect(original.withoutMany(...invalid, 31)).toEqual(original.without(31));
+});
+
+test('invalid rank and file constructors return empty sets', () => {
+  for (const coordinate of [NaN, Infinity, -Infinity, -1, 16, 32, 0.5, 15.5]) {
+    expect(SquareSet.fromRank(coordinate)).toEqual(SquareSet.empty());
+    expect(SquareSet.fromFile(coordinate)).toEqual(SquareSet.empty());
+  }
+});
+
 test('fromRank', () => {
   expect(SquareSet.fromRank(0)).toEqual(new SquareSet([0xffff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]));
   expect(SquareSet.fromRank(1)).toEqual(

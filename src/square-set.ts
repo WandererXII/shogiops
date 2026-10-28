@@ -1,5 +1,13 @@
 import type { Square } from './types.js';
 
+function isValidSquare(square: Square): boolean {
+  return Number.isInteger(square) && square >= 0 && square < 256;
+}
+
+function isValidCoordinate(coordinate: number): boolean {
+  return Number.isInteger(coordinate) && coordinate >= 0 && coordinate < 16;
+}
+
 function popcnt32(n: number): number {
   n = n - ((n >>> 1) & 0x55555555);
   n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
@@ -54,7 +62,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   static fromSquare(square: Square): SquareSet {
-    if (square >= 256 || square < 0) return SquareSet.empty();
+    if (!isValidSquare(square)) return SquareSet.empty();
     const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
     const index = square >>> 5;
     newRows[index] = 1 << (square - index * 32);
@@ -64,7 +72,7 @@ export class SquareSet implements Iterable<Square> {
   static fromSquares(...squares: Square[]): SquareSet {
     const newRows: BitRows = [0, 0, 0, 0, 0, 0, 0, 0];
     for (const square of squares) {
-      if (square < 256 && square >= 0) {
+      if (isValidSquare(square)) {
         const index = square >>> 5;
         newRows[index] = newRows[index] | (1 << (square - index * 32));
       }
@@ -73,10 +81,12 @@ export class SquareSet implements Iterable<Square> {
   }
 
   static fromRank(rank: number): SquareSet {
+    if (!isValidCoordinate(rank)) return SquareSet.empty();
     return new SquareSet([0xffff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]).shl256(16 * rank);
   }
 
   static fromFile(file: number): SquareSet {
+    if (!isValidCoordinate(file)) return SquareSet.empty();
     return new SquareSet([
       0x10001 << file,
       0x10001 << file,
@@ -269,12 +279,9 @@ export class SquareSet implements Iterable<Square> {
   }
 
   has(square: Square): boolean {
-    if (square >= 256) return false;
-    if (square >= 0) {
-      const index = square >>> 5;
-      return (this.dRows[index] & (1 << (square - 32 * index))) !== 0;
-    }
-    return false;
+    if (!isValidSquare(square)) return false;
+    const index = square >>> 5;
+    return (this.dRows[index] & (1 << (square - 32 * index))) !== 0;
   }
 
   set(square: Square, on: boolean): SquareSet {
@@ -282,7 +289,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   with(square: Square): SquareSet {
-    if (square >= 256 || square < 0) return this;
+    if (!isValidSquare(square)) return this;
     const index = square >>> 5;
     const newDRows: BitRows = [...this.dRows];
     newDRows[index] = newDRows[index] | (1 << (square - index * 32));
@@ -292,7 +299,7 @@ export class SquareSet implements Iterable<Square> {
   withMany(...squares: Square[]): SquareSet {
     const newDRows: BitRows = [...this.dRows];
     for (const square of squares) {
-      if (square < 256 && square >= 0) {
+      if (isValidSquare(square)) {
         const index = square >>> 5;
         newDRows[index] = newDRows[index] | (1 << (square - index * 32));
       }
@@ -301,7 +308,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   without(square: Square): SquareSet {
-    if (square >= 256 || square < 0) return this;
+    if (!isValidSquare(square)) return this;
     const index = square >>> 5;
     const newDRows: BitRows = [...this.dRows];
     newDRows[index] = newDRows[index] & ~(1 << (square - index * 32));
@@ -311,7 +318,7 @@ export class SquareSet implements Iterable<Square> {
   withoutMany(...squares: Square[]): SquareSet {
     const newDRows: BitRows = [...this.dRows];
     for (const square of squares) {
-      if (square < 256 && square >= 0) {
+      if (isValidSquare(square)) {
         const index = square >>> 5;
         newDRows[index] = newDRows[index] & ~(1 << (square - index * 32));
       }
@@ -320,7 +327,7 @@ export class SquareSet implements Iterable<Square> {
   }
 
   toggle(square: Square): SquareSet {
-    if (square >= 256 || square < 0) return this;
+    if (!isValidSquare(square)) return this;
     const index = square >>> 5;
     const newDRows: BitRows = [...this.dRows];
     newDRows[index] = newDRows[index] ^ (1 << (square - index * 32));

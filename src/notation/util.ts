@@ -9,6 +9,13 @@ export function aimingAt(pos: Position, pieces: SquareSet, to: Square): SquareSe
   return ambs;
 }
 
+export function iguiCapturers(pos: Position, pieces: SquareSet, to: Square): SquareSet {
+  let capturers = SquareSet.empty();
+  for (const from of pieces)
+    if (pos.isLegal({ from, midStep: to, to: from })) capturers = capturers.with(from);
+  return capturers;
+}
+
 export function roleToWestern(rules: Rules): (role: Role) => string {
   if (rules === 'dobutsu') return doubutsuRoleToWestern;
   return (role) => {

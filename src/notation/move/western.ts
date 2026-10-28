@@ -2,7 +2,7 @@ import type { Position } from '../../position/position.js';
 import { pieceCanPromote } from '../../position/util.js';
 import type { MoveOrDrop } from '../../types.js';
 import { defined, isDrop } from '../../util.js';
-import { aimingAt, makeNumberSquare, roleToWestern } from '../util.js';
+import { aimingAt, iguiCapturers, makeNumberSquare, roleToWestern } from '../util.js';
 
 // P-76
 export function makeWesternMoveOrDrop(pos: Position, md: MoveOrDrop): string | undefined {
@@ -22,8 +22,14 @@ export function makeWesternMoveOrDrop(pos: Position, md: MoveOrDrop): string | u
       if (defined(md.midStep)) {
         const midCapture = pos.board.pieceAt(md.midStep);
         const igui = !!midCapture && md.to === md.from;
-        if (igui) return `${roleStr}${disambStr}x!${makeNumberSquare(md.midStep)}`;
-        else if (md.to === md.from) return `--`;
+        if (igui) {
+          const origin = iguiCapturers(pos, pos.board.byPiece(piece.color, piece.role), md.midStep)
+            .without(md.from)
+            .nonEmpty()
+            ? makeNumberSquare(md.from)
+            : '';
+          return `${roleStr}${origin}x!${makeNumberSquare(md.midStep)}`;
+        } else if (md.to === md.from) return `--`;
         else
           return `${roleStr}${disambStr}${midCapture ? 'x' : '-'}${makeNumberSquare(md.midStep)}${toStr}`;
       } else {

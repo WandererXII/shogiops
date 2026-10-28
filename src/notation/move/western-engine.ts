@@ -2,7 +2,7 @@ import type { Position } from '../../position/position.js';
 import { pieceCanPromote } from '../../position/util.js';
 import type { MoveOrDrop } from '../../types.js';
 import { defined, isDrop, makeSquareName } from '../../util.js';
-import { aimingAt, roleToWestern } from '../util.js';
+import { aimingAt, iguiCapturers, roleToWestern } from '../util.js';
 
 // P-7f
 export function makeWesternEngineMoveOrDrop(pos: Position, md: MoveOrDrop): string | undefined {
@@ -22,8 +22,14 @@ export function makeWesternEngineMoveOrDrop(pos: Position, md: MoveOrDrop): stri
       if (defined(md.midStep)) {
         const midCapture = pos.board.pieceAt(md.midStep);
         const igui = !!midCapture && md.to === md.from;
-        if (igui) return `${roleStr}${disambStr}x!${makeSquareName(md.midStep)}`;
-        else if (md.to === md.from) return `--`;
+        if (igui) {
+          const origin = iguiCapturers(pos, pos.board.byPiece(piece.color, piece.role), md.midStep)
+            .without(md.from)
+            .nonEmpty()
+            ? makeSquareName(md.from)
+            : '';
+          return `${roleStr}${origin}x!${makeSquareName(md.midStep)}`;
+        } else if (md.to === md.from) return `--`;
         else
           return `${roleStr}${disambStr}${midCapture ? 'x' : '-'}${makeSquareName(md.midStep)}${toStr}`;
       } else {

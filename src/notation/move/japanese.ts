@@ -4,7 +4,13 @@ import { pieceCanPromote } from '../../position/util.js';
 import { SquareSet } from '../../square-set.js';
 import type { MoveOrDrop, Piece, Role, Rules, Square } from '../../types.js';
 import { defined, isDrop, squareDist, squareFile, squareRank } from '../../util.js';
-import { aimingAt, makeJapaneseSquare, roleKanjiDuplicates, roleToKanji } from '../util.js';
+import {
+  aimingAt,
+  iguiCapturers,
+  makeJapaneseSquare,
+  roleKanjiDuplicates,
+  roleToKanji,
+} from '../util.js';
 
 // ７六歩
 export function makeJapaneseMoveOrDrop(
@@ -57,11 +63,13 @@ export function makeJapaneseMoveOrDrop(
 
       if (defined(md.midStep)) {
         const midCapture = pos.board.pieceAt(md.midStep);
-        const igui = !!midCapture && md.to === md.from;
-        if (igui) return `${makeJapaneseSquare(md.midStep)}居喰い`;
-        else if (md.to === md.from) return 'じっと';
-        else
-          return `${makeJapaneseSquare(md.midStep)}・${makeJapaneseSquare(md.to)}${roleStr}${ambStr}`;
+        if (md.to === md.from && !midCapture) return 'じっと';
+        if (
+          md.to === md.from &&
+          iguiCapturers(pos, pos.board.byColor(piece.color), md.midStep).without(md.from).isEmpty()
+        )
+          return `${makeJapaneseSquare(md.midStep)}居喰い`;
+        return `${makeJapaneseSquare(md.midStep)}・${makeJapaneseSquare(md.to)}${roleStr}${ambStr}`;
       } else {
         const destStr =
           (lastDest ?? pos.lastMoveOrDrop?.to) === md.to ? '同　' : makeJapaneseSquare(md.to);

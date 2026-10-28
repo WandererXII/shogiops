@@ -149,7 +149,15 @@ export function parseKifHeader(kif: string): Result<Position, KifError> {
   const rules = handicap?.rules ?? detectRules(hSfen?.split('/').length, handicapName);
   if (defined(handicapName) && !handicap && handicapName !== defaultHandicap(rules))
     return Result.err(new KifError(InvalidKif.Kif));
-  return parseSfen(rules, hSfen ?? initialSfen(rules));
+  return parseSfen(rules, hSfen ?? initialSfen(rules)).map((pos) =>
+    pos.update({ turn: kifTurn(lines) ?? pos.turn }),
+  );
+}
+
+function kifTurn(lines: string[]): Color | undefined {
+  if (lines.some((l) => l.startsWith('後手番') || l.startsWith('上手番'))) return 'gote';
+  if (lines.some((l) => l.startsWith('先手番') || l.startsWith('下手番'))) return 'sente';
+  return undefined;
 }
 
 function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {
@@ -159,9 +167,7 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
     rulesOpt || detectRules(lines.filter((l) => l.startsWith('|')).length, handicapName);
   const goteHandStr = kifTagValue(lines, '後手の持駒', '上手の持駒');
   const senteHandStr = kifTagValue(lines, '先手の持駒', '下手の持駒');
-  const turn = lines.some((l) => l.startsWith('後手番') || l.startsWith('上手番'))
-    ? 'gote'
-    : 'sente';
+  const turn = kifTurn(lines) ?? 'sente';
 
   const board: Result<Board, KifError> = parseKifBoard(rules, kif);
   if (board.isErr) return Result.err(board.error);
@@ -276,8 +282,10 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
         ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'].includes(piece[i])
       )
         countStr += piece[i++];
-      const count = Math.max(kanjiToNumber(countStr), 1) + hand.get(role);
-      hand = hand.with(role, count);
+      const count = countStr ? kanjiToNumber(countStr) : 1;
+      if (countStr && numberToKanji(count) !== countStr)
+        return Result.err(new KifError(InvalidKif.Hands));
+      hand = hand.with(role, count + hand.get(role));
     }
   }
   return Result.ok(hand);
@@ -285,7 +293,7 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
 
 export function parseTags(kif: string): [string, string][] {
   return normalizedKifLines(kif)
-    .filter((l) => !/^[#*\d]/.test(l))
+    .filter((l) => !/^[#*&\d]/.test(l))
     .map(splitKifTag)
     .filter(([, value]) => defined(value));
 }
@@ -303,7 +311,7 @@ export function normalizedKifLines(kif: string): string[] {
 //
 
 export const chushogiKifMoveRegex: RegExp =
-  /((?:(?:[０１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)(\S{1,3}?)((?:（居食い）)|\(じっと\)|不成|成)?\s?[（|(|←]*((?:[０１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
+  /((?:(?:[０１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)\s?(\S{1,3}?)((?:（居食い）)|\(じっと\)|不成|成)?\s?[（|(|←]*((?:[０１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
 function parseChushogiMove(
   kifMd: string,
   lastDest: Square | undefined = undefined,
@@ -361,9 +369,11 @@ export function parseKifMoveOrDrop(
   }
 }
 
-function isLionDouble(kifMd: string | undefined): boolean {
+function lionStep(kifMd: string | undefined): 1 | 2 | undefined {
   const m = defined(kifMd) ? (kifMd || '').split('*')[0].trim() : '';
-  return m.includes('一歩目') || m.includes('二歩目');
+  if (m.includes('一歩目')) return 1;
+  if (m.includes('二歩目')) return 2;
+  return undefined;
 }
 
 export function parseKifMovesOrDrops(
@@ -374,10 +384,18 @@ export function parseKifMovesOrDrops(
   for (let i = 0; i < kifMds.length; i++) {
     const m = kifMds[i];
     let md: MoveOrDrop | undefined;
-    if (isLionDouble(m) && isLionDouble(kifMds[i + 1])) {
+    const step = lionStep(m);
+    if (defined(step)) {
+      if (step !== 1 || lionStep(kifMds[i + 1]) !== 2) return mds;
       const firstMove = parseChushogiMove(m, lastDest);
       const secondMove = parseChushogiMove(kifMds[++i], lastDest);
-      if (firstMove && secondMove && isMove(firstMove) && isMove(secondMove)) {
+      if (
+        firstMove &&
+        secondMove &&
+        isMove(firstMove) &&
+        isMove(secondMove) &&
+        firstMove.to === secondMove.from
+      ) {
         md = { from: firstMove.from, to: secondMove.to, midStep: firstMove.to, promotion: false };
       }
     } else md = parseKifMoveOrDrop(m, lastDest);

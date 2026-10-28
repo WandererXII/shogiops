@@ -810,3 +810,78 @@ test('kyoto handicap', () => {
   expect(makeKifHeader(pos)).toEqual(kif);
   expect(parseKifHeader(kif).unwrap()).toEqual(pos);
 });
+
+test('explicit turns override default and handicap turns without diagrams', () => {
+  for (const marker of ['後手番', '上手番'])
+    expect(parseKifHeader(`手合割：平手\n${marker}`).unwrap().turn).toEqual('gote');
+  for (const marker of ['先手番', '下手番'])
+    expect(parseKifHeader(`手合割：飛車落ち\n${marker}`).unwrap().turn).toEqual('sente');
+  expect(parseKifHeader('手合割：平手').unwrap().turn).toEqual('sente');
+  expect(parseKifHeader('手合割：飛車落ち').unwrap().turn).toEqual('gote');
+});
+
+for (const [name, rank] of [
+  ['左五枚落ち', '1nsgkgs2'],
+  ['左七枚落ち', '2sgkg3'],
+  ['右七枚落ち', '3gkgs2'],
+]) {
+  test(`parse standard handicap ${name}`, () => {
+    const pos = parseKifHeader(`手合割：${name}`).unwrap();
+    expect(makeSfen(pos)).toEqual(`${rank}/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1`);
+    expect(parseKifHeader(makeKifHeader(pos)).unwrap()).toEqual(pos);
+  });
+}
+
+test('chu shogi step pairs require ordered, continuous steps', () => {
+  const first = '一歩目 5四獅子 （←5五）';
+  const second = '二歩目 6四獅子 （←5四）';
+  expect(parseKifMovesOrDrops([first, second])).toEqual([parseUsi('5e5d6d')]);
+  for (const lines of [
+    [first],
+    [second],
+    [second, first],
+    [first, first],
+    [second, second],
+    [first, '二歩目 6四獅子 （←6五）'],
+    [first, '6四獅子 （←5四）'],
+  ])
+    expect(parseKifMovesOrDrops(lines)).toEqual([]);
+  expect(parseKifMovesOrDrops(['7八歩兵 （←7九）', first])).toEqual([parseUsi('7i7h')]);
+});
+
+test('chu shogi accepts padded repeated destinations', () => {
+  const move = parseUsi('5e1a')!;
+  for (const marker of ['同', '仝'])
+    for (const space of ['', ' ', '　']) {
+      const line = `${marker}${space}獅子 （←5五）`;
+      expect(parseKifMoveOrDrop(line, move.to)).toEqual(move);
+      expect(parseKifMoveOrDrop(line)).toEqual(undefined);
+      expect(parseKifMovesOrDrops([line, '2二獅子 （←1一）'], move.to)).toEqual([
+        move,
+        parseUsi('1a2b'),
+      ]);
+    }
+});
+
+test('kif hand counts must be canonical Japanese numerals', () => {
+  for (const count of ['二三', '十十', '九九', '一十', '二十一二']) {
+    const result = parseKifHand('standard', `歩${count}`);
+    expect(result.isErr).toEqual(true);
+    if (result.isErr) expect(result.error.message).toEqual(InvalidKif.Hands);
+  }
+  for (const [count, value] of [
+    ['一', 1],
+    ['十', 10],
+    ['十八', 18],
+    ['二十', 20],
+    ['九十九', 99],
+  ] as const)
+    expect(parseKifHand('standard', `歩${count}`).unwrap().get('pawn')).toEqual(value);
+});
+
+test('parse tags ignores bookmarks containing either colon width', () => {
+  expect(parseTags('先手：Alice\n&opening: side pawn\n&局面：終盤\n後手：Bob')).toEqual([
+    ['先手', 'Alice'],
+    ['後手', 'Bob'],
+  ]);
+});

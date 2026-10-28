@@ -75,6 +75,19 @@ test('incomplete sfen hand counts return an error', () => {
   }
 });
 
+test('sfen empty-hand marker must be the entire hands field', () => {
+  for (const rules of RULES.filter((rules) => rules !== 'chushogi')) {
+    expect(parseHands(rules, '-').unwrap().isEmpty()).toEqual(true);
+    for (const hand of ['-P', 'P-', 'P-p', 'P-garbage', '--']) {
+      const sfen = initialSfen(rules).replace(' - ', ` ${hand} `);
+      for (const result of [parseHands(rules, hand), parseSfen(rules, sfen, true)]) {
+        expect(result.isErr).toEqual(true);
+        expect(result.isErr ? result.error.message : undefined).toEqual(InvalidSfen.Hands);
+      }
+    }
+  }
+});
+
 test('parse and make sfen', () => {
   [
     'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b RG4P2b2s3p 143',

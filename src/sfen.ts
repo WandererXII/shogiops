@@ -132,8 +132,8 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
 
 export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenError> {
   let hands = Hands.empty();
+  if (handsPart === '-') return Result.ok(hands);
   for (let i = 0; i < handsPart.length; i++) {
-    if (handsPart[i] === '-') break;
     // max 99
     let count = Number.parseInt(handsPart[i], 10);
     if (!isNaN(count)) {

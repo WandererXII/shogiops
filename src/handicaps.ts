@@ -72,6 +72,11 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     englishName: '5-piece',
   },
   {
+    sfen: '1nsgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '左五枚落ち',
+    englishName: 'Left 5-piece',
+  },
+  {
     sfen: '2sgkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
     japaneseName: '六枚落ち',
     englishName: '6-piece',
@@ -80,6 +85,16 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     sfen: '3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
     japaneseName: '七枚落ち',
     englishName: '7-piece',
+  },
+  {
+    sfen: '2sgkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '左七枚落ち',
+    englishName: 'Left 7-piece',
+  },
+  {
+    sfen: '3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
+    japaneseName: '右七枚落ち',
+    englishName: 'Right 7-piece',
   },
   {
     sfen: '3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',

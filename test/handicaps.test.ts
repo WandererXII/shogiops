@@ -5,12 +5,12 @@ import { initialSfen, parseSfen } from '../src/sfen.js';
 import { expect } from './debug.js';
 
 test('proper count', () => {
-  expect(findHandicaps({ rules: 'standard' }).length).toEqual(34);
+  expect(findHandicaps({ rules: 'standard' }).length).toEqual(37);
   expect(findHandicaps({ rules: 'minishogi' }).length).toEqual(5);
   expect(findHandicaps({ rules: 'chushogi' }).length).toEqual(3);
   expect(findHandicaps({ rules: 'annanshogi' }).length).toEqual(15);
   expect(findHandicaps({ rules: 'kyotoshogi' }).length).toEqual(7);
-  expect(findHandicaps({ rules: 'checkshogi' }).length).toEqual(34);
+  expect(findHandicaps({ rules: 'checkshogi' }).length).toEqual(37);
 });
 
 test('only one field', () => {

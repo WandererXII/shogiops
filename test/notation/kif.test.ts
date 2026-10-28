@@ -7,6 +7,8 @@ import {
   makeKifHand,
   makeKifHeader,
   makeKifMoveOrDrop,
+  makeKifPositionHeader,
+  normalizedKifLines,
   parseKifBoard,
   parseKifHand,
   parseKifHeader,
@@ -29,6 +31,27 @@ for (const rules of [
   'annanshogi',
   'checkshogi',
 ] as const) {
+  test(`${rules} kif position headers accept either colon width`, () => {
+    const initial = parseSfen(rules, initialSfen(rules)).unwrap();
+    const pos = initial.update({
+      turn: 'gote',
+      hands:
+        rules === 'chushogi'
+          ? initial.hands
+          : initial.hands
+              .increment({ color: 'sente', role: 'pawn' })
+              .increment({ color: 'gote', role: 'pawn' }),
+    });
+    for (const separator of [':', '：']) {
+      const header = makeKifPositionHeader(pos).replace(/：/g, separator);
+      const parsed = parseKifHeader(`${header}\nURL${separator}https://example.com/a:b`).unwrap();
+      expect(parsed.rules).toEqual(pos.rules);
+      expect(parsed.board.equals(pos.board)).toEqual(true);
+      expect(parsed.hands.equals(pos.hands)).toEqual(true);
+      expect(parsed.turn).toEqual(pos.turn);
+    }
+  });
+
   test(`${rules} kif board requires complete dimensions`, () => {
     const pos = parseSfen(rules, initialSfen(rules)).unwrap();
     const diagram = makeKifBoard(rules, pos.board);
@@ -386,6 +409,33 @@ test('variant KIF sequences continue after exported moves and drops', () => {
   }
 });
 
+test('normalized kif lines preserve colon widths', () => {
+  expect(
+    normalizedKifLines(
+      '  URL：https://example.com/a:b\r\n\n開始日時:10:30:00\r注記：全角：値　終わり ',
+    ),
+  ).toEqual(['URL：https://example.com/a:b', '開始日時:10:30:00', '注記：全角：値 終わり']);
+});
+
+test('kif handicap headers accept either colon width', () => {
+  const handicap = findHandicap({ rules: 'standard', japaneseName: '飛車落ち' })!;
+  for (const separator of [':', '：']) {
+    expect(makeSfen(parseKifHeader(`手合割${separator}飛車落ち`).unwrap())).toEqual(handicap.sfen);
+  }
+});
+
+test('kif hand headers do not discard content after another colon', () => {
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  for (const separator of [':', '：']) {
+    for (const color of ['先手', '後手', '下手', '上手']) {
+      const header = `${makeKifBoard(pos.rules, pos.board)}\n${color}の持駒${separator}歩:余分`;
+      const result = parseKifHeader(header);
+      expect(result.isErr).toEqual(true);
+      if (result.isErr) expect(result.error.message).toEqual(InvalidKif.Hands);
+    }
+  }
+});
+
 test('parse tags', () => {
   expect(
     parseTags(`
@@ -396,6 +446,26 @@ test('parse tags', () => {
     ['後手', 'Raze'],
   ]);
 });
+
+for (const separator of [':', '：']) {
+  test(`parse tags preserves value colons with ${separator} separator`, () => {
+    expect(
+      parseTags(`
+      # ignored:comment
+      * ignored：comment
+      開始日時${separator}2026/10/26 10:30:00
+      URL${separator}https://example.com/a:b
+      先手${separator}Player:Alias
+      注記${separator}ASCII:全角：混在:値
+      `),
+    ).toEqual([
+      ['開始日時', '2026/10/26 10:30:00'],
+      ['URL', 'https://example.com/a:b'],
+      ['先手', 'Player:Alias'],
+      ['注記', 'ASCII:全角：混在:値'],
+    ]);
+  });
+}
 
 test('parse chushogi kif header', () => {
   // board takes precedence

@@ -123,33 +123,40 @@ function defaultHandicap(rules: Rules): string {
 }
 
 // Import
+function splitKifTag(line: string): [string, string] {
+  return line.split(/[:：](.*)/, 2) as [string, string];
+}
+
+function kifTagValue(lines: string[], ...keys: string[]): string | undefined {
+  for (const line of lines) {
+    const [key, value] = splitKifTag(line);
+    if (defined(value) && keys.includes(key)) return value;
+  }
+  return undefined;
+}
+
 export function parseKifHeader(kif: string): Result<Position, KifError> {
   const lines = normalizedKifLines(kif);
-  const hasPositionHeader = lines.some(
-    (l) => l.startsWith('|') || /^\+-+\+$/.test(l) || /^(先手|後手|下手|上手)の持駒：/.test(l),
-  );
+  const hasPositionHeader =
+    lines.some((l) => l.startsWith('|') || /^\+-+\+$/.test(l)) ||
+    defined(kifTagValue(lines, '先手の持駒', '後手の持駒', '下手の持駒', '上手の持駒'));
   if (hasPositionHeader) return parseKifPositionHeader(kif);
 
-  const handicapTag = lines.find((l) => l.startsWith('手合割：'));
-  const handicap = defined(handicapTag)
-    ? findHandicap({ japaneseName: handicapTag.split('：')[1] })
-    : undefined;
+  const handicapName = kifTagValue(lines, '手合割');
+  const handicap = defined(handicapName) ? findHandicap({ japaneseName: handicapName }) : undefined;
 
   const hSfen = handicap?.sfen;
-  const rules = handicap?.rules ?? detectRules(hSfen?.split('/').length, handicapTag);
+  const rules = handicap?.rules ?? detectRules(hSfen?.split('/').length, handicapName);
   return parseSfen(rules, hSfen ?? initialSfen(rules));
 }
 
 function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position, KifError> {
   const lines = normalizedKifLines(kif);
-  const handicapTag = lines.find((l) => l.startsWith('手合割：'));
-  const rules = rulesOpt || detectRules(lines.filter((l) => l.startsWith('|')).length, handicapTag);
-  const goteHandStr = lines.find(
-    (l) => l.startsWith('後手の持駒：') || l.startsWith('上手の持駒：'),
-  );
-  const senteHandStr = lines.find(
-    (l) => l.startsWith('先手の持駒：') || l.startsWith('下手の持駒：'),
-  );
+  const handicapName = kifTagValue(lines, '手合割');
+  const rules =
+    rulesOpt || detectRules(lines.filter((l) => l.startsWith('|')).length, handicapName);
+  const goteHandStr = kifTagValue(lines, '後手の持駒', '上手の持駒');
+  const senteHandStr = kifTagValue(lines, '先手の持駒', '下手の持駒');
   const turn = lines.some((l) => l.startsWith('後手番') || l.startsWith('上手番'))
     ? 'gote'
     : 'sente';
@@ -158,12 +165,12 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
   if (board.isErr) return Result.err(board.error);
 
   const goteHand = defined(goteHandStr)
-    ? parseKifHand(rules, goteHandStr.split('：')[1])
+    ? parseKifHand(rules, goteHandStr)
     : Result.ok(Hand.empty());
   if (goteHand.isErr) return Result.err(goteHand.error);
 
   const senteHand = defined(senteHandStr)
-    ? parseKifHand(rules, senteHandStr.split('：')[1])
+    ? parseKifHand(rules, senteHandStr)
     : Result.ok(Hand.empty());
   if (senteHand.isErr) return Result.err(senteHand.error);
 
@@ -181,18 +188,20 @@ function parseKifPositionHeader(kif: string, rulesOpt?: Rules): Result<Position,
   );
 }
 
-function detectRules(lines: number | undefined, tag: string | undefined): Rules {
-  if (lines === 12 || (defined(tag) && tag.startsWith('手合割：中将棋'))) return 'chushogi';
-  else if (defined(tag) && tag.startsWith('手合割：どうぶつしょうぎ')) return 'dobutsu';
+function detectRules(lines: number | undefined, handicapName: string | undefined): Rules {
+  if (lines === 12 || (defined(handicapName) && handicapName.startsWith('中将棋')))
+    return 'chushogi';
+  else if (defined(handicapName) && handicapName.startsWith('どうぶつしょうぎ')) return 'dobutsu';
   else if (
     (!defined(lines) || lines === 0 || lines === 5) &&
-    defined(tag) &&
-    tag.startsWith('手合割：京都')
+    defined(handicapName) &&
+    handicapName.startsWith('京都')
   )
     return 'kyotoshogi';
-  else if ((defined(tag) && tag.startsWith('手合割：5五')) || lines === 5) return 'minishogi';
-  else if (defined(tag) && tag.startsWith('手合割：安南')) return 'annanshogi';
-  else if (defined(tag) && tag.startsWith('手合割：王手')) return 'checkshogi';
+  else if ((defined(handicapName) && handicapName.startsWith('5五')) || lines === 5)
+    return 'minishogi';
+  else if (defined(handicapName) && handicapName.startsWith('安南')) return 'annanshogi';
+  else if (defined(handicapName) && handicapName.startsWith('王手')) return 'checkshogi';
   else return 'standard';
 }
 
@@ -275,12 +284,11 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
 export function parseTags(kif: string): [string, string][] {
   return normalizedKifLines(kif)
     .filter((l) => !l.startsWith('#') && !l.startsWith('*'))
-    .map((l) => l.replace('：', ':').split(/:(.*)/, 2) as [string, string]);
+    .map(splitKifTag);
 }
 
 export function normalizedKifLines(kif: string): string[] {
   return kif
-    .replace(/:/g, '：')
     .replace(/　/g, ' ') // full-width space to normal space
     .split(/[\r\n]+/)
     .map((l) => l.trim())

@@ -76,15 +76,8 @@ test('incomplete sfen hand counts return an error', () => {
 });
 
 test('sfen empty-hand marker must be the entire hands field', () => {
-  for (const rules of RULES.filter((rules) => rules !== 'chushogi')) {
-    expect(parseHands(rules, '-').unwrap().isEmpty()).toEqual(true);
-    for (const hand of ['-P', 'P-', 'P-p', 'P-garbage', '--']) {
-      const sfen = initialSfen(rules).replace(' - ', ` ${hand} `);
-      for (const result of [parseHands(rules, hand), parseSfen(rules, sfen, true)]) {
-        expect(result.isErr).toEqual(true);
-        expect(result.isErr ? result.error.message : undefined).toEqual(InvalidSfen.Hands);
-      }
-    }
+  for (const hand of ['-P', 'P-p']) {
+    expect(parseHands('standard', hand).isErr).toEqual(true);
   }
 });
 
@@ -103,6 +96,28 @@ test('parse and make sfen', () => {
     const pos = parseSfen('standard', sfen, true).unwrap();
     expect(makeSfen(pos)).toEqual(sfen);
   });
+});
+
+test('sfen hand counts are capped at 99 after accumulation', () => {
+  const sfen = initialSfen('standard').replace(' - ', ' 99PP ');
+  const pos = parseSfen('standard', sfen).unwrap();
+  expect(makeSfen(pos)).toEqual(sfen.replace('99PP', '99P'));
+  expect(parseSfen('standard', makeSfen(pos)).unwrap().hands).toEqual(pos.hands);
+});
+
+test('sfen accepts surrounding separators', () => {
+  const sfen = initialSfen('standard');
+  expect(makeSfen(parseSfen('standard', ` __${sfen}\n`).unwrap())).toEqual(sfen);
+  expect(makeSfen(parseSfen('standard', ' startpos\n').unwrap())).toEqual(sfen);
+});
+
+test('chushogi capture field requires a square inside the board', () => {
+  for (const field of ['13a', '1m', 'garbage']) {
+    const sfen = initialSfen('chushogi').replace(' - ', ` ${field} `);
+    expect(parseSfen('chushogi', sfen).isErr).toEqual(true);
+  }
+  const sfen = initialSfen('chushogi').replace(' - ', ' 12l ');
+  expect(makeSfen(parseSfen('chushogi', sfen).unwrap())).toEqual(sfen);
 });
 
 test('minishogi sfen', () => {

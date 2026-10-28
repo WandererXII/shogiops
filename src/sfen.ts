@@ -5,7 +5,7 @@ import { Hands } from './hands.js';
 import type { Position, PositionError } from './position/position.js';
 import type { RulesTypeMap } from './position/setup.js';
 import { initializePosition } from './position/setup.js';
-import { dimensions, handRoles, unpromote } from './position/util.js';
+import { dimensions, fullSquareSet, handRoles, unpromote } from './position/util.js';
 import type { Color, MoveOrDrop, Piece, Role, Rules, Square } from './types.js';
 import { defined, makeSquareName, parseCoordinates, parseSquareName, toBW } from './util.js';
 
@@ -148,7 +148,7 @@ export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenE
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
     if (rules === 'kyotoshogi' && !handRoles(rules).includes(piece.role))
       piece = { color: piece.color, role: unpromote(rules)(piece.role) || piece.role };
-    count += hands.get(piece);
+    count = Math.min(99, count + hands.get(piece));
     hands = hands.with(piece, count);
   }
   return Result.ok(hands);
@@ -159,6 +159,7 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   sfen: string,
   strict?: boolean,
 ): Result<RulesTypeMap[R], SfenError | PositionError> {
+  sfen = sfen.replace(/^[\s_]+|[\s_]+$/g, '');
   if (sfen === 'startpos') sfen = initialSfen(rules);
   const parts = sfen.split(/[\s_]+/);
 
@@ -179,6 +180,12 @@ export function parseSfen<R extends keyof RulesTypeMap>(
   let lastLionCapture: Square | undefined;
   if (rules === 'chushogi') {
     const destSquare = defined(handsPart) ? parseSquareName(handsPart) : undefined;
+    if (
+      defined(handsPart) &&
+      handsPart !== '-' &&
+      (!defined(destSquare) || !fullSquareSet(rules).has(destSquare))
+    )
+      return Result.err(new SfenError(InvalidSfen.Hands));
     if (defined(destSquare)) {
       lastMoveOrDrop = { to: destSquare };
       lastLionCapture = destSquare;

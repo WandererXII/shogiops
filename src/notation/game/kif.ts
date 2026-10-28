@@ -259,10 +259,10 @@ export function parseKifBoard(rules: Rules, kifBoard: string): Result<Board, Kif
 
 export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifError> {
   let hand = Hand.empty();
-  const pieces = handPart.replace(/　/g, ' ').trim().split(' ');
+  const normalized = handPart.replace(/　/g, ' ').trim();
 
-  if (handPart.includes('なし')) return Result.ok(hand);
-  for (const piece of pieces) {
+  if (normalized === 'なし') return Result.ok(hand);
+  for (const piece of normalized.split(' ')) {
     for (let i = 0; i < piece.length; ) {
       const name = piece.slice(i).match(/^(ひよこ|ぞう|きりん)/)?.[0] ?? piece[i];
       i += name.length;
@@ -285,8 +285,9 @@ export function parseKifHand(rules: Rules, handPart: string): Result<Hand, KifEr
 
 export function parseTags(kif: string): [string, string][] {
   return normalizedKifLines(kif)
-    .filter((l) => !l.startsWith('#') && !l.startsWith('*'))
-    .map(splitKifTag);
+    .filter((l) => !/^[#*\d]/.test(l))
+    .map(splitKifTag)
+    .filter(([, value]) => defined(value));
 }
 
 export function normalizedKifLines(kif: string): string[] {
@@ -309,11 +310,12 @@ function parseChushogiMove(
 ): MoveOrDrop | undefined {
   const match = kifMd.match(chushogiKifMoveRegex);
   if (match) {
-    const dest = parseJapaneseSquare(match[1]) ?? lastDest;
-    if (!defined(dest)) return;
+    const dest = match[1] === '同' || match[1] === '仝' ? lastDest : parseJapaneseSquare(match[1]);
+    const from = parseJapaneseSquare(match[4]);
+    if (!defined(dest) || !defined(from)) return;
 
     return {
-      from: parseJapaneseSquare(match[4])!,
+      from,
       midStep: undefined,
       to: dest,
       promotion: match[3] === '成',
@@ -349,9 +351,12 @@ export function parseKifMoveOrDrop(
     const match = kifMd.match(kifDropRegex);
     if (!match || !match[1]) return parseChushogiMove(kifMd, lastDest);
 
+    const dest = parseJapaneseSquare(match[1]) ?? lastDest;
+    if (!defined(dest)) return;
+
     return {
       role: kanjiToRole(match[2])[0],
-      to: parseJapaneseSquare(match[1])!,
+      to: dest,
     };
   }
 }

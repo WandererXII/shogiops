@@ -91,7 +91,13 @@ for (const [rules, input, expected] of [
   });
 }
 
-for (const input of ['飛X', '飛X角', '飛二X', '飛二X角']) {
+for (const input of ['なし', ' なし ', '　なし　']) {
+  test(`parse empty kif hand ${input}`, () => {
+    expect(parseKifHand('standard', input).unwrap()).toEqual(Hand.empty());
+  });
+}
+
+for (const input of ['飛X', '飛X角', '飛二X', '飛二X角', '歩二 なし', '玉なし', 'なし歩二']) {
   test(`reject invalid characters in kif hand ${input}`, () => {
     const result = parseKifHand('standard', input);
     expect(result.isErr).toEqual(true);
@@ -345,6 +351,26 @@ test('parse kif moves/drops one by one', () => {
   expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
+test('parse same-destination drops', () => {
+  for (const to of [parseUsi('1a1a')!.to, parseUsi('5e5e')!.to]) {
+    for (const kif of ['同歩打', '同 歩打', '同　歩打']) {
+      expect(parseKifMoveOrDrop(kif, to)).toEqual({ role: 'pawn', to });
+    }
+  }
+});
+
+test('same-destination drops require a previous destination', () => {
+  for (const kif of ['同歩打', '同 歩打', '同　歩打']) {
+    expect(parseKifMoveOrDrop(kif)).toEqual(undefined);
+  }
+});
+
+test('explicit drop destinations take precedence over the previous destination', () => {
+  const drop = parseUsi('P*5e')!;
+  expect(parseKifMoveOrDrop('５五歩打', parseUsi('1a1a')!.to)).toEqual(drop);
+  expect(parseKifMoveOrDrop('５五歩打')).toEqual(drop);
+});
+
 test('parse kif moves/drops', () => {
   let pos = parseSfen('standard', initialSfen('standard')).unwrap();
   const line = [
@@ -447,6 +473,39 @@ test('parse tags', () => {
   ]);
 });
 
+test('parse tags ignores timed moves', () => {
+  expect(
+    parseTags(`
+    先手：Sova
+    後手：Raze
+    手数----指手---------消費時間--
+    1 ７六歩(77) (0:01/0:00:01)
+    2 ３四歩(33) (0:02/0:00:02)
+    3 投了 (0:00/0:00:01)
+    まで2手で後手の勝ち`),
+  ).toEqual([
+    ['先手', 'Sova'],
+    ['後手', 'Raze'],
+  ]);
+});
+
+test('parse tags ignores lines without separators and preserves empty values', () => {
+  expect(
+    parseTags(`
+    # ignored:comment
+    * ignored：comment
+    先手：
+    後手:
+    +---------------------------+
+    | ・ ・ ・ ・ ・ ・ ・ ・ ・|一
+    後手番
+    1 ７六歩(77)`),
+  ).toEqual([
+    ['先手', ''],
+    ['後手', ''],
+  ]);
+});
+
 for (const separator of [':', '：']) {
   test(`parse tags preserves value colons with ${separator} separator`, () => {
     expect(
@@ -537,6 +596,28 @@ test('parse chushogi moves', () => {
   expect(parseKifMoveOrDrop('1手目 ▲7八歩兵 （←7九）')).toEqual(parseUsi('7i7h')!);
   expect(parseKifMoveOrDrop('123手目 ▲6十一金将成 （←5十二）')).toEqual(parseUsi('5l6k+')!);
 });
+
+for (const square of ['99一', '９９一', '0五', '０五', '5十七']) {
+  test(`reject invalid chushogi origin: ${square}`, () => {
+    for (const lastDest of [undefined, parseUsi('1a1a')!.to]) {
+      expect(parseKifMoveOrDrop(`5五獅子 （←${square}）`, lastDest)).toEqual(undefined);
+    }
+  });
+  test(`reject invalid chushogi destination: ${square}`, () => {
+    for (const lastDest of [undefined, parseUsi('1a1a')!.to]) {
+      expect(parseKifMoveOrDrop(`${square}獅子 （←5五）`, lastDest)).toEqual(undefined);
+    }
+  });
+}
+
+for (const marker of ['同', '仝']) {
+  test(`chushogi repeat destination requires a previous destination: ${marker}`, () => {
+    const move = parseUsi('5e1a')!;
+    expect(parseKifMoveOrDrop(`${marker}獅子 （←5五）`, move.to)).toEqual(move);
+    expect(parseKifMoveOrDrop(`${marker}獅子 （←5五）`)).toEqual(undefined);
+    expect(parseKifMoveOrDrop(`${marker}獅子 （←99一）`, move.to)).toEqual(undefined);
+  });
+}
 
 for (const [kif, usi] of [
   ['１０五獅子 （←９六）', '9f10e'],

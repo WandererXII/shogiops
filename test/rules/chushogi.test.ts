@@ -244,6 +244,51 @@ test('bare king', () => {
   expect(pos5.update({ turn: opposite(pos5.turn) }).outcome()).toEqual(undefined);
 });
 
+for (const color of ['sente', 'gote'] as const) {
+  test(`bare king win with both king and prince for ${color}`, () => {
+    for (const board of [
+      '11k/12/12/12/12/7p4/7R4/12/12/12/12/K+E10',
+      // Capturing the prince cannot save the bare king while the rook remains.
+      '10+Ek/12/12/12/12/7p4/7R4/12/12/12/12/K11',
+    ]) {
+      const coloredBoard =
+        color === 'sente'
+          ? board
+          : board.replace(/[a-z]/gi, (c) =>
+              c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase(),
+            );
+      const pos = parseSfen(
+        'chushogi',
+        `${coloredBoard} ${color === 'sente' ? 'b' : 'w'}`,
+        true,
+      ).unwrap();
+      const move = parseUsi('5g5f')!;
+      expect(pos.outcome()).toEqual(undefined);
+      expect(pos.isLegal(move)).toEqual(true);
+      expect(pos.play(move).outcome()).toEqual({ result: 'bareKing', winner: color });
+    }
+  });
+
+  test(`bare king can counter-bare a king and prince for ${color}`, () => {
+    const board = '10+Ek/12/12/12/12/12/12/12/12/12/12/K11';
+    const coloredBoard =
+      color === 'sente'
+        ? board
+        : board.replace(/[a-z]/gi, (c) =>
+            c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase(),
+          );
+    const pos = parseSfen(
+      'chushogi',
+      `${coloredBoard} ${color === 'sente' ? 'w' : 'b'}`,
+      true,
+    ).unwrap();
+    expect(pos.outcome()).toEqual(undefined);
+    const move = parseUsi('1a2a')!;
+    expect(pos.isLegal(move)).toEqual(true);
+    expect(pos.play(move).outcome()).toEqual({ result: 'draw', winner: undefined });
+  });
+}
+
 const chushogiPerfts: [string, number, number][] = [
   ['', 1, 36],
   ['', 2, 1296],

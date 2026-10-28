@@ -289,7 +289,7 @@ function isBareKing(pos: Chushogi, color: Color): boolean {
         .byRoles('pawn', 'lance')
         .intersect(SquareSet.fromRank(color === 'sente' ? 0 : dimensions(pos.rules).ranks - 1)),
     );
-  const theirKing = pos.kingsOf(theirColor).singleSquare();
+  const theirKings = pos.kingsOf(theirColor);
   const theirPieces = pos.board
     .byColor(theirColor)
     .diff(
@@ -308,8 +308,8 @@ function isBareKing(pos: Chushogi, color: Color): boolean {
     ourPieces.size() === 1 &&
     defined(ourKing) &&
     theirPieces.size() > 1 &&
-    defined(theirKing) &&
-    !pos.isCheck(theirColor) &&
+    theirKings.nonEmpty() &&
+    (theirKings.moreThanOne() || !pos.isCheck(theirColor)) &&
     (theirPieces.size() > 2 || kingAttacks(ourKing).intersect(theirPieces).isEmpty())
   );
 }

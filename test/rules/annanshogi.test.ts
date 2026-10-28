@@ -157,6 +157,27 @@ test('reject pawn-drop checkmate with borrowed movement', () => {
   }
 });
 
+test('allow nonchecking pawn drops that cause stalemate with borrowed movement', async (t) => {
+  const cases = [
+    ['9/9/9/9/4p4/4k4/9/4NG3/K8 b GP', 'P*5g'],
+    ['8k/3gn4/9/4K4/4P4/9/9/9/9 w gp', 'P*5c'],
+  ];
+  for (const [sfen, usi] of cases) {
+    await t.test(usi, () => {
+      const pos = parseSfen('annanshogi', sfen).unwrap();
+      const drop = parseUsi(usi)!;
+      const child = pos.play(drop);
+      expect(child.isCheck()).toEqual(false);
+      expect(child.outcome()).toEqual({ result: 'stalemate', winner: pos.turn });
+      expect(pos.isLegal({ role: 'gold', to: drop.to })).toEqual(true);
+      expect(pos.dropDests({ color: pos.turn, role: 'pawn' }).has(drop.to)).toEqual(true);
+      expect(pos.isLegal(drop)).toEqual(true);
+      const alternate = pos.update({ turn: child.turn });
+      expect(alternate.isLegal(drop, alternate.ctx(pos.turn))).toEqual(true);
+    });
+  }
+});
+
 test('allow pawn-drop checks with borrowed movement when the king can escape', () => {
   const cases = [
     ['4k4/9/3G1G3/9/4R4/4S4/9/9/K8 b P', '5d'],

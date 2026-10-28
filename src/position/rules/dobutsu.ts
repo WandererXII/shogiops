@@ -14,7 +14,7 @@ export class Dobutsu extends Position {
 
   static from(setup: Setup, strict: boolean): Result<Dobutsu, PositionError> {
     const pos = new Dobutsu(setup);
-    return pos.validate(strict).map((_) => pos);
+    return pos.validate(strict).map(() => pos);
   }
 
   validation = {

@@ -16,7 +16,7 @@ export class Annanshogi extends Position {
 
   static from(setup: Setup, strict: boolean): Result<Annanshogi, PositionError> {
     const pos = new Annanshogi(setup);
-    return pos.validate(strict).map((_) => pos);
+    return pos.validate(strict).map(() => pos);
   }
 
   validation = {

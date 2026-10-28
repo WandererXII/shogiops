@@ -312,10 +312,7 @@ export function normalizedKifLines(kif: string): string[] {
 
 export const chushogiKifMoveRegex: RegExp =
   /(?:^|[^0-9０-９])((?:(?:[０１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))|仝|同)\s?(\S{1,3}?)((?:（居食い）)|\(じっと\)|不成|成)?\s?[（|(|←]*((?:[０１２３４５６７８９]{1,2}|\d\d?)(?:十?[一二三四五六七八九十]))[）|)]/;
-function parseChushogiMove(
-  kifMd: string,
-  lastDest: Square | undefined = undefined,
-): MoveOrDrop | undefined {
+function parseChushogiMove(kifMd: string, lastDest?: Square): MoveOrDrop | undefined {
   const match = kifMd.match(chushogiKifMoveRegex);
   if (match) {
     const dest = match[1] === '同' || match[1] === '仝' ? lastDest : parseJapaneseSquare(match[1]);
@@ -338,10 +335,7 @@ export const kifDropRegex: RegExp =
   /(?:^|[^0-9０-９])((?:[１２３４５６７８９][一二三四五六七八九]|同\s?))(飛|角|金|銀|桂|香|歩|と|ひよこ|ぞう|きりん)打/;
 
 // Parsing kif moves/drops
-export function parseKifMoveOrDrop(
-  kifMd: string,
-  lastDest: Square | undefined = undefined,
-): MoveOrDrop | undefined {
+export function parseKifMoveOrDrop(kifMd: string, lastDest?: Square): MoveOrDrop | undefined {
   // Move
   const match = kifMd.match(kifMoveRegex);
   if (match) {
@@ -376,10 +370,7 @@ function lionStep(kifMd: string | undefined): 1 | 2 | undefined {
   return undefined;
 }
 
-export function parseKifMovesOrDrops(
-  kifMds: string[],
-  lastDest: Square | undefined = undefined,
-): MoveOrDrop[] {
+export function parseKifMovesOrDrops(kifMds: string[], lastDest?: Square): MoveOrDrop[] {
   const mds: MoveOrDrop[] = [];
   for (let i = 0; i < kifMds.length; i++) {
     const m = kifMds[i];

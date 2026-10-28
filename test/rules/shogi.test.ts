@@ -203,7 +203,7 @@ test('promotion', () => {
 });
 
 test('random perft', () => {
-  random.forEach(([_, sfen, d1, d2]) => {
+  random.forEach(([, sfen, d1, d2]) => {
     const pos = parseSfen('standard', sfen).unwrap();
     expect(perft(pos, 1)).toEqual(d1);
     expect(perft(pos, 2)).toEqual(d2);

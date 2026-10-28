@@ -42,7 +42,7 @@ export class Chushogi extends Position {
 
   static from(setup: Setup, strict: boolean): Result<Chushogi, PositionError> {
     const pos = new Chushogi(setup);
-    return pos.validate(strict).map((_) => pos);
+    return pos.validate(strict).map(() => pos);
   }
 
   validation = {

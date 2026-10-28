@@ -100,7 +100,7 @@ export class Board implements Iterable<[Square, Piece]> {
 
   presentRoles(): Role[] {
     return Array.from(this.roleMap)
-      .filter(([_, sqs]) => sqs.nonEmpty())
+      .filter(([, sqs]) => sqs.nonEmpty())
       .map(([r]) => r);
   }
 }

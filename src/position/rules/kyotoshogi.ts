@@ -25,7 +25,7 @@ export class Kyotoshogi extends Position {
 
   static from(setup: Setup, strict: boolean): Result<Kyotoshogi, PositionError> {
     const pos = new Kyotoshogi(setup);
-    return pos.validate(strict).map((_) => pos);
+    return pos.validate(strict).map(() => pos);
   }
 
   validation = {

@@ -22,7 +22,7 @@ test('roles outside minishogi', () => {
   const r1 = parseSfen('minishogi', '2k2/2p2/2l2/2P2/2K2 b - 1', true);
   expect(
     r1.unwrap(
-      (_) => undefined,
+      () => undefined,
       (err) => err.message,
     ),
   ).toEqual(InvalidSfen.BoardPiece);

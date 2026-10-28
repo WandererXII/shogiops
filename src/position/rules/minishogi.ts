@@ -21,7 +21,7 @@ export class Minishogi extends Position {
 
   static from(setup: Setup, strict: boolean): Result<Minishogi, PositionError> {
     const pos = new Minishogi(setup);
-    return pos.validate(strict).map((_) => pos);
+    return pos.validate(strict).map(() => pos);
   }
 
   squareAttackers(square: Square, attacker: Color, occupied: SquareSet): SquareSet {

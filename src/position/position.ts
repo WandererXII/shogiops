@@ -382,7 +382,7 @@ export abstract class Position {
       moveNumber: this.moveNumber + 1,
       board: nextBoard,
       hands: nextHands,
-      lastMoveOrDrop: md,
+      lastMoveOrDrop: { ...md },
       lastLionCapture: nextLastLionCapture,
     });
   }

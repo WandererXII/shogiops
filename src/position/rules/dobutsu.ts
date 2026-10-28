@@ -97,7 +97,7 @@ export class Dobutsu extends Position {
         result: 'tryRule',
         winner: 'gote',
       };
-    } else if (!this.hasDests()) {
+    } else if (!this.hasDests(ctx)) {
       return {
         result: 'stalemate',
         winner: opposite(ctx.color),

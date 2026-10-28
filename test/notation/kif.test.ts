@@ -351,6 +351,12 @@ test('parse kif moves/drops one by one', () => {
   expect(pos.outcome()?.result).toEqual('checkmate');
 });
 
+test('KIF destination files cannot be parsed from the end of a longer number', () => {
+  expect(parseKifMoveOrDrop('１１六歩(17)')).toEqual(undefined);
+  expect(parseKifMoveOrDrop('１１六歩打')).toEqual(undefined);
+  expect(parseKifMoveOrDrop('11六獅子 （←5五）')).toEqual(parseUsi('5e11f'));
+});
+
 test('parse same-destination drops', () => {
   for (const to of [parseUsi('1a1a')!.to, parseUsi('5e5e')!.to]) {
     for (const kif of ['同歩打', '同 歩打', '同　歩打']) {

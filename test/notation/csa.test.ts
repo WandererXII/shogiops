@@ -298,3 +298,28 @@ test('parse tags', () => {
     ['SITE', 'lishogi'],
   ]);
 });
+
+test('ignore comma-separated statements inside CSA comments', () => {
+  const pos = parseSfen('standard', initialSfen('standard')).unwrap();
+  expect(parseCsaHeader("PI\n+\n'ignored,-,P+00FU").unwrap()).toEqual(pos);
+  expect(parseTags("$EVENT:Real\n'ignored,$SITE:Injected")).toEqual([['EVENT', 'Real']]);
+});
+
+test('reject incomplete or mismatched CSA setup descriptors', () => {
+  for (const [header, error] of [
+    ['P+59OU00F\nP-51OU\n+', InvalidCsa.AdditionalInfo],
+    ['PI82HI22K\n-', InvalidCsa.Handicap],
+    ['PI82FU\n-', InvalidCsa.Handicap],
+  ]) {
+    const result = parseCsaHeader(header);
+    expect(result.isErr ? result.error.message : undefined).toEqual(error);
+  }
+});
+
+test('reject CSA moves with mismatched roles, signs or surrounding text', () => {
+  const pos = parseSfen('standard', '4k4/9/2P6/9/9/9/9/9/4K4 b - 1', true).unwrap();
+  for (const token of ['+7372HI', '-7372TO', "'variation +7372TO", '+7372TOgarbage']) {
+    expect(parseCsaMoveOrDrop(pos, token)).toEqual(undefined);
+  }
+  expect(parseCsaMoveOrDrop(pos, '+7372TO')).toEqual(parseUsi('7c7b+'));
+});

@@ -96,11 +96,14 @@ export function parseCsaHeader(csa: string): Result<Shogi, CsaError> {
 }
 
 export function parseCsaHandicap(handicap: string): Result<Board, CsaError> {
+  if (!/^PI(?:[1-9][1-9][a-z]{2})*$/i.test(handicap) || (handicap.length - 2) % 4 !== 0)
+    return Result.err(new CsaError(InvalidCsa.Handicap));
   const splitted = handicap.substring(2).match(/.{4}/g) || [];
   let intitalBoard = parseSfen('standard', initialSfen('standard'), false).unwrap().board;
   for (const s of splitted) {
     const sq = parseNumberSquare(s.substring(0, 2));
-    if (defined(sq)) {
+    const role = csaToRole(s.substring(2));
+    if (defined(sq) && defined(role) && intitalBoard.roleAt(sq) === role) {
       intitalBoard = intitalBoard.withoutPieceAt(sq);
     } else {
       return Result.err(new CsaError(InvalidCsa.Handicap));
@@ -142,6 +145,7 @@ function parseCsaBoard(csaBoard: string[]): Result<Board, CsaError> {
 
 function parseAdditions(initialPos: Setup, additions: string[]): Result<Setup, CsaError> {
   for (const line of additions) {
+    if ((line.length - 2) % 4 !== 0) return Result.err(new CsaError(InvalidCsa.AdditionalInfo));
     const color: Color = line[1] === '+' ? 'sente' : 'gote';
     for (const sp of line.substring(2).match(/.{4}/g) || []) {
       if (sp === '00AL') {
@@ -195,11 +199,15 @@ export function parseTags(csa: string): [string, string][] {
 }
 
 export function normalizedCsaLines(csa: string): string[] {
-  return csa
-    .replace(/,/g, '\n')
-    .split(/[\r\n]+/)
-    .map((l) => l.trim())
-    .filter((l) => l);
+  const lines: string[] = [];
+  for (const line of csa.split(/[\r\n]+/)) {
+    for (const statement of line.split(',')) {
+      const trimmed = statement.trim();
+      if (trimmed.startsWith("'")) break;
+      if (trimmed) lines.push(trimmed);
+    }
+  }
+  return lines;
 }
 
 //
@@ -208,13 +216,15 @@ export function normalizedCsaLines(csa: string): string[] {
 
 // Parsing CSA moves/drops
 export function parseCsaMoveOrDrop(pos: Shogi, csaMd: string): MoveOrDrop | undefined {
+  if ((csaMd[0] === '+' && pos.turn !== 'sente') || (csaMd[0] === '-' && pos.turn !== 'gote'))
+    return;
   // Move
   const match = csaMd.match(
-    /(?:[+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)/,
+    /^(?:[+-])?([1-9][1-9])([1-9][1-9])(OU|HI|RY|KA|UM|KI|GI|NG|KE|NK|KY|NY|FU|TO)$/,
   );
   if (!match) {
     // Drop
-    const match = csaMd.match(/(?:[+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)/);
+    const match = csaMd.match(/^(?:[+-])?00([1-9][1-9])(HI|KA|KI|GI|KE|KY|FU)$/);
     if (!match) return;
     const drop = {
       role: csaToRole(match[2])!,
@@ -224,11 +234,14 @@ export function parseCsaMoveOrDrop(pos: Shogi, csaMd: string): MoveOrDrop | unde
   }
   const role = csaToRole(match[3])!;
   const orig = parseNumberSquare(match[1])!;
+  const originalRole = pos.board.roleAt(orig);
+  if (!originalRole || (originalRole !== role && promote('standard')(originalRole) !== role))
+    return;
   return {
     from: orig,
     midStep: undefined,
     to: parseNumberSquare(match[2])!,
-    promotion: pos.board.pieceAt(orig)?.role !== role,
+    promotion: originalRole !== role,
   };
 }
 

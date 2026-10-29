@@ -1,5 +1,18 @@
 # Changelog for shogiops
 
+## v0.22.1
+
+- Added left 5-piece, left 7-piece and right 7-piece handicaps.
+- Fixed KIF parsing of tags, turn markers, alternate promoted piece names, dobutsu piece names and drops using the previous destination (`同`).
+- KIF headers now reject unknown handicaps; fixed parsing of chushogi two-step moves.
+- Fixed CSA handicap and move parsing, and handling of comments containing commas.
+- SFEN parsing now trims surrounding whitespace and underscores.
+- Improved chushogi Japanese move disambiguation and igui capture disambiguation in Japanese, Western, Western engine and Kitao-Kawasaki notation.
+- Fixed `Position.play` retaining a mutable reference to the supplied move or drop.
+- Allowed pawn drops causing stalemate in annanshogi.
+- Fixed the chushogi bare king rule when the winning side has two royal pieces, and dobutsu stalemate detection with a supplied context.
+- Fixed `parseNumberSquare` to accept all 16×16 coordinates produced by `makeNumberSquare`.
+
 ## v0.22.0
 
 - `Position`, `Board`, `Hands` and `Hand` are now immutable. Use returned instances, e.g. `const next = pos.play(move)`, and `Position.update` to change setup fields. Removed `clone` methods.

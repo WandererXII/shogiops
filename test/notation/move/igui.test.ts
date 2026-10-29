@@ -1,12 +1,12 @@
 import { test } from 'node:test';
-import { makeJapaneseMoveOrDrop } from '../../src/notation/move/japanese.js';
-import { makeKitaoKawasakiMoveOrDrop } from '../../src/notation/move/kitao-kawasaki.js';
-import { makeWesternMoveOrDrop } from '../../src/notation/move/western.js';
-import { makeWesternEngineMoveOrDrop } from '../../src/notation/move/western-engine.js';
-import { makeYorozuyaMoveOrDrop } from '../../src/notation/move/yorozuya.js';
-import { parseSfen } from '../../src/sfen.js';
-import { parseSquareName, parseUsi } from '../../src/util.js';
-import { expect } from '../debug.js';
+import { makeJapaneseMoveOrDrop } from '../../../src/notation/move/japanese.js';
+import { makeKitaoKawasakiMoveOrDrop } from '../../../src/notation/move/kitao-kawasaki.js';
+import { makeWesternMoveOrDrop } from '../../../src/notation/move/western.js';
+import { makeWesternEngineMoveOrDrop } from '../../../src/notation/move/western-engine.js';
+import { makeYorozuyaMoveOrDrop } from '../../../src/notation/move/yorozuya.js';
+import { parseSfen } from '../../../src/sfen.js';
+import { parseSquareName, parseUsi } from '../../../src/util.js';
+import { expect } from '../../debug.js';
 
 for (const [turn, board, target, rank, kanjiRank] of [
   ['b', '11k/12/12/8p3/7+D1+D2/12/12/12/12/12/12/K11', '4d', '4', '四'],

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
-import { findHandicap } from '../../src/handicaps.js';
-import { Hand } from '../../src/hands.js';
+import { findHandicap } from '../../../src/handicaps.js';
+import { Hand } from '../../../src/hands.js';
 import {
   InvalidKif,
   makeKifBoard,
@@ -15,12 +15,12 @@ import {
   parseKifMoveOrDrop,
   parseKifMovesOrDrops,
   parseTags,
-} from '../../src/notation/game/kif.js';
-import { dimensions } from '../../src/position/util.js';
-import { initialSfen, makeSfen, parseSfen } from '../../src/sfen.js';
-import type { Rules } from '../../src/types.js';
-import { parseUsi } from '../../src/util.js';
-import { expect } from '../debug.js';
+} from '../../../src/notation/game/kif.js';
+import { dimensions } from '../../../src/position/util.js';
+import { initialSfen, makeSfen, parseSfen } from '../../../src/sfen.js';
+import type { Rules } from '../../../src/types.js';
+import { parseUsi } from '../../../src/util.js';
+import { expect } from '../../debug.js';
 
 for (const rules of [
   'standard',

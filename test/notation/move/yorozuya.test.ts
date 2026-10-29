@@ -2,11 +2,11 @@ import { test } from 'node:test';
 import {
   convertJapaneseToYorozuya,
   makeYorozuyaMoveOrDrop,
-} from '../../src/notation/move/yorozuya.js';
-import { makeJapaneseSquare } from '../../src/notation/util.js';
-import { initialSfen, parseSfen } from '../../src/sfen.js';
-import { parseSquareName, parseUsi } from '../../src/util.js';
-import { expect } from '../debug.js';
+} from '../../../src/notation/move/yorozuya.js';
+import { makeJapaneseSquare } from '../../../src/notation/util.js';
+import { initialSfen, parseSfen } from '../../../src/sfen.js';
+import { parseSquareName, parseUsi } from '../../../src/util.js';
+import { expect } from '../../debug.js';
 
 test('chushogi origin disambiguation survives Yorozuya conversion', () => {
   const pos = parseSfen(

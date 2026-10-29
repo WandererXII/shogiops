@@ -1,8 +1,8 @@
 import { test } from 'node:test';
-import { makeKitaoKawasakiMoveOrDrop } from '../../src/notation/move/kitao-kawasaki.js';
-import { initialSfen, parseSfen } from '../../src/sfen.js';
-import { parseUsi } from '../../src/util.js';
-import { expect } from '../debug.js';
+import { makeKitaoKawasakiMoveOrDrop } from '../../../src/notation/move/kitao-kawasaki.js';
+import { initialSfen, parseSfen } from '../../../src/sfen.js';
+import { parseUsi } from '../../../src/util.js';
+import { expect } from '../../debug.js';
 
 test('basic moves', () => {
   const pos = parseSfen('standard', initialSfen('standard')).unwrap();

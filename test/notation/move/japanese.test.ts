@@ -1,8 +1,8 @@
 import { test } from 'node:test';
-import { makeJapaneseMoveOrDrop } from '../../src/notation/move/japanese.js';
-import { initialSfen, parseSfen } from '../../src/sfen.js';
-import { parseUsi } from '../../src/util.js';
-import { expect } from '../debug.js';
+import { makeJapaneseMoveOrDrop } from '../../../src/notation/move/japanese.js';
+import { initialSfen, parseSfen } from '../../../src/sfen.js';
+import { parseUsi } from '../../../src/util.js';
+import { expect } from '../../debug.js';
 
 test('chushogi origins distinguish lions with identical direction markers', () => {
   for (const turn of ['b', 'w']) {

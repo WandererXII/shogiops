@@ -7,12 +7,12 @@ import {
   parseCsaMoveOrDrop,
   parseCsaMovesOrDrops,
   parseTags,
-} from '../../src/notation/game/csa.js';
-import { parseNumberSquare } from '../../src/notation/util.js';
-import { IllegalSetup } from '../../src/position/position.js';
-import { initialSfen, parseSfen } from '../../src/sfen.js';
-import { parseSquareName, parseUsi } from '../../src/util.js';
-import { expect } from '../debug.js';
+} from '../../../src/notation/game/csa.js';
+import { parseNumberSquare } from '../../../src/notation/util.js';
+import { IllegalSetup } from '../../../src/position/position.js';
+import { initialSfen, parseSfen } from '../../../src/sfen.js';
+import { parseSquareName, parseUsi } from '../../../src/util.js';
+import { expect } from '../../debug.js';
 
 test('parse csa square', () => {
   expect(parseNumberSquare('11')).toEqual(parseSquareName('1a'));

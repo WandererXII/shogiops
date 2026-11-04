@@ -829,7 +829,7 @@ test('explicit turns override default and handicap turns without diagrams', () =
 for (const [name, rank] of [
   ['左五枚落ち', '1nsgkgs2'],
   ['左七枚落ち', '2sgkg3'],
-  ['右七枚落ち', '3gkgs2'],
+  ['七枚落ち', '3gkgs2'],
 ]) {
   test(`parse standard handicap ${name}`, () => {
     const pos = parseKifHeader(`手合割：${name}`).unwrap();

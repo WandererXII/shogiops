@@ -92,11 +92,6 @@ const standardHandicaps: Omit<Handicap, 'rules'>[] = [
     englishName: 'Left 7-piece',
   },
   {
-    sfen: '3gkgs2/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
-    japaneseName: '右七枚落ち',
-    englishName: 'Right 7-piece',
-  },
-  {
     sfen: '3gkg3/9/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL w - 1',
     japaneseName: '八枚落ち',
     englishName: '8-piece',
@@ -251,19 +246,19 @@ export const handicaps: Handicap[] = [
   {
     rules: 'chushogi',
     sfen: 'lfcsgekgscfl/a1b1txxt1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1T+O+OT1B1A/LFCSGKEGSCFL w - 1',
-    japaneseName: '3枚獅子',
+    japaneseName: '三枚獅子',
     englishName: '3-piece lion',
   },
   {
     rules: 'chushogi',
     sfen: 'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1T+OXT1B1A/LFCSGKEGSCFL w - 1',
-    japaneseName: '2枚獅子',
+    japaneseName: '二枚獅子',
     englishName: '2-lions',
   },
   {
     rules: 'chushogi',
     sfen: 'lfcsgekgscfl/a1b1txot1b1a/mvrhdqndhrvm/pppppppppppp/3i4i3/12/12/3I4I3/PPPPPPPPPPPP/MVRHDNQDHRVM/A1B1TOXT1B1A/LFCSGK+EGSCFL w - 1',
-    japaneseName: '2枚王',
+    japaneseName: '二枚王',
     englishName: '2-kings',
   },
   // annanshogi

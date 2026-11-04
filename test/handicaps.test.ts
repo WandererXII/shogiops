@@ -5,12 +5,26 @@ import { initialSfen, parseSfen } from '../src/sfen.js';
 import { expect } from './debug.js';
 
 test('proper count', () => {
-  expect(findHandicaps({ rules: 'standard' }).length).toEqual(37);
+  expect(findHandicaps({ rules: 'standard' }).length).toEqual(36);
   expect(findHandicaps({ rules: 'minishogi' }).length).toEqual(5);
   expect(findHandicaps({ rules: 'chushogi' }).length).toEqual(3);
   expect(findHandicaps({ rules: 'annanshogi' }).length).toEqual(15);
   expect(findHandicaps({ rules: 'kyotoshogi' }).length).toEqual(7);
-  expect(findHandicaps({ rules: 'checkshogi' }).length).toEqual(37);
+  expect(findHandicaps({ rules: 'checkshogi' }).length).toEqual(36);
+});
+
+test('unique positions within each ruleset', () => {
+  for (const h of handicaps)
+    expect(findHandicaps({ rules: h.rules, sfen: h.sfen }).length).toEqual(1);
+});
+
+test('Japanese names use kanji numerals', () => {
+  for (const h of handicaps) expect(/[0-9０-９]/u.test(h.japaneseName)).toEqual(false);
+  expect(findHandicaps({ rules: 'chushogi' }).map((h) => h.japaneseName)).toEqual([
+    '三枚獅子',
+    '二枚獅子',
+    '二枚王',
+  ]);
 });
 
 test('only one field', () => {

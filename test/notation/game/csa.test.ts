@@ -292,10 +292,15 @@ test('parse tags', () => {
   expect(
     parseTags(`
     $EVENT:Championship
-    $SITE:lishogi`),
+    $NOCOLON
+    $SITE:lishogi
+    $START_TIME:12:34:56
+    $OPENING:`),
   ).toEqual([
     ['EVENT', 'Championship'],
     ['SITE', 'lishogi'],
+    ['START_TIME', '12:34:56'],
+    ['OPENING', ''],
   ]);
 });
 

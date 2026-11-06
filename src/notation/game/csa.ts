@@ -195,7 +195,8 @@ function parseAdditions(initialPos: Setup, additions: string[]): Result<Setup, C
 export function parseTags(csa: string): [string, string][] {
   return normalizedCsaLines(csa)
     .filter((l) => l.startsWith('$'))
-    .map((l) => l.substring(1).split(/:(.*)/, 2) as [string, string]);
+    .map((l) => l.substring(1).split(/:(.*)/, 2))
+    .filter((tag): tag is [string, string] => tag.length === 2);
 }
 
 export function normalizedCsaLines(csa: string): string[] {

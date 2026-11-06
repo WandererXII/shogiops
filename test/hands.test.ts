@@ -1,7 +1,19 @@
 import { test } from 'node:test';
-import { Hands } from '../src/hands.js';
+import { Hand, Hands } from '../src/hands.js';
 import type { Piece } from '../src/types.js';
 import { expect } from './debug.js';
+
+test('Hand.from clamps negative counts to zero', () => {
+  const hand = Hand.from([
+    ['pawn', -2],
+    ['rook', 1],
+  ]);
+
+  expect(hand.count()).toEqual(1);
+  expect(hand.get('pawn')).toEqual(0);
+  expect(hand.get('rook')).toEqual(1);
+  expect(hand.nonEmpty()).toEqual(true);
+});
 
 test('set and get', () => {
   const hands = Hands.empty();

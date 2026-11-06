@@ -10,7 +10,9 @@ export class Hand {
   }
 
   static from(iter: Iterable<[Role, number]>): Hand {
-    return new Hand(new Map(iter));
+    const handMap = new Map<Role, number>();
+    for (const [role, count] of iter) handMap.set(role, Math.max(count, 0));
+    return new Hand(handMap);
   }
 
   combine(other: Hand): Hand {

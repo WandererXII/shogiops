@@ -939,6 +939,31 @@ test('scalashogiCharPair - drops', () => {
   expect(convStr('R*9i')).toEqual(`st`);
 });
 
+test('scalashogiCharPair - minishogi drops', () => {
+  expect(convStr('R*1a', 'minishogi')).toEqual('#<');
+  expect(convStr('B*1a', 'minishogi')).toEqual('#=');
+  expect(convStr('G*1a', 'minishogi')).toEqual('#>');
+  expect(convStr('S*1a', 'minishogi')).toEqual('#?');
+  expect(convStr('P*1a', 'minishogi')).toEqual('#@');
+});
+
+test('scalashogiCharPair - kyotoshogi drops', () => {
+  expect(convStr('T*1a', 'kyotoshogi')).toEqual('#<');
+  expect(convStr('S*1a', 'kyotoshogi')).toEqual('#=');
+  expect(convStr('G*1a', 'kyotoshogi')).toEqual('#>');
+  expect(convStr('P*1a', 'kyotoshogi')).toEqual('#?');
+  expect(convStr('L*1a', 'kyotoshogi')).toEqual('#@');
+  expect(convStr('B*1a', 'kyotoshogi')).toEqual('#A');
+  expect(convStr('N*1a', 'kyotoshogi')).toEqual('#B');
+  expect(convStr('R*1a', 'kyotoshogi')).toEqual('#C');
+});
+
+test('scalashogiCharPair - dobutsu drops', () => {
+  expect(convStr('R*1a', 'dobutsu')).toEqual('#/');
+  expect(convStr('B*1a', 'dobutsu')).toEqual('#0');
+  expect(convStr('P*1a', 'dobutsu')).toEqual('#1');
+});
+
 test('scalashogiCharPair - lion moves', () => {
   expect(convStr('5e4d3c', 'chushogi')).toEqual(`WÎ`);
   expect(convStr('5e4d4c', 'chushogi')).toEqual(`WÆ`);

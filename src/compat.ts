@@ -1,9 +1,9 @@
 import type { Position } from './position/position.js';
 import type { Chushogi } from './position/rules/chushogi.js';
 import { secondLionStepDests } from './position/rules/chushogi.js';
-import { dimensions, fullSquareSet, promote } from './position/util.js';
+import { dimensions, fullSquareSet, handRoles, promote } from './position/util.js';
 import type { SquareSet } from './square-set.js';
-import type { DropMove, MoveOrDrop, PieceName, Rules, Square, SquareName } from './types.js';
+import type { DropMove, MoveOrDrop, PieceName, Role, Rules, Square, SquareName } from './types.js';
 import {
   defined,
   isDrop,
@@ -89,14 +89,16 @@ export function scalashogiCharPair(md: MoveOrDrop, rules: Rules): string {
     return charOffset + fullSquareSet(rules).size() + toMidStep + 8 * toDest;
   }
 
-  if (isDrop(md))
+  if (isDrop(md)) {
+    const dropRoles: Role[] =
+      rules === 'kyotoshogi'
+        ? ['tokin', 'silver', 'gold', 'pawn', 'lance', 'bishop', 'knight', 'rook']
+        : handRoles(rules);
     return String.fromCharCode(
       squareToCharCode(md.to),
-      charOffset +
-        81 +
-        ['rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'].indexOf(md.role),
+      charOffset + fullSquareSet(rules).size() + dropRoles.indexOf(md.role),
     );
-  else {
+  } else {
     const from = squareToCharCode(md.from);
     const to = defined(md.midStep)
       ? lionMoveToChar(md.from, md.to, md.midStep, rules)

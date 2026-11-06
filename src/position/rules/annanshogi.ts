@@ -2,7 +2,7 @@ import type { Result } from '@badrap/result';
 import { attacks, between, ray } from '../../attacks.js';
 import { Board } from '../../board.js';
 import { SquareSet } from '../../square-set.js';
-import type { Color, Piece, Setup, Square } from '../../types.js';
+import type { Color, Piece, Role, Setup, Square } from '../../types.js';
 import { defined, opposite, squareFile } from '../../util.js';
 import type { Context, PositionError } from '../position.js';
 import { Position } from '../position.js';
@@ -176,11 +176,11 @@ export const directlyBehind = (color: Color, square: Square): Square => {
 
 // Changes the pieces in front of other friendly piece to said pieces
 export const annanAttackBoard = (board: Board): Board => {
-  let newBoard = Board.empty();
+  const roles = new Map<Role, SquareSet>();
   for (const [sq, piece] of board) {
     const pieceBehind = board.pieceAt(directlyBehind(piece.color, sq));
     const role = pieceBehind?.color === piece.color ? pieceBehind.role : piece.role;
-    newBoard = newBoard.withPieceAt(sq, { role, color: piece.color });
+    roles.set(role, (roles.get(role) ?? SquareSet.empty()).with(sq));
   }
-  return newBoard;
+  return Board.from(board.occupied, board.sente, board.gote, roles);
 };

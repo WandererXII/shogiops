@@ -244,6 +244,16 @@ test('bare king', () => {
   expect(pos5.update({ turn: opposite(pos5.turn) }).outcome()).toEqual(undefined);
 });
 
+test('bare king takes precedence over stalemate', () => {
+  const pos = parseSfen(
+    'chushogi',
+    '10PK/10PP/10L1/12/12/12/12/12/12/12/k11/12 b - 1',
+    true,
+  ).unwrap();
+  expect(pos.hasDests()).toEqual(false);
+  expect(pos.outcome()).toEqual({ result: 'bareKing', winner: 'sente' });
+});
+
 for (const color of ['sente', 'gote'] as const) {
   test(`bare king win with both king and prince for ${color}`, () => {
     for (const board of [

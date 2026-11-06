@@ -173,12 +173,7 @@ export class Chushogi extends Position {
         result: 'kingsLost',
         winner: opposite(ctx.color),
       };
-    else if (!this.hasDests(ctx)) {
-      return {
-        result: 'stalemate',
-        winner: opposite(ctx.color),
-      };
-    } else if (isBareKing(this, 'sente')) {
+    else if (isBareKing(this, 'sente')) {
       return {
         result: 'bareKing',
         winner: 'gote',
@@ -187,6 +182,11 @@ export class Chushogi extends Position {
       return {
         result: 'bareKing',
         winner: 'sente',
+      };
+    } else if (!this.hasDests(ctx)) {
+      return {
+        result: 'stalemate',
+        winner: opposite(ctx.color),
       };
     } else if (isDraw(this)) {
       return {

@@ -75,6 +75,23 @@ test('incomplete sfen hand counts return an error', () => {
   }
 });
 
+test('zero digits in sfen ranks return a board dimensions error', () => {
+  const sfen = initialSfen('standard');
+  for (const invalid of [sfen.replace('LNSGKGSNL', 'LNSGKGSNL0'), sfen.replace('/9/', '/09/')]) {
+    const result = parseSfen('standard', invalid, true);
+    expect(result.isErr ? result.error.message : undefined).toEqual(InvalidSfen.BoardDims);
+  }
+});
+
+test('zero sfen hand counts return a hands error', () => {
+  for (const hand of ['0P', '0K', '00P', 'P0P']) {
+    const sfen = initialSfen('standard').replace(' - ', ` ${hand} `);
+    for (const result of [parseHands('standard', hand), parseSfen('standard', sfen, true)]) {
+      expect(result.isErr ? result.error.message : undefined).toEqual(InvalidSfen.Hands);
+    }
+  }
+});
+
 test('sfen empty-hand marker must be the entire hands field', () => {
   for (const hand of ['-P', 'P-p']) {
     expect(parseHands('standard', hand).isErr).toEqual(true);

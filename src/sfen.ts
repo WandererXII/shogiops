@@ -109,6 +109,7 @@ export function parseBoardSfen(rules: Rules, boardPart: string): Result<Board, S
     } else {
       const step = Number.parseInt(c, 10);
       if (!isNaN(step)) {
+        if (step === 0 && empty === 0) return Result.err(new SfenError(InvalidSfen.BoardDims));
         file = file + empty - (empty * 10 + step);
         empty = empty * 10 + step;
       } else {
@@ -143,7 +144,7 @@ export function parseHands(rules: Rules, handsPart: string): Result<Hands, SfenE
         i++;
       }
     } else count = 1;
-    if (i >= handsPart.length) return Result.err(new SfenError(InvalidSfen.Hands));
+    if (count === 0 || i >= handsPart.length) return Result.err(new SfenError(InvalidSfen.Hands));
     let piece: Piece | undefined = forsythToPiece(rules)(handsPart[i]);
     if (!piece) return Result.err(new SfenError(InvalidSfen.Hands));
     if (rules === 'kyotoshogi' && !handRoles(rules).includes(piece.role))
